@@ -1,0 +1,76 @@
+&adjust
+
+    j_multi    = 0.7
+
+/
+
+&incurray
+
+    eqdsk_name = "__IPS_CONTROL__"
+    nprofs     = 51
+    nraypts    = 6000
+    nthin      = 9
+    islofa     = -1
+    inc        = 1
+    maxref     = 6
+    bmax       = 30
+    psi0       = 0.95
+    psistep    = 2.5e-2
+    iprof      = 1
+    pkexpnt    = 1.0e-3
+    freqcy     = 56.0e6
+    epserr     = 2.0e-2
+    epser1     = 4.0e-3
+    igraph     = 1
+    iprint     = 0
+    idcur      = 1
+    indvar     = 1
+    ioread     = 1
+    ichois     = 2
+    igrill     = -3
+    thgril     = -17.0
+    modcd      = 0
+    idmpsw     = 1
+    nprim      = 2
+    nspec      = 4
+    nimp       = 2
+    nminor     = 0
+    atm        = 2.0 3.0 12.0 4.0
+    azi        = 1.0 1.0 6.0 2.0
+    kboot      = 0
+    kalfa      = 0
+    nalfa      = 0
+    isimm      = 6
+    nspect     = 6
+    ptot0      = 20.0
+    nnkpar     = 6*1
+    powers     = 3.590455366479703
+                 0.2620020914535602
+                 0.7468390531419337
+                 4.038406692651392
+                 7.487403745603194
+                 3.874893050670216
+    anzinf     = -11.15800000000000
+                 -6.160000000000000
+                 -1.976000000000000
+                  1.976000000000000
+                  3.603000000000000
+                  5.346000000000000
+    anzsup     = -11.15900000000000
+                 -6.161000000000000
+                 -1.977000000000000
+                  1.975000000000000
+                  3.602000000000000
+                  5.345000000000000
+    nnkpol     = 6*1
+    anpinf     = 6*0.0
+    anpsup     = 6*0.0
+    heigth     = 200.0
+    irayio     = 0
+    icurdr     = 0
+    idrive     = 1
+    iounit     = 6 12 13 14 15 16
+    ebkev      = 0.0
+    atmf       = 0.0
+    azf        = 0.0
+/

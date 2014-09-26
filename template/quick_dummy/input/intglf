@@ -1,0 +1,24 @@
+&tglfin
+
+    xnu_model_tg  = 2
+
+    igeo_tg       = 1
+    
+    use_bper_tg   = False
+    use_bpar_tg   = False
+    
+    alpha_e_tg    = 1.0
+    alpha_p_tg    = 1.0
+
+    alpha_quench_tg = 1.0
+    
+    ns_tg   = 2
+    
+    mass_tg(1)    = 2.723D-4  !me/mdeuterium
+    mass_tg(2)    = 1.25      !0.5*(2.0+3.0)/2.0
+    mass_tg(3)    = 6.0       !mcarbon/mdeuterium
+    
+    zs_tg(1)      =-1.0
+    zs_tg(2)      = 1.0
+    zs_tg(3)      = 6.0
+/

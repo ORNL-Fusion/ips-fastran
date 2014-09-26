@@ -1,0 +1,11 @@
+# Last modified: 06/17/2014
+# JM
+
+export FASTRAN_ROOT=/global/u1/p/parkjm/fastran
+export DATA_ROOT=/global/u1/p/parkjm/fastran
+
+export PYTHONPATH=$FASTRAN_ROOT/lib/python:$PYTHONPATH
+export PYTHONPATH=$FASTRAN_ROOT/utils:$PYTHONPATH
+export PYTHONPATH=$FASTRAN_ROOT/src:$PYTHONPATH
+
+export PREACTDIR=/project/projectdirs/m876/PREACT

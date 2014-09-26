@@ -1,0 +1,11 @@
+# Last modified: 06/17/2014
+# JM
+
+setenv FASTRAN_ROOT /global/u1/p/parkjm/fastran
+setenv DATA_ROOT  /global/u1/p/parkjm/fastran
+
+setenv PYTHONPATH $FASTRAN_ROOT/lib/python:$PYTHONPATH
+setenv PYTHONPATH $FASTRAN_ROOT/utils:$PYTHONPATH
+setenv PYTHONPATH $FASTRAN_ROOT/src:$PYTHONPATH
+
+setenv PREACTDIR /project/projectdirs/m876/PREACT

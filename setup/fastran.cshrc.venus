@@ -1,0 +1,21 @@
+# Last modified: 06/17/2014
+# JM
+
+setenv IPS_ROOT /d/ips/ips
+setenv FASTRAN_ROOT /d/ips/fastran
+setenv DATA_ROOT /d/ips
+setenv MPI_ROOT /u/parkjm/share/mpich
+
+if ( ! ($?PYTHONPATH) ) then
+    setenv PYTHONPATH 
+endif
+setenv PYTHONPATH $FASTRAN_ROOT/lib/python:$PYTHONPATH
+setenv PYTHONPATH $FASTRAN_ROOT/utils:$PYTHONPATH
+setenv PYTHONPATH $FASTRAN_ROOT/src:$PYTHONPATH
+
+setenv PATH $MPI_ROOT/bin:$FASTRAN_ROOT/bin:$FASTRAN_ROOT/utils:$PATH
+
+setenv PREACTDIR $DATA_ROOT/data/preact
+
+setenv LD_LIBRARY_PATH /u/parkjm/share/netcdf/lib:$LD_LIBRARY_PATH 
+setenv LD_LIBRARY_PATH /c/source/PGI/pgi/linux86/8.0-2/lib:$LD_LIBRARY_PATH 

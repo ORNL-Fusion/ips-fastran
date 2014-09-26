@@ -1,0 +1,168 @@
+! based on Ron's setup
+! ITER EC
+
+&GENR
+   MNEMONIC =  'genray'
+   RAYOP =  'netcdf'
+   DIELECTRIC_OP =  'disabled'
+   R0X =   1.00000
+   B0 =   1.00000
+   OUTDAT =  'zrn.dat'
+   STAT =  'new'
+&END
+
+&TOKAMAK
+   EQDSKIN =  '__IPS_CONTROL__'
+   INDEXRHO =   2
+   IPSI =   1
+   IONETWO =   1
+   IEFFIC =   4
+   PSIFACTR =   0.999000
+   DELTRIPL =   0.00000
+   NLOOP =   24
+   I_RIPPLE =   1
+&END
+
+&WAVE
+   FRQNCY =   170.000
+   IOXM =   1
+   IREFLM =   1
+   JWAVE =   1
+   ISTART =   1
+   DELPWRMN =   1.00000e-04
+   IBW =   0
+   I_VGR_INI =   1
+   POLDIST_MX =   5.00000
+&END
+
+&SCATNPER
+&END
+
+&DISPERS
+   IB =   1
+   ID =   2
+   IHERM =   1
+   IABSORP =   1
+   ISWITCH =   0
+   DEL_Y =   0.00100000
+   JY_D =   1
+   IDSWITCH =   2
+   IABSWITCH =   1
+   N_RELT_HARM =   5
+   N_RELT_INTGR =   50
+   IFLUX =   2
+   I_IM_NPERP =   1
+&END
+
+&NUMERCL
+   IRKMETH =   2
+   NDIM1 =   6
+   ISOLV =   1
+   IDIF =   1
+   NRELT =   1000
+   PRMT1 =   0.00000
+   PRMT2 =   999900.
+   PRMT3 =   1.00000e-04
+   PRMT4 =   1.00000e-05
+   PRMT6 =   0.00375000
+   ICORRECT =   1
+   IOUT3D =  'enable'
+   MAXSTEPS_RK =   10000
+&END
+
+&OUTPUT
+   IWCNTR =   0
+   IWOPEN =   1
+   IWJ =   1
+   ITOOLS =   0
+   I_PLOT_B =   0
+   I_PLOT_D =   0
+&END
+
+&PLASMA
+   NDENS =   101
+   NBULK =   1
+   IZEFF =   2
+   IDENS =   1
+   TEMP_SCALE =   1.00000
+   DEN_SCALE =   1.00000
+&END
+
+&SPECIES
+   CHARGE =  1.00000  1.00000  6.00000
+   DMAS   =  1.00000  3674.00  22044.0
+&END
+
+&VARDEN
+&END
+
+&GRILL
+&END
+
+&ECCONE
+   NCONE = 1
+   POWTOT = 20.00000
+   RAYPATT = 'toray'
+   RST = 9.20
+   ZST = 1.21
+   ALFAST = 220.0
+   BETAST = 90.0
+   PHIST  = 0.00000
+   ALPHA1 = 0.63580
+   GZONE  = 5
+   MRAY   = 1  5  12  12  18
+   CR     = 0.00  0.10  0.05  -0.05  0.05
+&END
+
+&DENTAB
+   PROF = '__IPS_CONTROL__' 
+&END
+
+&TEMTAB
+   PROF = '__IPS_CONTROL__'
+&END
+
+&TPOPTAB
+   PROF = 101*0.0
+&END
+
+&VFLOWTAB
+   PROF = 101*0.0
+&END
+
+&ZEFTAB
+   ZEFF1 = '__IPS_CONTROL__' 
+&END
+
+&READ_DISKF
+   I_DISKF =   0
+   NETCDFNM =  'netcdfnm.nc'
+   JX =   200
+   LRZ =   20
+   IYM =   100
+   NGEN =   1
+   RTEM0 =   10.0000
+   R1T =   1.00000
+   R2T =   0.00000
+   RTAIL =   0.00000
+   TTAIL =   1.00000
+   R1H =   1.00000
+   R2H =   0.00000
+   RHOT =   0.00250000
+   THOTPAR  =   1.00000
+   THOTPER  =   1.00000
+   HOTMNPAR =   1.00000
+   HOTMXPAR =   2.00000
+   HOTMNPER =   1.00000
+   HOTMXPER =   2.00000
+   HOTEXP =   0.00000
+   R1B =   1.00000
+   R2B =   2.00000
+   RBEAM =   0.00000
+   EBEAM =   1.00000
+   THBEAM =   30.0000
+   TBEAM =   1.00000
+&END
+
+&EMISSION
+&END
