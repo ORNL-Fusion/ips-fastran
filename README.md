@@ -1,4 +1,4 @@
 fastran
 =======
 
-IPS binind of fastran and fastran-related components
+IPS binding of fastran and fastran-related components
