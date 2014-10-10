@@ -52,7 +52,6 @@ class toray(Component):
 
         #--- get plasma state file name
 
-        cur_instate_file = services.get_config_param('CURRENT_INSTATE')
         cur_state_file = services.get_config_param('CURRENT_STATE')
         cur_eqdsk_file = services.get_config_param('CURRENT_EQDSK')
 
@@ -61,8 +60,6 @@ class toray(Component):
         services.stage_input_files(self.INPUT_FILES)
 
         #--- generate toray input
-
-        instate = Namelist(cur_instate_file,case="lower")
 
         geq = zefitutil.readg(cur_eqdsk_file) 
         r0  = geq["rzero" ]
@@ -87,9 +84,6 @@ class toray(Component):
         print 'number of gyrotron: ',ntoray
         for k in range(ntoray):
 
-            # prof,intoray_k = ztoray.io_input_from_instate(instate,intoray,k)
-            # ztoray.write_toray_input(geq,ps,prof,intoray_k)
-
             ztoray.io_input_from_state(geq,ps,intoray,k)
             
             #--- run toray
@@ -110,7 +104,6 @@ class toray(Component):
 
         #--- get toray output
 
-        #ztoray.io_update_instate(geq,cur_instate_file,intoray)
         ztoray.io_update_state(geq,ps,intoray)
    
         ps.close()

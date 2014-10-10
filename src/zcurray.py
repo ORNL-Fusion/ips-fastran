@@ -259,9 +259,9 @@ def io_update_state(f_state,f_geq,f_outcurray,f_incurray):
     pe_ps = 1.0e6*interp1d(rho,pe,kind='cubic')(rho_ps)
     pi_ps = 1.0e6*interp1d(rho,pi,kind='cubic')(rho_ps)
 
-    ps.load_j_parallel_CD(jp_ps,"ic")
-    ps.load_profile(pe_ps,"pmine","vol")
-    ps.load_profile(pi_ps,"pmini","vol")
+    ps.load_j_parallel_CD(rho_ps,jp_ps,"ic")
+    ps.load_profile(rho_ps,pe_ps,"pmine","vol")
+    ps.load_profile(rho_ps,pi_ps,"pmini","vol")
 
     ps.close()
 

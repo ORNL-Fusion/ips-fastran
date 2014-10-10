@@ -11,6 +11,7 @@ import os
 from numpy import *
 import netCDF4
 from Namelist import Namelist
+from zinterp import zinterp
 
 class plasma_state_file():
 
@@ -32,13 +33,14 @@ class plasma_state_file():
         self.ip = ip
 
         self.map = { 
-            "bs":"curr_bootstrap",
-            "oh":"curr_ohmic",
-            "nb":"curbeam",
-            "ec":"curech",
-            "ic":"curich" }
+            "bs":["curr_bootstrap","rho"],
+            "oh":["curr_ohmic","rho"],
+            "nb":["curbeam","rho_nbi"],
+            "ec":["curech","rho_ecrf"],
+            "ic":["curich","rho_icrf"] }
     
     def info(self):
+
         pass
 
     def close(self):
@@ -56,33 +58,43 @@ class plasma_state_file():
         self[key][0] = 0.0 
         for i in range(1,self.nrho):
             self[key][i] = self[key][i-1]+prof[i]*(zone[i]-zone[i-1])
-        print self[key][:]
         if sum>0.0:
             self[key][:] *= sum/self[key][-1]
-        print self[key][:]
 
-    def load_profile(self,prof,key,mode,sum=0.0):
+    def load_profile(self,rho,prof,key,mode,sum=0.0):
 
-        zone = self[mode]
+        zone_spl = zinterp(self["rho"][:],self[mode][:])
+        prof_spl = zinterp(rho,prof)
+
+        rho_key = self["rho"+self[key].dimensions[-1].split("rho")[-1]][:]
+
         tmp = 0.0
-        for i in range(self.nrho-1):
-            self[key][i] = 0.5*(prof[i+1]+prof[i])*(zone[i+1]-zone[i])
+        for i in range(len(rho_key)-1):
+            self[key][i] = 0.5*(prof_spl(rho_key[i+1])+prof_spl(rho_key[i])) \
+                              *(zone_spl(rho_key[i+1])-zone_spl(rho_key[i]))
             tmp += self[key][i]
         if sum>0.0:
             self[key][:] *= sum/tmp
         print 'integrated : ',tmp
 
-    def dump_profile(self,key,mode,k=-1):
+    def dump_profile(self,rho,key,mode,k=-1):
 
-        zone = self[mode][:]
+        zone_spl = zinterp(self["rho"][:],self[mode][:])
+
+        rho_key = self["rho"+self[key].dimensions[-1].split("rho")[-1]][:]
+        nrho_key = len(rho_key)
+
         if k>=0: 
             prof = self[key][k][:]
         else:
             prof = self[key][:]
-        rvec = zeros(self.nrho-1)
-        for i in range(self.nrho-1):
-            rvec[i] = prof[i]/(zone[i+1]-zone[i])
-        return self.cell2node(rvec)
+
+        cell = zeros(nrho_key-1)
+        for i in range(nrho_key-1):
+            cell[i] = prof[i]/(zone_spl(rho_key[i+1])-zone_spl(rho_key[i]))
+        node = self.cell2node(cell)
+
+        return zinterp(rho_key,node)(rho)
 
     def load_j_parallel(self,jpar):
 
@@ -125,51 +137,59 @@ class plasma_state_file():
 
         return self.cell2node(jpar)
 
-    def load_j_parallel_CD(self,jpar,mode):
+    def load_j_parallel_CD(self,rhoin,jparin,key):
 
-        curt = zeros(self.nrho)
+        xkey = self.map[key][1]
+        ykey = self.map[key][0]
+
+        rho = self[xkey][:]
+        curt = zeros(len(rho))
 
         r0   = self.r0
         b0   = self.b0
-        rho  = self["rho"][:]
-        ipol = self["g_eq"][:]/(r0*b0)
-        vol  = self["vol"][:]
-        area = self["area"][:]
+        ipol = zinterp(self["rho"][:],self["g_eq"][:]/(r0*b0))(rho)
+        vol  = zinterp(self["rho"][:],self["vol"][:])(rho)
+        area = zinterp(self["rho"][:],self["area"][:])(rho)
+
+        jpar = zinterp(rhoin,jparin)(rho)
 
         curt[0] = 0.0
-        for i in range(self.nrho-1):
+        for i in range(len(rho)-1):
             dV = vol[i+1]-vol[i]
             jparm = 0.5*(jpar[i]+jpar[i+1])
             ipolm = 0.5*(ipol[i]+ipol[i+1])
             curt[i+1] = (curt[i]/ipol[i]+jparm*dV/(2.0*pi*r0*ipolm**2))*ipol[i+1]
 
-        print "I%s=%5.3e"%(mode,1.0e-6*curt[-1])+"MA"
+        print "I%s=%5.3e"%(key,1.0e-6*curt[-1])+"MA"
 
-        for i in range(self.nrho-1):
-            self[self.map[mode]][i] = curt[i+1]-curt[i]
+        for i in range(len(rho)-1):
+            self[ykey][i] = curt[i+1]-curt[i]
 
-    def dump_j_parallel_CD(self,mode):
+    def dump_j_parallel_CD(self,rhoin,key):
         
-        curt = zeros(self.nrho)
-        jpar = self[self.map[mode]][:] 
+        ykey = self.map[key][0]
+        xkey = self.map[key][1]
+
+        rho = self[xkey][:]
+        jpar = self[ykey][:]
+        curt = zeros(len(rho))
 
         r0 = self.r0
         b0 = self.b0
-        rho  = self["rho"][:]
-        ipol = self["g_eq"][:]/(r0*b0)
-        vol  = self["vol"][:]
-        area = self["area"][:]
+        ipol = zinterp(self["rho"][:],self["g_eq"][:]/(r0*b0))(rho)
+        vol  = zinterp(self["rho"][:],self["vol"][:])(rho)
+        area = zinterp(self["rho"][:],self["area"][:])(rho)
 
         curt[0] = 0.0
-        for i in range(self.nrho-1): 
+        for i in range(len(rho)-1): 
             curt[i+1] = curt[i]+jpar[i]
 
-        for i in range(self.nrho-1):
+        for i in range(len(rho)-1):
             dV = vol[i+1]-vol[i]
             ipolm = 0.5*(ipol[i]+ipol[i+1])
             jpar[i] = 2.0*pi*r0*ipolm**2/dV*(curt[i+1]/ipol[i+1]-curt[i]/ipol[i])
 
-        return self.cell2node(jpar)
+        return zinterp(rho,self.cell2node(jpar))(rhoin)
 
     def node2cell(self,node):
     
@@ -186,8 +206,8 @@ class plasma_state_file():
         node[0] = cell[0]
         for i in range(1,nrho-1):
             node[i] = 0.5*(cell[i-1]+cell[i])
-       #node[-1] = cell[-1]
-        node[-1] = 2.0*cell[-1]-node[-2]
+        node[-1] = cell[-1]
+       #node[-1] = 2.0*cell[-1]-node[-2]
         return node
 
 #    def node2cell(self,node):
@@ -214,7 +234,7 @@ def instate2ps(instate,ps):
     #------------------------------------------------------------------
     # from instate
 
-    nrho  = instate["nrho" ][0]
+    nrho  = instate["nrho"][0]
 
     n_ion = instate["n_ion"][0]
     z_ion = instate["z_ion"]
@@ -232,6 +252,8 @@ def instate2ps(instate,ps):
     omega = array(instate["omega"])
     zeff = array(instate["zeff"])
     density_beam = array(instate["density_beam"])
+
+    rho = ps["rho"][:]
 
     #------------------------------------------------------------------
     # density
@@ -325,11 +347,11 @@ def instate2ps(instate,ps):
     j_bs  = 1.0e6*array(instate["j_bs"])
     j_oh  = 1.0e6*array(instate["j_oh"])
 
-    ps.load_j_parallel_CD(j_nb,"nb")
-    ps.load_j_parallel_CD(j_ec,"ec")
-    ps.load_j_parallel_CD(j_ic,"ic")
-    ps.load_j_parallel_CD(j_bs,"bs")
-    ps.load_j_parallel_CD(j_oh,"oh")
+    ps.load_j_parallel_CD(rho,j_nb,"nb")
+    ps.load_j_parallel_CD(rho,j_ec,"ec")
+    ps.load_j_parallel_CD(rho,j_ic,"ic")
+    ps.load_j_parallel_CD(rho,j_bs,"bs")
+    ps.load_j_parallel_CD(rho,j_oh,"oh")
 
     #------------------------------------------------------------------
     # heating

@@ -109,8 +109,8 @@ def io_update_state(f_state,f_eqdsk):
     jp_ps = 1.0e6*zinterp(rho,j_par)(rho_ps)
     pe_ps = 1.0e6*zinterp(rho,prf_e)(rho_ps)
 
-    ps.load_j_parallel_CD(jp_ps,"ec")
-    ps.load_profile(pe_ps,"peech","vol")
+    ps.load_j_parallel_CD(rho_ps,jp_ps,"ec")
+    ps.load_profile(rho_ps,pe_ps,"peech","vol")
 
     ps.close()
 

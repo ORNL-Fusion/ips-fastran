@@ -389,6 +389,7 @@ def io_input_from_state(f_geqdsk,f_ps,f_inbc):
     ps = plasma_state_file(f_ps,r0=r0,b0=b0,ip=ip)
 
     nrho  = ps.nrho
+
     rho   = ps["rho"][:]
     ne    = ps["ns"][0,:]*1.0e-19
     ni    = ps["ni"][:]*1.0e-19
@@ -399,11 +400,11 @@ def io_input_from_state(f_geqdsk,f_ps,f_inbc):
     te    = ps.cell2node(te)
     ti    = ps.cell2node(ti)
 
-    wbeam = ps.dump_profile("eperp_beami","vol",k=0) \
-          + ps.dump_profile("epll_beami" ,"vol",k=0)
+    wbeam = ps.dump_profile(rho,"eperp_beami","vol",k=0) \
+          + ps.dump_profile(rho,"epll_beami" ,"vol",k=0)
 
-    walp = ps.dump_profile("eperp_fusi","vol",k=0) \
-         + ps.dump_profile("epll_fusi", "vol",k=0)
+    walp = ps.dump_profile(rho,"eperp_fusi","vol",k=0) \
+         + ps.dump_profile(rho,"epll_fusi", "vol",k=0)
 
     pmhd = 1.602e3*(ne*te+ni*ti)+2.0/3.0*1.602e-16*(wbeam+walp)
 

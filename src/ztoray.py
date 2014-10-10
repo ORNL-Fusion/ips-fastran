@@ -509,8 +509,8 @@ def io_update_state(geq,ps,intoray):
     jec_ps = 1.0e6*interp1d(rho,jec_sum,kind='cubic')(rho_ps)
     pec_ps = 1.0e6*interp1d(rho,qec_sum,kind='cubic')(rho_ps)
 
-    ps.load_j_parallel_CD(jec_ps,"ec")
-    ps.load_profile(pec_ps,"peech","vol")
+    ps.load_j_parallel_CD(rho_ps,jec_ps,"ec")
+    ps.load_profile(rho_ps,pec_ps,"peech","vol")
     
 
 ###############################################################################

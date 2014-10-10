@@ -9,12 +9,11 @@
 
 import sys,os,shutil
 from numpy import *
+import netCDF4
 
 #--- zcode libraries
 from Namelist import Namelist
 import zfdat, zefitutil
-
-import netCDF4
 from zinterp import zinterp
 from zplasmastate import plasma_state_file
 
@@ -111,32 +110,33 @@ def io_write_input(f_state,f_eqdsk):
     fp = zeros(nrho)
 
     j_tot = 1.0e-6*ps.dump_j_parallel()
-    j_nb  = 1.0e-6*ps.dump_j_parallel_CD("nb")
-    j_rf  = 1.0e-6*(ps.dump_j_parallel_CD("ec")+ps.dump_j_parallel_CD("ic"))
+
+    j_nb  = 1.0e-6*ps.dump_j_parallel_CD(rho,"nb")
+    j_rf  = 1.0e-6*(ps.dump_j_parallel_CD(rho,"ec")+ps.dump_j_parallel_CD(rho,"ic"))
     j_bs  = zeros(nrho)
 
-    density_beam = ps.dump_profile("nbeami","vol",k=0)*1.e-19
-    wbeam = ps.dump_profile("eperp_beami","vol",k=0) \
-          + ps.dump_profile("epll_beami" ,"vol",k=0)
+    density_beam = ps.dump_profile(rho,"nbeami","vol",k=0)*1.e-19
+    wbeam = ps.dump_profile(rho,"eperp_beami","vol",k=0) \
+          + ps.dump_profile(rho,"epll_beami" ,"vol",k=0)
     wbeam = density_beam*wbeam*1.602e-3 #MJ/m**3
 
-    pe_nb  = ps.dump_profile("pbe" ,"vol")*1.e-6
-    pi_nb  = ps.dump_profile("pbi" ,"vol")*1.e-6
-    pth_nb = ps.dump_profile("pbth","vol")*1.e-6
+    pe_nb  = ps.dump_profile(rho,"pbe" ,"vol")*1.e-6
+    pi_nb  = ps.dump_profile(rho,"pbi" ,"vol")*1.e-6
+    pth_nb = ps.dump_profile(rho,"pbth","vol")*1.e-6
 
-    density_alpha = ps.dump_profile("nfusi","vol",k=0)*1.e-19
-    walpha = ps.dump_profile("eperp_fusi","vol",k=0) \
-         + ps.dump_profile("epll_fusi","vol",k=0)
+    density_alpha = ps.dump_profile(rho,"nfusi","vol",k=0)*1.e-19
+    walpha = ps.dump_profile(rho,"eperp_fusi","vol",k=0) \
+         + ps.dump_profile(rho,"epll_fusi","vol",k=0)
     walpha = density_alpha*walpha*1.602e-3 #MJ/m**3
 
-    pe_fus  = ps.dump_profile("pfuse" ,"vol")*1.e-6
-    pi_fus  = ps.dump_profile("pfusi" ,"vol")*1.e-6
-    pth_fus = ps.dump_profile("pfusth","vol")*1.e-6
+    pe_fus  = ps.dump_profile(rho,"pfuse" ,"vol")*1.e-6
+    pi_fus  = ps.dump_profile(rho,"pfusi" ,"vol")*1.e-6
+    pth_fus = ps.dump_profile(rho,"pfusth","vol")*1.e-6
 
-    pe_rf  = ps.dump_profile("peech","vol") \
-           + ps.dump_profile("pmine","vol")
+    pe_rf  = ps.dump_profile(rho,"peech","vol") \
+           + ps.dump_profile(rho,"pmine","vol")
     pe_rf *= 1.e-6
-    pi_rf  = ps.dump_profile("pmini","vol")
+    pi_rf  = ps.dump_profile(rho,"pmini","vol")
     pi_rf *= 1.e-6
 
     p_rad= zeros(nrho)
@@ -342,8 +342,8 @@ def io_update_state(
     ps["omegat"][:] = ps.node2cell(omega)
 
     ps.load_j_parallel(j_tot)
-    ps.load_j_parallel_CD(j_bs,"bs")
-    ps.load_j_parallel_CD(j_oh,"oh")
+    ps.load_j_parallel_CD(rho,j_bs,"bs")
+    ps.load_j_parallel_CD(rho,j_oh,"oh")
 
     #------------------------------------------------------------------
     # write plasma state

@@ -48,7 +48,7 @@ class fastran_solver(Component):
 
         cur_state_file = services.get_config_param('CURRENT_STATE')
         cur_eqdsk_file = services.get_config_param('CURRENT_EQDSK')
-        cur_fastran_file = services.get_config_param('CURRENT_FASTRAN')
+        #cur_fastran_file = services.get_config_param('CURRENT_FASTRAN')
 
         #--- stage input files
 
@@ -88,7 +88,7 @@ class fastran_solver(Component):
            f_state=cur_state_file,f_eqdsk=cur_eqdsk_file,
            f_fastran='fastran.nc',time = timeStamp)
 
-        shutil.copyfile('fastran.nc',cur_fastran_file)
+        #shutil.copyfile('fastran.nc',cur_fastran_file)
 
         #--- update plasma state files
 

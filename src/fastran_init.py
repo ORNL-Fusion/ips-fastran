@@ -83,22 +83,28 @@ class fastran_init (Component):
 
             services.stage_input_files(self.INPUT_FILES)
 
+            #----------------------------------------------------------
+            #-- get plasma state file names
+
             cur_state_file = services.get_config_param('CURRENT_STATE')
             cur_eqdsk_file = services.get_config_param('CURRENT_EQDSK')
-            cur_instate_file = services.get_config_param('CURRENT_INSTATE')
-            cur_fastran_file = services.get_config_param('CURRENT_FASTRAN')
             cur_bc_file = services.get_config_param('CURRENT_BC')
 
-            os.system("touch %s"%cur_fastran_file)
+            #----------------------------------------------------------
+            #-- get pstool excutable name
+
+            try:
+                pstool_bin = os.path.join(self.BIN_PATH, self.BIN)
+            except:
+                pstool_bin = os.path.join(self.BIN_PATH, 'pstool')
+            print pstool_bin
+
 
             #----------------------------------------------------------
             #-- initial plasma state file from instate
 
-            try:
-                shutil.copyfile("instate",cur_instate_file)
-            except Exception, e:
-                print 'No input instate file ', e
-                raise
+            if "instate" not in self.INPUT_FILES:
+                raise Exception('no instate file provided')
 
             instate = Namelist("instate")["instate"]
             nrho = instate["nrho"][0]
@@ -144,12 +150,6 @@ class fastran_init (Component):
 
             inps.write("inps")
 
-            try:
-                pstool_bin = os.path.join(self.BIN_PATH, self.BIN)
-            except:
-                pstool_bin = os.path.join(self.BIN_PATH, 'pstool')
-            print pstool_bin
-
             print 'pstool init'
 
             logfile=open("pstool_init.log","w")
@@ -157,8 +157,8 @@ class fastran_init (Component):
                           stdout=logfile,stderr=logfile)
             logfile.close()
             if (retcode != 0):
-               print 'Error executing ', pstool_bin
-               raise
+               raise Exception('Error executing ', pstool_bin)
+
 
             #----------------------------------------------------------
             #-- load innubeam to plasma state
@@ -248,7 +248,7 @@ class fastran_init (Component):
 
             shutil.copyfile("ps.nc",cur_state_file)
             shutil.copyfile("geqdsk",cur_eqdsk_file)
-    
+
         # --------------------------------------------------------------
         # Update plasma state
 
