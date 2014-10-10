@@ -1,8 +1,9 @@
 # Last modified: 06/17/2014
 # JM
 
-export IPS_ROOT=/d/ips/ips
-export FASTRAN_ROOT=/d/ips/fastran
+#export IPS_ROOT=/d/ips/ips
+#export FASTRAN_ROOT=/d/ips/fastran
+
 export DATA_ROOT=/d/ips
 export MPI_ROOT=/u/parkjm/share/mpich
 
