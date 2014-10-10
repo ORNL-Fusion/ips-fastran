@@ -99,7 +99,7 @@ class fastran_driver(Component):
 
         for k in range(nstep):
 
-            iStamp = "iteration_%d"%k
+            iStamp = k #"iteration_%d"%k
 
             print ''
             print 72*"="
@@ -126,12 +126,12 @@ class fastran_driver(Component):
             if 'TR' in port_names:
                 self.component_call(services,'TR',port_dict['TR'],'step',iStamp) #t)
             if 'MONITOR' in port_names:
-                self.component_call(services,'MOINTOR',port_dict['MONITOR'],'step',k) #iStamp) #t)
+                self.component_call(services,'MOINTOR',port_dict['MONITOR'],'step',iStamp) #t)
 
             services.stage_plasma_state()
 
           # post step processing: stage plasma state, checkpoint components and self
-          # services.stage_output_files(t, self.OUTPUT_FILES)
+            services.stage_output_files(t, self.OUTPUT_FILES)
           # services.checkpoint_components(port_id_list, t)
           # self.checkpoint(t)
 
