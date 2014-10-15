@@ -115,18 +115,18 @@ def io_write_input(f_state,f_eqdsk):
     j_rf  = 1.0e-6*(ps.dump_j_parallel_CD(rho,"ec")+ps.dump_j_parallel_CD(rho,"ic"))
     j_bs  = zeros(nrho)
 
-    density_beam = ps.dump_profile(rho,"nbeami","vol",k=0)*1.e-19
-    wbeam = ps.dump_profile(rho,"eperp_beami","vol",k=0) \
-          + ps.dump_profile(rho,"epll_beami" ,"vol",k=0)
+    density_beam = ps.dump_profile(rho,"nbeami",k=0)*1.e-19
+    wbeam = ps.dump_profile(rho,"eperp_beami",k=0) \
+          + ps.dump_profile(rho,"epll_beami" ,k=0)
     wbeam = density_beam*wbeam*1.602e-3 #MJ/m**3
 
     pe_nb  = ps.dump_profile(rho,"pbe" ,"vol")*1.e-6
     pi_nb  = ps.dump_profile(rho,"pbi" ,"vol")*1.e-6
     pth_nb = ps.dump_profile(rho,"pbth","vol")*1.e-6
 
-    density_alpha = ps.dump_profile(rho,"nfusi","vol",k=0)*1.e-19
-    walpha = ps.dump_profile(rho,"eperp_fusi","vol",k=0) \
-         + ps.dump_profile(rho,"epll_fusi","vol",k=0)
+    density_alpha = ps.dump_profile(rho,"nfusi",k=0)*1.e-19
+    walpha = ps.dump_profile(rho,"eperp_fusi",k=0) \
+         + ps.dump_profile(rho,"epll_fusi",k=0)
     walpha = density_alpha*walpha*1.602e-3 #MJ/m**3
 
     pe_fus  = ps.dump_profile(rho,"pfuse" ,"vol")*1.e-6
