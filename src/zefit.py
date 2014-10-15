@@ -54,13 +54,13 @@ def fixbdry_kfile(shot,time,f_inefit,p_scale=1.0,efitdir='.'):
     print 'efitdir = ',efitdir
     print 'gfile   = ',gfile
 
-    geq = zefitdata.efitdata(gfile,"ps"
-              ,nrho=129,nrho_eq=129,nth_eq=101,nrho_eq_geo=129)
+    geq = zefitdata.efitdata(gfile,nrho_eq=129,nth_eq=101,nrho_eq_geo=129)
 
-    psirho = geq["ps"]["psipol"]/geq["ps"]["psipol"][-1]  # equi-drho grid
+    psirho = geq["psipol"]/geq["psipol"][-1]  # equi-drho grid
     dpsi = abs(geq["ssibry"]-geq["ssimag"])
 
-    rhob = (geq["ps"]["phit"][-1]/pi/abs(geq["bcentr"]))**0.5 
+    rhob = (geq["phit"][-1]/pi/abs(geq["bcentr"]))**0.5 
+
     nrho = len(psirho)
     rho = arange(nrho)/(nrho-1.0)
     drho = 1.0/(nrho-1.0)
@@ -71,11 +71,11 @@ def fixbdry_kfile(shot,time,f_inefit,p_scale=1.0,efitdir='.'):
     rho_eval = rhopsi_spl(psi)
     rho_eval[0]  = 0.0
     rho_eval[-1] = 1.0
- 
-    ipol = geq["ps"]["g_eq"]/(r0*b0)
-    volp = 4.0*pi*pi*rho*rhob*r0/ipol/(r0*r0*geq["ps"]["gr2i"])
-    rm2  = geq["ps"]["gr2i"]
-    qmhd = geq["ps"]["q_eq"]
+
+    ipol = geq["g_eq"][:]/(r0*b0)
+    volp = 4.0*pi*pi*rho*rhob*r0/ipol/(r0*r0*geq["gr2i"][:])
+    rm2  = geq["gr2i"][:]
+    qmhd = geq["q_eq"][:]
 
     #-------------------------------------------------------------------
     # spline profiles

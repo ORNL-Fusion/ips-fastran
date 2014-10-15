@@ -2,7 +2,7 @@
 
 """
  -----------------------------------------------------------------------
- fastran efit component 
+ efit component 
  JM
  -----------------------------------------------------------------------
 """
@@ -15,7 +15,8 @@ from  component import Component
 
 #-------------------
 #--- zcode libraries
-import zefit
+import zefit, zefitutil
+from zplasmastate import plasma_state_file
 
 class efit(Component):
 
@@ -48,12 +49,14 @@ class efit(Component):
 
         #--- get plasma state file names
 
-        cur_instate_file = services.get_config_param('CURRENT_INSTATE')
-        cur_eqdsk = services.get_config_param('CURRENT_EQDSK')
+        cur_state_file = services.get_config_param('CURRENT_STATE')
+        cur_eqdsk_file = services.get_config_param('CURRENT_EQDSK')
+        cur_bc_file = services.get_config_param('CURRENT_BC')
 
         #--- generate inefit
 
-        zefit.io_input_from_instate(cur_instate_file)
+        zefit.io_input_from_state(
+            cur_eqdsk_file,cur_state_file,cur_bc_file)
 
         #--- run efit
 
@@ -61,7 +64,6 @@ class efit(Component):
             efit_bin = os.path.join(self.BIN_PATH, self.BIN)
         except:
             efit_bin = os.path.join(self.BIN, 'efitd90 129 129')
-        print fastran_bin
 
         niter = 5
         shot=0
@@ -72,7 +74,7 @@ class efit(Component):
         logfile.close()
         for k in range(niter):
 
-            print "generate kfile"
+            print "generate kfile %d"%k
             if k == 0:
                 zefit.fixbdry_kfile_init(shot,time,f_inefit)
             else:
@@ -82,7 +84,6 @@ class efit(Component):
             kfile = "k000000.00000"
             args = "2\n 1\n "+kfile
             command = 'echo \"%s\"'%args + ' | ' + efit_bin 
-
             logfile = open('efit.log', 'a')
             retcode = subprocess.call([command]
                           ,stdout=logfile,stderr=logfile,shell=True)
@@ -93,7 +94,45 @@ class efit(Component):
 
         #--- update local geqdsk state
 
-        shutil.copyfile('g000000.00000', cur_eqdsk)
+        shutil.copyfile("g000000.00000", cur_eqdsk_file)
+
+        #--- load geqdsk to plasma state file
+
+        shutil.copyfile("g000000.00000", "geqdsk")
+        shutil.copyfile(cur_state_file,"ps.nc")
+
+        try:
+            FASTRAN_ROOT = os.environ["FASTRAN_ROOT"]
+            DIR_BIN = os.path.join(FASTRAN_ROOT,"bin")
+            pstool_bin = os.path.join(DIR_BIN,"pstool")
+        except:
+            pstool_bin = 'pstool'
+
+        geq = zefitutil.readg("geqdsk") 
+        r0  = geq["rzero" ]
+        b0  = abs(geq["bcentr"])
+        ip  = geq['cpasma']
+        print 'r0 = ',r0
+        print 'b0 = ',b0
+        print 'ip = ',ip 
+
+        ps = plasma_state_file("ps.nc",r0=r0,b0=b0,ip=ip)
+        j_tot = ps.dump_j_parallel()
+        ps.close()
+
+        logfile = open('pstool.log', 'w')
+        retcode = subprocess.call([pstool_bin, "load", "geqdsk", "1.0d-6"],
+                      stdout=logfile,stderr=logfile)
+        logfile.close()
+        if (retcode != 0):
+           print 'Error executing ', pstool_bin
+           raise
+
+        ps = plasma_state_file("ps.nc",r0=r0,b0=b0,ip=ip)
+        ps.load_j_parallel(j_tot)
+        ps.close()
+
+        shutil.copyfile("ps.nc",cur_state_file)
 
         #--- update plasma state files
 
