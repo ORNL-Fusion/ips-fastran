@@ -9,9 +9,12 @@
 
 import sys,os,shutil
 from numpy import * 
-from scipy.interpolate import interp1d
 import netCDF4
+from scipy.interpolate import interp1d
+from scipy import optimize
+
 from Namelist import Namelist
+from zinterp import zinterp
 
 def write_toray_input(geq,prof,intoray):
 
@@ -255,33 +258,38 @@ def get_nread(n,ncol=5):
     return nr
 
 ###############################################################################
-# utils 
+# utils adjust
 
-def integrate_current(jpar,geq):
+def cur_integral(rho,jpar,geq):
+
+    vol  = zinterp(geq["rho"][:],geq["vol"][:])(rho)
+    g_eq = zinterp(geq["rho"][:],geq["g_eq"][:])(rho)
+    r0 = geq.r0
+    b0 = abs(geq.b0)
 
     I = 0.0
-    nrho = len(jpar)
+    nrho = len(rho)
     for i in range(1,nrho):
         jpar_m = 0.5*(jpar[i]+jpar[i-1])
-        dvol   = (geq["ps"]["vol"][i]-geq["ps"]["vol"][i-1])
-        ipol_m = 0.5*(geq["ps"]["g_eq"][i]+geq["ps"]["g_eq"][i-1])
-        ipol_m/= geq["rzero"]*geq["bcentr"]
-        I += jpar_m*dvol/ipol_m**2/(2.0*pi*geq["rzero"])
+        dvol   = (vol[i]-vol[i-1])
+        ipol_m = 0.5*(g_eq[i]+g_eq[i-1])
+        ipol_m/= r0*b0
+        I += jpar_m*dvol/ipol_m**2/(2.0*pi*r0)
     return I 
 
-def vol_integral(f,geq):
+def vol_integral(rho,f,geq):
 
     val = 0.0
-    nrho = len(f)
+    nrho = len(rho)
+    vol  = zinterp(geq["rho"][:],geq["vol"][:])(rho)
     for i in range(nrho-1):
         f_m = 0.5*(f[i]+f[i-1])
-        dvol = geq["ps"]["vol"][i+1]-geq["ps"]["vol"][i]
+        dvol = vol[i+1]-vol[i]
         val += f_m*dvol
     return val
 
 def fit_gaussian(rho,f):
 
-    from scipy import optimize
 
     fitfunc = lambda p, x: p[0]*exp(-(x-p[1])**2/(2*p[2]**2))
     errfunc = lambda p, x, y: fitfunc(p, x)-y
@@ -296,14 +304,12 @@ def fit_gaussian(rho,f):
 
 def adjust_jec(width,xmid,fmax,Iec,nrho,geq):
 
-    from scipy import optimize
-
     gauss = lambda p, x: p[0]*exp(-(x-p[1])**2/(2*p[2]**2))
 
     def func(f):
         x = arange(nrho)/(nrho-1.0)
         y = gauss( [f,xmid,width], x )
-        return integrate_current(y,geq)-Iec
+        return cur_integral(x,y,geq)-Iec
 
     tmp = optimize.bisect(func,0.0,10*fmax,xtol=1.0e-6)
 
@@ -314,14 +320,12 @@ def adjust_jec(width,xmid,fmax,Iec,nrho,geq):
 
 def adjust_qec(width,xmid,fmax,Pec,nrho,geq):
 
-    from scipy import optimize
-
     gauss = lambda p, x: p[0]*exp(-(x-p[1])**2/(2*p[2]**2))
 
     def func(f):
         x = arange(nrho)/(nrho-1.0)
         y = gauss( [f,xmid,width], x )
-        return vol_integral(y,geq)-Pec
+        return vol_integral(x,y,geq)-Pec
 
     tmp = optimize.bisect(func,0.0,10.0*fmax,xtol=1.0e-6)
 
@@ -366,7 +370,7 @@ def io_update_instate(geq,f_instate,intoray):
         f_ncfile = "toray_%d.nc"%k
         outtoray = read_toray_output(f_ncfile)
 
-        nrho = outtoray["outtoray"]["nrho"]
+        nrho = outtoray["outtoray"]["nrho"][0]
         rho  = outtoray["outtoray"]["rho" ]     #[] 
         jec  = outtoray["outtoray"]["jec" ]     #[A/m^2/W]
         qec  = outtoray["outtoray"]["qec" ]     #[W/m^3/W]
@@ -462,7 +466,7 @@ def io_update_state(geq,ps,intoray):
         f_ncfile = "toray_%d.nc"%k
         outtoray = read_toray_output(f_ncfile)
 
-        nrho = outtoray["outtoray"]["nrho"]
+        nrho = outtoray["outtoray"]["nrho"][0]
         rho  = outtoray["outtoray"]["rho" ]     #[] 
         jec  = outtoray["outtoray"]["jec" ]     #[A/m^2/W]
         qec  = outtoray["outtoray"]["qec" ]     #[W/m^3/W]
@@ -488,12 +492,12 @@ def io_update_state(geq,ps,intoray):
 
             fit_coeff = fit_gaussian(rho,jec)
             fit = adjust_jec(
-                      0.5*width,fit_coeff[1],fit_coeff[0],Iec,nrho,geq)
+                      0.5*width,fit_coeff[1],fit_coeff[0],Iec,nrho,ps) #geq)
             jec = fit
 
             fit_coeff = fit_gaussian(rho,qec)
             fit = adjust_qec(
-                      0.5*width,fit_coeff[1],fit_coeff[0],Pec,nrho,geq)
+                      0.5*width,fit_coeff[1],fit_coeff[0],Pec,nrho,ps) #geq)
             qec = fit
 
         if k==0:
