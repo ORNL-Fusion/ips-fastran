@@ -7,7 +7,7 @@
  -----------------------------------------------------------------------
 """
 
-import os
+import os,subprocess,glob
 from numpy import *
 import netCDF4
 from Namelist import Namelist
@@ -38,6 +38,16 @@ class plasma_state_file():
             "nb":["curbeam","rho_nbi"],
             "ec":["curech","rho_ecrf"],
             "ic":["curich","rho_icrf"] }
+
+        try:
+            FASTRAN_ROOT = os.environ["FASTRAN_ROOT"]
+            DIR_BIN = os.path.join(FASTRAN_ROOT,"bin")
+            self.pstool_bin = os.path.join(DIR_BIN,"pstool")
+        except:
+            self.pstool_bin = 'pstool'
+
+        self.f_ps = f_ps
+        self.mode = mode
     
     def info(self):
 
@@ -46,6 +56,10 @@ class plasma_state_file():
     def close(self):
 
         self.data.close()
+        log=open("pstool.log","w")
+        retcode = subprocess.call([self.pstool_bin, "rehash",self.f_ps],
+            stdout=log,stderr=log)
+        log.close()
 
     def __getitem__(self, key):
 
@@ -77,24 +91,39 @@ class plasma_state_file():
             self[key][:] *= sum/tmp
         print 'integrated : ',tmp
 
-    def dump_profile(self,rho,key,mode,k=-1):
+    def dump_profile(self,rho,key,mode=None,k=-1):
 
-        zone_spl = zinterp(self["rho"][:],self[mode][:])
+        if mode in ["vol","area"]:
 
-        rho_key = self["rho"+self[key].dimensions[-1].split("rho")[-1]][:]
-        nrho_key = len(rho_key)
+            zone_spl = zinterp(self["rho"][:],self[mode][:])
+    
+            rho_key = self["rho"+self[key].dimensions[-1].split("rho")[-1]][:]
+            nrho_key = len(rho_key)
+    
+            if k>=0: 
+                prof = self[key][k][:]
+            else:
+                prof = self[key][:]
+    
+            cell = zeros(nrho_key-1)
+            for i in range(nrho_key-1):
+                cell[i] = prof[i]/(zone_spl(rho_key[i+1])-zone_spl(rho_key[i]))
+            node = self.cell2node(cell)
+    
+            rvec = zinterp(rho_key,node)(rho)
 
-        if k>=0: 
-            prof = self[key][k][:]
         else:
-            prof = self[key][:]
 
-        cell = zeros(nrho_key-1)
-        for i in range(nrho_key-1):
-            cell[i] = prof[i]/(zone_spl(rho_key[i+1])-zone_spl(rho_key[i]))
-        node = self.cell2node(cell)
+            rho_key = self["rho"+self[key].dimensions[-1].split("rho")[-1]][:]
 
-        return zinterp(rho_key,node)(rho)
+            if k>=0: 
+                prof = self[key][k][:]
+            else:
+                prof = self[key][:]
+
+            rvec = zinterp(rho_key,self.cell2node(prof))(rho)
+
+        return rvec
 
     def load_j_parallel(self,jpar):
 
