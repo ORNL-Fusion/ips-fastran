@@ -7,14 +7,16 @@
  -----------------------------------------------------------------------
 """
 
-import sys,os,os.path,shutil,pickle
+import sys,os,os.path,shutil,pickle,glob
 import subprocess
 from numpy import *
+import netCDF4
 
 from  component import Component
 
 # import zcode libraries
 import Namelist
+from zplasmastate import plasma_state_file
 
 class nubeam(Component):
 
@@ -48,6 +50,8 @@ class nubeam(Component):
         nubeam_files = Namelist.Namelist()
         nubeam_files["NUBEAM_FILES"]["INPUT_PLASMA_STATE"] = \
             [cur_state_file]
+        #nubeam_files["NUBEAM_FILES"]["OUTPUT_PLASMA_STATE"] = \
+        #    [cur_state_file]
         nubeam_files["NUBEAM_FILES"]["PLASMA_STATE_UPDATE"] = \
             ["state_changes.cdf"]
         nubeam_files["NUBEAM_FILES"]["INIT_NAMELIST"] = \
@@ -57,6 +61,8 @@ class nubeam(Component):
         nubeam_files = Namelist.Namelist()
         nubeam_files["NUBEAM_FILES"]["INPUT_PLASMA_STATE"] = \
             [cur_state_file]
+        #nubeam_files["NUBEAM_FILES"]["OUTPUT_PLASMA_STATE"] = \
+        #    [cur_state_file]
         nubeam_files["NUBEAM_FILES"]["PLASMA_STATE_UPDATE"] = \
             ["state_changes.cdf"]
         nubeam_files["NUBEAM_FILES"]["STEP_NAMELIST"] = \
@@ -126,6 +132,7 @@ class nubeam(Component):
 
         #--- update plasma state
 
+        services.update_plasma_state() #<== ugly
         services.merge_current_plasma_state("state_changes.cdf",
                      logfile='log.update_state')
 
@@ -168,11 +175,30 @@ class nubeam(Component):
 
         ncpu =  int(self.NPROC)
         nstep = innubeam["nubeam_run"]["nstep"][0]
+        try:
+            navg = innubeam["nubeam_run"]["navg"][0]
+        except:
+            navg = 0
+        if nstep-navg < 0: 
+           raise Exception("nubeam.py: nstep < navg")
+
         dt_nubeam = innubeam["nubeam_run"]["dt_nubeam"][0]
 
         print "ncpu  = ",ncpu
         print "dt    = ",dt_nubeam
         print "nstep = ",nstep
+        print "navg  = ",navg
+
+        difb_0  = innubeam["nbi_model"]["difb_0"  ][0]
+        difb_a  = innubeam["nbi_model"]["difb_a"  ][0]
+        difb_in = innubeam["nbi_model"]["difb_in" ][0]
+        difb_out= innubeam["nbi_model"]["difb_out"][0]
+
+        ps = plasma_state_file(cur_state_file)
+        rho_anom = ps["rho_anom"][:]
+        ps["difb_nbi"][:] = difb_a \
+            +(difb_0-difb_a)*(1.0-rho_anom**difb_in)**difb_out
+        ps.close()
 
         try:
             nubeam_bin = os.path.join(self.BIN_PATH, self.BIN)
@@ -180,28 +206,65 @@ class nubeam(Component):
             nubeam_bin = os.path.join(self.BIN_PATH, 'mpi_nubeam_comp_exec')
 
         os.environ['NUBEAM_ACTION'] = 'STEP'
-        os.environ['NUBEAM_REPEAT_COUNT'] = '%dx%f'%(nstep,dt_nubeam)
-        os.environ['NUBEAM_POSTPROC'] = 'FBM_WRITE'
+        os.environ['NUBEAM_REPEAT_COUNT'] = '%dx%f'%(nstep-navg,dt_nubeam)
         os.environ['STEPFLAG'] = 'TRUE'
-        os.environ['NUBEAM_POSTPROC'] = 'summary_test'
+        os.environ['NUBEAM_POSTPROC'] = 'SUMMARY_TEST' #'FBM_WRITE'
         try:
             del os.environ['FRANTIC_INIT']
         except:
             pass
         os.environ['FRANTIC_ACTION'] = 'NONE' #'none' #'execute'
 
-        print nubeam_bin
-        print os.environ['NUBEAM_REPEAT_COUNT'] 
+        #--- run nstep-navg
 
+        print os.environ['NUBEAM_REPEAT_COUNT'] 
         task_id = services.launch_task(self.NPROC, workdir, nubeam_bin, logfile = 'log.nubeam')
         retcode = services.wait_task(task_id)
         if (retcode != 0):
-            e = 'Error executing command:  mpi_nubeam_comp_exec: init '
-            print e
+            e = 'Error executing command:  mpi_nubeam_comp_exec: step '
             raise Exception(e)
+
+        if navg > 0:
+
+            print 'run navg'
+
+             #--- run navg
+
+            os.environ['NUBEAM_REPEAT_COUNT'] = '%dx%f'%(1,dt_nubeam)
+            for k in range(navg):
+                task_id = services.launch_task(self.NPROC, workdir, nubeam_bin, logfile = 'log.nubeam2')
+                retcode = services.wait_task(task_id)
+                if (retcode != 0):
+                    e = 'Error executing command:  mpi_nubeam_comp_exec: step avg '
+                    raise Exception(e)
+                shutil.copyfile("state_changes.cdf","state_changes_%d.cdf"%k)
+
+             #--- avgerage
+
+            data = {}
+            for k in range(navg):
+                filename = "state_changes_%d.cdf"%k
+                data[k] = netCDF4.Dataset(filename,'r+',format='NETCDF4')
+
+            vars = []
+            for v in data[0].variables.keys():
+                if v not in ["ps_partial_update", "version_id"]: vars.append(v)
+
+            for var in vars:
+                avg = []
+                for k in range(navg):
+                    avg.append(data[k].variables[var][:])
+                avg = average(array(avg),axis=0)
+                data[0].variables[var][:] =  avg
+            
+            for k in range(navg):
+                data[k].close()
+
+            shutil.copyfile ("state_changes_0.cdf","state_changes.cdf")
 
         #--- update plasma state
 
+        services.update_plasma_state() 
         services.merge_current_plasma_state("state_changes.cdf", logfile='log.update_state')
 
         #--- archive output files
@@ -213,4 +276,4 @@ class nubeam(Component):
     def finalize(self, timeStamp=0.0):
 
         return
-    
+
