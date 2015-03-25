@@ -400,13 +400,20 @@ def io_input_from_state(f_geqdsk,f_ps,f_inbc):
     te    = ps.cell2node(te)
     ti    = ps.cell2node(ti)
 
-    wbeam = ps.dump_profile(rho,"eperp_beami","vol",k=0) \
-          + ps.dump_profile(rho,"epll_beami" ,"vol",k=0)
+    density_beam = ps.dump_profile(rho,"nbeami",k=0)*1.e-19
+    wbeam = ps.dump_profile(rho,"eperp_beami",k=0) \
+          + ps.dump_profile(rho,"epll_beami" ,k=0)
+    wbeam = density_beam*wbeam
 
-    walp = ps.dump_profile(rho,"eperp_fusi","vol",k=0) \
-         + ps.dump_profile(rho,"epll_fusi", "vol",k=0)
+    density_alpha = ps.dump_profile(rho,"nfusi",k=0)*1.e-19
+    walpha = ps.dump_profile(rho,"eperp_fusi",k=0) \
+           + ps.dump_profile(rho,"epll_fusi",k=0)
+    walpha = density_alpha*walpha
 
-    pmhd = 1.602e3*(ne*te+ni*ti)+2.0/3.0*1.602e-16*(wbeam+walp)
+    pmhd = 1.602e3*(ne*te+ni*ti)+2.0/3.0*1.602e3*(wbeam+walpha)
+
+    #print 1.602e3*(ne*te+ni*ti)
+    #print 2.0/3.0*(wbeam+walpha)
 
     jpar = ps.dump_j_parallel()
 

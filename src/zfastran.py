@@ -99,10 +99,10 @@ def io_write_input(f_state,f_eqdsk):
     ti    = ps["Ti"][:]
     zeff  = ps["Zeff"][:]
     omega = ps["omegat"][:]
-    ne    = ps.cell2node(ne)
+    ne    = ps.cell2node_bdry(ne)
     nith  = ps.cell2node(nith)
-    te    = ps.cell2node(te)
-    ti    = ps.cell2node(ti)
+    te    = ps.cell2node_bdry(te)
+    ti    = ps.cell2node_bdry(ti)
     zeff  = ps.cell2node(zeff)
     omega = ps.cell2node(omega)
 
@@ -134,9 +134,12 @@ def io_write_input(f_state,f_eqdsk):
     pth_fus = ps.dump_profile(rho,"pfusth","vol")*1.e-6
 
     pe_rf  = ps.dump_profile(rho,"peech","vol") \
-           + ps.dump_profile(rho,"pmine","vol")
+           + ps.dump_profile(rho,"pmine","vol") \
+           + ps.dump_profile(rho,"picrf_totals","vol",k=0)
+
     pe_rf *= 1.e-6
-    pi_rf  = ps.dump_profile(rho,"pmini","vol")
+    pi_rf  = ps.dump_profile(rho,"pmini","vol") \
+           + ps.dump_profile(rho,"picth","vol")        
     pi_rf *= 1.e-6
 
     p_rad= zeros(nrho)
