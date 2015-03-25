@@ -56,10 +56,10 @@ class plasma_state_file():
     def close(self):
 
         self.data.close()
-        log=open("pstool.log","w")
-        retcode = subprocess.call([self.pstool_bin, "rehash",self.f_ps],
-            stdout=log,stderr=log)
-        log.close()
+        #log=open("pstool.log","w")
+        #retcode = subprocess.call([self.pstool_bin, "rehash",self.f_ps],
+        #    stdout=log,stderr=log)
+        #log.close()
 
     def __getitem__(self, key):
 
@@ -75,20 +75,30 @@ class plasma_state_file():
         if sum>0.0:
             self[key][:] *= sum/self[key][-1]
 
-    def load_profile(self,rho,prof,key,mode,sum=0.0):
+    def load_profile(self,rho,prof,key,mode,k=-1,sum=0.0):
 
         zone_spl = zinterp(self["rho"][:],self[mode][:])
         prof_spl = zinterp(rho,prof)
 
         rho_key = self["rho"+self[key].dimensions[-1].split("rho")[-1]][:]
 
-        tmp = 0.0
-        for i in range(len(rho_key)-1):
-            self[key][i] = 0.5*(prof_spl(rho_key[i+1])+prof_spl(rho_key[i])) \
-                              *(zone_spl(rho_key[i+1])-zone_spl(rho_key[i]))
-            tmp += self[key][i]
-        if sum>0.0:
-            self[key][:] *= sum/tmp
+        if k<0:
+            tmp = 0.0
+            for i in range(len(rho_key)-1):
+                self[key][i] = 0.5*(prof_spl(rho_key[i+1])+prof_spl(rho_key[i])) \
+                                  *(zone_spl(rho_key[i+1])-zone_spl(rho_key[i]))
+                tmp += self[key][i]
+            if sum>0.0:
+                self[key][:] *= sum/tmp
+        else:
+            tmp = 0.0
+            for i in range(len(rho_key)-1):
+                self[key][k][i] = 0.5*(prof_spl(rho_key[i+1])+prof_spl(rho_key[i])) \
+                                  *(zone_spl(rho_key[i+1])-zone_spl(rho_key[i]))
+                tmp += self[key][k][i]
+            if sum>0.0:
+                self[key][k][:] *= sum/tmp
+
         print 'integrated : ',tmp
 
     def dump_profile(self,rho,key,mode=None,k=-1):
@@ -236,7 +246,16 @@ class plasma_state_file():
         for i in range(1,nrho-1):
             node[i] = 0.5*(cell[i-1]+cell[i])
         node[-1] = cell[-1]
-       #node[-1] = 2.0*cell[-1]-node[-2]
+        return node
+
+    def cell2node_bdry(self,cell):
+    
+        nrho = len(cell)+1
+        node = zeros(nrho)
+        node[0] = cell[0]
+        for i in range(1,nrho-1):
+            node[i] = 0.5*(cell[i-1]+cell[i])
+        node[-1] = 2.0*cell[-1]-node[-2] #<=====
         return node
 
 #    def node2cell(self,node):
@@ -385,6 +404,22 @@ def instate2ps(instate,ps):
     #------------------------------------------------------------------
     # heating
 
+    density_beam = 1.e19*array(instate["density_beam"])
+
+    pe_nb = 1.0e6*array(instate["pe_nb"])
+    pi_nb = 1.0e6*array(instate["pi_nb"])
+
+    pe_ec = 1.0e6*array(instate["pe_ec"])
+    pe_ic = 1.0e6*array(instate["pe_ic"])
+    pi_ic = 1.0e6*array(instate["pi_ic"])
+    pe_fus = 1.0e6*array(instate["pe_fus"])
+    pi_fus = 1.0e6*array(instate["pi_fus"])
+
+    ps.load_profile (rho,pe_nb,"pbe","vol")
+    ps.load_profile (rho,pi_nb,"pbi","vol")
+    ps.load_profile (rho,pe_ec,"peech","vol")
+    ps.load_profile (rho,pe_ic,"picrf_totals","vol",k=0)
+    ps.load_profile (rho,pi_ic,"picth","vol")
 
     #------------------------------------------------------------------
     # temp
