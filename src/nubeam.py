@@ -17,6 +17,7 @@ from  component import Component
 # import zcode libraries
 import Namelist
 from zplasmastate import plasma_state_file
+import znubeam
 
 class nubeam(Component):
 
@@ -27,9 +28,8 @@ class nubeam(Component):
 
     def init(self, timeStamp=0.0):
 
-        if (self.services == None) :
-            print 'Error in nubeam.init() : No services'
-            raise Exception('Error in nubeam.init(): No services')
+        #--- entry
+
         services = self.services
 
         #--- get plasma state file name
@@ -132,7 +132,7 @@ class nubeam(Component):
 
         #--- update plasma state
 
-        services.update_plasma_state() #<== ugly
+        # services.update_plasma_state() #<== ugly
         services.merge_current_plasma_state("state_changes.cdf",
                      logfile='log.update_state')
 
@@ -200,6 +200,8 @@ class nubeam(Component):
             +(difb_0-difb_a)*(1.0-rho_anom**difb_in)**difb_out
         ps.close()
 
+        services.update_plasma_state()
+
         try:
             nubeam_bin = os.path.join(self.BIN_PATH, self.BIN)
         except:
@@ -208,7 +210,7 @@ class nubeam(Component):
         os.environ['NUBEAM_ACTION'] = 'STEP'
         os.environ['NUBEAM_REPEAT_COUNT'] = '%dx%f'%(nstep-navg,dt_nubeam)
         os.environ['STEPFLAG'] = 'TRUE'
-        os.environ['NUBEAM_POSTPROC'] = 'SUMMARY_TEST' #'FBM_WRITE'
+        os.environ['NUBEAM_POSTPROC'] = 'summary_test' #'FBM_WRITE'
         try:
             del os.environ['FRANTIC_INIT']
         except:
@@ -264,8 +266,13 @@ class nubeam(Component):
 
         #--- update plasma state
 
-        services.update_plasma_state() 
+        # services.update_plasma_state() 
+
         services.merge_current_plasma_state("state_changes.cdf", logfile='log.update_state')
+
+        services.stage_plasma_state()
+        znubeam.update_ps_profile(cur_state_file,cur_eqdsk_file)
+        services.update_plasma_state()
 
         #--- archive output files
 
