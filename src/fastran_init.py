@@ -159,6 +159,19 @@ class fastran_init (Component):
             if (retcode != 0):
                raise Exception('Error executing ', pstool_bin)
 
+            #----------------------------------------------------------
+            #-- load intoric to plasma state
+
+            if "intoric" in self.INPUT_FILES:
+
+                print 'pstool load inrf'
+    
+                logfile=open("pstool_intoric.log","w")
+                retcode = subprocess.call([pstool_bin, "load","intoric"],
+                              stdout=logfile,stderr=logfile)
+                logfile.close()
+                if (retcode != 0):
+                   raise Exception('Error executing ', pstool_bin)
 
             #----------------------------------------------------------
             #-- load innubeam to plasma state
