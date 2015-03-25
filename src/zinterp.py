@@ -9,7 +9,6 @@
 
 import os
 from numpy import *
-from Scientific.IO import NetCDF
 from scipy.interpolate import interp1d,splrep,splev
 
 class zinterp():

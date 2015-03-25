@@ -24,6 +24,8 @@ class fastran_driver(Component):
     # init function
 
     def init(self, timestamp=0):
+        print 80*'*'
+        print 'DIRVER INIT'
         return
 
     # ------------------------------------------------------------------
@@ -160,6 +162,8 @@ class fastran_driver(Component):
 
     def finalize(self, timestamp = 0):
       # Driver finalize - nothing to be done
+        print 80*'*'
+        print 'DIRVER FINALIZE'
         pass
 
     # ----------------------------------------------------------------------

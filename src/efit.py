@@ -53,6 +53,14 @@ class efit(Component):
         cur_eqdsk_file = services.get_config_param('CURRENT_EQDSK')
         cur_bc_file = services.get_config_param('CURRENT_BC')
 
+        #--- get shot and time
+
+        try:
+            shot = int(services.get_config_param('SHOT_NUMBER'))
+        except:
+            shot = 0
+        time = 0
+
         #--- generate inefit
 
         zefit.io_input_from_state(
@@ -66,8 +74,6 @@ class efit(Component):
             efit_bin = os.path.join(self.BIN, 'efitd90 129 129')
 
         niter = 5
-        shot=0
-        time=0
         f_inefit="inefit"
 
         logfile = open('efit.log', 'w')
@@ -81,7 +87,7 @@ class efit(Component):
                 zefit.fixbdry_kfile(shot,time,f_inefit)
     
             print "run efit"
-            kfile = "k000000.00000"
+            kfile = "k%06d.%05d"%(shot,time)
             args = "2\n 1\n "+kfile
             command = 'echo \"%s\"'%args + ' | ' + efit_bin 
             logfile = open('efit.log', 'a')
@@ -94,11 +100,11 @@ class efit(Component):
 
         #--- update local geqdsk state
 
-        shutil.copyfile("g000000.00000", cur_eqdsk_file)
+        shutil.copyfile("g%06d.%05d"%(shot,time), cur_eqdsk_file)
 
         #--- load geqdsk to plasma state file
 
-        shutil.copyfile("g000000.00000", "geqdsk")
+        shutil.copyfile("g%06d.%05d"%(shot,time), "geqdsk")
         shutil.copyfile(cur_state_file,"ps.nc")
 
         try:
