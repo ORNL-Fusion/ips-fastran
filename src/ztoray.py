@@ -395,8 +395,23 @@ def io_update_instate(geq,f_instate,intoray):
             print 'adjust width'
 
             fit_coeff = fit_gaussian(rho,jec)
+
+            jec_max=0.0
+            for k in range(len(rho)):
+                if jec[k] > jec_max:
+                   jec_max = jec[k]
+                   k_find = k
+            print 72*"-"
+           #print jec
+            print 'rho_EC, find = ',rho[k_find]
+            print 'jec_max = ',jec_max
+          
+            #fit = adjust_jec(
+            #          0.5*width,fit_coeff[1],fit_coeff[0],Iec,nrho,geq)
+
             fit = adjust_jec(
-                      0.5*width,fit_coeff[1],fit_coeff[0],Iec,nrho,geq)
+                      0.5*width,rho[k_find],jec_max,Iec,nrho,geq)
+
             jec = fit
 
             fit_coeff = fit_gaussian(rho,qec)
@@ -490,15 +505,29 @@ def io_update_state(geq,ps,intoray):
 
             print 'adjust width'
 
-            fit_coeff = fit_gaussian(rho,jec)
+            #fit_coeff = fit_gaussian(rho,jec)
+            #print fit_coeff[1],fit_coeff[0]
+            #fit = adjust_jec(
+            #          0.5*width,fit_coeff[1],fit_coeff[0],Iec,nrho,ps) #geq)
+            #jec = fit
+
+            jec_max=0.0
+            for j in range(len(rho)):
+                if jec[j] > jec_max:
+                   jec_max = jec[j]
+                   j_find = j
+            #print 72*"-"
+            #print jec
+            print 'rho_peak, jec_peak :',rho[j_find],jec_max
+          
             fit = adjust_jec(
-                      0.5*width,fit_coeff[1],fit_coeff[0],Iec,nrho,ps) #geq)
+                      0.5*width,rho[j_find],jec_max,Iec,nrho,ps)
             jec = fit
 
-            fit_coeff = fit_gaussian(rho,qec)
-            fit = adjust_qec(
-                      0.5*width,fit_coeff[1],fit_coeff[0],Pec,nrho,ps) #geq)
-            qec = fit
+            #fit_coeff = fit_gaussian(rho,qec)
+            #fit = adjust_qec(
+            #          0.5*width,fit_coeff[1],fit_coeff[0],Pec,nrho,ps) #geq)
+            #qec = fit
 
         if k==0:
            jec_sum = jec*rfpow
