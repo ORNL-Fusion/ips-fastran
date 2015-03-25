@@ -12,214 +12,104 @@ from numpy import *
 from scipy.interpolate import interp1d
 
 import Namelist
-import zplasmastate
-import zutil,zinterp
+from zplasmastate import plasma_state_file
+from zefitutil import readg
 
 ########################################################################
 # io
 
-def io_write_input_files(instate,innubeam):
+def update_ps_profile(f_state,f_eqdsk):
 
-    #-------------------------------------------------------------------
-    # machine 
+    #------------------------------------------------------------------- 
+    # read geqdsk and plasma state file
 
-    tokamak_id = instate["instate"]["tokamak_id"][0]
+    geq = readg(f_eqdsk) 
+    r0  = geq["rzero" ]
+    b0  = abs(geq["bcentr"])
+    ip  = geq['cpasma']
+    ps  = plasma_state_file(f_state,r0=r0,b0=b0,ip=ip)
 
-    #-------------------------------------------------------------------
-    # species
+    ps_xe  = 1.6022e-19
+    ps_mp  = 1.6726e-27
 
-    nspec_ion  = instate["instate"]["n_ion"] 
-    z_ion      = instate["instate"]["z_ion"]        
-    a_ion      = instate["instate"]["a_ion"]      
-    f_ion      = instate["instate"]["f_ion"]      
-    nspec_imp  = instate["instate"]["n_imp"] 
-    z_imp      = instate["instate"]["z_imp"]     
-    a_imp      = instate["instate"]["a_imp"]     
-    f_imp      = instate["instate"]["f_imp"]      
+    z_spec = [round(x) for x in ps["qatom_S"][1:]/ps_xe ]
+    a_spec = [round(x) for x in ps["m_S"][1:]/ps_mp ]
+    n_spec = len(z_spec)
 
+    n_imp = len(ps.data.dimensions["dim_nspec_imp0"])
+    n_ion = n_spec-n_imp
 
-    #-------------------------------------------------------------------
-    # "dnubeam_prof.dat"
+    z_ion = z_spec[0:n_ion]
+    a_ion = a_spec[0:n_ion]
+    z_imp = z_spec[n_ion:n_imp+n_ion]
+    a_imp = a_spec[n_ion:n_imp+n_ion]
 
-    prof = Namelist.Namelist()
+    ns_ion = ps["ns"][1:n_ion+1]
+    ns_imp = ps["ns"][n_ion+1:n_imp+n_ion+1]
 
-    nrho  = len  (instate["instate"]["rho"]) 
-    rho   = array(instate["instate"]["rho"])        
-    te    = array(instate["instate"]["te"])        
-    ti    = array(instate["instate"]["ti"])        
-    ne    = array(instate["instate"]["ne"])
-    zeff  = array(instate["instate"]["zeff"])        
-    omega = array(instate["instate"]["omega"])        
-    vloop = zeros(nrho) #zeros(nrho)
-    n0w   = ones(nrho)  #zeros(nrho)
-    n0v   = ones(nrho)  #zeros(nrho)
-    f0w   = 1.0
-    t0    = ones(nrho)*0.1
-    dn0out = 5e+12
-
-    prof["dnubeam_prof"]["t0_nubeam"] = [0.00]       # [s]
-    prof["dnubeam_prof"]["t1_nubeam"] = innubeam["nubeam_run"]["dt_nubeam"] # [s]
-
-    prof["dnubeam_prof"]["shot"] = [0]
-    prof["dnubeam_prof"]["tokamak_id"] = [tokamak_id]
-
-    prof["dnubeam_prof"]["nspec_ion"] = nspec_ion
-    prof["dnubeam_prof"]["z_ion"]     = z_ion
-    prof["dnubeam_prof"]["a_ion"]     = a_ion
-    prof["dnubeam_prof"]["f_ion"]     = f_ion
-    prof["dnubeam_prof"]["nspec_imp"] = nspec_imp
-    prof["dnubeam_prof"]["z_imp"]     = z_imp
-    prof["dnubeam_prof"]["a_imp"]     = a_imp
-    prof["dnubeam_prof"]["f_imp"]     = f_imp
-
-    prof["dnubeam_prof"]["nrho_in"  ] = [len(instate["instate"]["rho"])] # []
-    prof["dnubeam_prof"]["rho_in"   ] = rho          # input grid
-    prof["dnubeam_prof"]["te_in"    ] = te           # [kev]
-    prof["dnubeam_prof"]["ti_in"    ] = ti           # [kev]
-    prof["dnubeam_prof"]["ne_in"    ] = ne*1.0e19    # [m^-3]
-    prof["dnubeam_prof"]["zeff_in"  ] = zeff         # []
-    prof["dnubeam_prof"]["omega_in" ] = omega        # [rad/sec]
-    prof["dnubeam_prof"]["vloop_in" ] = vloop        # [V]
-    prof["dnubeam_prof"]["n0w_in"   ] = n0w          # [m^-3]
-    prof["dnubeam_prof"]["n0v_in"   ] = n0v          # [m^-3]
-    prof["dnubeam_prof"]["f0w_in"   ] = [f0w]        # [number/sec]
-    prof["dnubeam_prof"]["t0_in"    ] = t0           # [kev]
-    prof["dnubeam_prof"]["dn0out"   ] = [dn0out]     # [number/sec]
-
-    prof["dnubeam_difb"]["difb_0"   ] = innubeam["nbi_model"]["difb_0"   ] # [cm^2/s]
-    prof["dnubeam_difb"]["difb_a"   ] = innubeam["nbi_model"]["difb_a"   ] # [cm^2/s]
-    prof["dnubeam_difb"]["difb_in"  ] = innubeam["nbi_model"]["difb_in"  ] # []
-    prof["dnubeam_difb"]["difb_out" ] = innubeam["nbi_model"]["difb_out" ] # []
-    prof["dnubeam_difb"]["nkdifb"   ] = innubeam["nbi_model"]["nkdifb"   ] # [3]
-
-    prof.write("dnubeam_prof.dat")
+    nrho  = ps.nrho
+    rho   = ps["rho"][:]
+    ne    = ps["ns"][0,:]
+    density_beam = ps["nbeami"][0,:]
+    zeff  = ps["Zeff"][:]
 
     #------------------------------------------------------------------
-    # "dnubeam_nbi.dat"
+    # density
 
-    nbi = Namelist.Namelist()
+    density_ion = {}
+    for k in range(n_ion):
+        density_ion[k] = zeros(nrho-1)
 
-    nbi["dnubeam_nbi"] = innubeam["nbi_config"]
+    density_imp = {}
+    for k in range(n_imp):
+        density_imp[k] = zeros(nrho-1)
 
-    nbi.write("dnubeam_nbi.dat")
+    density_th = zeros(nrho)
 
-    #------------------------------------------------------------------
-    # "dnubeam_nml.dat"
+    f_ion = ns_ion/sum(ns_ion,axis=0)
+    f_imp = ns_imp/sum(ns_imp,axis=0)
 
-    nml = Namelist.Namelist()
+    #print f_ion
+    #print f_imp
 
-    nml["nbi_init"] =innubeam["nbi_init"] # innubeam["nbi_nml"]
-    nml["nbi_update"]["nltest_output"] = [1]
+    for i in range(nrho-1):
 
-    nml.write("dnubeam_nml.dat")
-
-def io_update_instate(nstep=-1,navg=5,
-        f_instate='instate',
-        f_outnubeam='dnubeam_prof.dat'):
-
-    #------------------------------------------------------------------ 
-    # read instate
-    #
-
-    instate = Namelist.Namelist(f_instate)
-    rho_ps = instate["instate"]["rho"]
-    nrho_ps = len(rho_ps)
-
-    #------------------------------------------------------------------ 
-    # outnubeam
-    #
-    
-    if nstep < 0:
-
-        outnubeam = Namelist.Namelist(f_outnubeam)["dnubeam_out"]
-    
-        nrho= outnubeam["nrho_out"][0]
-        rho = array(outnubeam["rho_out"][0:nrho])
-        curbdotb = array(outnubeam["curbdotb_out"][0:nrho]) #A/m^2/T
-        tqbsum = array(outnubeam["tqbsum_out"][0:nrho]) # NT-M/m^3
-        pbe = array(outnubeam["pbe_out"][0:nrho])  #W/m^3
-        pbi = array(outnubeam["pbi_out"][0:nrho])  #W/m^3
-        udenspl = array(outnubeam["udenspl_out"][0:nrho]) #J/m^3 
-        udenspp = array(outnubeam["udenspp_out"][0:nrho]) #J/m^3
-        bdenss = array(outnubeam["bdenss_out"][0:nrho]) #/m^3
-
-    else:
-
-        curbdotb_a = []
-        tqbsum_a = []
-        pbe_a = []
-        pbi_a = []
-        bdenss_a = []
-        udenspl_a = []
-        udenspp_a = []
+        # print i, f_ion[:,i], f_imp[:,i]
         
-        for k in range(nstep-navg,nstep):
-        
-            file = "dnubeam_out_%d.dat"%k
-            dat = Namelist.Namelist(file)
-            dat = dat["dnubeam_out"]
-            nrho     = dat["nrho_out"][0]
-            rho      = dat["rho_out"][0:nrho]
-            curbdotb = array(dat["curbdotb_out"][0:nrho]) #A/m^2/T
-            tqbsum   = array(dat["tqbsum_out"][0:nrho]) # NT-M/m^3
-            pbe      = array(dat["pbe_out"][0:nrho])  #W/m^3
-            pbi      = array(dat["pbi_out"][0:nrho])  #W/m^3
-            bdenss   = array(dat["bdenss_out"][0:nrho]) #/m^3
-            udenspl  = array(dat["udenspl_out"][0:nrho]) #J/m^3 
-            udenspp  = array(dat["udenspp_out"][0:nrho]) #J/m^3
+        a=0; b=0; c=0; d=0
+        for k in range(n_imp):
+            b = b+f_imp[k,i]*z_imp[k]
+            d = d+f_imp[k,i]*z_imp[k]*z_imp[k]
+        for k in range(n_ion):
+            a = a+f_ion[k,i]*z_ion[k]
+            c = c+f_ion[k,i]*z_ion[k]*z_ion[k]
 
-            curbdotb_a.append(curbdotb)
-            tqbsum_a.append(tqbsum)
-            pbe_a.append(pbe)
-            pbi_a.append(pbi)
-            bdenss_a.append(bdenss)
-            udenspl_a.append(udenspl)
-            udenspp_a.append(udenspp)
+        zne_adj = ne[i]
+        zzne_adj = ne[i]*zeff[i]
 
-        curbdotb = average(curbdotb_a, axis=0) 
-        tqbsum   = average(tqbsum_a, axis=0)
-        pbe      = average(pbe_a, axis=0)
-        pbi      = average(pbi_a, axis=0)
-        bdenss   = average(bdenss_a, axis=0)
-        udenspl  = average(udenspl_a, axis=0)
-        udenspp  = average(udenspp_a, axis=0)
+        # depletion due to beam ions
 
-    outprof = {}
-    outprof["j_nb"] = curbdotb/abs(instate["instate"]["b0"][0])*1.0e-6
-    outprof["torque_nb"] = tqbsum
-    outprof["pe_nb"] = pbe*1.0e-6 
-    outprof["pi_nb"] = pbi*1.0e-6 
-    outprof["density_beam"] = bdenss*1.0e-19 
-    outprof["wbeam"] = (udenspl+udenspp)*1.0e-6
+        zne_adj = zne_adj - 1.0*density_beam[i]
+        zzne_adj = zzne_adj - 1.0**2*density_beam[i]
 
-    #------------------------------------------------------------------ 
-    # update instate
-    #
+        # effective main ion and impurity densities
 
-    for p in outprof.keys():
+        nion = (zne_adj *d-zzne_adj*b)/(a*d-b*c)
+        nimp = (zzne_adj*a-zne_adj *c)/(a*d-b*c)
 
-        vec = zinterp.zinterp(rho,outprof[p],s=0)[rho_ps]
-        instate["instate"][p] = vec 
-        
-    instate.write(f_instate)
+        for k in range(n_ion):
+            density_ion[k][i] = f_ion[k,i]*nion
+        for k in range(n_imp):
+            density_imp[k][i] = f_imp[k,i]*nimp
 
-    pass
+        for k in range(n_ion):
+            density_th[i] = density_th[i] + density_ion[k][i]
+        for k in range(n_imp):
+            density_th[i] = density_th[i] + density_imp[k][i]
 
-def read_nubeam_output():
-    pass
+    for k in range(n_ion):
+        #print ps["ns"][k+1][:]
+        ps["ns"][k+1] = density_ion[k]
+        #print ps["ns"][k+1][:]
 
-###############################################################################
-# driver
-
-def driver():
-    pass
-
-###############################################################################
-# test
-
-if __name__ == "__main__":
-
-    instate = Namelist.Namelist("instate")
-    innubeam = Namelist.Namelist("innubeam")
-
-    write_nubeam_input(instate,innubeam)
+    ps.close()
