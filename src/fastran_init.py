@@ -123,7 +123,7 @@ class fastran_init (Component):
             inps["inps"]["nspec_imp"   ] = instate["n_imp"]
             inps["inps"]["nspec_beam"  ] = [1]
             inps["inps"]["nspec_fusion"] = [1]
-            inps["inps"]["nspec_rfmin" ] = [0]
+            inps["inps"]["nspec_rfmin" ] = [1]
             inps["inps"]["nspec_gas"   ] = instate["n_ion"] 
          
             inps["inps"]["z_ion"       ] = instate["z_ion"]
@@ -134,6 +134,8 @@ class fastran_init (Component):
             inps["inps"]["a_beam"      ] = [2]
             inps["inps"]["z_fusion"    ] = [2]
             inps["inps"]["a_fusion"    ] = [4]
+            inps["inps"]["z_rfmin"     ] = [2]
+            inps["inps"]["a_rfmin"     ] = [3]
             inps["inps"]["z_gas"       ] = instate["z_ion"]
             inps["inps"]["a_gas"       ] = instate["a_ion"]
 
