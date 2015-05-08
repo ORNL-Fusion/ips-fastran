@@ -1,0 +1,23 @@
+#! /bin/bash
+
+module load python matplotlib numpy netcdf
+
+setenv IPS_ROOT /project/projectdirs/atom/users/elwasif/IPS_edison
+setenv DAKOTA_ROOT /project/projectdirs/atom/atom-install-edison/dakota
+setenv FASTRAN_ROOT /global/project/projectdirs/atom/atom-install-edison/ips-wrappers/ips-fastran
+
+setenv PYTHONPATH $FASTRAN_ROOT/share/python:$PYTHONPATH
+setenv PYTHONPATH $FASTRAN_ROOT/utils:$PYTHONPATH
+setenv PYTHONPATH $FASTRAN_ROOT/src:$PYTHONPATH
+setenv PREACTDIR /project/projectdirs/m876/PREACT
+
+setenv EXTERN_EDISON /project/projectdirs/atom/users/elwasif/extern-edison
+setenv LD_LIBRARY_PATH $EXTERN_EDISON/lib:$EXTERN_EDISON/lib64:$LD_LIBRARY_PATH
+setenv PYTHONPATH $EXTERN_EDISON/lib/python2.7/site-packages/Numeric:$EXTERN_EDISON/lib/python2.7/site-packages:$EXTERN_EDISON/lib/python2.7/site-packages/Scientific/linux2/:$PYTHONPATH
+
+setenv PATH $DAKOTA_ROOT/bin:$IPS_ROOT/bin:$PATH
+setenv PATH $FASTRAN_ROOT/bin:$FASTRAN_ROOT/utils:$PATH
+setenv LD_LIBRARY_PATH $DAKOTA_ROOT/lib:$LD_LIBRARY_PATH
+
+setenv IPS_PHYS_ROOT /project/projectdirs/atom/m876/phys-bin/phys
+
