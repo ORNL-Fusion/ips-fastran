@@ -19,6 +19,7 @@ import zefit
 import netCDF4
 import zefitutil
 from zplasmastate import plasma_state_file,instate2ps
+from inspect import currentframe, getframeinfo
 
 class fastran_init (Component):
 
@@ -97,6 +98,7 @@ class fastran_init (Component):
                 pstool_bin = os.path.join(self.BIN_PATH, self.BIN)
             except:
                 pstool_bin = os.path.join(self.BIN_PATH, 'pstool')
+            print 'pstool_bin path:'
             print pstool_bin
 
 
@@ -263,6 +265,28 @@ class fastran_init (Component):
 
             shutil.copyfile("ps.nc",cur_state_file)
             shutil.copyfile("geqdsk",cur_eqdsk_file)
+
+            #----------------------------------------------------------
+            #-- copy current plasma state to prior state and next state
+            if "PRIOR_STATE" in self.PLASMA_STATE_FILES:
+                try:
+                    prior_state_file = services.get_config_param('PRIOR_STATE')
+                    shutil.copyfile(cur_state_file, prior_state_file)
+                except Exception, e:
+                    frameinfo = getframeinfo(currentframe())
+                    print framemeinfo.filename, frameinfo.lineno
+                    print 'No PRIOR_STATE file ', e
+                    raise
+
+            if "NEXT_STATE" in self.PLASMA_STATE_FILES:
+                try:
+                    next_state_file = services.get_config_param('NEXT_STATE')
+                    shutil.copyfile(cur_state_file, next_state_file)
+                except Exception, e:
+                    frameinfo = getframeinfo(currentframe())
+                    print framemeinfo.filename, frameinfo.lineno
+                    print 'No NEXT_STATE file ', e
+                    raise
 
         # --------------------------------------------------------------
         # Update plasma state
