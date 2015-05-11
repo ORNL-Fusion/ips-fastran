@@ -48,6 +48,8 @@ class plasma_state_file():
 
         self.f_ps = f_ps
         self.mode = mode
+
+        self.geqdsk = ''
     
     def info(self):
 
@@ -258,31 +260,15 @@ class plasma_state_file():
         node[-1] = 2.0*cell[-1]-node[-2] #<=====
         return node
 
-#    def node2cell(self,node):
-#    
-#        nrho = len(node)
-#        cell = zeros(nrho-1)
-#        cell[0] = node[1]
-#        for i in range(1,nrho-1):
-#            cell[i] = 0.5*(node[i]+node[i+1])
-#        return cell
-#
-#    def cell2node(self,cell):
-#    
-#        nrho = len(cell)+1
-#        node = zeros(nrho)
-#        node[0] = cell[0]
-#        for i in range(nrho-1):
-#            node[i+1] = 2.0*cell[i]-node[i]
-#        return node
-
-
 def instate2ps(instate,ps):
 
     #------------------------------------------------------------------
     # from instate
 
+    for key in instate.keys(): instate[key] = array(instate[key])
+
     nrho  = instate["nrho"][0]
+    rho   = instate["rho"]
 
     n_ion = instate["n_ion"][0]
     z_ion = instate["z_ion"]
@@ -294,12 +280,30 @@ def instate2ps(instate,ps):
     a_imp = instate["a_imp"]
     f_imp = instate["f_imp"]
 
-    ne = array(instate["ne"])
-    te = array(instate["te"])
-    ti = array(instate["ti"])
-    omega = array(instate["omega"])
-    zeff = array(instate["zeff"])
-    density_beam = array(instate["density_beam"])
+    ne = instate["ne"]
+    te = instate["te"]
+    ti = instate["ti"]
+    omega = instate["omega"]
+    zeff = instate["zeff"]
+
+    #------------------------------------------------------------------
+    # put zeros if not defined
+
+    for key in [
+        "j_oh", "j_bs", "j_nb", "j_ec", "j_ic", \
+        "pe_nb", "pe_ec", "pe_ic", "pe_fus", "pe_ionization", "p_rad", \
+        "pi_nb", "pi_ec", "pi_ic", "pi_fus", "pi_ionization", "pi_cx", "p_ohm", "p_ei", \
+        "torque_nb", "torque_in", "se_nb", "se_ionization", "si_nb", "si_ionization", \
+        "q", "psipol", \
+        "density_beam", "wbeam", "density_alpha", "walpha", \
+        "chie",
+        "chii" ]:
+        if key.upper() not in instate.keys(): instate[key] = zeros(nrho)
+
+
+    density_beam = instate["density_beam"]
+    density_alpha = instate["density_alpha"]
+    wbeam = instate["wbeam"]
 
     rho = ps["rho"][:]
 
@@ -360,6 +364,17 @@ def instate2ps(instate,ps):
     ps["ni"][:] = 1.0e19*ps.node2cell(density_th)
 
     #------------------------------------------------------------------
+    # beam
+
+    ps["nbeami"][0] = 1.0e19*ps.node2cell(density_beam)
+    ps["eperp_beami"][0] = 2.0*20.0*ones(nrho-1)
+    ps["epll_beami"][0] = 20.0*ones(nrho-1)
+
+    tbeam = wbeam/1.602e-3/(density_beam+1.0e-6)
+    ps["eperp_beami"][0] = ps.node2cell(2.0*tbeam/3.0)
+    ps["epll_beami"][0] = ps.node2cell(tbeam/3.0)
+
+    #------------------------------------------------------------------
     # temperature
 
     ps["Ts"][0] =ps.node2cell(te)
@@ -382,39 +397,41 @@ def instate2ps(instate,ps):
 
     ps["omegat"][:] = ps.node2cell(omega)
 
-    #------------------------------------------------------------------
+    #--------------------------------------------------------------
     # current
-
-    j_tot = 1.0e6*array(instate["j_tot"])
-
+    
+    j_tot = 1.e6*instate["j_tot"]
     ps.load_j_parallel(j_tot)
-
-    j_nb  = 1.0e6*array(instate["j_nb"])
-    j_ec  = 1.0e6*array(instate["j_ec"])
-    j_ic  = 1.0e6*array(instate["j_ic"])
-    j_bs  = 1.0e6*array(instate["j_bs"])
-    j_oh  = 1.0e6*array(instate["j_oh"])
-
+    
+    for key in ["j_nb","j_ec","j_ic","j_bs","j_oh"]:
+        if key.upper() not in instate.keys(): instate[key] = zeros(nrho)
+    
+    j_nb  = 1.e6*instate["j_nb"]
+    j_ec  = 1.e6*instate["j_ec"]
+    j_ic  = 1.e6*instate["j_ic"]
+    j_bs  = 1.e6*instate["j_bs"]
+    j_oh  = 1.e6*instate["j_oh"]
+    
     ps.load_j_parallel_CD(rho,j_nb,"nb")
     ps.load_j_parallel_CD(rho,j_ec,"ec")
     ps.load_j_parallel_CD(rho,j_ic,"ic")
     ps.load_j_parallel_CD(rho,j_bs,"bs")
     ps.load_j_parallel_CD(rho,j_oh,"oh")
-
-    #------------------------------------------------------------------
+    
+    #-------------------------------------------------------------
     # heating
-
-    density_beam = 1.e19*array(instate["density_beam"])
-
-    pe_nb = 1.0e6*array(instate["pe_nb"])
-    pi_nb = 1.0e6*array(instate["pi_nb"])
-
-    pe_ec = 1.0e6*array(instate["pe_ec"])
-    pe_ic = 1.0e6*array(instate["pe_ic"])
-    pi_ic = 1.0e6*array(instate["pi_ic"])
-    pe_fus = 1.0e6*array(instate["pe_fus"])
-    pi_fus = 1.0e6*array(instate["pi_fus"])
-
+    
+    for key in ["pe_nb","pi_nb","pe_ec","pe_ic","pi_ic","pe_fus","pi_fus"]:
+        if key.upper() not in instate.keys(): instate[key] = zeros(nrho)
+    
+    pe_nb  = 1.e6*instate["pe_nb" ]
+    pi_nb  = 1.e6*instate["pi_nb" ]
+    pe_ec  = 1.e6*instate["pe_ec" ]
+    pe_ic  = 1.e6*instate["pe_ic" ]
+    pi_ic  = 1.e6*instate["pi_ic" ]
+    pe_fus = 1.e6*instate["pe_fus"]
+    pi_fus = 1.e6*instate["pi_fus"]
+    
     ps.load_profile (rho,pe_nb,"pbe","vol")
     ps.load_profile (rho,pi_nb,"pbi","vol")
     ps.load_profile (rho,pe_ec,"peech","vol")
@@ -428,7 +445,6 @@ def instate2ps(instate,ps):
     ps["n0norm"][:] = 1.0e-10 
     ps["T0sc0"][:] = 0.01 
     ps["sc0_to_sgas"][:] = 1
-
 
 ########################################################################
 #  test
