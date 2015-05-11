@@ -18,6 +18,7 @@ from  component import Component
 import Namelist
 from zplasmastate import plasma_state_file
 import znubeam
+from inspect import currentframe, getframeinfo
 
 class nubeam(Component):
 
@@ -127,6 +128,8 @@ class nubeam(Component):
         retcode = services.wait_task(task_id)
         if (retcode != 0):
             e = 'Error executing command:  mpi_nubeam_comp_exec: init '
+            frameinfo = getframeinfo(currentframe())
+            print framemeinfo.filename, frameinfo.lineno
             print e
             raise Exception(e)
 

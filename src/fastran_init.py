@@ -268,25 +268,38 @@ class fastran_init (Component):
 
             #----------------------------------------------------------
             #-- copy current plasma state to prior state and next state
-            if "PRIOR_STATE" in self.PLASMA_STATE_FILES:
-                try:
-                    prior_state_file = services.get_config_param('PRIOR_STATE')
-                    shutil.copyfile(cur_state_file, prior_state_file)
-                except Exception, e:
-                    frameinfo = getframeinfo(currentframe())
-                    print framemeinfo.filename, frameinfo.lineno
-                    print 'No PRIOR_STATE file ', e
-                    raise
+            #if any("psp" in self.PLASMA_STATE_FILES):
+            print 'Creating PRIOR_STATE'
+            try:
+                prior_state_file = services.get_config_param('PRIOR_STATE')
+                shutil.copyfile(cur_state_file, prior_state_file)
+            except Exception, e:
+                frameinfo = getframeinfo(currentframe())
+                print framemeinfo.filename, frameinfo.lineno
+                print 'No PRIOR_STATE file ', e
+                raise
 
-            if "NEXT_STATE" in self.PLASMA_STATE_FILES:
-                try:
-                    next_state_file = services.get_config_param('NEXT_STATE')
-                    shutil.copyfile(cur_state_file, next_state_file)
-                except Exception, e:
-                    frameinfo = getframeinfo(currentframe())
-                    print framemeinfo.filename, frameinfo.lineno
-                    print 'No NEXT_STATE file ', e
-                    raise
+            #if "psn" in self.PLASMA_STATE_FILES:
+            print 'Creating NEXT_STATE'
+            try:
+                next_state_file = services.get_config_param('NEXT_STATE')
+                shutil.copyfile(cur_state_file, next_state_file)
+            except Exception, e:
+                frameinfo = getframeinfo(currentframe())
+                print framemeinfo.filename, frameinfo.lineno
+                print 'No NEXT_STATE file ', e
+                raise
+
+            print 'Creating CURRENT_JSDSK'
+            try:
+                cur_jsdsk_file = services.get_config_param('CURRENT_JSDSK')
+                subprocess.call(['touch', cur_jsdsk_file])
+            except Exception, e:
+                frameinfo = getframeinfo(currentframe())
+                print framemeinfo.filename, frameinfo.lineno
+                print 'No CURRENT_JSDSK file ', e
+                raise
+
 
         # --------------------------------------------------------------
         # Update plasma state
