@@ -25,27 +25,21 @@ class efit(Component):
         Component.__init__(self, services, config)
         print 'Created %s' % (self.__class__)
 
-    def init(self, timeStamp=0.0):
+    def init(self, timeStamp=0):
 
         return
 
-    def step(self, timeStamp=0.0):
+    def step(self, timeStamp=0):
 
         #--- entry
 
         print 'enter efit.step()'
 
-        if (self.services == None) :
-            print 'Error in efit.step () : No services'
-            raise Exception('Error in efit.step (): No services')
         services = self.services
 
         #--- stage plasma state files
 
-        try:
-            services.stage_plasma_state()
-        except Exception, e:
-            print 'Error in call to stage_plasma_state()', e
+        services.stage_plasma_state()
 
         #--- get plasma state file names
 
@@ -63,8 +57,7 @@ class efit(Component):
 
         #--- generate inefit
 
-        zefit.io_input_from_state(
-            cur_eqdsk_file,cur_state_file,cur_bc_file)
+        zefit.io_input_from_state(cur_state_file,cur_bc_file)
 
         #--- run efit
 
@@ -73,12 +66,30 @@ class efit(Component):
         except:
             efit_bin = os.path.join(self.BIN, 'efitd90 129 129')
 
-        niter = 5
+        try:
+            niter = int(self.NITER)
+        except:
+            niter = 5
+        try:
+            kinit = int(self.RESTART)
+        except:
+            kinit = 0
+
+        shutil.copyfile(cur_eqdsk_file,"g%06d.%05d"%(shot,time))
+
         f_inefit="inefit"
 
-        logfile = open('efit.log', 'w')
-        logfile.close()
-        for k in range(niter):
+        kfile = "k%06d.%05d"%(shot,time)
+        args = "2\n 1\n "+kfile
+        command = 'echo \"%s\"'%args + ' | ' + efit_bin 
+
+        f=open("xefit","w")
+        f.write(command)
+        f.close()
+
+        cwd = services.get_working_dir()
+
+        for k in range(kinit,kinit+niter):
 
             print "generate kfile %d"%k
             if k == 0:
@@ -87,16 +98,12 @@ class efit(Component):
                 zefit.fixbdry_kfile(shot,time,f_inefit)
     
             print "run efit"
-            kfile = "k%06d.%05d"%(shot,time)
-            args = "2\n 1\n "+kfile
-            command = 'echo \"%s\"'%args + ' | ' + efit_bin 
-            logfile = open('efit.log', 'a')
-            retcode = subprocess.call([command]
-                          ,stdout=logfile,stderr=logfile,shell=True)
+
+            task_id = services.launch_task(1, cwd, "sh xefit", logfile='efit.log')
+            retcode = services.wait_task(task_id)
             if (retcode != 0):
                print 'Error executing ', 'efit'
                raise
-            logfile.close()
 
         #--- update local geqdsk state
 
@@ -158,6 +165,6 @@ class efit(Component):
  
         return
     
-    def finalize(self, timeStamp=0.0):
+    def finalize(self, timeStamp=0):
         return
     

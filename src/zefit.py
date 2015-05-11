@@ -16,13 +16,15 @@ import zutil,zefitutil,zefitdata
 from zinterp import *
 from zplasmastate import plasma_state_file
 
+########################################################################
+#   compose kfile
+
 def fixbdry_kfile(shot,time,f_inefit,p_scale=1.0,efitdir='.'): 
 
     mu0 = 4.e-7*pi
 
     #-------------------------------------------------------------------
     # read inefit
-    #
 
     inefit = Namelist(f_inefit,"r")
 
@@ -41,13 +43,11 @@ def fixbdry_kfile(shot,time,f_inefit,p_scale=1.0,efitdir='.'):
 
     #-------------------------------------------------------------------
     # scale pressure
-    #
 
     press_in = p_scale*press_in
 
     #-------------------------------------------------------------------
     # read geqdsk file and calculate metric
-    #
 
     gfile = os.path.join(efitdir,'g%06d.%05d'%(shot,time))
 
@@ -79,7 +79,6 @@ def fixbdry_kfile(shot,time,f_inefit,p_scale=1.0,efitdir='.'):
 
     #-------------------------------------------------------------------
     # spline profiles
-    #
 
     ipol_spl = zinterp(rho,ipol)
     ipol_der = ipol_spl(rho,der=1)
@@ -108,7 +107,6 @@ def fixbdry_kfile(shot,time,f_inefit,p_scale=1.0,efitdir='.'):
 
     #-------------------------------------------------------------------
     # Ip scale
-    #
     
     ip_temp = 0.0
     for i in range(nrho-1):
@@ -124,7 +122,6 @@ def fixbdry_kfile(shot,time,f_inefit,p_scale=1.0,efitdir='.'):
 
     #-------------------------------------------------------------------
     # calculate p' and ff'
-    #
 
     x0 = [0.1,0.15,0.2]
     extrapolation(psi,pprim_psi,x0,y0=None)
@@ -146,7 +143,6 @@ def fixbdry_kfile(shot,time,f_inefit,p_scale=1.0,efitdir='.'):
 
     #-------------------------------------------------------------------
     # write kfile
-    #
 
     kfile = Namelist()
 
@@ -371,21 +367,17 @@ def io_input_from_instate(f_instate):
 
     inefit.write("inefit")
 
-def io_input_from_state(f_geqdsk,f_ps,f_inbc):
+def io_input_from_state(f_ps,f_inbc):
 
     # read inbc
 
     inbc = Namelist(f_inbc)["inbc"]
 
-    # read geqdsk
-
-    geq = zefitutil.readg(f_geqdsk) 
-    r0  = geq["rzero" ]
-    b0  = abs(geq["bcentr"])
-    ip  = geq['cpasma']
-
     # read plasma state
 
+    r0 = inbc["r0"][0]
+    b0 = abs(inbc["b0"][0])
+    ip = inbc['ip'][0]*1.0e6
     ps = plasma_state_file(f_ps,r0=r0,b0=b0,ip=ip)
 
     nrho  = ps.nrho
@@ -411,9 +403,6 @@ def io_input_from_state(f_geqdsk,f_ps,f_inbc):
     walpha = density_alpha*walpha
 
     pmhd = 1.602e3*(ne*te+ni*ti)+2.0/3.0*1.602e3*(wbeam+walpha)
-
-    #print 1.602e3*(ne*te+ni*ti)
-    #print 2.0/3.0*(wbeam+walpha)
 
     jpar = ps.dump_j_parallel()
 
