@@ -119,12 +119,12 @@ class fastran_driver(Component):
 
             if 'EQ' in port_names:
                 self.component_call(services,'EQ',port_dict['EQ'],'step',iStamp) #t)
-            if 'NB' in port_names:
-                self.component_call(services,'NB',port_dict['NB'],'step',iStamp) #t)
             if 'EC' in port_names:
                 self.component_call(services,'EC',port_dict['EC'],'step',iStamp) #t)
             if 'IC' in port_names:
                 self.component_call(services,'IC',port_dict['IC'],'step',iStamp) #t)
+            if 'NB' in port_names:
+                self.component_call(services,'NB',port_dict['NB'],'step',iStamp) #t)
             if 'TR' in port_names:
                 self.component_call(services,'TR',port_dict['TR'],'step',iStamp) #t)
             if 'MONITOR' in port_names:

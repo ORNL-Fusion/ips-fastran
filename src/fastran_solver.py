@@ -54,6 +54,11 @@ class fastran_solver(Component):
 
         services.stage_input_files(self.INPUT_FILES)
 
+        try:
+            shutil.copyfile(self.INFASTRAN,"infastran")
+        except:
+            pass
+
         #--- generate fastran input
 
         zfastran.io_write_input(cur_state_file,cur_eqdsk_file)
