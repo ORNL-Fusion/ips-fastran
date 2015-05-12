@@ -28,8 +28,8 @@ def io_write_inputfiles(f_state,f_eqdsk,f_ingenray):
     ps_xe  = 1.6022e-19
     ps_mp  = 1.6726e-27
 
-    z_ion = ps["qatom_S"][1:]/ps_xe
-    a_ion = ps["m_S"][1:]/ps_mp
+    z_ion = ps["qatom_SA"][1:]/ps_xe
+    a_ion = ps["m_SA"][1:]/ps_mp
     n_ion = len(z_ion)
     n_imp = len(ps.data.dimensions["dim_nspec_imp0"])
 
