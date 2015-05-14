@@ -26,6 +26,34 @@ class genray(Component):
 
     def init(self, timeStamp=0.0):
 
+        services = self.services
+        services.stage_plasma_state()
+
+        pstool_path = self.PSTOOL_PATH
+
+        pstool_bin = pstool_path
+
+        print 'pstool_bin path:'
+        print pstool_bin
+
+        print 'pstool genray init'
+
+        logfile=open("pstool_init.log","w")
+        retcode = subprocess.call([pstool_bin, "init", "genray"],
+                      stdout=logfile,stderr=logfile)
+        logfile.close()
+        if (retcode != 0):
+           raise Exception('Error executing ', pstool_bin)
+
+        cur_state_file = services.get_config_param('CURRENT_STATE')
+        shutil.copyfile("ips-state-genray.nc",cur_state_file)
+
+        try:
+            services.update_plasma_state()
+        except Exception, e:
+            print 'Error in call to update_plasma_state()', e
+            raise
+
         return
 
     def step(self, timeStamp=0.0):

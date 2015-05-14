@@ -186,6 +186,10 @@ class plasma_state_file():
 
         r0   = self.r0
         b0   = self.b0
+        print self["rho"][:]
+        print self["g_eq"][:]
+        print len(self["rho"][:])
+        print len(self["rho"][:])
         ipol = zinterp(self["rho"][:],self["g_eq"][:]/(r0*b0))(rho)
         vol  = zinterp(self["rho"][:],self["vol"][:])(rho)
         area = zinterp(self["rho"][:],self["area"][:])(rho)
