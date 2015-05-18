@@ -36,7 +36,7 @@ def update_ps_profile(f_state,f_eqdsk):
     a_spec = [round(x) for x in ps["m_S"][1:]/ps_mp ]
     n_spec = len(z_spec)
 
-    n_imp = len(ps.data.dimensions["dim_nspec_imp0"])
+    n_imp = len(ps.data.dimensions["dim_nspec_impi"])
     n_ion = n_spec-n_imp
 
     z_ion = z_spec[0:n_ion]
