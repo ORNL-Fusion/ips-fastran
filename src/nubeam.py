@@ -33,6 +33,33 @@ class nubeam(Component):
 
         services = self.services
 
+        services.stage_plasma_state()
+
+        pstool_path = self.PSTOOL_PATH
+
+        pstool_bin = pstool_path
+
+        print 'pstool_bin path:'
+        print pstool_bin
+
+        print 'pstool nubeam init'
+
+        logfile=open("pstool_init.log","w")
+        retcode = subprocess.call([pstool_bin, "init", "nubeam"],
+                      stdout=logfile,stderr=logfile)
+        logfile.close()
+        if (retcode != 0):
+           raise Exception('Error executing ', pstool_bin)
+
+        cur_state_file = services.get_config_param('CURRENT_STATE')
+        shutil.copyfile("ips-state-nubeam.nc",cur_state_file)
+
+        try:
+            services.update_plasma_state()
+        except Exception, e:
+            print 'Error in call to update_plasma_state()', e
+            raise
+
         #--- get plasma state file name
 
         cur_state_file = services.get_config_param('CURRENT_STATE')
@@ -109,9 +136,17 @@ class nubeam(Component):
 
         services.stage_plasma_state()
 
+        try:
+            shutil.copyfile(cur_state_file, "input_state.cdf")
+        except IOError, (errno, strerror):
+            print 'Error copying file %s in nubeam' % ("input_state.cdf", strerror)
+            self.services.error('Error copying plasma state files over to generic file names')
+            raise Exception, 'Error copying plasma state files over to generic file names'
+
         #--- setup nubeam_comp_exec run
 
-        os.environ['NUBEAM_ACTION'] = 'INIT'
+        os.environ['NUBEAM_ACTION'] = 'init'
+        os.environ['FRANTIC_INIT'] = '50'
         try:
             del os.environ['FRANTIC_ACTION']
         except:
@@ -124,7 +159,7 @@ class nubeam(Component):
         print nubeam_bin
 
         task_id = services.launch_task(1, workdir, nubeam_bin,
-                      logfile = 'log.nubeam')
+                      logfile = 'log.init_nubeam')
         retcode = services.wait_task(task_id)
         if (retcode != 0):
             e = 'Error executing command:  mpi_nubeam_comp_exec: init '
@@ -132,6 +167,11 @@ class nubeam(Component):
             print framemeinfo.filename, frameinfo.lineno
             print e
             raise Exception(e)
+
+        try:
+            shutil.copyfile('log.init_nubeam', 'log.nubeam')
+        except Exception, e:
+            raise Exception, 'Error in file cp'
 
         #--- update plasma state
 
@@ -218,7 +258,7 @@ class nubeam(Component):
             del os.environ['FRANTIC_INIT']
         except:
             pass
-        os.environ['FRANTIC_ACTION'] = 'NONE' #'none' #'execute'
+        os.environ['FRANTIC_ACTION'] = 'execute' #'none' #'execute'
 
         #--- run nstep-navg
 

@@ -225,16 +225,55 @@ subroutine pstool_init_genray()
 
     call ps_get_plasma_state(ierr,'ips-state.nc')
 
-    ps%nrho_ecrf = nrho_ecrf
+    if(.not.allocated(ps%rho_ecrf)) then
 
-    call ps_alloc_plasma_state(ierr)
+        write(*,*) 'DLG : Allocating arrays in pstool_init_genray()'
 
-    do i = 1,ps%nrho_ecrf
-        ps%rho_ecrf(i) = (i-1.0)/(ps%nrho_ecrf-1.0)
-    enddo
+        ps%nrho_ecrf = nrho_ecrf
 
-    call ps_store_plasma_state(ierr,'ips-state-genray.nc')
+        call ps_alloc_plasma_state(ierr)
 
+        do i = 1,ps%nrho_ecrf
+            ps%rho_ecrf(i) = (i-1.0)/(ps%nrho_ecrf-1.0)
+        enddo
+
+        call ps_store_plasma_state(ierr,'ips-state-genray.nc')
+
+    end if
+
+end 
+
+!=======================================================================
+! add nubeam variables to the statefile
+!
+subroutine pstool_init_nubeam()
+
+    use plasma_state_mod
+
+    implicit none
+
+    integer :: ierr,i
+    integer :: nrho_anom    = 51
+
+    write(*,*) 'DLG : Running pstool_init_nubeam()'
+
+    call ps_get_plasma_state(ierr,'ips-state.nc')
+
+    if(.not.allocated(ps%rho_anom))then
+
+        write(*,*) 'DLG : Allocating arrays in pstool_init_nubeam()'
+
+        ps%nrho_anom = nrho_anom
+
+        call ps_alloc_plasma_state(ierr)
+
+        do i = 1,ps%nrho_anom
+            ps%rho_anom(i) = (i-1.0)/(ps%nrho_anom-1.0)
+        enddo
+
+        call ps_store_plasma_state(ierr,'ips-state-nubeam.nc')
+
+    end if
 end 
 
 
@@ -1375,15 +1414,14 @@ program pstool
   if (trim(command) .eq. 'init' ) then
 
     if (trim(parm1).eq.'genray')then
-
         write(*,*) 'DLG : calling pstool_init_genray()'
         call pstool_init_genray()
-
+    else if (trim(parm1).eq.'nubeam')then
+        write(*,*) 'DLG : calling pstool_init_nubeam()'
+        call pstool_init_nubeam()
     else 
-
         write(*,*) 'init'
         call pstool_init()
-
     end if
 
   else if (trim(command) .eq. 'geqdsk' ) then
