@@ -14,6 +14,7 @@ from scipy.interpolate import interp1d
 import Namelist
 from zplasmastate import plasma_state_file
 from zefitutil import readg
+from plasmastate import *
 
 ########################################################################
 # io
@@ -67,11 +68,14 @@ def update_ps_profile(f_state,f_eqdsk):
 
     density_th = zeros(nrho)
 
+    # DLG - hack to avoid zero density problems
+
+    min_density = 1e-5
+    ns_imp_zero_ii = ns_imp < min_density
+    ns_imp[ns_imp_zero_ii] = min_density
+
     f_ion = ns_ion/sum(ns_ion,axis=0)
     f_imp = ns_imp/sum(ns_imp,axis=0)
-
-    #print f_ion
-    #print f_imp
 
     # DLG : Get beam density on rho grid
     # This is a terrible terrible hack.
@@ -88,6 +92,10 @@ def update_ps_profile(f_state,f_eqdsk):
     _rho_nbi_full = concatenate([[_rho_nbi[0]-_drho_nbi],_rho_nbi_dm1,[_rho_nbi[-1]+_drho_nbi]])
     _density_beam_full = concatenate([[density_beam[0]],density_beam,[density_beam[-1]]])
     _density_beam = interp1d(_rho_nbi_full,_density_beam_full)
+
+    #_ps = PlasmaState("ips",1)
+    #_ps.read(f_state)
+    #_density_beam = _ps.interp1d("nbeami",0,rho) 
 
     for i in range(nrho-1):
 

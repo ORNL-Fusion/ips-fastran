@@ -19,6 +19,7 @@ import Namelist
 from zplasmastate import plasma_state_file
 import znubeam
 from inspect import currentframe, getframeinfo
+from plasmastate import *
 
 class nubeam(Component):
 
@@ -192,17 +193,18 @@ class nubeam(Component):
             raise Exception('Error in nubeam.step(): No services')
         services = self.services
 
-        #--- stage plasma state files
-
-        try:
-            services.stage_plasma_state()
-        except Exception, e:
-            print 'Error in call to stage_plasma_state()', e
-
         #--- get plasma state file name
 
         cur_state_file = services.get_config_param('CURRENT_STATE')
         cur_eqdsk_file = services.get_config_param('CURRENT_EQDSK')
+
+        #--- stage plasma state files
+
+        try:
+            services.stage_plasma_state()
+            shutil.copyfile (cur_state_file,'initial-'+cur_state_file)
+        except Exception, e:
+            print 'Error in call to stage_plasma_state()', e
 
         #--- stage input files
 
@@ -215,6 +217,24 @@ class nubeam(Component):
         #--- set nubeam_comp_exec run
 
         innubeam = Namelist.Namelist("innubeam")
+
+        # Santiy check on plasma state density
+
+        _ps = PlasmaState("ips",1)
+        _ps.read(cur_state_file)
+        nS = _ps["ns"].shape[0]
+
+        for nn in range(0,nS-1):
+
+            print 'DLG : Checking for NaNs before running Nubeam'
+
+            if np.isnan(np.sum(_ps["ns"][nn])):
+
+                print 'DLG ERROR : NaN detected before running Nubeam'
+                frameinfo = getframeinfo(currentframe())
+                print frameinfo.filename, frameinfo.lineno 
+                services.error('DLG ERROR : NaN detected before running Nubeam')
+                raise
 
         ncpu =  int(self.NPROC)
         nstep = innubeam["nubeam_run"]["nstep"][0]
@@ -326,4 +346,3 @@ class nubeam(Component):
     def finalize(self, timeStamp=0.0):
 
         return
-
