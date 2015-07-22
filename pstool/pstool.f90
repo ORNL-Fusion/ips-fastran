@@ -271,9 +271,10 @@ subroutine pstool_init_nubeam()
             ps%rho_anom(i) = (i-1.0)/(ps%nrho_anom-1.0)
         enddo
 
-        call ps_store_plasma_state(ierr,'ips-state-nubeam.nc')
-
     end if
+
+    call ps_store_plasma_state(ierr,'ips-state-nubeam.nc')
+
 end 
 
 

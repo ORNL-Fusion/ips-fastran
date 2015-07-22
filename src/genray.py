@@ -12,7 +12,7 @@ import subprocess
 from numpy import *
 
 from component import Component
-
+import traceback
 #-------------------
 #--- zcode libraries
 import zgenray
@@ -43,15 +43,23 @@ class genray(Component):
                       stdout=logfile,stderr=logfile)
         logfile.close()
         if (retcode != 0):
-           raise Exception('Error executing ', pstool_bin)
+            logMsg = 'Error executing ' + pstool_bin
+            services.exception(logMsg)
+            raise Exception(logMsg)
 
         cur_state_file = services.get_config_param('CURRENT_STATE')
-        shutil.copyfile("ips-state-genray.nc",cur_state_file)
+        try:
+            shutil.copyfile("ips-state-genray.nc",cur_state_file)
+        except Exception:
+            logMsg = 'ERROR : File copy failed'
+            services.exception(logMsg)
+            raise
 
         try:
             services.update_plasma_state()
-        except Exception, e:
-            print 'Error in call to update_plasma_state()', e
+        except Exception:
+            logMsg = 'Error in call to update_plasma_state()'
+            services.exception(logMsg)
             raise
 
         return
@@ -61,8 +69,8 @@ class genray(Component):
         #--- entry
 
         if (self.services == None) :
-            print 'Error in genray.step() : No services'
-            raise Exception('Error in genray.step(): No services')
+            logMsg = 'Error in genray.step() : No services'
+            raise Exception(logMsg)
         services = self.services
 
         #--- excutable
@@ -71,14 +79,18 @@ class genray(Component):
             genray_bin = os.path.join(self.BIN_PATH, self.BIN)
         except:
             genray_bin = os.path.join(self.BIN_PATH, 'xgenray')
+            logMsg = 'Using default binary path for GENRAY'
+            services.info(logMsg)
         print genray_bin
 
         #--- stage plasma state files
 
         try:
             services.stage_plasma_state()
-        except Exception, e:
-            print 'Error in call to stage_plasma_state()', e
+        except Exception:
+            logMsg = 'Error in call to stage_plasma_state()'
+            services.exception(logMsg)
+            raise
 
         #--- get plasma state file names
 
@@ -108,8 +120,9 @@ class genray(Component):
         retcode = services.wait_task(task_id)
 
         if (retcode != 0):
-           print 'Error executing ', 'xgenray'
-           raise
+           logMsg = 'Error executing ', 'xgenray'
+           services.exception(logMsg)
+           raise Exception(logMsg)
 
         #--- get genray output
 
@@ -120,19 +133,41 @@ class genray(Component):
         try:
             services.update_plasma_state()
         except Exception, e:
-            print 'Error in call to update_plasma_state()', e
+            logMsg =  'Error in call to update_plasma_state()'
+            services.exception(logMsg)
             raise
 
         #--- archive output files
 
         try:
             services.stage_output_files(timeStamp, self.OUTPUT_FILES)
-        except Exception, e:
-            print 'Error in call to stage_output_files()', e
-            raise Exception, e
+        except Exception: 
+            logMsg = 'Error in call to stage_output_files()'
+            services.exception(logMsg)
+            raise Exception
+
+        return
+
+
+    def restart(self, timeStamp=0.0):
+
+        self.services.info('restart() called for GENRAY')
+        restart_root = self.services.get_config_param('RESTART_ROOT')
+        self.services.get_restart_files(restart_root, timeStamp, self.RESTART_FILES)
 
         return
     
+
+    def checkpoint(self, timestamp=0.0):
+
+        services = self.services
+
+        services.info('checkpoint() called for genray')
+
+        services.save_restart_files(timestamp, self.RESTART_FILES)
+
+        return
+
     def finalize(self, timeStamp=0.0):
         return
     
