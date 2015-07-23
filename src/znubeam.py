@@ -19,6 +19,21 @@ from plasmastate import *
 ########################################################################
 # io
 
+def ps_interp1d(rho_, f_, rho):
+
+    # -----------------------------------------
+    # Interpolates from the dm1 plasma-state grid
+    # Underscore vars are on the dm1 (minus 1) plasma-state grid
+    # This assumes df/dRho=0 at boundaries
+
+    drho = rho_[1]-rho_[0]
+    rho = concatenate([[_rho[0]-drho],rho_,[rho_[-1]+drho]])
+    f = concatenate([[f_[0]],f_,[f_[-1]]])
+    f_interp = interp1d(rho,f)
+
+    return f_interp(rho)
+
+
 def update_ps_profile(f_state,f_eqdsk):
 
     #------------------------------------------------------------------- 
@@ -68,7 +83,7 @@ def update_ps_profile(f_state,f_eqdsk):
 
     density_th = zeros(nrho)
 
-    # DLG - hack to avoid zero density problems
+    # Hack to avoid zero density problems
 
     min_density = 1e-5
     ns_imp_zero_ii = ns_imp < min_density
@@ -77,30 +92,15 @@ def update_ps_profile(f_state,f_eqdsk):
     f_ion = ns_ion/sum(ns_ion,axis=0)
     f_imp = ns_imp/sum(ns_imp,axis=0)
 
-    # DLG : Get beam density on rho grid
-    # This is a terrible terrible hack.
-    # Assumes dn/drho=0 at boundaries.
-    # Should use the plasma-state API to get
-    # the nbeami data at the rho grid desired.
-    # - OR - 
-    # looks like JM has some cell2node functions
-    # that could do part of this.
-
-    _rho_nbi = ps["rho_nbi"][:]
-    _drho_nbi = _rho_nbi[1]-_rho_nbi[0]
-    _rho_nbi_dm1 = _rho_nbi[0:nrho_nbi-1]+_drho_nbi/2
-    _rho_nbi_full = concatenate([[_rho_nbi[0]-_drho_nbi],_rho_nbi_dm1,[_rho_nbi[-1]+_drho_nbi]])
-    _density_beam_full = concatenate([[density_beam[0]],density_beam,[density_beam[-1]]])
-    _density_beam = interp1d(_rho_nbi_full,_density_beam_full)
-
+    # The plasma-state API inter1d function does not work.
     #_ps = PlasmaState("ips",1)
     #_ps.read(f_state)
-    #_density_beam = _ps.interp1d("nbeami",0,rho) 
+    #density_beam_at_rho = _ps.interp1d("nbeami",0,rho) 
+
+    density_beam_at_rho = ps_interp1d(ps["rho_nbi"][:],density_beam,rho)
 
     for i in range(nrho-1):
 
-        # print i, f_ion[:,i], f_imp[:,i]
-        
         a=0; b=0; c=0; d=0
         for k in range(n_imp):
             b = b+f_imp[k,i]*z_imp[k]
@@ -114,12 +114,8 @@ def update_ps_profile(f_state,f_eqdsk):
 
         # depletion due to beam ions
 
-        #zne_adj = zne_adj - 1.0*density_beam[i]
-        #zzne_adj = zzne_adj - 1.0**2*density_beam[i]
-
-        # DLG : This is part of the terrible hack
-        zne_adj = zne_adj - 1.0*_density_beam(rho[i])
-        zzne_adj = zzne_adj - 1.0**2*_density_beam(rho[i])
+        zne_adj = zne_adj - 1.0*density_beam_at_rho[i]
+        zzne_adj = zzne_adj - 1.0**2*density_beam_at_rho[i]
 
         # effective main ion and impurity densities
 
