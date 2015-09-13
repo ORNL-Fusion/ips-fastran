@@ -19,7 +19,6 @@ import zefit
 import netCDF4
 import zefitutil
 from zplasmastate import plasma_state_file,instate2ps
-from inspect import currentframe, getframeinfo
 
 class fastran_init (Component):
 
@@ -27,6 +26,7 @@ class fastran_init (Component):
 
         Component.__init__(self, services, config)
         print 'Created %s' % (self.__class__)
+        return
 
     def init(self, timestamp=0.0):
 
@@ -66,7 +66,7 @@ class fastran_init (Component):
         # --------------------------------------------------------------
         # NORMAL simulation mode
         
-        elif mode == 'NORMAL':
+        elif ( mode == 'NORMAL' ) or ( mode == 'REGULAR' ):
         
             #----------------------------------------------------------
             #-- define run identifiers
@@ -274,8 +274,6 @@ class fastran_init (Component):
                 prior_state_file = services.get_config_param('PRIOR_STATE')
                 shutil.copyfile(cur_state_file, prior_state_file)
             except Exception, e:
-                frameinfo = getframeinfo(currentframe())
-                print framemeinfo.filename, frameinfo.lineno
                 print 'No PRIOR_STATE file ', e
                 raise
 
@@ -285,8 +283,6 @@ class fastran_init (Component):
                 next_state_file = services.get_config_param('NEXT_STATE')
                 shutil.copyfile(cur_state_file, next_state_file)
             except Exception, e:
-                frameinfo = getframeinfo(currentframe())
-                print framemeinfo.filename, frameinfo.lineno
                 print 'No NEXT_STATE file ', e
                 raise
 
@@ -295,11 +291,18 @@ class fastran_init (Component):
                 cur_jsdsk_file = services.get_config_param('CURRENT_JSDSK')
                 subprocess.call(['touch', cur_jsdsk_file])
             except Exception, e:
-                frameinfo = getframeinfo(currentframe())
-                print framemeinfo.filename, frameinfo.lineno
                 print 'No CURRENT_JSDSK file ', e
                 raise
-
+        
+        # --------------------------------------------------------------
+        # simulation mode not set to NORMAL or RESTART
+        
+        else:
+            logMsg = 'ERROR : SIMULATION_MODE not set to NORMAL or RESTART'
+            print logMsg
+            self.services.exception(logMsg)
+            raise Exception(logMsg)
+                    
 
         # --------------------------------------------------------------
         # Update plasma state

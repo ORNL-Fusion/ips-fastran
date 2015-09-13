@@ -19,7 +19,6 @@ import Namelist
 from zplasmastate import plasma_state_file
 import znubeam
 from plasmastate import *
-import traceback
 
 class nubeam(Component):
 
@@ -73,6 +72,7 @@ class nubeam(Component):
         #--- entry
 
         services = self.services
+        workdir = services.get_working_dir()
 
         services.stage_plasma_state()
 
@@ -91,7 +91,7 @@ class nubeam(Component):
         logfile.close()
         if (retcode != 0):
             logMsg = 'Error executing pstool_bin'
-            services.exception(logMsg)
+            services.error(logMsg)
             raise Exception(logMgs, pstool_bin)
 
         cur_state_file = services.get_config_param('CURRENT_STATE')
@@ -183,7 +183,7 @@ class nubeam(Component):
         retcode = services.wait_task(task_id)
         if (retcode != 0):
             logMsg = 'Error executing command:  mpi_nubeam_comp_exec: init '
-            services.exception(logMsg)
+            services.error(logMsg)
             raise Exception(logMsg)
 
         try:
@@ -209,6 +209,7 @@ class nubeam(Component):
 
         if (self.services == None) :
             logMsg = 'Error in nubeam.step() : No services'
+            services.error(logMsg)
             raise Exception(logMsg)
 
         services = self.services
@@ -264,7 +265,9 @@ class nubeam(Component):
         except:
             navg = 0
         if nstep-navg < 0: 
-           raise Exception("nubeam.py: nstep < navg")
+            logMsg = "nubeam.py: nstep < navg"
+            services.error(logMsg)
+            raise Exception(logMsg)
 
         dt_nubeam = innubeam["nubeam_run"]["dt_nubeam"][0]
 
@@ -309,6 +312,7 @@ class nubeam(Component):
         if (retcode != 0):
             print nubeam_bin
             logMsg = 'Error executing command:  mpi_nubeam_comp_exec: step '
+            services.error(logMsg)
             raise Exception(logMsg)
 
         if navg > 0:
@@ -323,6 +327,7 @@ class nubeam(Component):
                 retcode = services.wait_task(task_id)
                 if (retcode != 0):
                     logMsg = 'Error executing command:  mpi_nubeam_comp_exec: step avg '
+                    services.error(logMsg)
                     raise Exception(logMsg)
                 shutil.copyfile("state_changes.cdf","state_changes_%d.cdf"%k)
 
@@ -371,7 +376,7 @@ class nubeam(Component):
         services = self.services
         componentName = self.__class__.__name__ 
         logMsg = 'INFO : restart() called for '+componentName
-        services.info(logMsg)
+        services.warning(logMsg)
         restart_root = services.get_config_param('RESTART_ROOT')
         services.get_restart_files(restart_root, timeStamp, self.RESTART_FILES)
 
@@ -386,7 +391,7 @@ class nubeam(Component):
 
         services = self.services
 
-        services.info('checkpoint() called for nubeam')
+        services.warning('checkpoint() called for nubeam')
 
         services.save_restart_files(timestamp, self.RESTART_FILES)
 

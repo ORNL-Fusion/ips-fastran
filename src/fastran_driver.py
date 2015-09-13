@@ -19,13 +19,14 @@ class fastran_driver(Component):
 
         Component.__init__(self, services, config)
         print 'Created %s' % (self.__class__)
+        return
 
     # ------------------------------------------------------------------
     # init function
 
     def init(self, timestamp=0):
         print 80*'*'
-        print 'DIRVER INIT'
+        print 'DRIVER INIT'
         return
 
     # ------------------------------------------------------------------

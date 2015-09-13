@@ -27,9 +27,10 @@ def ps_interp1d(rho_, f_, rho):
     # This assumes df/dRho=0 at boundaries
 
     drho = rho_[1]-rho_[0]
-    rho = concatenate([[_rho[0]-drho],rho_,[rho_[-1]+drho]])
-    f = concatenate([[f_[0]],f_,[f_[-1]]])
-    f_interp = interp1d(rho,f)
+    rhoCentered = rho_[0:-1]+drho/2
+    rhoExtend = concatenate([[rhoCentered[0]-drho],rhoCentered,[rhoCentered[-1]+drho]])
+    fExtend = concatenate([[f_[0]],f_,[f_[-1]]])
+    f_interp = interp1d(rhoExtend,fExtend)
 
     return f_interp(rho)
 
@@ -97,7 +98,7 @@ def update_ps_profile(f_state,f_eqdsk):
     #_ps.read(f_state)
     #density_beam_at_rho = _ps.interp1d("nbeami",0,rho) 
 
-    density_beam_at_rho = ps_interp1d(ps["rho_nbi"][:],density_beam,rho)
+    density_beam_at_rho = ps_interp1d(ps["rho_nbi"][:],ps["nbeami"][0,:],rho)
 
     for i in range(nrho-1):
 
