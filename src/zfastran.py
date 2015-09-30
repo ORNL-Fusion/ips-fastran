@@ -100,11 +100,13 @@ def io_write_input(f_state,f_eqdsk):
     zeff  = ps["Zeff"][:]
     omega = ps["omegat"][:]
     ne    = ps.cell2node_bdry(ne)
-    nith  = ps.cell2node(nith)
+    nith  = ps.cell2node_bdry(nith)
     te    = ps.cell2node_bdry(te)
     ti    = ps.cell2node_bdry(ti)
-    zeff  = ps.cell2node(zeff)
-    omega = ps.cell2node(omega)
+    zeff  = ps.cell2node_bdry(zeff)
+    print omega
+    omega = ps.cell2node_bdry(omega)
+    print omega
 
     q  = zeros(nrho)
     fp = zeros(nrho)
@@ -302,7 +304,7 @@ def io_write_input(f_state,f_eqdsk):
     f.close()
 
 def io_update_state(
-        f_state,f_eqdsk,f_fastran,time=''):
+        f_state,f_eqdsk,f_fastran,time='',relax=1.0):
 
     #------------------------------------------------------------------ 
     # read geqdsk and plasma state
@@ -334,15 +336,15 @@ def io_update_state(
     #------------------------------------------------------------------
     # update plasma state
 
-    ps["Ts"][0] =ps.node2cell(te)
+    ps["Ts"][0] = (1.0-relax)*ps["Ts"][0] + relax*ps.node2cell(te)
 
     nspec_th = len(ps.data.dimensions["dim_nspec_th"])
     for k in range(nspec_th):
-        ps["Ts"][k+1] = ps.node2cell(ti)
+        ps["Ts"][k+1] = (1.0-relax)*ps["Ts"][k+1] + relax*ps.node2cell(ti)
 
-    ps["Ti"][:] = ps.node2cell(ti)
+    ps["Ti"][:] = (1.0-relax)*ps["Ti"][:] + relax*ps.node2cell(ti)
 
-    ps["omegat"][:] = ps.node2cell(omega)
+    ps["omegat"][:] = (1.0-relax)*ps["omegat"][:] + relax*ps.node2cell(omega)
 
     ps.load_j_parallel(j_tot)
     ps.load_j_parallel_CD(rho,j_bs,"bs")

@@ -88,10 +88,15 @@ class fastran_solver(Component):
            raise
 
         #--- update local plasma state
+        try:
+           relax = float(self.RELAX)
+        except:
+           relax = 1.0
+        print 'relax=',relax
 
         zfastran.io_update_state(
            f_state=cur_state_file,f_eqdsk=cur_eqdsk_file,
-           f_fastran='fastran.nc',time = timeStamp)
+           f_fastran='fastran.nc',time=timeStamp,relax=relax)
 
         #shutil.copyfile('fastran.nc',cur_fastran_file)
 

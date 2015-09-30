@@ -250,14 +250,23 @@ class plasma_state_file():
         node[-1] = cell[-1]
         return node
 
+    #def cell2node_bdry(self,cell):
+    #
+    #    nrho = len(cell)+1
+    #    node = zeros(nrho)
+    #    node[0] = cell[0]
+    #    for i in range(1,nrho-1):
+    #        node[i] = 0.5*(cell[i-1]+cell[i])
+    #    node[-1] = 2.0*cell[-1]-node[-2] #<=====
+    #    return node
+
     def cell2node_bdry(self,cell):
     
         nrho = len(cell)+1
         node = zeros(nrho)
         node[0] = cell[0]
-        for i in range(1,nrho-1):
-            node[i] = 0.5*(cell[i-1]+cell[i])
-        node[-1] = 2.0*cell[-1]-node[-2] #<=====
+        for i in range(1,nrho):
+            node[i] = 2.0*cell[i-1]-node[i-1]
         return node
 
 def instate2ps(instate,ps):
@@ -285,6 +294,12 @@ def instate2ps(instate,ps):
     ti = instate["ti"]
     omega = instate["omega"]
     zeff = instate["zeff"]
+
+    ne[0] = ne[1]
+    te[0] = te[1]
+    ti[0] = ti[1]
+    omega[0] = omega[1]
+    zeff[0] = zeff[1]
 
     #------------------------------------------------------------------
     # put zeros if not defined
@@ -401,6 +416,7 @@ def instate2ps(instate,ps):
     # current
     
     j_tot = 1.e6*instate["j_tot"]
+    j_tot[0] = j_tot[1]
     ps.load_j_parallel(j_tot)
     
     for key in ["j_nb","j_ec","j_ic","j_bs","j_oh"]:

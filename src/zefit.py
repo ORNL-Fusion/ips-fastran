@@ -16,10 +16,12 @@ import zutil,zefitutil,zefitdata
 from zinterp import *
 from zplasmastate import plasma_state_file
 
+import time as timer
+
 ########################################################################
 #   compose kfile
 
-def fixbdry_kfile(shot,time,f_inefit,p_scale=1.0,efitdir='.'): 
+def fixbdry_kfile(shot,time,f_inefit,p_scale=1.0,efitdir='.',relax=0): 
 
     mu0 = 4.e-7*pi
 
@@ -54,9 +56,12 @@ def fixbdry_kfile(shot,time,f_inefit,p_scale=1.0,efitdir='.'):
     print 'efitdir = ',efitdir
     print 'gfile   = ',gfile
 
+    t1 = timer.time()
     geq = zefitdata.efitdata(gfile,nrho_eq=129,nth_eq=101,nrho_eq_geo=129)
+    t2 = timer.time()
+    print '>>>>>>>>',t2-t1
 
-    psirho = geq["psipol"]/geq["psipol"][-1]  # equi-drho grid
+    psirho = geq["psipol"][:]/geq["psipol"][-1]  # equi-drho grid
     dpsi = abs(geq["ssibry"]-geq["ssimag"])
 
     rhob = (geq["phit"][-1]/pi/abs(geq["bcentr"]))**0.5 
@@ -94,6 +99,8 @@ def fixbdry_kfile(shot,time,f_inefit,p_scale=1.0,efitdir='.'):
         jtor[i] = 1.0/ipol[i]*(jpar[i]
             +4.0*pi**2/mu0*r0*b0/volp[i]*rho[i]/qmhd[i]*ipol_der[i])
     jtor[0] = 1.0/ipol[0]*jpar[0]
+
+    jtor = jpar  #<=============
 
     jtor_spl = zinterp(rho,jtor)
     jtor_psi = jtor_spl(rho_eval)
@@ -144,6 +151,10 @@ def fixbdry_kfile(shot,time,f_inefit,p_scale=1.0,efitdir='.'):
     #-------------------------------------------------------------------
     # write kfile
 
+    if relax:
+       kfile_old = Namelist("k%06d.%05d"%(shot,time))
+
+
     kfile = Namelist()
 
     kfile['in1']['iconvr'] = [3]
@@ -187,10 +198,33 @@ def fixbdry_kfile(shot,time,f_inefit,p_scale=1.0,efitdir='.'):
     kfile['in1']['prbdry'] = [press_in[-1]]
     kfile['profile_ext']['npsi_ext'] = [npsi]
     kfile['profile_ext']['psin_ext'] = psi
-    kfile['profile_ext']['pprime_ext'] = -pprim_psi
-    kfile['profile_ext']['ffprim_ext'] = -ffprim_psi
+    if relax:
+        kfile['profile_ext']['pprime_ext'] =0.5*( -pprim_psi + kfile_old['profile_ext']['pprime_ext'])
+        kfile['profile_ext']['ffprim_ext'] =0.5*(-ffprim_psi + kfile_old['profile_ext']['ffprim_ext'])
+    else:
+        kfile['profile_ext']['pprime_ext'] = -pprim_psi   
+        kfile['profile_ext']['ffprim_ext'] =-ffprim_psi  
 
     kfile.write("k%06d.%05d"%(shot,time))
+
+    iconv = 0
+    max_error = 0.01
+    diff_p = 0.0
+    diff_p_sum = 0.0
+    diff_f = 0.0
+    diff_f_sum = 0.0
+    if relax:
+       for k in range(nrho):
+           diff_p += abs(kfile['profile_ext']['pprime_ext'][k]-kfile_old['profile_ext']['pprime_ext'][k] )
+           diff_p_sum += abs(kfile['profile_ext']['pprime_ext'][k])
+           diff_f += abs(kfile['profile_ext']['ffprim_ext'][k] - kfile_old['profile_ext']['ffprim_ext'][k] )
+           diff_f_sum += abs(kfile['profile_ext']['ffprim_ext'][k])
+       print 'diff=',diff_p/diff_p_sum
+       print 'diff=',diff_f/diff_f_sum
+       if diff_p/diff_p_sum < max_error and diff_f/diff_f_sum < max_error: iconv = 1
+    return iconv        
+
+
 
 def fixbdry_kfile_init(shot,time,f_inefit): 
 
@@ -261,6 +295,8 @@ def fixbdry_kfile_init(shot,time,f_inefit):
     kfile['profile_ext']['ffprim_ext'] = npsi*[0.0]
 
     kfile.write("k%06d.%05d"%(shot,time))
+
+    return 0
 
 ########################################################################
 #   UTILS
@@ -367,7 +403,7 @@ def io_input_from_instate(f_instate):
 
     inefit.write("inefit")
 
-def io_input_from_state(f_ps,f_inbc):
+def io_input_from_state(f_ps,f_inbc,mode='kinetic'):
 
     # read inbc
 
@@ -381,7 +417,6 @@ def io_input_from_state(f_ps,f_inbc):
     ps = plasma_state_file(f_ps,r0=r0,b0=b0,ip=ip)
 
     nrho  = ps.nrho
-
     rho   = ps["rho"][:]
     ne    = ps["ns"][0,:]*1.0e-19
     ni    = ps["ni"][:]*1.0e-19
@@ -391,19 +426,25 @@ def io_input_from_state(f_ps,f_inbc):
     ni    = ps.cell2node(ni)
     te    = ps.cell2node(te)
     ti    = ps.cell2node(ti)
-
+    
     density_beam = ps.dump_profile(rho,"nbeami",k=0)*1.e-19
     wbeam = ps.dump_profile(rho,"eperp_beami",k=0) \
           + ps.dump_profile(rho,"epll_beami" ,k=0)
     wbeam = density_beam*wbeam
-
+    
     density_alpha = ps.dump_profile(rho,"nfusi",k=0)*1.e-19
     walpha = ps.dump_profile(rho,"eperp_fusi",k=0) \
            + ps.dump_profile(rho,"epll_fusi",k=0)
     walpha = density_alpha*walpha
 
-    pmhd = 1.602e3*(ne*te+ni*ti)+2.0/3.0*1.602e3*(wbeam+walpha)
+    if mode == 'kinetic':
+       print 'mode = kinetic'
+       pmhd = 1.602e3*(ne*te+ni*ti)+2.0/3.0*1.602e3*(wbeam+walpha)
 
+    else:
+       print 'mode = total'
+       pmhd = ps["P_eq"][:]
+ 
     jpar = ps.dump_j_parallel()
 
     rlim = ps["rlim"][:]

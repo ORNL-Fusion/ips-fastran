@@ -57,8 +57,11 @@ class esc(Component):
 
         #--- generate inefit
 
+        #zefit.io_input_from_state(
+        #    cur_eqdsk_file,cur_state_file,cur_bc_file)
+
         zefit.io_input_from_state(
-            cur_eqdsk_file,cur_state_file,cur_bc_file)
+            cur_state_file,cur_bc_file)
 
         #--- excutables
 

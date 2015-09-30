@@ -93,7 +93,7 @@ class nubeam(Component):
         try:
             copy_preact = self.COPY_PREACT
         except:
-            copy_preact = 0
+            copy_preact = 1
 
         if copy_preact:
             try:

@@ -7,9 +7,10 @@
  -----------------------------------------------------------------------
 """
 
-import sys,os,shutil
+import sys,os,shutil,glob
 import subprocess
 from numpy import *
+import time as timer
 
 from  component import Component
 
@@ -57,7 +58,17 @@ class efit(Component):
 
         #--- generate inefit
 
+        # zefit.io_input_from_state(cur_state_file,cur_bc_file,mode='total')
         zefit.io_input_from_state(cur_state_file,cur_bc_file)
+
+        #--- clean up
+
+        try: 
+           files = glob.glob("g000000.?????")
+           for file in files: os.remove(file)
+           print 'removed'
+        except:
+           pass
 
         #--- run efit
 
@@ -91,12 +102,25 @@ class efit(Component):
 
         for k in range(kinit,kinit+niter):
 
-            print "generate kfile %d"%k
+            print "*** generate kfile %d"%k
+
+            t0 = timer.time()
+ 
             if k == 0:
-                zefit.fixbdry_kfile_init(shot,time,f_inefit)
+                iconv = zefit.fixbdry_kfile_init(shot,time,f_inefit)
             else:
-                zefit.fixbdry_kfile(shot,time,f_inefit)
-    
+                if k > kinit: 
+                   relax = 1
+                   print 'apply underrelaxation'
+                else: relax = 0
+                iconv = zefit.fixbdry_kfile(shot,time,f_inefit,relax=relax)
+         
+            if iconv:
+               print 'converged'
+               break
+
+            t1 = timer.time()
+
             print "run efit"
 
             task_id = services.launch_task(1, cwd, "sh xefit", logfile='efit.log')
@@ -104,6 +128,12 @@ class efit(Component):
             if (retcode != 0):
                print 'Error executing ', 'efit'
                raise
+            shutil.copyfile("g%06d.%05d"%(shot,time),"g000000.%05d"%(k)) #<--------
+
+            t2 = timer.time()
+
+            print '**** %6.3f %6.3f'%(t1-t0,t2-t1)
+
 
         #--- update local geqdsk state
 
