@@ -1,0 +1,36 @@
+#! /bin/bash
+#PBS -q premium
+#PBS -l mppwidth=24
+#PBS -l walltime=2:00:00
+#PBS -o fastran_ips.log
+#PBS -e fastran_ips.err
+#PBS -S /bin/bash
+
+umask 0022
+ulimit -Ss 8192
+
+cd $PBS_O_WORKDIR
+
+module load python matplotlib numpy netcdf
+
+export IPS_ROOT=/project/projectdirs/atom/atom-install-edison/ips-gnu-sf
+export IPS_ROOT_SWIM=/project/projectdirs/atom/atom-install-edison/ips-cswim-wrappers
+export DAKOTA_ROOT=/project/projectdirs/atom/atom-install-edison/dakota
+export FASTRAN_ROOT=/project/projectdirs/atom/atom-install-edison/ips-wrappers/ips-fastran
+export DATA_ROOT=/project/projectdirs/atom/atom-install-edison/data
+
+export PYTHONPATH=$FASTRAN_ROOT/share/python:$PYTHONPATH
+export PYTHONPATH=$FASTRAN_ROOT/utils:$PYTHONPATH
+export PYTHONPATH=$FASTRAN_ROOT/src:$PYTHONPATH
+
+EXTERN_EDISON=/project/projectdirs/atom/users/elwasif/extern-edison
+export LD_LIBRARY_PATH=$EXTERN_EDISON/lib:$EXTERN_EDISON/lib64:$LD_LIBRARY_PATH
+export PYTHONPATH=$EXTERN_EDISON/lib/python2.7/site-packages/Numeric:$EXTERN_EDISON/lib/python2.7/site-packages:$EXTERN_EDISON/lib/python2.7/site-packages/Scientific/linux2/:$PYTHONPATH
+
+export PATH=$DAKOTA_ROOT/bin:$IPS_ROOT/bin:$PATH
+export LD_LIBRARY_PATH=$DAKOTA_ROOT/lib:$LD_LIBRARY_PATH
+
+export PATH=/project/projectdirs/atom/atom-install-edison/numactl/bin:$PATH
+
+$IPS_ROOT/bin/ips.py --config=fastran_scenario.config --platform=edison.conf --log=fastran_run.log
+#$IPS_ROOT/bin/ips_dakota_dynamic.py --dakotaconfig=dakota_fastran.in --simulation=fastran_scenario.config --platform=edison.conf --log=fastran_sweep.log  

@@ -5,7 +5,7 @@ ITER Off-axis beam benchmark case
 
   DT_NUBEAM = 0.050
   NSTEP = 40
-! NAVG  = 10
+  NAVG  = 10
 
 /
 
