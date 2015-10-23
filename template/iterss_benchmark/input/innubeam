@@ -67,7 +67,7 @@ ITER Off-axis beam benchmark case
   NMCURB   = 1 
   NSEED    = 410338673
 
-  NLTEST_OUTPUT = 0
+  NLTEST_OUTPUT = 1
   NSDBGB = 2
 /
 

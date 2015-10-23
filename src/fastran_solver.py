@@ -91,7 +91,7 @@ class fastran_solver(Component):
         try:
            relax = float(self.RELAX)
         except:
-           relax = 1.0
+           relax = 0.5
         print 'relax=',relax
 
         zfastran.io_update_state(
