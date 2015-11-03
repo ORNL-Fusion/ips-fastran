@@ -298,6 +298,34 @@ def fixbdry_kfile_init(shot,time,f_inefit):
 
     return 0
 
+def io_input_init(f_instate):
+
+    instate = Namelist(f_instate)['instate']
+
+    nrho  = instate['nrho'][0]
+    rho = arange(nrho)/(nrho-1.0)
+
+    jpar  = zeros(nrho)
+    pmhd  = zeros(nrho)
+
+    inefit = Namelist()
+    
+    inefit["inefit"]["ip"   ] = [instate["ip"][0]*1.0e6]
+    inefit["inefit"]["r0"   ] = instate["r0"]
+    inefit["inefit"]["b0"   ] = instate["b0"]
+    inefit["inefit"]["nrho" ] = [nrho]
+    inefit["inefit"]["rho"  ] = rho
+    inefit["inefit"]["press"] = pmhd
+    inefit["inefit"]["jpar" ] = jpar
+    inefit["inefit"]["nlim" ] = instate["nlim" ]
+    inefit["inefit"]["rlim" ] = instate["rlim" ]
+    inefit["inefit"]["zlim" ] = instate["zlim" ]
+    inefit["inefit"]["nbdry"] = instate["nbdry"]
+    inefit["inefit"]["rbdry"] = instate["rbdry"]
+    inefit["inefit"]["zbdry"] = instate["zbdry"]
+
+    inefit.write("inefit")
+
 ########################################################################
 #   UTILS
 

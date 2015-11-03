@@ -14,8 +14,7 @@ import time as timer
 
 from  component import Component
 
-#-------------------
-#--- zcode libraries
+#--- zcode libraries ---
 import zefit, zefitutil
 from zplasmastate import plasma_state_file
 
@@ -54,12 +53,20 @@ class efit(Component):
             shot = int(services.get_config_param('SHOT_NUMBER'))
         except:
             shot = 0
-        time = 0
+        try:
+            time = int(services.get_config_param('TIME_ID'))
+        except:
+            time = 0
 
         #--- generate inefit
 
-        # zefit.io_input_from_state(cur_state_file,cur_bc_file,mode='total')
-        zefit.io_input_from_state(cur_state_file,cur_bc_file)
+        try:
+            mode = self.PRESSURE
+        except:
+            mode = 'kinetic'
+        print 'mode = ', mode
+
+        zefit.io_input_from_state(cur_state_file,cur_bc_file,mode=mode)
 
         #--- clean up
 
@@ -133,7 +140,6 @@ class efit(Component):
             t2 = timer.time()
 
             print '**** %6.3f %6.3f'%(t1-t0,t2-t1)
-
 
         #--- update local geqdsk state
 
