@@ -48,6 +48,7 @@ class fastran_solver(Component):
 
         cur_state_file = services.get_config_param('CURRENT_STATE')
         cur_eqdsk_file = services.get_config_param('CURRENT_EQDSK')
+        cur_bc_file = services.get_config_param('CURRENT_BC')
         #cur_fastran_file = services.get_config_param('CURRENT_FASTRAN')
 
         #--- stage input files
@@ -61,7 +62,7 @@ class fastran_solver(Component):
 
         #--- generate fastran input
 
-        zfastran.io_write_input(cur_state_file,cur_eqdsk_file)
+        zfastran.io_write_input(cur_state_file,cur_eqdsk_file,cur_bc_file)
 
         #--- run fastran
 
@@ -88,15 +89,16 @@ class fastran_solver(Component):
            raise
 
         #--- update local plasma state
+
         try:
            relax = float(self.RELAX)
         except:
-           relax = 1.0
+           relax = 0.5
         print 'relax=',relax
 
         zfastran.io_update_state(
            f_state=cur_state_file,f_eqdsk=cur_eqdsk_file,
-           f_fastran='fastran.nc',time=timeStamp,relax=relax)
+           f_fastran='fastran.nc',time = timeStamp,relax=relax)
 
         #shutil.copyfile('fastran.nc',cur_fastran_file)
 
