@@ -14,8 +14,6 @@ from netCDF4 import *
 
 from  component import Component
 
-#-------------------
-#--- zcode libraries
 from Namelist import Namelist
 import zefitutil,zefit
 from zplasmastate import plasma_state_file
@@ -28,6 +26,16 @@ class esc(Component):
         print 'Created %s' % (self.__class__)
 
     def init(self, timeStamp=0.0):
+
+        print 'esc.init() entered'
+        try:
+           init_run = int(self.INIT_RUN)
+        except:
+           init_run = 0
+        print 'init_run = ',init_run
+
+        if init_run:
+            self.step(-1)
 
         return
 
@@ -56,9 +64,6 @@ class esc(Component):
         cur_bc_file = services.get_config_param('CURRENT_BC')
 
         #--- generate inefit
-
-        #zefit.io_input_from_state(
-        #    cur_eqdsk_file,cur_state_file,cur_bc_file)
 
         zefit.io_input_from_state(
             cur_state_file,cur_bc_file)

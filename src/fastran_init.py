@@ -199,25 +199,58 @@ class fastran_init (Component):
 
                 print 'solve initial equilibrium'
 
-                zefit.io_input_from_instate("instate")
-                esc_bin = os.path.join(self.BIN_PATH,'xesc')
-                wgeqdsk_bin = os.path.join(self.BIN_PATH, 'wgeqdsk')
+                try:
+                    gs_solver = self.INIT_EQ
+                except:
+                    gs_solver = 'esc'
+                    pass
 
-                logfile = open('xesc.log', 'w')
-                retcode = subprocess.call([esc_bin]
-                              ,stdout=logfile,stderr=logfile,shell=True)
-                if (retcode != 0):
-                   print 'Error executing ', 'esc'
-                   raise
-                logfile.close()
+                if gs_solver == 'esc':
 
-                logfile = open('wgeqdsk.log', 'a')
-                retcode = subprocess.call([wgeqdsk_bin]
-                              ,stdout=logfile,stderr=logfile,shell=True)
-                if (retcode != 0):
-                   print 'Error executing ', 'wgeqdsk'
-                   raise
-                logfile.close()
+                    zefit.io_input_from_instate("instate")
+                    esc_bin = os.path.join(self.BIN_PATH,'xesc')
+                    wgeqdsk_bin = os.path.join(self.BIN_PATH, 'wgeqdsk')
+
+                    logfile = open('xesc.log', 'w')
+                    retcode = subprocess.call([esc_bin]
+                                  ,stdout=logfile,stderr=logfile,shell=True)
+                    if (retcode != 0):
+                       print 'Error executing ', 'esc'
+                       raise
+                    logfile.close()
+
+                    logfile = open('wgeqdsk.log', 'a')
+                    retcode = subprocess.call([wgeqdsk_bin]
+                                  ,stdout=logfile,stderr=logfile,shell=True)
+                    if (retcode != 0):
+                       print 'Error executing ', 'wgeqdsk'
+                       raise
+                    logfile.close()
+
+                elif gs_solver == 'efit':
+
+                    efit_bin = os.path.join(self.BIN_PATH, 'efitd90 129 129')
+
+                    shot = 0
+                    time = 0
+                    kfile = "k%06d.%05d"%(shot,time)
+                    args = "2\n 1\n "+kfile
+                    command = 'echo \"%s\"'%args + ' | ' + efit_bin 
+
+                    f=open("xefit","w")
+                    f.write(command)
+                    f.close()
+
+                    zefit.io_input_init("instate")
+                    zefit.fixbdry_kfile_init(shot,time,f_inefit="inefit")
+
+                    cwd = services.get_working_dir()
+                    task_id = services.launch_task(1, cwd, "sh xefit", logfile='efit.log')
+                    retcode = services.wait_task(task_id)
+                    if (retcode != 0):
+                       print 'Error executing ', 'efit'
+                       raise
+                    shutil.copyfile("g%06d.%05d"%(shot,time),"geqdsk") #<--------
 
             #----------------------------------------------------------
             #-- load geqdsk to plasma state
