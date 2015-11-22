@@ -32,39 +32,11 @@ class modeleq_init(Component):
     def init(self, timestamp=0.0):
 
         print ('modeleq_init.init() called')
-        services = self.services
-
-        input_dir_fastran = services.get_config_param('INPUT_DIR_FASTRAN')
-        input_dir_sim = services.get_config_param('INPUT_DIR_SIM')
-
-        print 'INPUT_DIR_FASTRAN = ',input_dir_fastran
-        print 'INPUT_DIR_SIM = ',input_dir_sim
-
-        if not os.path.exists(input_dir_sim):
-            print 'making directory', input_dir_sim
-            os.mkdir(input_dir_sim)
-
-        try:
-            input_id = int(float(self.INPUT_ID))
-        except:
-            input_id = 0
-        print 'input_id = ',input_id
-
-
-        for input_file in self.INPUT_FILES.split():
- 
-            src = os.path.join(input_dir_fastran,input_file)
-            if input_id > 0:
-                src = src+".%d"%input_id
-            target = os.path.join(input_dir_sim,input_file)
-            print 'src    :',src
-            print 'target :',target
-            shutil.copyfile (src,target)
 
     def step(self, timeStamp):
 
         #----------------------------------------------------------
-        #-- entry
+        # entry
 
         print ('modeleq_init.step() called')
         services = self.services
@@ -74,31 +46,42 @@ class modeleq_init(Component):
         run_id = services.get_config_param('RUN_ID')
 
         #----------------------------------------------------------
-        #-- stage input files
+        # stage input files
 
         services.stage_input_files(self.INPUT_FILES)
 
         #----------------------------------------------------------
-        #-- get plasma state file names
+        # get plasma state file names
 
         cur_state_file = services.get_config_param('CURRENT_STATE')
         cur_eqdsk_file = services.get_config_param('CURRENT_EQDSK')
         cur_bc_file = services.get_config_param('CURRENT_BC')
 
+        instate = Namelist("instate")
+        var_list = [ var.upper() for var in instate["instate"].keys()]
+        for key in var_list: 
+            try:
+                instate["instate"][key][0] = float(getattr(self, key))
+                print key, 'updated' 
+            except AttributeError:
+                pass 
+        instate.write("instate")
+
         #----------------------------------------------------------
-        #-- read instate file
+        # read instate file
 
         instate = Namelist("instate")["instate"]
+
         nrho = instate["nrho"][0]
         rho = arange(nrho)/(nrho-1.0)
 
         #----------------------------------------------------------
-        #-- get pstool excutable name
+        # get pstool excutable name
 
         pstool_bin = os.path.join(self.BIN_PATH, 'pstool')
 
         #----------------------------------------------------------
-        #-- allocate initial plasma state file
+        # allocate initial plasma state file
 
         inps = Namelist()
         inps["inps"]["global_label"] = ['fastran_model_equilibrium']
@@ -142,7 +125,7 @@ class modeleq_init(Component):
            raise Exception('Error executing ', pstool_bin)
 
         #----------------------------------------------------------
-        #-- run initial equilibrium
+        # run initial equilibrium
 
         inefit = Namelist()
         inefit["inefit"]["rho"  ] = rho
@@ -188,7 +171,7 @@ class modeleq_init(Component):
         shutil.copyfile("g%06d.%05d"%(shot,time), cur_eqdsk_file)
 
         #----------------------------------------------------------
-        #-- load geqdsk to plasma state
+        # load geqdsk to plasma state
 
         print 'pstool load geqdsk'
 
@@ -202,7 +185,7 @@ class modeleq_init(Component):
         logfile.close()
 
         #----------------------------------------------------------
-        #-- load innubeam to plasma state
+        # load innubeam to plasma state
 
         if "innubeam" in self.INPUT_FILES:
             print 'pstool load innubeam'
@@ -215,7 +198,7 @@ class modeleq_init(Component):
                raise
 
         #----------------------------------------------------------
-        #-- compose inital plasma state profile
+        # compose inital plasma state profile
 
         print 'initial plasma state'
 
@@ -229,7 +212,7 @@ class modeleq_init(Component):
         #shutil.copyfile("ps.nc",cur_state_file)
 
         #----------------------------------------------------------
-        #-- boundary condition plasma state file
+        # boundary condition plasma state file
 
         inbc = Namelist()
         inbc["inbc"]["r0"   ] = instate["r0"]
@@ -311,13 +294,44 @@ def init_plasmastate(f_instate, f_ps):
     nbeam_alpha= instate["nbeam_alpha"][0]
     nbeam_beta = instate["nbeam_beta" ][0]
     tbeami     = instate["tbeami"     ][0]
+
+    try:
+        omega_axis    = instate["omega_axis" ][0]
+        omega_ped     = instate["omega_ped"  ][0]
+        omega_sep     = instate["omega_sep"  ][0]
+        omega_alpha   = instate["omega_alpha"][0]
+        omega_beta    = instate["omega_beta" ][0]
+    except:
+        omega_axis    = 0.0 
+        omega_ped     = 0.0 
+        omega_sep     = 0.0 
+        omega_alpha   = 1.5
+        omega_beta    = 1.5
+    print 'omega:', omega_axis, omega_ped, omega_sep, omega_alpha, omega_beta
     
     rho = arange(nrho)/(nrho-1.0)
     ne = profile_pedestal(nrho,xmid,xwid,ne_ped,ne_sep,ne_axis,ne_alpha,ne_beta)(rho)
     te = profile_pedestal(nrho,xmid,xwid,te_ped,te_sep,te_axis,te_alpha,te_beta)(rho)
     ti = profile_pedestal(nrho,xmid,xwid,ti_ped,ti_sep,ti_axis,ti_alpha,ti_beta)(rho)
-    omega = 150.0e3*(1.0-rho**1.5)**1.5
+   #omega = 150.0e3*(1.0-rho**1.5)**1.5
+    if omega_axis > 0:
+        omega = profile_pedestal(nrho,xmid,xwid,omega_ped,omega_sep,omega_axis,omega_alpha,omega_beta)(rho)
+    else:
+        omega = zeros(nrho)
+
     zeff = zeff*ones(nrho)
+
+    try:
+        zeff0 = instate["zeff_profile"][0]
+        zeff_profile = instate["zeff_profile"]
+    except:
+        zeff_profile = []
+    print 'zeff_profile = ',zeff_profile
+
+    if len(zeff_profile) == nrho:
+        zeff = zeff_profile
+        print 'zeff from zeff_profile'
+
     jtot = (jpar_axis-jpar_sep)*(1.0-rho**jpar_alpha)**jpar_beta+jpar_sep
     density_beam = (nbeam_axis-nbeam_sep)*(1.0-rho**nbeam_alpha)**nbeam_beta+nbeam_sep
     density_alpha = zeros(nrho)

@@ -189,6 +189,78 @@ def getbdry(geq,nskip=2):
 #    write (lun,2020) (rbbbs(i),zbbbs(i),i=1,nbbbs)
 #    write (lun,2020) (xlim(i),ylim(i),i=1,limitr)
 
+def reada(fname):
+    
+    #-------------------------------------
+    # read
+
+    f = open(fname,"r")
+    lines = f.readlines()
+    f.close()
+
+    #-------------------------------------
+    # parse
+    for k in range(4,7): print lines[k]
+
+    #data = [ line2vec(lines[k]) for k in range(4,5) ]
+
+    r0    = line2vec(lines[4 ][1:])[1]
+    b0    = line2vec(lines[4 ][1:])[2]
+    a0    = line2vec(lines[5 ][1:])[3]
+    ip    = line2vec(lines[5 ][1:])[0]
+    betat = line2vec(lines[7 ][1:])[3]
+    qaxis = line2vec(lines[17][1:])[2]
+    betan = fabs(ip*1.0e-6)/(0.01*a0*abs(b0))
+
+    print r0,a0 
+    print b0,ip
+    print betat,betan 
+
+#    read (neqdsk,1060) time(jj),jflag(jj),lflag,limloc(jj),
+# .                      mco2v,mco2r,qmflag,nlold,nlnew
+#    read (neqdsk,1040) tsaisq(jj),rcencm,bcentr(jj),pasmat(jj)          4
+#    read (neqdsk,1040) cpasma(jj),rout(jj),zout(jj),aout(jj)            5 
+#    read (neqdsk,1040) eout(jj),doutu(jj),doutl(jj),vout(jj)            6
+#    read (neqdsk,1040) rcurrt(jj),zcurrt(jj),qsta(jj),betat(jj)         7
+#    read (neqdsk,1040) betap(jj),ali(jj),oleft(jj),oright(jj)           8
+#    read (neqdsk,1040) otop(jj),obott(jj),qpsib(jj),vertn(jj)           9
+#    read (neqdsk,1040) (rco2v(k,jj),k=1,mco2v) 10
+#    read (neqdsk,1040) (dco2v(jj,k),k=1,mco2v) 11 
+#    read (neqdsk,1040) (rco2r(k,jj),k=1,mco2r) 12
+#    read (neqdsk,1040) (dco2r(jj,k),k=1,mco2r) 13 
+#    read (neqdsk,1040) shearb(jj),bpolav(jj),s1(jj),s2(jj)      14
+#    read (neqdsk,1040) s3(jj),qout(jj),olefs(jj),orighs(jj)      15
+#    read (neqdsk,1040) otops(jj),sibdry(jj),areao(jj),wplasm(jj)  16
+#    read (neqdsk,1040) terror(jj),elongm(jj),qqmagx(jj),cdflux(jj) 17
+#    read (neqdsk,1040) alpha(jj),rttt(jj),psiref(jj),xndnt(jj)
+#    read (neqdsk,1040) rseps(1,jj),zseps(1,jj),rseps(2,jj),zseps(2,jj)
+#    read (neqdsk,1040) sepexp(jj),obots(jj),btaxp(jj),btaxv(jj)
+#    read (neqdsk,1040) aaq1(jj),aaq2(jj),aaq3(jj),seplim(jj)
+#    read (neqdsk,1040) rmagx(jj),zmagx(jj),simagx(jj),taumhd(jj)
+#    read (neqdsk,1040) betapd(jj),betatd(jj),wplasmd(jj),diamag(jj)
+#    read (neqdsk,1040) vloopt(jj),taudia(jj),qmerci(jj),tavem(jj)
+#    read (neqdsk,1041) nsilop0,magpri0,nfcoil0,nesum0
+#    read (neqdsk,1040) ((csilop(k,jj),k=1,nsilop0),
+# .                      (cmpr2(k,jj),k=1,magpri0))
+#    read (neqdsk,1040) (ccbrsp(k,jj),k=1,nfcoil0)
+#    read (neqdsk,1040) (eccurt(jj,k),k=1,nesum0)
+#    read (neqdsk,1040) pbinj(jj),rvsin(jj),zvsin(jj),rvsout(jj)
+#    read (neqdsk,1040) zvsout(jj),vsurfa(jj),wpdot(jj),wbdot(jj)
+#    read (neqdsk,1040) slantu(jj),slantl(jj),zuperts(jj),chipre
+#    read (neqdsk,1040) cjor95(jj),pp95(jj),ssep(jj),yyy2(jj)
+#    read (neqdsk,1040) xnnc(jj),cprof,oring(jj),cjor0(jj)
+#    read (neqdsk,1040) fexpan(jj),qqmin(jj),chigamt(jj),ssi01(jj)
+#    read (neqdsk,1040) fexpvs(jj),sepnose(jj),ssi95(jj),rqqmin(jj)
+#    read (neqdsk,1040) cjor99(jj),cj1ave(jj),rmidin(jj),rmidout(jj)
+#    read (neqdsk,1040) psurfa(jj),peak(jj),dminux(jj),dminlx(jj)
+#    read (neqdsk,1040) dolubaf(jj),dolubafm(jj),diludom(jj),),diludomm(jj)
+#    read (neqdsk,1040) ratsol(jj),rvsiu(jj),zvsiu(jj),rvsid(jj)
+#    read (neqdsk,1040) zvsid(jj),rvsou(jj),zvsou(jj),rvsod(jj)
+#    read (neqdsk,1040) zvsod(jj),condno,psin32(jj),psin21(jj)
+#    read (neqdsk,1040) rq32in(jj),rq21top(jj),chilibt,ali3(jj)
+#    read (neqdsk,1040) xbetapr,tflux(jj),xdum,xdum
+
+
 ########################################################################
 #  Check
 

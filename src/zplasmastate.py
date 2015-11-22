@@ -250,24 +250,30 @@ class plasma_state_file():
         node[-1] = cell[-1]
         return node
 
-    #def cell2node_bdry(self,cell):
-    #
-    #    nrho = len(cell)+1
-    #    node = zeros(nrho)
-    #    node[0] = cell[0]
-    #    for i in range(1,nrho-1):
-    #        node[i] = 0.5*(cell[i-1]+cell[i])
-    #    node[-1] = 2.0*cell[-1]-node[-2] #<=====
-    #    return node
-
     def cell2node_bdry(self,cell):
     
         nrho = len(cell)+1
         node = zeros(nrho)
         node[0] = cell[0]
-        for i in range(1,nrho):
-            node[i] = 2.0*cell[i-1]-node[i-1]
+        for i in range(1,nrho-1):
+            node[i] = 0.5*(cell[i-1]+cell[i])
+        node[-1] = 2.0*cell[-1]-node[-2] #<=====
         return node
+
+    #def cell2node_bdry(self,cell):
+    #
+    #    nrho = len(cell)+1
+    #    node = zeros(nrho)
+    #    node[0] = cell[0]
+    #    for i in range(1,nrho):
+    #        node[i] = 2.0*cell[i-1]-node[i-1]
+    #    return node
+
+    def get_eqdsk_file(self):
+
+        eqdsk_file = ''
+        for c in self["eqdsk_file"][:]: eqdsk_file+=c
+        return eqdsk_file.strip()
 
 def instate2ps(instate,ps):
 

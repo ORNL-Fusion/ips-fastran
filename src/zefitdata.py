@@ -17,22 +17,27 @@ pstool = os.path.join(DIR_BIN,"pstool")
 
 class efitdata():
 
-    def __init__(self,file_geqdsk,nrho_eq=101,nth_eq=101,nrho_eq_geo=101):
+    def __init__(self,file_geqdsk,nrho_eq=101,nth_eq=101,nrho_eq_geo=101,f_geq=""):
 
-        self.data = zefitutil.readg(file_geqdsk) 
-
-        if file_geqdsk != "geqdsk":
-            shutil.copyfile(file_geqdsk,"geqdsk")       
-
-        inps = Namelist()
-        inps["inps"]["nrho_eq"] = [nrho_eq] 
-        inps["inps"]["nth_eq"] = [nth_eq] 
-        inps["inps"]["nrho_eq_geo"] = [nrho_eq_geo]
-        inps.write("inps")
-
-        os.system(pstool+" geqdsk 1.0e-6 >& pstool_geqdsk.log")
-
-        self.nc = netCDF4.Dataset("ps.nc","r",format='NETCDF4')
+        if f_geq:
+            print 'f_geq',f_geq
+            self.data = zefitutil.readg(file_geqdsk) 
+            self.nc = netCDF4.Dataset(f_geq,"r",format='NETCDF4')
+        else: 
+            self.data = zefitutil.readg(file_geqdsk) 
+    
+            if file_geqdsk != "geqdsk":
+                shutil.copyfile(file_geqdsk,"geqdsk")       
+    
+            inps = Namelist()
+            inps["inps"]["nrho_eq"] = [nrho_eq] 
+            inps["inps"]["nth_eq"] = [nth_eq] 
+            inps["inps"]["nrho_eq_geo"] = [nrho_eq_geo]
+            inps.write("inps")
+    
+            os.system(pstool+" geqdsk 1.0e-6 >& pstool_geqdsk.log")
+    
+            self.nc = netCDF4.Dataset("ps.nc","r",format='NETCDF4')
 
     def __getitem__(self, key):
 
