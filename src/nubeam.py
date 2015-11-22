@@ -91,7 +91,7 @@ class nubeam(Component):
             services.exeception('no PREACT parameter')
 
         try:
-            copy_preact = self.COPY_PREACT
+            copy_preact = int(self.COPY_PREACT)
         except:
             copy_preact = 1
 
@@ -123,7 +123,7 @@ class nubeam(Component):
         print nubeam_bin
 
         task_id = services.launch_task(1, workdir, nubeam_bin,
-                      logfile = 'log.nubeam')
+                      logfile = 'log.nubeam_init')
         retcode = services.wait_task(task_id)
         if (retcode != 0):
             e = 'Error executing command:  mpi_nubeam_comp_exec: init '
@@ -230,11 +230,18 @@ class nubeam(Component):
 
             print 'run navg'
 
+            #services.merge_current_plasma_state("state_changes.cdf", logfile='log.update_state')
+
+            #services.stage_plasma_state()
+            #znubeam.update_ps_profile(cur_state_file,cur_eqdsk_file)
+            #services.update_plasma_state()
+
              #--- run navg
 
             os.environ['NUBEAM_REPEAT_COUNT'] = '%dx%f'%(1,dt_nubeam)
+
             for k in range(navg):
-                task_id = services.launch_task(self.NPROC, workdir, nubeam_bin, logfile = 'log.nubeam2')
+                task_id = services.launch_task(self.NPROC, workdir, nubeam_bin, logfile = 'log.nubeam_%d'%k)
                 retcode = services.wait_task(task_id)
                 if (retcode != 0):
                     e = 'Error executing command:  mpi_nubeam_comp_exec: step avg '

@@ -35,7 +35,8 @@ def io_write_inputfiles(f_state,f_eqdsk,f_ingenray):
 
     nrho  = ps.nrho
     rho   = ps["rho"][:]
-    ne    = ps["ns"][0,:]*1.0e-19
+### ne    = ps["ns"][0,:]*1.0e-19
+    ne    = ps["ns"][0,:]
     te    = ps["Ts"][0,:]
     ti    = ps["Ti"][:]
     zeff  = ps["Zeff"][:]
@@ -78,9 +79,10 @@ def io_write_inputfiles(f_state,f_eqdsk,f_ingenray):
     ingenray["TEMTAB"]["PROF"] = prof_tmp
     ingenray["ZEFTAB"]["ZEFF1"] = zeff
 
-    ingenray.write("genray.dat")
+#   ingenray.write("genray.dat")
+    ingenray.write("genray.in")
 
-def io_update_state(f_state,f_eqdsk):
+def io_update_state(f_state,f_eqdsk,imode='IC'):
 
     # read genray output
 
@@ -94,6 +96,7 @@ def io_update_state(f_state,f_eqdsk):
     prf_i = ncgenray.variables['powden_i'][:]*1.0e-7  # erg/(cm**3*sec) -> MW/(m**3*sec)
     I_rf  = ncgenray.variables['toroidal_cur_total'][:]
     j_par = abs(j_par)
+   #j_par = -j_par
 
     ncgenray.close()
 
@@ -109,8 +112,17 @@ def io_update_state(f_state,f_eqdsk):
     jp_ps = 1.0e6*zinterp(rho,j_par)(rho_ps)
     pe_ps = 1.0e6*zinterp(rho,prf_e)(rho_ps)
 
-    ps.load_j_parallel_CD(rho_ps,jp_ps,"ec")
-    ps.load_profile(rho_ps,pe_ps,"peech","vol")
+#   ps.load_j_parallel_CD(rho_ps,jp_ps,"ec")
+#   ps.load_profile(rho_ps,pe_ps,"peech","vol")
+
+    ps.load_j_parallel_CD(rho_ps,jp_ps,"ic")
+    ps.load_profile(rho_ps,pe_ps,"pmine","vol")
+#   ps.load_profile(rho_ps,pi_ps,"pmini","vol")
+
+
+#   ps.load_j_parallel_CD(rho_ps,jp_ps,"ec")
+#   ps.load_profile(rho_ps,pe_ps,"peech","vol")
+
 
     ps.close()
 

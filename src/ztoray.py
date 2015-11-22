@@ -334,6 +334,41 @@ def adjust_qec(width,xmid,fmax,Pec,nrho,geq):
 
     return y
 
+def gauss_asym(p,x):
+    rvec = zeros(len(x))
+    for k in range(len(x)):
+        if x[k]>=p[1]: rvec[k] = p[0]*exp(-(x[k]-p[1])**2/(2*p[2]**2))
+        if x[k]< p[1]: rvec[k] = p[0]*exp(-(x[k]-p[1])**2/(2*p[3]**2))
+    return rvec
+
+def adjust_jec_asym(width,width2,xmid,fmax,Iec,nrho,geq):
+
+    def func(f):
+        x = arange(nrho)/(nrho-1.0)
+        y = gauss_asym( [f,xmid,width,width2], x )
+        return cur_integral(x,y,geq)-Iec
+
+    tmp = optimize.bisect(func,0.0,10*fmax,xtol=1.0e-6)
+
+    x = arange(nrho)/(nrho-1.0)
+    y = gauss_asym( [tmp,xmid,width,width2], x )
+
+    return y
+
+def adjust_qec_asym(width,width2,xmid,fmax,Pec,nrho,geq):
+
+    def func(f):
+        x = arange(nrho)/(nrho-1.0)
+        y = gauss_asym( [f,xmid,width,width2], x )
+        return vol_integral(x,y,geq)-Pec
+
+    tmp = optimize.bisect(func,0.0,10.0*fmax,xtol=1.0e-6)
+
+    x = arange(nrho)/(nrho-1.0)
+    y = gauss_asym( [tmp,xmid,width,width2], x )
+
+    return y
+
 ###############################################################################
 # io instate
 
@@ -389,6 +424,12 @@ def io_update_instate(geq,f_instate,intoray):
         except:
            width = 0.0
            print 'no width inuput, set 0'
+        try:
+           width2 = intoray["adjust"]["width2"][k]
+        except:
+           width2 = 0.0
+           print 'no width2 inuput, set 0'
+        print 'width: ',width,width2
 
         if width > 0.0:
 
@@ -409,15 +450,25 @@ def io_update_instate(geq,f_instate,intoray):
             #fit = adjust_jec(
             #          0.5*width,fit_coeff[1],fit_coeff[0],Iec,nrho,geq)
 
-            fit = adjust_jec(
-                      0.5*width,rho[k_find],jec_max,Iec,nrho,geq)
+            if width2 > 0.0:
+                print 'call asym'
+                fit = adjust_jec_asym(
+                          0.5*width,0.5*width2,rho[k_find],jec_max,Iec,nrho,geq)
+                jec = fit
+    
+                fit = adjust_qec_asym(
+                          0.5*width,0.5*width2,rho[k_find],qec[k_find],Pec,nrho,geq)
+                qec = fit
 
-            jec = fit
 
-            fit_coeff = fit_gaussian(rho,qec)
-            fit = adjust_qec(
-                      0.5*width,fit_coeff[1],fit_coeff[0],Pec,nrho,geq)
-            qec = fit
+            else: 
+                fit = adjust_jec(
+                          0.5*width,rho[k_find],jec_max,Iec,nrho,geq)
+                jec = fit
+    
+                fit = adjust_qec(
+                          0.5*width,rho[k_find],qec[k_find],Pec,nrho,geq)
+                qec = fit
 
         if k==0:
            jec_sum = jec*rfpow
@@ -500,34 +551,51 @@ def io_update_state(geq,ps,intoray):
         except:
            width = 0.0
            print 'no width inuput, set 0'
+        try:
+           width2 = intoray["adjust"]["width2"][k]
+        except:
+           width2 = 0.0
+           print 'no width2 inuput, set 0'
+        print 'width: ',width,width2
 
         if width > 0.0:
 
             print 'adjust width'
-
-            #fit_coeff = fit_gaussian(rho,jec)
-            #print fit_coeff[1],fit_coeff[0]
-            #fit = adjust_jec(
-            #          0.5*width,fit_coeff[1],fit_coeff[0],Iec,nrho,ps) #geq)
-            #jec = fit
 
             jec_max=0.0
             for j in range(len(rho)):
                 if jec[j] > jec_max:
                    jec_max = jec[j]
                    j_find = j
-            #print 72*"-"
-            #print jec
             print 'rho_peak, jec_peak :',rho[j_find],jec_max
           
-            fit = adjust_jec(
-                      0.5*width,rho[j_find],jec_max,Iec,nrho,ps)
-            jec = fit
+            #fit = adjust_jec(
+            #          0.5*width,rho[j_find],jec_max,Iec,nrho,ps)
+            #jec = fit
 
-            #fit_coeff = fit_gaussian(rho,qec)
             #fit = adjust_qec(
-            #          0.5*width,fit_coeff[1],fit_coeff[0],Pec,nrho,ps) #geq)
+            #          0.5*width,rho[j_find],qec[j_find],Pec,nrho,ps)
             #qec = fit
+
+            if width2 > 0.0:
+                print 'call asym'
+                fit = adjust_jec_asym(
+                          0.5*width,0.5*width2,rho[j_find],jec_max,Iec,nrho,ps)
+                jec = fit
+    
+                fit = adjust_qec_asym(
+                          0.5*width,0.5*width2,rho[j_find],qec[j_find],Pec,nrho,ps)
+                qec = fit
+
+
+            else: 
+                fit = adjust_jec(
+                          0.5*width,rho[j_find],jec_max,Iec,nrho,ps)
+                jec = fit
+    
+                fit = adjust_qec(
+                          0.5*width,rho[j_find],qec[j_find],Pec,nrho,ps)
+                qec = fit
 
         if k==0:
            jec_sum = jec*rfpow
@@ -535,6 +603,18 @@ def io_update_state(geq,ps,intoray):
         else:
            jec_sum+= jec*rfpow
            qec_sum+= qec*rfpow
+
+    try:
+       j0_seed = intoray["seed"]["j0"][0]
+       drho_seed = intoray["seed"]["drho"][0]
+    except:
+       j0_seed = 0.0
+       drho_seed = 0.0
+    print '***** seed current: j0,drho',j0_seed,drho_seed
+    if j0_seed > 0.0:
+       jec_seed = j0_seed*exp(-rho**2/(2*drho_seed**2))
+       jec_sum += jec_seed
+
 
     # update local infastran
 
