@@ -3,7 +3,6 @@
 """
  -----------------------------------------------------------------------
  fastran transport solver component 
- JM
  -----------------------------------------------------------------------
 """
 
@@ -11,13 +10,13 @@ import sys,os,shutil
 import subprocess
 from numpy import *
 
+#--- ips framework
 from  component import Component 
 
-#-------------------
 #--- zcode libraries
 import zfastran
 
-class fastran_solver(Component):
+class fastran(Component):
 
     def __init__(self, services, config):
 
@@ -32,9 +31,6 @@ class fastran_solver(Component):
 
         #--- entry
 
-        if (self.services == None) :
-            print 'Error in fastran_solver.step() : No services'
-            raise Exception('Error in fastran_solver.step(): No services')
         services = self.services
 
         #--- stage plasma state files 
@@ -49,7 +45,6 @@ class fastran_solver(Component):
         cur_state_file = services.get_config_param('CURRENT_STATE')
         cur_eqdsk_file = services.get_config_param('CURRENT_EQDSK')
         cur_bc_file = services.get_config_param('CURRENT_BC')
-        #cur_fastran_file = services.get_config_param('CURRENT_FASTRAN')
 
         #--- stage input files
 
@@ -62,7 +57,7 @@ class fastran_solver(Component):
 
         #--- generate fastran input
 
-        zfastran.io_write_input(cur_state_file,cur_eqdsk_file,cur_bc_file)
+        zfastran.io_write_input(cur_state_file, cur_eqdsk_file, cur_bc_file)
 
         #--- run fastran
 
@@ -97,8 +92,8 @@ class fastran_solver(Component):
         print 'relax=',relax
 
         zfastran.io_update_state(
-           f_state=cur_state_file,f_eqdsk=cur_eqdsk_file,
-           f_fastran='fastran.nc',time = timeStamp,relax=relax)
+           f_state=cur_state_file, f_eqdsk=cur_eqdsk_file,
+           f_fastran='fastran.nc', time = timeStamp, relax=relax)
 
         #shutil.copyfile('fastran.nc',cur_fastran_file)
 

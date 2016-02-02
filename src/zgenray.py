@@ -3,7 +3,6 @@
 """
  -----------------------------------------------------------------------
  utils for genray IO
- JM
  -----------------------------------------------------------------------
 """
 
@@ -11,19 +10,19 @@ import os,sys,shutil
 from numpy import *
 import netCDF4
 
-#-------------------
 #--- zcode libraries
 from Namelist import Namelist
 import zefitutil
 from zinterp import zinterp
-from zplasmastate import plasma_state_file
+import zplasmastate
 
 def io_write_inputfiles(f_state,f_eqdsk,f_ingenray):
 
     # =================================================================
     # read plasma state file
-    
-    ps  = plasma_state_file(f_state)
+
+    ps = zplasmastate.zplasmastate('ips',1)
+    ps.read(f_state)
 
     ps_xe  = 1.6022e-19
     ps_mp  = 1.6726e-27
@@ -31,9 +30,9 @@ def io_write_inputfiles(f_state,f_eqdsk,f_ingenray):
     z_ion = ps["qatom_S"][1:]/ps_xe
     a_ion = ps["m_S"][1:]/ps_mp
     n_ion = len(z_ion)
-    n_imp = len(ps.data.dimensions["dim_nspec_imp0"])
+    n_imp = len(ps["m_SIMPI"])
 
-    nrho  = ps.nrho
+    nrho  = len(ps["rho"])
     rho   = ps["rho"][:]
 ### ne    = ps["ns"][0,:]*1.0e-19
     ne    = ps["ns"][0,:]
@@ -79,7 +78,7 @@ def io_write_inputfiles(f_state,f_eqdsk,f_ingenray):
     ingenray["TEMTAB"]["PROF"] = prof_tmp
     ingenray["ZEFTAB"]["ZEFF1"] = zeff
 
-#   ingenray.write("genray.dat")
+### ingenray.write("genray.dat")
     ingenray.write("genray.in")
 
 def io_update_state(f_state,f_eqdsk,imode='IC'):
@@ -92,38 +91,35 @@ def io_update_state(f_state,f_eqdsk,imode='IC'):
     rho   = ncgenray.variables['rho_bin_center'][:]
 
     j_par = ncgenray.variables['s_cur_den_onetwo'][:]*0.01 # MA/m**2
-    prf_e = ncgenray.variables['powden_e'][:]*1.0e-7  # erg/(cm**3*sec) -> MW/(m**3*sec)
-    prf_i = ncgenray.variables['powden_i'][:]*1.0e-7  # erg/(cm**3*sec) -> MW/(m**3*sec)
+    prf_e = ncgenray.variables['powden_e'][:]*1.0e-7 # erg/(cm**3*sec) -> MW/(m**3*sec)
+    prf_i = ncgenray.variables['powden_i'][:]*1.0e-7 # erg/(cm**3*sec) -> MW/(m**3*sec)
     I_rf  = ncgenray.variables['toroidal_cur_total'][:]
-    j_par = abs(j_par)
-   #j_par = -j_par
+    j_par = abs(j_par) #<=== 
 
     ncgenray.close()
 
     # update plasma state
 
+    ps = zplasmastate.zplasmastate('ips',1)
+    ps.read(f_state)
+
     geq = zefitutil.readg(f_eqdsk) 
     r0  = geq["rzero" ]
     b0  = abs(geq["bcentr"])
-    ip  = geq['cpasma']
-    ps  = plasma_state_file(f_state,r0=r0,b0=b0,ip=ip)
 
     rho_ps = ps["rho"][:]
     jp_ps = 1.0e6*zinterp(rho,j_par)(rho_ps)
     pe_ps = 1.0e6*zinterp(rho,prf_e)(rho_ps)
+    pi_ps = 1.0e6*zinterp(rho,prf_i)(rho_ps)
 
-#   ps.load_j_parallel_CD(rho_ps,jp_ps,"ec")
-#   ps.load_profile(rho_ps,pe_ps,"peech","vol")
+    if imode=='EC':
+        ps.load_j_parallel(rho_ps,jp_ps,"rho_ecrf","curech",r0,b0)
+        ps.load_vol_profile(rho_ps,pe_ps,"rho_ecrf","peech")
+    elif imode=='IC':
+        ps.load_j_parallel(rho_ps,jp_ps,"rho_icrf","curich",r0,b0)
+        ps.load_vol_profile(rho_ps,pe_ps,"rho_icrf","pmine")
+        ps.load_vol_profile(rho_ps,pi_ps,"rho_icrf","pmini")
 
-    ps.load_j_parallel_CD(rho_ps,jp_ps,"ic")
-    ps.load_profile(rho_ps,pe_ps,"pmine","vol")
-#   ps.load_profile(rho_ps,pi_ps,"pmini","vol")
-
-
-#   ps.load_j_parallel_CD(rho_ps,jp_ps,"ec")
-#   ps.load_profile(rho_ps,pe_ps,"peech","vol")
-
-
-    ps.close()
+    ps.store(f_state)
 
     print "I_genray = ",I_rf

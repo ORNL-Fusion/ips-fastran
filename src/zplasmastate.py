@@ -1,236 +1,261 @@
-#!/usr/bin/env python
+#! /usr/bin/env python
 
 """
  -----------------------------------------------------------------------
- plasma state utility
- JM
+ fastran plasma state file utility 
  -----------------------------------------------------------------------
 """
 
-import os,subprocess,glob
+from plasmastate import *
 from numpy import *
-import netCDF4
 from Namelist import Namelist
 from zinterp import zinterp
 
-class plasma_state_file():
+class zplasmastate (PlasmaState):
 
-    def __init__(self,f_ps,mode='r+',r0=0.0,b0=0.0,ip=0.0):
+    def init_from_instate (self,fn="instate",runid='fastran',shot=0,t0=0.0,t1=0.0):
 
-        self.data = netCDF4.Dataset(f_ps,mode,format='NETCDF4')
+        instate = Namelist(fn)["instate"]
 
-        self.nrho = len(self.data.dimensions["dim_nrho"])
-        self.nrho_eq = len(self.data.dimensions["dim_nrho_eq"])
-        self.nrho_eq_geo = len(self.data.dimensions["dim_nrho_eq_geo"])
+        nrho = instate["nrho"][0]
+        nth  = 101
 
-        if self.nrho_eq != self.nrho:
-            raise Exception('nrho_eq != nrho')
-        if self.nrho_eq_geo != self.nrho:
-            raise Exception('nrho_eq_geo != nrho')
+        n_ion = instate["n_ion"][0]
+        n_imp = instate["n_imp"][0]
 
-        self.r0 = r0
-        self.b0 = b0
-        self.ip = ip
+        z_spec = instate["z_ion"]+instate["z_imp"]
+        a_spec = instate["a_ion"]+instate["a_imp"]
 
-        self.map = { 
-            "bs":["curr_bootstrap","rho"],
-            "oh":["curr_ohmic","rho"],
-            "nb":["curbeam","rho_nbi"],
-            "ec":["curech","rho_ecrf"],
-            "ic":["curich","rho_icrf"] }
+        nspec_th = instate["n_ion"][0]+instate["n_imp"][0]
 
-        try:
-            FASTRAN_ROOT = os.environ["FASTRAN_ROOT"]
-            DIR_BIN = os.path.join(FASTRAN_ROOT,"bin")
-            self.pstool_bin = os.path.join(DIR_BIN,"pstool")
-        except:
-            self.pstool_bin = 'pstool'
+        nspec_rfmin = instate["n_min"][0]
+        z_rfmin = instate["z_min"]
+        a_rfmin = instate["a_min"]
 
-        self.f_ps = f_ps
-        self.mode = mode
+        nspec_beam = instate["n_beam"][0]
+        z_beam = instate["z_beam"]
+        a_beam = instate["a_beam"]
 
-        self.geqdsk = ''
-    
-    def info(self):
+        nspec_fusion = instate["n_fusion"][0]
+        z_fusion = instate["z_beam"]
+        a_fusion = instate["a_beam"]
 
-        pass
+        self["nspec_th"] = nspec_th 
+        self["nspec_rfmin"] = nspec_rfmin
+        self["nrho"] =  nrho
+        self["nrho_eq"] = nrho
+        self["nth_eq"] = nth
+        self["nrho_eq_geo"] = nrho
+        self["nr"] = 0
+        self["nz"] = 0
 
-    def close(self):
+        self["nrho_gas"] = nrho
+        self["nrho_nbi"] = nrho
+        self["nrho_ecrf"] = nrho
+        self["nrho_icrf"] = nrho
+        self["nrho_fus"] = nrho
+        self["nrho_anom"] = nrho
 
-        self.data.close()
-        #log=open("pstool.log","w")
-        #retcode = subprocess.call([self.pstool_bin, "rehash",self.f_ps],
-        #    stdout=log,stderr=log)
-        #log.close()
+        self["global_label"] = runid
+        self["tokamak_id"] = instate["tokamak_id"][0]
+        self["runid"] = runid
+        self["shot_number"] = shot
 
-    def __getitem__(self, key):
+        self["t0"] = t0
+        self["t1"] = t1
 
-        if key in self.data.variables: return self.data.variables[key]
-        else: return []
+        self.alloc()
 
-    def put_sum_profile(self,prof,key,mode,sum=0.0):
+        self.setThermalSpecies(-1, -1, 0)
 
-        zone = self[mode]
-        self[key][0] = 0.0 
-        for i in range(1,self.nrho):
-            self[key][i] = self[key][i-1]+prof[i]*(zone[i]-zone[i-1])
-        if sum>0.0:
-            self[key][:] *= sum/self[key][-1]
+        for k in range(nspec_th):
+            self.setThermalSpecies(z_spec[k], z_spec[k], a_spec[k])
 
-    def load_profile(self,rho,prof,key,mode,k=-1,sum=0.0):
+        for k in range(nspec_rfmin):
+            self.setRFMinoritySpecies(z_rfmin[k], z_rfmin[k], a_rfmin[k])
 
-        zone_spl = zinterp(self["rho"][:],self[mode][:])
+        for k in range(nspec_beam):
+            self.setNeutralBeamSpecies(z_beam[k], z_beam[k], a_beam[k])
+
+        for k in range(nspec_fusion):
+            self.setFusionSpecies(z_fusion[k], z_fusion[k], a_fusion[k])
+
+        self.finishSpecies()
+
+        rho =linspace(0.0,1.0,num=nrho)
+        self["rho"] = rho
+        self["rho_eq"] = rho
+        self["th_eq"] = linspace(0.0,2.0*pi,num=nth)
+        self["rho_eq_geo"] = rho
+
+        self["rho_gas"] = rho
+        self["rho_nbi"] = rho
+        self["rho_ecrf"] = rho
+        self["rho_icrf"] = rho
+        self["rho_fus"] = rho
+        self["rho_anom"] = rho
+
+    def load_innubeam (self, fn="innubeam"):
+
+        innubeam = Namelist(fn)
+        nbi = innubeam["nbi_config"]
+
+        self["t0"] = 0.0
+        self["t1"] = innubeam["nubeam_run"]["dt_nubeam"][0]
+
+        nbeam = nbi["nbeam"][0]
+        self["nbeam"] = nbeam
+        self.alloc()
+
+        self["nbi_src_name"] = ['NB%02d'%k for k in range(nbeam)]
+
+        nbion_table = { (1,1):'H',(1,2):'D',(2,3):'He3',(2,4):'He4'}
+        self["nbion"] = [ nbion_table[(int(nbi["xzbeama"][k]),int(nbi["abeama"][k]))] for k in range(nbeam) ]
+
+        srtcen = 1.0e-2*array(nbi["rtcena"])
+        for k in range(nbeam):
+            if not nbi["nlco"]: srtcen[k] -= 1.
+        self["srtcen"] = srtcen # (signed: + means ccw momentum inj.)
+
+        self["lbsctan"] = 1.e-2*array(nbi["xlbtna"]) # dist., sce to tangency pt.
+        self["zbsc"] = 1.e-2*array(nbi["xybsca"]) # height, sce above midplane
+        self["phibsc"] =  nbeam*[0.0] #nbi["xbzeta"] # toroidal angle of sce
+
+        self["lbscap"] = 1.e-2*array(nbi["xlbapa"]) # dist., sce to aperture
+        self["zbap"] = 1.e-2*array(nbi["xybapa"]) # height, aperture center
+
+
+        zdivcon = 2.*pi/(360.0*sqrt(2.0))
+        self["nbshape"] = [ ('','rectangle','circle')[s] for s in nbi["nbshapa"] ] # shape of source
+
+        self["b_halfwidth"] = 1.0e-2*array(nbi["bmwidra"]) # half-width
+        self["b_halfheight"] = 1.0e-2*array(nbi["bmwidza"]) # half-height
+        self["b_hfocal_length"] = 1.0e-2*array(nbi["foclra"]) # horiz. focal len
+        self["b_vfocal_length"] = 1.0e-2*array(nbi["foclza"]) # vert. focal len
+        self["b_hdivergence"] = array(nbi["divra"])/zdivcon # horiz. diverg.
+        self["b_vdivergence"] = array(nbi["divza"])/zdivcon # vert.  diverg.
+
+        self["nbap_shape"] = [ ('','rectangle','circle')[s] for s in nbi["nbapsha"] ] # shape of aperture
+        self["ap_halfwidth"] = 1.e-2*array(nbi["rapedga"])
+        self["ap_halfheight"] = 1.e-2*array(nbi["xzpedga"])
+        self["ap_horiz_offset"] = 1.e-2*array(nbi["xrapoffa"])
+        self["ap_vert_offset" ] = 1.e-2*array(nbi["xzapoffa"])
+
+        self["nbap2_shape"] = [ ('none','rectangle','circle')[s] for s in nbi["nbapsh2"] ] # shape of 2nd aperture
+
+        self["Lbscap2"] = 1.e-2*array(nbi["xlbapa2"])
+        self["ap2_halfwidth"] = 1.e-2*array(nbi["rapedg2"])
+        self["ap2_halfheight"]  = 1.e-2*array(nbi["xzpedg2"])
+        self["ap2_horiz_offset"]= 1.e-2*array(nbi["xrapoff2"])
+        self["ap2_vert_offset"] = 1.e-2*array(nbi["xzapoff2"])
+
+        self["beam_type"] = nbeam*['Standard']
+        
+        self["power_nbi"] = nbi["pinja"]
+        self["kvolt_nbi"] = 1.e-3*array(nbi["einja"])
+        self["frac_full"] = nbi["ffulla"]  
+        self["frac_half"] = nbi["fhalfa"]  
+
+        self["einj_max"] = 1.25*1.0e-3*array(nbi["einja"])
+        self["einj_min"] = nbeam*[20.0]
+
+        self["dn0out"] = 0.5e18  #defalut:0.5e18
+
+    def load_geqdsk (self,fn_geqdsk,bdy_crat=1.e-6):
+
+        kcur_option = 0
+        rho_curbrk = 0.9 
+
+        self["EQ_Code_Info"] = 'efit'
+        self.updateEquilibrium(fn_geqdsk, bdy_crat, kcur_option, rho_curbrk)
+        self.deriveMhdEq('everything')
+
+    def init_from_geqdsk (self,fn_geqdsk,nrho=101,nth=101,shot=0,time=0,bdy_crat=1.e-6):
+
+        self["nrho_eq"] = nrho
+        self["nth_eq"] = nth
+        self["nrho_eq_geo"] = nrho
+        self["nr"] = 0
+        self["nz"] = 0
+
+        self.alloc()
+
+        rho =linspace(0.0,1.0,num=nrho)
+        self["rho_eq"] = rho
+        self["th_eq"] = linspace(0.0,2.0*pi,num=nth)
+        self["rho_eq_geo"] = rho
+
+        kcur_option = 0
+        rho_curbrk = 0.9 
+
+        self["EQ_Code_Info"] = 'efit'
+        self.updateEquilibrium(fn_geqdsk, bdy_crat, kcur_option, rho_curbrk)
+        self.deriveMhdEq('everything')
+
+    def load_vol_profile (self,rho,prof,xkey,ykey,k=-1,sum=0):
+
+        zone_spl = zinterp(self["rho_eq"],self["vol"])
         prof_spl = zinterp(rho,prof)
 
-        rho_key = self["rho"+self[key].dimensions[-1].split("rho")[-1]][:]
+        rho_ps = self[xkey]
+     
+        dat = zeros(len(rho_ps)-1)
+        vol_integral = 0.
+        for i in range(len(rho_ps)-1):
+            dat[i] = 0.5*(prof_spl(rho_ps[i+1])+prof_spl(rho_ps[i])) \
+                        *(zone_spl(rho_ps[i+1])-zone_spl(rho_ps[i]))
+            vol_integral += dat[i]
+        if sum>0:
+            dat *= sum/vol_integral
 
         if k<0:
-            tmp = 0.0
-            for i in range(len(rho_key)-1):
-                self[key][i] = 0.5*(prof_spl(rho_key[i+1])+prof_spl(rho_key[i])) \
-                                  *(zone_spl(rho_key[i+1])-zone_spl(rho_key[i]))
-                tmp += self[key][i]
-            if sum>0.0:
-                self[key][:] *= sum/tmp
+            self[ykey] = dat
         else:
-            tmp = 0.0
-            for i in range(len(rho_key)-1):
-                self[key][k][i] = 0.5*(prof_spl(rho_key[i+1])+prof_spl(rho_key[i])) \
-                                  *(zone_spl(rho_key[i+1])-zone_spl(rho_key[i]))
-                tmp += self[key][k][i]
-            if sum>0.0:
-                self[key][k][:] *= sum/tmp
+            self[ykey][k] = dat
 
-        print 'integrated : ',tmp
+        print 'integrated : ', vol_integral
 
-    def dump_profile(self,rho,key,mode=None,k=-1):
+    def dump_vol_profile (self,rho,xkey,ykey,k=-1):
 
-        if mode in ["vol","area"]:
+        zone_spl = zinterp(self["rho_eq"],self["vol"])
 
-            zone_spl = zinterp(self["rho"][:],self[mode][:])
-    
-            rho_key = self["rho"+self[key].dimensions[-1].split("rho")[-1]][:]
-            nrho_key = len(rho_key)
-    
-            if k>=0: 
-                prof = self[key][k][:]
-            else:
-                prof = self[key][:]
-    
-            cell = zeros(nrho_key-1)
-            for i in range(nrho_key-1):
-                cell[i] = prof[i]/(zone_spl(rho_key[i+1])-zone_spl(rho_key[i]))
-            node = self.cell2node(cell)
-    
-            rvec = zinterp(rho_key,node)(rho)
-
+        rho_ps = self[xkey]
+        if k<0:
+           prof_ps = self[ykey]
         else:
+           prof_ps = self[ykey][k]
 
-            rho_key = self["rho"+self[key].dimensions[-1].split("rho")[-1]][:]
+        cell = zeros(len(rho_ps)-1)
+        for i in range(len(rho_ps)-1):
+            cell[i] = prof_ps[i]/(zone_spl(rho_ps[i+1])-zone_spl(rho_ps[i]))
+        node = self.cell2node(cell)
 
-            if k>=0: 
-                prof = self[key][k][:]
-            else:
-                prof = self[key][:]
+        return zinterp(rho_ps,node)(rho)
 
-            rvec = zinterp(rho_key,self.cell2node(prof))(rho)
+    def load_profile (self,rho,prof,xkey,ykey,k=-1):
 
-        return rvec
+        prof_spl = zinterp(rho,prof)
 
-    def load_j_parallel(self,jpar):
+        rho_ps = self[xkey]
+        prof_ps = prof_spl(rho_ps)
 
-        curt = zeros(self.nrho)
+        if k<0:
+            self[ykey] = prof_ps
+        else:
+            self[ykey][k] = prof_ps
+       
+    def dump_profile (self,rho,xkey,ykey,k=-1):
 
-        r0   = self.r0
-        b0   = self.b0
-        ip   = self.ip
-        rho  = self["rho"][:]
-        ipol = self["g_eq"][:]/(r0*b0)
-        vol  = self["vol"][:]
-        area = self["area"][:]
+        rho_ps = self[xkey]
 
-        curt[0] = 0.0
-        for i in range(self.nrho-1):
-            dV = vol[i+1]-vol[i]
-            jparm = 0.5*(jpar[i]+jpar[i+1])
-            ipolm = 0.5*(ipol[i]+ipol[i+1])
-            curt[i+1] = (curt[i]/ipol[i]+jparm*dV/(2.0*pi*r0*ipolm**2))*ipol[i+1]
+        if k<0:
+           prof_ps = self[ykey]
+        else:
+           prof_ps = self[ykey][k]
 
-        self["curt"][:] = curt[:]*ip/curt[-1]
+        node = self.cell2node(prof_ps)
 
-    def dump_j_parallel(self):
-        
-        jpar = zeros(self.nrho-1)
-        curt = self["curt"][:] 
-
-        r0   = self.r0
-        b0   = self.b0
-        ip   = self.ip
-        rho  = self["rho"][:]
-        ipol = self["g_eq"][:]/(r0*b0)
-        vol  = self["vol"][:]
-        area = self["area"][:]
-
-        for i in range(self.nrho-1):
-            dV = vol[i+1]-vol[i]
-            ipolm = 0.5*(ipol[i]+ipol[i+1])
-            jpar[i] = 2.0*pi*r0*ipolm**2/dV*(curt[i+1]/ipol[i+1]-curt[i]/ipol[i])
-
-        return self.cell2node(jpar)
-
-    def load_j_parallel_CD(self,rhoin,jparin,key):
-
-        xkey = self.map[key][1]
-        ykey = self.map[key][0]
-
-        rho = self[xkey][:]
-        curt = zeros(len(rho))
-
-        r0   = self.r0
-        b0   = self.b0
-        ipol = zinterp(self["rho"][:],self["g_eq"][:]/(r0*b0))(rho)
-        vol  = zinterp(self["rho"][:],self["vol"][:])(rho)
-        area = zinterp(self["rho"][:],self["area"][:])(rho)
-
-        jpar = zinterp(rhoin,jparin)(rho)
-
-        curt[0] = 0.0
-        for i in range(len(rho)-1):
-            dV = vol[i+1]-vol[i]
-            jparm = 0.5*(jpar[i]+jpar[i+1])
-            ipolm = 0.5*(ipol[i]+ipol[i+1])
-            curt[i+1] = (curt[i]/ipol[i]+jparm*dV/(2.0*pi*r0*ipolm**2))*ipol[i+1]
-
-        print "I%s=%5.3e"%(key,1.0e-6*curt[-1])+"MA"
-
-        for i in range(len(rho)-1):
-            self[ykey][i] = curt[i+1]-curt[i]
-
-    def dump_j_parallel_CD(self,rhoin,key):
-        
-        ykey = self.map[key][0]
-        xkey = self.map[key][1]
-
-        rho = self[xkey][:]
-        jpar = self[ykey][:]
-        curt = zeros(len(rho))
-
-        r0 = self.r0
-        b0 = self.b0
-        ipol = zinterp(self["rho"][:],self["g_eq"][:]/(r0*b0))(rho)
-        vol  = zinterp(self["rho"][:],self["vol"][:])(rho)
-        area = zinterp(self["rho"][:],self["area"][:])(rho)
-
-        curt[0] = 0.0
-        for i in range(len(rho)-1): 
-            curt[i+1] = curt[i]+jpar[i]
-
-        for i in range(len(rho)-1):
-            dV = vol[i+1]-vol[i]
-            ipolm = 0.5*(ipol[i]+ipol[i+1])
-            jpar[i] = 2.0*pi*r0*ipolm**2/dV*(curt[i+1]/ipol[i+1]-curt[i]/ipol[i])
-
-        return zinterp(rho,self.cell2node(jpar))(rhoin)
+        return zinterp(rho_ps,node)(rho)
 
     def node2cell(self,node):
     
@@ -260,253 +285,76 @@ class plasma_state_file():
         node[-1] = 2.0*cell[-1]-node[-2] #<=====
         return node
 
-    #def cell2node_bdry(self,cell):
-    #
-    #    nrho = len(cell)+1
-    #    node = zeros(nrho)
-    #    node[0] = cell[0]
-    #    for i in range(1,nrho):
-    #        node[i] = 2.0*cell[i-1]-node[i-1]
-    #    return node
+    def load_j_parallel(self,rho,jpar,xkey,ykey,r0,b0,tot=False):
 
-    def get_eqdsk_file(self):
+        rho_ps = self[xkey][:]
 
-        eqdsk_file = ''
-        for c in self["eqdsk_file"][:]: eqdsk_file+=c
-        return eqdsk_file.strip()
+        ipol = zinterp(self["rho_eq"],self["g_eq"]/(r0*b0))(rho_ps)
+        vol  = zinterp(self["rho_eq"],self["vol"])(rho_ps)
+        area = zinterp(self["rho_eq"],self["area"])(rho_ps)
 
-def instate2ps(instate,ps):
+        jpar_ps = zinterp(rho,jpar)(rho_ps)
 
-    #------------------------------------------------------------------
-    # from instate
+        curt = zeros(len(rho_ps))
+        curt[0] = 0.0
+        for i in range(len(rho_ps)-1):
+            dV = vol[i+1]-vol[i]
+            jparm = 0.5*(jpar_ps[i]+jpar_ps[i+1])
+            ipolm = 0.5*(ipol[i]+ipol[i+1])
+            curt[i+1] = (curt[i]/ipol[i]+jparm*dV/(2.0*pi*r0*ipolm**2))*ipol[i+1]
 
-    for key in instate.keys(): instate[key] = array(instate[key])
+        print "I%s=%5.3e"%(ykey,1.0e-6*curt[-1])+"MA"
 
-    nrho  = instate["nrho"][0]
-    rho   = instate["rho"]
+        if tot:
+            self[ykey] = curt
+        else:
+            for i in range(len(rho)-1):
+                self[ykey][i] = curt[i+1]-curt[i]
 
-    n_ion = instate["n_ion"][0]
-    z_ion = instate["z_ion"]
-    a_ion = instate["a_ion"]
-    f_ion = instate["f_ion"]
+    def dump_j_parallel(self,rho,xkey,ykey,r0,b0,tot=False):
+        
+        rho_ps = self[xkey]
+        jpar_ps = self[ykey]
 
-    n_imp = instate["n_imp"][0]
-    z_imp = instate["z_imp"]
-    a_imp = instate["a_imp"]
-    f_imp = instate["f_imp"]
+        ipol = zinterp(self["rho_eq"],self["g_eq"][:]/(r0*b0))(rho_ps)
+        vol  = zinterp(self["rho_eq"],self["vol"][:])(rho_ps)
+        area = zinterp(self["rho_eq"],self["area"][:])(rho_ps)
 
-    ne = instate["ne"]
-    te = instate["te"]
-    ti = instate["ti"]
-    omega = instate["omega"]
-    zeff = instate["zeff"]
+        if tot:
+           curt = jpar_ps
+        else:
+           curt = zeros(len(rho_ps))
+           curt[0] = 0.0
+           for i in range(len(rho)-1): 
+               curt[i+1] = curt[i]+jpar_ps[i]
 
-    ne[0] = ne[1]
-    te[0] = te[1]
-    ti[0] = ti[1]
-    omega[0] = omega[1]
-    zeff[0] = zeff[1]
+        jpar = zeros(len(rho_ps)-1)
+        for i in range(len(rho_ps)-1):
+            dV = vol[i+1]-vol[i]
+            ipolm = 0.5*(ipol[i]+ipol[i+1])
+            jpar[i] = 2.0*pi*r0*ipolm**2/dV*(curt[i+1]/ipol[i+1]-curt[i]/ipol[i])
 
-    #------------------------------------------------------------------
-    # put zeros if not defined
+        return zinterp(rho,self.cell2node(jpar))(rho)
 
-    for key in [
-        "j_oh", "j_bs", "j_nb", "j_ec", "j_ic", \
-        "pe_nb", "pe_ec", "pe_ic", "pe_fus", "pe_ionization", "p_rad", \
-        "pi_nb", "pi_ec", "pi_ic", "pi_fus", "pi_ionization", "pi_cx", "p_ohm", "p_ei", \
-        "torque_nb", "torque_in", "se_nb", "se_ionization", "si_nb", "si_ionization", \
-        "q", "psipol", \
-        "density_beam", "wbeam", "density_alpha", "walpha", \
-        "chie",
-        "chii" ]:
-        if key.upper() not in instate.keys(): instate[key] = zeros(nrho)
-
-
-    density_beam = instate["density_beam"]
-    density_alpha = instate["density_alpha"]
-    wbeam = instate["wbeam"]
-
-    rho = ps["rho"][:]
-
-    #------------------------------------------------------------------
-    # density
-
-    a=0; b=0; c=0; d=0
-    for k in range(n_imp):
-        b = b+f_imp[k]*z_imp[k]
-        d = d+f_imp[k]*z_imp[k]*z_imp[k]
-    for k in range(n_ion):
-        a = a+f_ion[k]*z_ion[k]
-        c = c+f_ion[k]*z_ion[k]*z_ion[k]
-
-    density_ion = {}
-    for k in range(n_ion):
-        density_ion[k] = zeros(nrho)
-
-    density_imp = {}
-    for k in range(n_imp):
-        density_imp[k] = zeros(nrho)
-
-    density_th = zeros(nrho)
-
-    for i in range(nrho):
-
-        zne_adj = ne[i]
-        zzne_adj = ne[i]*zeff[i]
-
-        # depletion due to beam ions
-
-        zne_adj = zne_adj - 1.0*density_beam[i]
-        zzne_adj = zzne_adj - 1.0**2*density_beam[i]
-
-        # effective main ion and impurity densities
-
-        nion = (zne_adj *d-zzne_adj*b)/(a*d-b*c)
-        nimp = (zzne_adj*a-zne_adj *c)/(a*d-b*c)
-
-        for k in range(n_ion):
-            density_ion[k][i] = f_ion[k]*nion
-        for k in range(n_imp):
-            density_imp[k][i] = f_imp[k]*nimp
-
-        for k in range(n_ion):
-            density_th[i] = density_th[i] + density_ion[k][i]
-        for k in range(n_imp):
-            density_th[i] = density_th[i] + density_imp[k][i]
-
-    ps["ns"][0] = 1.0e19*ps.node2cell(ne)
-
-    for k in range(n_ion):
-        ps["ns"][k+1] = 1.0e19*ps.node2cell(density_ion[k])
-
-    for k in range(n_imp):
-        ps["ns"][k+n_ion+1] = 1.0e19*ps.node2cell(density_imp[k])
-
-    ps["ni"][:] = 1.0e19*ps.node2cell(density_th)
-
-    #------------------------------------------------------------------
-    # beam
-
-    ps["nbeami"][0] = 1.0e19*ps.node2cell(density_beam)
-    ps["eperp_beami"][0] = 2.0*20.0*ones(nrho-1)
-    ps["epll_beami"][0] = 20.0*ones(nrho-1)
-
-    tbeam = wbeam/1.602e-3/(density_beam+1.0e-6)
-    ps["eperp_beami"][0] = ps.node2cell(2.0*tbeam/3.0)
-    ps["epll_beami"][0] = ps.node2cell(tbeam/3.0)
-
-    #------------------------------------------------------------------
-    # temperature
-
-    ps["Ts"][0] =ps.node2cell(te)
-
-    for k in range(n_ion):
-        ps["Ts"][k+1] = ps.node2cell(ti)
-    for k in range(n_imp):
-        ps["Ts"][k+n_ion+1] = ps.node2cell(ti)
-
-    ps["Ti"][:] = ps.node2cell(ti)
-
-    #------------------------------------------------------------------
-    # zeff
-
-    ps["Zeff"][:] = ps.node2cell(zeff)
-    ps["Zeff_th"][:] = ps.node2cell(zeff)
-
-    #------------------------------------------------------------------
-    # rotation
-
-    ps["omegat"][:] = ps.node2cell(omega)
-
-    #--------------------------------------------------------------
-    # current
-    
-    j_tot = 1.e6*instate["j_tot"]
-    j_tot[0] = j_tot[1]
-    ps.load_j_parallel(j_tot)
-    
-    for key in ["j_nb","j_ec","j_ic","j_bs","j_oh"]:
-        if key.upper() not in instate.keys(): instate[key] = zeros(nrho)
-    
-    j_nb  = 1.e6*instate["j_nb"]
-    j_ec  = 1.e6*instate["j_ec"]
-    j_ic  = 1.e6*instate["j_ic"]
-    j_bs  = 1.e6*instate["j_bs"]
-    j_oh  = 1.e6*instate["j_oh"]
-    
-    ps.load_j_parallel_CD(rho,j_nb,"nb")
-    ps.load_j_parallel_CD(rho,j_ec,"ec")
-    ps.load_j_parallel_CD(rho,j_ic,"ic")
-    ps.load_j_parallel_CD(rho,j_bs,"bs")
-    ps.load_j_parallel_CD(rho,j_oh,"oh")
-    
-    #-------------------------------------------------------------
-    # heating
-    
-    for key in ["pe_nb","pi_nb","pe_ec","pe_ic","pi_ic","pe_fus","pi_fus"]:
-        if key.upper() not in instate.keys(): instate[key] = zeros(nrho)
-    
-    pe_nb  = 1.e6*instate["pe_nb" ]
-    pi_nb  = 1.e6*instate["pi_nb" ]
-    pe_ec  = 1.e6*instate["pe_ec" ]
-    pe_ic  = 1.e6*instate["pe_ic" ]
-    pi_ic  = 1.e6*instate["pi_ic" ]
-    pe_fus = 1.e6*instate["pe_fus"]
-    pi_fus = 1.e6*instate["pi_fus"]
-    
-    ps.load_profile (rho,pe_nb,"pbe","vol")
-    ps.load_profile (rho,pi_nb,"pbi","vol")
-    ps.load_profile (rho,pe_ec,"peech","vol")
-    ps.load_profile (rho,pe_ic,"picrf_totals","vol",k=0)
-    ps.load_profile (rho,pi_ic,"picth","vol")
-
-    #------------------------------------------------------------------
-    # temp
-
-    ps["sc0"][:] = 2.0e21
-    ps["n0norm"][:] = 1.0e-10 
-    ps["T0sc0"][:] = 0.01 
-    ps["sc0_to_sgas"][:] = 1
-
-########################################################################
-#  test
+#--test
 
 if __name__ == "__main__":
 
-    #load_j_parallel(j_par)
-    #dump_j_parallel()
-    #load_j_parallel_CD(j_ec,"ec")
-    #dump_j_parallel_CD("ec")
+    ps = zplasmastate("test",1)
+    ps.init_from_instate()
+    ps.load_innubeam()
+    ps.load_geqdsk("g147634.03365")
+    print  ps["power_nbi"]
+    ps.store("out.nc")
     
-    instate = Namelist("instate")["instate"]
-    r0 = instate["r0"][0]
-    b0 = abs(instate["b0"][0])
-    ip = 1.0e6*instate["ip"][0]
-    j_tot = 1.0e6*array(instate["j_tot"])
-    j_ec = 1.0e6*array(instate["j_tot"])
+    nrho = 20
+    rho = arange(nrho)/(nrho-1.0)
+    pbe = rho**2
+    print pbe
+    ps.load_vol_profile(rho,pbe,"rho_nbi","pbe")
+    pbe2 = ps.dump_vol_profile(rho,"rho_nbi","pbe")
+    print pbe2
     
-    ps = plasma_state_file("ps.nc",r0=r0,b0=b0,ip=ip)
-    ps.info()
+    tmp = ps.dump_profile(rho,"rho_nbi","pbe")
+    print tmp
     
-    ps.load_j_parallel(j_tot)
-    
-    jpar = ps.dump_j_parallel()
-    
-    for i in range(51):
-        print i, j_tot[i]*1.0e-6,jpar[i]*1.0e-6
-    
-    ps.load_j_parallel_CD(j_tot,"ec")
-    jec = ps.dump_j_parallel_CD("ec")
-
-    for i in range(51):
-        print i, j_tot[i]*1.0e-6,jec[i]*1.0e-6
-    
-    #ps["ns"][0]=1.0
-
-    temp = ps["Ts"][0][:]
-    print temp
-    
-    print ps["eperp_beami"][:] #(~nrho_nbi,nspec_beam)
-
-    ps.close()
-

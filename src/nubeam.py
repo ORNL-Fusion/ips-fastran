@@ -3,7 +3,6 @@
 """
  -----------------------------------------------------------------------
  nubeam component for steady-state solution
- JM
  -----------------------------------------------------------------------
 """
 
@@ -12,11 +11,13 @@ import subprocess
 from numpy import *
 import netCDF4
 
+#--- ips framework
+
 from  component import Component
 
-# import zcode libraries
+#--- zcode libraries
 import Namelist
-from zplasmastate import plasma_state_file
+import zplasmastate
 import znubeam
 
 class nubeam(Component):
@@ -194,11 +195,14 @@ class nubeam(Component):
         difb_in = innubeam["nbi_model"]["difb_in" ][0]
         difb_out= innubeam["nbi_model"]["difb_out"][0]
 
-        ps = plasma_state_file(cur_state_file)
+        ps = zplasmastate.zplasmastate('ips',1)
+        ps.read(cur_state_file)
+
         rho_anom = ps["rho_anom"][:]
         ps["difb_nbi"][:] = difb_a \
             +(difb_0-difb_a)*(1.0-rho_anom**difb_in)**difb_out
-        ps.close()
+
+        ps.store(cur_state_file)
 
         services.update_plasma_state()
 

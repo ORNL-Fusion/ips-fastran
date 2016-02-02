@@ -3,7 +3,6 @@
 """
  -----------------------------------------------------------------------
  esc component 
- JM
  -----------------------------------------------------------------------
 """
 
@@ -14,9 +13,10 @@ from netCDF4 import *
 
 from  component import Component
 
+#--- zcode libraries
 from Namelist import Namelist
-import zefitutil,zefit
-from zplasmastate import plasma_state_file
+import zefitutil, zefit
+import zplasmastate
 
 class esc(Component):
 
@@ -79,9 +79,6 @@ class esc(Component):
         wgeqdsk_bin = os.path.join(self.BIN_PATH, 'wgeqdsk')
         print wgeqdsk_bin
 
-        pstool_bin = os.path.join(self.BIN_PATH, 'pstool')
-        print pstool_bin
-
         #--- run esc
 
         cwd = services.get_working_dir()
@@ -117,25 +114,14 @@ class esc(Component):
         print 'b0 = ',b0
         print 'ip = ',ip 
 
-        shutil.copyfile(cur_state_file,"ps.nc")
+        ps = zplasmastate.zplasmastate('ips',1)
+        ps.read(cur_state_file)
 
-        ps = plasma_state_file("ps.nc",r0=r0,b0=b0,ip=ip)
-        j_tot = ps.dump_j_parallel()
-        ps.close()
+        j_tot = 1.e-6*ps.dump_j_parallel(ps["rho"],"rho_eq","curt",r0,b0,tot=True)
+        ps.load_geqdsk("geqdsk")
+        ps.load_j_parallel(ps["rho"],j_tot,"rho_eq","curt",r0,b0,tot=True)
 
-        logfile = open('pstool.log', 'w')
-        retcode = subprocess.call([pstool_bin, "load", "geqdsk", "1.0d-6"],
-                      stdout=logfile,stderr=logfile)
-        logfile.close()
-        if (retcode != 0):
-           print 'Error executing ', pstool_bin
-           raise
-
-        ps = plasma_state_file("ps.nc",r0=r0,b0=b0,ip=ip)
-        ps.load_j_parallel(j_tot)
-        ps.close()
-
-        shutil.copyfile("ps.nc",cur_state_file)
+        ps.store(cur_state_file)
 
         #--- update plasma state files
 

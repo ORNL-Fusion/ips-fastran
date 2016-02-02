@@ -3,7 +3,6 @@
 """
  -----------------------------------------------------------------------
  fastran init component 
- JM
  -----------------------------------------------------------------------
 """
 
@@ -18,7 +17,8 @@ import zefit
 
 import netCDF4
 import zefitutil
-from zplasmastate import plasma_state_file,instate2ps
+import zplasmastate
+import zinstate
 
 class fastran_init (Component):
 
@@ -34,18 +34,12 @@ class fastran_init (Component):
 
     def step(self, timeStamp):
 
-        # --------------------------------------------------------------
-        # entry
+        #-- entry
 
         print ('fastran_init.step() called')
-
-        if (self.services == None) :
-            print 'Error in fastran_init.step() : No services'
-            raise Exception('Error in fastran_init.step(): No services')
         services = self.services
 
-        # --------------------------------------------------------------
-        # check if this is a restart simulation
+        #-- check if this is a restart simulation
 
         try:
             mode = services.get_config_param('SIMULATION_MODE')
@@ -53,21 +47,18 @@ class fastran_init (Component):
         except Exception, e:
             print 'fastran_init: No SIMULATION_MODE variable in config file' \
                   ', NORMAL assumed', e
-            mode='NORMAL'
+            mode = 'NORMAL'
             
-        # --------------------------------------------------------------
-        # RESTART simulation mode
+        #-- RESTART simulation mode
 
         if mode == 'RESTART':
            #not implemented
            pass
 
-        # --------------------------------------------------------------
-        # NORMAL simulation mode
+        #-- NORMAL simulation mode
         
         elif mode == 'NORMAL':
         
-            #----------------------------------------------------------
             #-- define run identifiers
 
             tokamak_id = services.get_config_param('TOKAMAK_ID')
@@ -78,117 +69,38 @@ class fastran_init (Component):
             print 'shot_number =',shot_number
             print 'run_id =', run_id
     
-            #----------------------------------------------------------
             #-- stage input files
 
             services.stage_input_files(self.INPUT_FILES)
 
-            #----------------------------------------------------------
             #-- get plasma state file names
 
             cur_state_file = services.get_config_param('CURRENT_STATE')
             cur_eqdsk_file = services.get_config_param('CURRENT_EQDSK')
             cur_bc_file = services.get_config_param('CURRENT_BC')
 
-            #----------------------------------------------------------
-            #-- get pstool excutable name
-
-            try:
-                pstool_bin = os.path.join(self.BIN_PATH, self.BIN)
-            except:
-                pstool_bin = os.path.join(self.BIN_PATH, 'pstool')
-            print pstool_bin
-
-
-            #----------------------------------------------------------
             #-- initial plasma state file from instate
+
+            ps = zplasmastate.zplasmastate('ips',1)
 
             if "instate" not in self.INPUT_FILES:
                 raise Exception('no instate file provided')
 
-            instate = Namelist("instate")["instate"]
-            nrho = instate["nrho"][0]
-            print "nrho = ", nrho
+            ps.init_from_instate (fn="instate",runid=run_id,shot=int(shot_number),t0=0.0,t1=0.0)
 
-            inps = Namelist()
-
-            inps["inps"]["global_label"] = ['fastran_scenario']
-            inps["inps"]["tokamak_id"  ] = [tokamak_id]
-            inps["inps"]["runid"       ] = [run_id]
-
-            inps["inps"]["shot_number" ] = [int(shot_number)]
-            inps["inps"]["time"        ] = [0.0]
-
-            inps["inps"]["nspec_ion"   ] = instate["n_ion"] 
-            inps["inps"]["nspec_imp"   ] = instate["n_imp"]
-            inps["inps"]["nspec_beam"  ] = [1]
-            inps["inps"]["nspec_fusion"] = [1]
-            inps["inps"]["nspec_rfmin" ] = [1]
-            inps["inps"]["nspec_gas"   ] = instate["n_ion"] 
-         
-            inps["inps"]["z_ion"       ] = instate["z_ion"]
-            inps["inps"]["a_ion"       ] = instate["a_ion"]
-            inps["inps"]["z_imp"       ] = instate["z_imp"]
-            inps["inps"]["a_imp"       ] = instate["a_imp"]
-            inps["inps"]["z_beam"      ] = [1]
-            inps["inps"]["a_beam"      ] = [2]
-            inps["inps"]["z_fusion"    ] = [2]
-            inps["inps"]["a_fusion"    ] = [4]
-            inps["inps"]["z_rfmin"     ] = [2]
-            inps["inps"]["a_rfmin"     ] = [3]
-            inps["inps"]["z_gas"       ] = instate["z_ion"]
-            inps["inps"]["a_gas"       ] = instate["a_ion"]
-
-            inps["inps"]["nrho"        ] = [nrho]
-            inps["inps"]["nrho_eq"     ] = [nrho]
-            inps["inps"]["nth_eq"      ] = [101]
-            inps["inps"]["nrho_eq_geo" ] = [nrho]
-            inps["inps"]["nrho_gas"    ] = [nrho]
-            inps["inps"]["nrho_nbi"    ] = [nrho]
-            inps["inps"]["nrho_ecrf"   ] = [nrho]
-            inps["inps"]["nrho_icrf"   ] = [nrho]
-            inps["inps"]["nrho_fus"    ] = [nrho]
-            inps["inps"]["nrho_anom"   ] = [nrho]
-
-            inps.write("inps")
-
-            print 'pstool init'
-
-            logfile=open("pstool_init.log","w")
-            retcode = subprocess.call([pstool_bin, "init"],
-                          stdout=logfile,stderr=logfile)
-            logfile.close()
-            if (retcode != 0):
-               raise Exception('Error executing ', pstool_bin)
-
-            #----------------------------------------------------------
             #-- load intoric to plasma state
 
             if "intoric" in self.INPUT_FILES:
+                print 'load intoric'
+                #ps.load_intoric()
 
-                print 'pstool load inrf'
-    
-                logfile=open("pstool_intoric.log","w")
-                retcode = subprocess.call([pstool_bin, "load","intoric"],
-                              stdout=logfile,stderr=logfile)
-                logfile.close()
-                if (retcode != 0):
-                   raise Exception('Error executing ', pstool_bin)
-
-            #----------------------------------------------------------
             #-- load innubeam to plasma state
 
             if "innubeam" in self.INPUT_FILES:
-                print 'pstool load innubeam'
-                logfile=open("pstool_innubeam.log","w")
-                retcode = subprocess.call([pstool_bin, "load", "innubeam"],
-                              stdout=logfile,stderr=logfile)
-                logfile.close()
-                if (retcode != 0):
-                   print 'Error executing ', pstool_bin
-                   raise
 
-            #----------------------------------------------------------
+                print 'load innubeam'
+                ps.load_innubeam()
+
             #-- initial equilibrium
 
             if "ingeqdsk" in self.INPUT_FILES:
@@ -252,36 +164,22 @@ class fastran_init (Component):
                        raise
                     shutil.copyfile("g%06d.%05d"%(shot,time),"geqdsk") #<--------
 
-            #----------------------------------------------------------
+            shutil.copyfile("geqdsk",cur_eqdsk_file)
+
             #-- load geqdsk to plasma state
 
-            print 'pstool load geqdsk'
+            print 'pstool: load geqdsk'
+            ps.load_geqdsk("geqdsk")
 
-            logfile = open('pstool_geqdsk.log', 'w')
-            retcode = subprocess.call([pstool_bin, "load", "geqdsk", "1.0d-6"],
-                          stdout=logfile,stderr=logfile)
-            if (retcode != 0):
-               print 'Error executing ', pstool_bin
-               raise
-            logfile.close()
-
-            #----------------------------------------------------------
             #-- load instate to plasma state
 
             print 'instate2ps'
+            zinstate.instate2ps("instate",ps)
+            ps.store(cur_state_file)
 
-            geq = zefitutil.readg("geqdsk") 
-            r0  = geq["rzero" ]
-            b0  = abs(geq["bcentr"])
-            ip  = geq['cpasma']
+            #-- boundary condition state file
 
-            ps = plasma_state_file("ps.nc",r0=r0,b0=b0,ip=ip)
-            instate2ps(instate,ps)
-            ps.close()
-
-            #----------------------------------------------------------
-            #-- boundary condition plasma state file
-
+            instate = Namelist("instate")["instate"]
             inbc = Namelist()
             inbc["inbc"]["r0"] = instate["r0"]
             inbc["inbc"]["b0"] = instate["b0"]
@@ -291,14 +189,7 @@ class fastran_init (Component):
             inbc["inbc"]["zbdry"] = instate["zbdry"]
             inbc.write(cur_bc_file) 
     
-            #----------------------------------------------------------
-            #-- copy to plasma state files
-
-            shutil.copyfile("ps.nc",cur_state_file)
-            shutil.copyfile("geqdsk",cur_eqdsk_file)
-
-        # --------------------------------------------------------------
-        # Update plasma state
+        #-- Update plasma state
 
         try:
             services.update_plasma_state()
@@ -306,8 +197,7 @@ class fastran_init (Component):
             print 'Error in call to update_plasma_state()', e
             raise
 
-        # --------------------------------------------------------------
-        # archive output files
+        #-- archive output files
 
         services.stage_output_files(timeStamp, self.OUTPUT_FILES)
 

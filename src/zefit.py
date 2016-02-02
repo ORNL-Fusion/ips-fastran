@@ -3,7 +3,6 @@
 """
  -----------------------------------------------------------------------
   fixed boundary efit solver
-  JM
  -----------------------------------------------------------------------
 """
 
@@ -12,9 +11,9 @@ from numpy import *
 from scipy.interpolate import splrep,splev,interp1d
 
 from Namelist import Namelist
-import zutil,zefitutil,zefitdata
+import zutil, zefitutil
 from zinterp import *
-from zplasmastate import plasma_state_file
+import zplasmastate
 
 import time as timer
 
@@ -57,14 +56,20 @@ def fixbdry_kfile(shot,time,f_inefit,p_scale=1.0,efitdir='.',relax=0):
     print 'gfile   = ',gfile
 
     t1 = timer.time()
-    geq = zefitdata.efitdata(gfile,nrho_eq=129,nth_eq=101,nrho_eq_geo=129)
+    geq = zplasmastate.zplasmastate('ips',1)
+    geq.init_from_geqdsk (gfile,nrho=129,nth=101)
     t2 = timer.time()
     print '>>>>>>>>',t2-t1
 
-    psirho = geq["psipol"][:]/geq["psipol"][-1]  # equi-drho grid
-    dpsi = abs(geq["ssibry"]-geq["ssimag"])
+    geq2 = zefitutil.readg(gfile) 
+    ssibry = geq2["ssibry"]
+    ssimag = geq2["ssimag"]
+    bcentr = geq2["bcentr"]
 
-    rhob = (geq["phit"][-1]/pi/abs(geq["bcentr"]))**0.5 
+    psirho = geq["psipol"][:]/geq["psipol"][-1]  # equi-drho grid
+    dpsi = abs(ssibry-ssimag)
+
+    rhob = (geq["phit"][-1]/pi/abs(bcentr))**0.5 
 
     nrho = len(psirho)
     rho = arange(nrho)/(nrho-1.0)
@@ -442,9 +447,11 @@ def io_input_from_state(f_ps,f_inbc,mode='kinetic'):
     r0 = inbc["r0"][0]
     b0 = abs(inbc["b0"][0])
     ip = inbc['ip'][0]*1.0e6
-    ps = plasma_state_file(f_ps,r0=r0,b0=b0,ip=ip)
 
-    nrho  = ps.nrho
+    ps = zplasmastate.zplasmastate('ips',1)
+    ps.read(f_ps)
+
+    nrho  = len(ps["rho"])
     rho   = ps["rho"][:]
     ne    = ps["ns"][0,:]*1.0e-19
     ni    = ps["ni"][:]*1.0e-19
@@ -454,15 +461,15 @@ def io_input_from_state(f_ps,f_inbc,mode='kinetic'):
     ni    = ps.cell2node(ni)
     te    = ps.cell2node(te)
     ti    = ps.cell2node(ti)
-    
-    density_beam = ps.dump_profile(rho,"nbeami",k=0)*1.e-19
-    wbeam = ps.dump_profile(rho,"eperp_beami",k=0) \
-          + ps.dump_profile(rho,"epll_beami" ,k=0)
+
+    density_beam = ps.dump_profile(rho,"rho_nbi","nbeami",k=0)*1.e-19
+    wbeam = ps.dump_profile(rho,"rho_nbi","eperp_beami",k=0) \
+        + ps.dump_profile(rho,"rho_nbi","epll_beami" ,k=0)
     wbeam = density_beam*wbeam
-    
-    density_alpha = ps.dump_profile(rho,"nfusi",k=0)*1.e-19
-    walpha = ps.dump_profile(rho,"eperp_fusi",k=0) \
-           + ps.dump_profile(rho,"epll_fusi",k=0)
+
+    density_alpha = ps.dump_profile(rho,"rho_fus","nfusi",k=0)*1.e-19
+    walpha = ps.dump_profile(rho,"rho_fus","eperp_fusi",k=0) \
+        + ps.dump_profile(rho,"rho_fus","epll_fusi",k=0)
     walpha = density_alpha*walpha
 
     if mode == 'kinetic':
@@ -473,13 +480,12 @@ def io_input_from_state(f_ps,f_inbc,mode='kinetic'):
        print 'mode = total'
        pmhd = ps["P_eq"][:]
  
-    jpar = ps.dump_j_parallel()
+    #jpar = ps.dump_j_parallel()
+    jpar = ps.dump_j_parallel(rho,"rho_eq","curt",r0,b0,tot=True)
 
     rlim = ps["rlim"][:]
     zlim = ps["zlim"][:]
     nlim = len(rlim)
-
-    ps.close()
 
     # namelist for efit
 

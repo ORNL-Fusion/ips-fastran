@@ -3,7 +3,6 @@
 """
  -----------------------------------------------------------------------
  genray component 
- JM
  -----------------------------------------------------------------------
 """
 
@@ -13,7 +12,6 @@ from numpy import *
 
 from component import Component
 
-#-------------------
 #--- zcode libraries
 import zgenray
 
@@ -32,9 +30,6 @@ class genray(Component):
 
         #--- entry
 
-        if (self.services == None) :
-            print 'Error in genray.step() : No services'
-            raise Exception('Error in genray.step(): No services')
         services = self.services
 
         #--- excutable
@@ -64,16 +59,11 @@ class genray(Component):
         #--- generate genray input
 
         f_ingenray = "ingenray"
-        zgenray.io_write_inputfiles(cur_state_file,cur_eqdsk_file,f_ingenray)
+        zgenray.io_write_inputfiles(cur_state_file, cur_eqdsk_file, f_ingenray)
 
         #--- run genray
 
         print 'run genray'
-
-        #logfile=open("genray.log","w")
-        #retcode = subprocess.call([genray_bin],
-        #              stdout=logfile,stderr=logfile)
-        #logfile.close()
 
         cwd = services.get_working_dir()
         task_id = services.launch_task(1, cwd, genray_bin, logfile = 'xgenray.log')
@@ -85,7 +75,7 @@ class genray(Component):
 
         #--- get genray output
 
-        zgenray.io_update_state(cur_state_file,cur_eqdsk_file)
+        zgenray.io_update_state(cur_state_file, cur_eqdsk_file)
 
         #--- update plasma state files
 

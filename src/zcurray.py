@@ -3,7 +3,6 @@
 """
  -----------------------------------------------------------------------
  utils for curray IO
- JM
  -----------------------------------------------------------------------
 """
 
@@ -11,12 +10,11 @@ import sys,os,shutil
 import subprocess
 from numpy import *
 
-#-------------------
-#--- zcode libraries
+#-- zcode libraries
+from Namelist import Namelist
 from zinterp import *
 import zefitutil
-from zplasmastate import plasma_state_file
-from Namelist import Namelist
+import zplasmastate
 
 def write_f(fvec,num,ncol,file):
 
@@ -50,7 +48,8 @@ def wrt_curray_input(f_state,f_incurray,f_geqdsk):
     # =================================================================
     # read plasma state file
     
-    ps  = plasma_state_file(f_state)
+    ps = zplasmastate.zplasmastate('ips',1)
+    ps.read(f_state)
 
     ps_xe  = 1.6022e-19
     ps_mp  = 1.6726e-27
@@ -59,7 +58,7 @@ def wrt_curray_input(f_state,f_incurray,f_geqdsk):
     a_ion = [round(x) for x in ps["m_S"][1:]/ps_mp ]
     n_ion = len(z_ion)
 
-    nrho  = ps.nrho
+    nrho  = len(ps["rho"])
     rho   = ps["rho"][:]
     ne    = ps["ns"][0,:]
     te    = ps["Ts"][0,:]
@@ -73,7 +72,7 @@ def wrt_curray_input(f_state,f_incurray,f_geqdsk):
         ns = ps["ns"][k+1,:]
         ni[k] = ps.cell2node(ns)
 
-    n_imp =  len(ps.data.dimensions["dim_nspec_imp0"])
+    n_imp =  len(ps["m_SIMPI"])
 
     print "n_ion = ",n_ion
     print "z_ion = ",z_ion
@@ -187,49 +186,16 @@ def read_curray_output():
 ###############################################################################
 # io
 
-def io_update_instate(f_instate,f_outcurray,f_incurray):
-
-    # read incurray
-
-    incurray = Namelist(f_incurray)
-
-    try:
-       j_multi = incurray["adjust"]["j_multi"][0]
-    except:
-       j_multi = 1.0
-       print 'no j_multi inuput, set 1.0'
-
-    # read outcurray
-
-    outcurray = Namelist(f_outcurray)
-    rho   = outcurray["outcurray"]["rho"  ]
-    pe_ic = outcurray["outcurray"]["pe_ic"]
-    pi_ic = outcurray["outcurray"]["pi_ic"]
-    j_ic  = outcurray["outcurray"]["j_ic" ]
-
-    j_ic = j_multi*array(j_ic)
-
-    # update local infastran
-
-    instate = Namelist(f_instate)
-    rho_in = instate["instate"]["rho"]
-    instate["instate"]["j_ic" ] = interp1d(rho,j_ic ,kind='cubic')(rho_in)
-    instate["instate"]["pe_ic"] = interp1d(rho,pe_ic,kind='cubic')(rho_in)
-    instate["instate"]["pi_ic"] = interp1d(rho,pi_ic,kind='cubic')(rho_in)
-    instate["instate"]["j_ic" ] = interp1d(rho,j_ic ,kind='cubic')(rho_in)
-    instate.write(f_instate)
-
 def io_update_state(f_state,f_geq,f_outcurray,f_incurray):
 
     # read plasma state
 
-    #ps  = plasma_state_file(f_state)
+    ps = zplasmastate.zplasmastate('ips',1)
+    ps.read(f_state)
 
     geq = zefitutil.readg(f_geq) 
     r0  = geq["rzero" ]
     b0  = abs(geq["bcentr"])
-    ip  = geq['cpasma']
-    ps  = plasma_state_file(f_state,r0=r0,b0=b0,ip=ip)
 
     # read incurray
 
@@ -252,18 +218,18 @@ def io_update_state(f_state,f_geq,f_outcurray,f_incurray):
 
     jp = j_multi*array(jp)
 
-    # update local infastran
+    # update local plasma state
 
     rho_ps = ps["rho"][:]
     jp_ps = 1.0e6*interp1d(rho,jp,kind='cubic')(rho_ps)
     pe_ps = 1.0e6*interp1d(rho,pe,kind='cubic')(rho_ps)
     pi_ps = 1.0e6*interp1d(rho,pi,kind='cubic')(rho_ps)
 
-    ps.load_j_parallel_CD(rho_ps,jp_ps,"ic")
-    ps.load_profile(rho_ps,pe_ps,"pmine","vol")
-    ps.load_profile(rho_ps,pi_ps,"pmini","vol")
+    ps.load_j_parallel(rho_ps,jp_ps,"rho_icrf","curich",r0,b0)
+    ps.load_vol_profile(rho_ps,pe_ps,"rho_icrf","pmine")
+    ps.load_vol_profile(rho_ps,pi_ps,"rho_icrf","pmini")
 
-    ps.close()
+    ps.store(f_state)
 
 ###############################################################################
 # check

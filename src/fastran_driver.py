@@ -3,8 +3,6 @@
 """
  -----------------------------------------------------------------------
  driver for fastran scenario modeling
- based on $IPS_ROOT/components/dbb/general_driver.py
- JM
  -----------------------------------------------------------------------
 """
 

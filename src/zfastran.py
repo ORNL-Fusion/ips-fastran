@@ -3,7 +3,6 @@
 """
  ----------------------------------------------------------------------
  utils for fastran IO
- JM
  ----------------------------------------------------------------------
 """
 
@@ -13,9 +12,9 @@ import netCDF4
 
 #--- zcode libraries
 from Namelist import Namelist
-import zfdat, zefitutil
 from zinterp import zinterp
-from zplasmastate import plasma_state_file
+import zfdat, zefitutil
+import zplasmastate
 
 #---------------------------------------------------------------------- 
 # variable mapping
@@ -81,7 +80,9 @@ def io_write_input(f_state,f_eqdsk,f_bc,rdir='.'):
     r0  = geq["rzero" ]
     b0  = abs(geq["bcentr"])
     ip  = geq['cpasma']
-    ps  = plasma_state_file(f_state,r0=r0,b0=b0,ip=ip)
+
+    ps = zplasmastate.zplasmastate('ips',1)
+    ps.read(f_state)
 
     ps_xe  = 1.6022e-19
     ps_mp  = 1.6726e-27
@@ -89,9 +90,9 @@ def io_write_input(f_state,f_eqdsk,f_bc,rdir='.'):
     z_ion = [round(x) for x in ps["qatom_S"][1:]/ps_xe ]
     a_ion = [round(x) for x in ps["m_S"][1:]/ps_mp ]
     n_ion = len(z_ion)
-    n_imp = len(ps.data.dimensions["dim_nspec_imp0"])
+    n_imp = len(ps["m_SIMPI"])
 
-    nrho  = ps.nrho
+    nrho  = len(ps["rho"])
     rho   = ps["rho"][:]
     ne    = ps["ns"][0,:]*1.0e-19
     nith  = ps["ni"][:]*1.0e-19
@@ -109,37 +110,37 @@ def io_write_input(f_state,f_eqdsk,f_bc,rdir='.'):
     q  = zeros(nrho)
     fp = zeros(nrho)
 
-    j_tot = 1.0e-6*ps.dump_j_parallel()
+    j_tot = 1.e-6*ps.dump_j_parallel(rho,"rho_eq","curt",r0,b0,tot=True)
 
-    j_nb  = 1.0e-6*ps.dump_j_parallel_CD(rho,"nb")
-    j_rf  = 1.0e-6*(ps.dump_j_parallel_CD(rho,"ec")+ps.dump_j_parallel_CD(rho,"ic"))
+    j_nb = 1.e-6*ps.dump_j_parallel(rho,"rho_nbi","curbeam",r0,b0)
+    j_rf = 1.e-6*(ps.dump_j_parallel(rho,"rho_ecrf","curech",r0,b0)+ps.dump_j_parallel(rho,"rho_icrf","curich",r0,b0))
     j_bs  = zeros(nrho)
 
-    density_beam = ps.dump_profile(rho,"nbeami",k=0)*1.e-19
-    wbeam = ps.dump_profile(rho,"eperp_beami",k=0) \
-          + ps.dump_profile(rho,"epll_beami" ,k=0)
+    density_beam = ps.dump_profile(rho,"rho_nbi","nbeami",k=0)*1.e-19
+    wbeam = ps.dump_profile(rho,"rho_nbi","eperp_beami",k=0) \
+          + ps.dump_profile(rho,"rho_nbi","epll_beami" ,k=0)
     wbeam = density_beam*wbeam*1.602e-3 #MJ/m**3
 
-    pe_nb  = ps.dump_profile(rho,"pbe" ,"vol")*1.e-6
-    pi_nb  = ps.dump_profile(rho,"pbi" ,"vol")*1.e-6
-    pth_nb = ps.dump_profile(rho,"pbth","vol")*1.e-6
+    pe_nb  = ps.dump_vol_profile(rho,"rho_nbi","pbe" )*1.e-6
+    pi_nb  = ps.dump_vol_profile(rho,"rho_nbi","pbi" )*1.e-6
+    pth_nb = ps.dump_vol_profile(rho,"rho_nbi","pbth")*1.e-6
 
-    density_alpha = ps.dump_profile(rho,"nfusi",k=0)*1.e-19
-    walpha = ps.dump_profile(rho,"eperp_fusi",k=0) \
-         + ps.dump_profile(rho,"epll_fusi",k=0)
+    density_alpha = ps.dump_profile(rho,"rho_fus","nfusi",k=0)*1.e-19
+    walpha = ps.dump_profile(rho,"rho_fus","eperp_fusi",k=0) \
+         + ps.dump_profile(rho,"rho_fus","epll_fusi",k=0)
     walpha = density_alpha*walpha*1.602e-3 #MJ/m**3
 
-    pe_fus  = ps.dump_profile(rho,"pfuse" ,"vol")*1.e-6
-    pi_fus  = ps.dump_profile(rho,"pfusi" ,"vol")*1.e-6
-    pth_fus = ps.dump_profile(rho,"pfusth","vol")*1.e-6
+    pe_fus  = ps.dump_vol_profile(rho,"rho_fus","pfuse" )*1.e-6
+    pi_fus  = ps.dump_vol_profile(rho,"rho_fus","pfusi" )*1.e-6
+    pth_fus = ps.dump_vol_profile(rho,"rho_fus","pfusth")*1.e-6
 
-    pe_rf  = ps.dump_profile(rho,"peech","vol") \
-           + ps.dump_profile(rho,"pmine","vol") \
-           + ps.dump_profile(rho,"picrf_totals","vol",k=0)
-
+    pe_rf  = ps.dump_vol_profile(rho,"rho_ecrf","peech") \
+           + ps.dump_vol_profile(rho,"rho_icrf","pmine") \
+           + ps.dump_vol_profile(rho,"rho_icrf","picrf_totals",k=0)
     pe_rf *= 1.e-6
-    pi_rf  = ps.dump_profile(rho,"pmini","vol") \
-           + ps.dump_profile(rho,"picth","vol")
+
+    pi_rf  = ps.dump_profile(rho,"rho_icrf","pmini") \
+           + ps.dump_profile(rho,"rho_icrf","picth")
     pi_rf *= 1.e-6
 
     p_rad= zeros(nrho)
@@ -216,16 +217,12 @@ def io_write_input(f_state,f_eqdsk,f_bc,rdir='.'):
     pmhd    = ps["P_eq"][:]
     qmhd    = ps["q_eq"][:]
 
-
     nc1 = ps["gncfh"][:]
     gb1 = ps["gb1"][:]
     gb2 = ps["gb2"][:]
     Bmax = ps["B_surfMax"][:]
     hfac1 = gb1/Bmax
     hfac2 = gb2/Bmax**2
-    #print nc1
-    #print hfac1
-    #print hfac2
 
     #------------------------------------------------------------------ 
     # write inprof
@@ -333,11 +330,13 @@ def io_update_state(
     #------------------------------------------------------------------ 
     # read geqdsk and plasma state
 
+    ps = zplasmastate.zplasmastate('ips',1)
+    ps.read(f_state)
+
     geq = zefitutil.readg(f_eqdsk) 
     r0  = geq["rzero" ]
     b0  = abs(geq["bcentr"])
     ip  = geq['cpasma']
-    ps  = plasma_state_file(f_state,r0=r0,b0=b0,ip=ip)
 
     #------------------------------------------------------------------ 
     # read fastran
@@ -346,7 +345,7 @@ def io_update_state(
     rho = fastran.variables["rho"][:]
     nrho = len(rho)
 
-    if nrho != ps.nrho:
+    if nrho != len(ps["rho"]):
         raise Exception('nrho differ, fastran: %d, ps: %s'%(nrho,ps.nrho))
 
     te = fastran.variables["te"][-1,:]
@@ -362,7 +361,8 @@ def io_update_state(
 
     ps["Ts"][0] = (1.0-relax)*ps["Ts"][0] + relax*ps.node2cell(te)
 
-    nspec_th = len(ps.data.dimensions["dim_nspec_th"])
+    nspec_th = len(ps["Ts"])-1
+    print 'nspec_th =',nspec_th
     for k in range(nspec_th):
         ps["Ts"][k+1] = (1.0-relax)*ps["Ts"][k+1] + relax*ps.node2cell(ti)
 
@@ -370,15 +370,14 @@ def io_update_state(
 
     ps["omegat"][:] = (1.0-relax)*ps["omegat"][:] + relax*ps.node2cell(omega)
 
-    ps.load_j_parallel(j_tot)
-    ps.load_j_parallel_CD(rho,j_bs,"bs")
-    ps.load_j_parallel_CD(rho,j_oh,"oh")
+    ps.load_j_parallel(rho,j_tot,"rho_eq","curt",r0,b0,tot=True)
+    ps.load_j_parallel(rho,j_bs,"rho","curr_bootstrap",r0,b0)
+    ps.load_j_parallel(rho,j_oh,"rho","curr_ohmic",r0,b0)
 
     #------------------------------------------------------------------
     # write plasma state
 
-    ps.close()
-
+    ps.store(f_state)
 
 #-----------------------------------------------------------------------
 # test

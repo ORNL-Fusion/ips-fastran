@@ -2,7 +2,6 @@
 
 #------------------------------------------------------------------------------
 # data class for fastran : efit
-# JM
 #------------------------------------------------------------------------------
 
 import os,shutil
@@ -10,10 +9,7 @@ from numpy import *
 import  netCDF4
 from Namelist import Namelist
 import zefitutil
-
-FASTRAN_ROOT = os.environ["FASTRAN_ROOT"]
-DIR_BIN = os.path.join(FASTRAN_ROOT,"bin")
-pstool = os.path.join(DIR_BIN,"pstool")
+import zplasmastate
 
 class efitdata():
 
@@ -22,32 +18,22 @@ class efitdata():
         if f_geq:
             print 'f_geq',f_geq
             self.data = zefitutil.readg(file_geqdsk) 
-            self.nc = netCDF4.Dataset(f_geq,"r",format='NETCDF4')
+            self.ps = zplasmastate.zplasmastate('ips',1)
+            self.ps.read(f_geq)
+
         else: 
             self.data = zefitutil.readg(file_geqdsk) 
-    
-            if file_geqdsk != "geqdsk":
-                shutil.copyfile(file_geqdsk,"geqdsk")       
-    
-            inps = Namelist()
-            inps["inps"]["nrho_eq"] = [nrho_eq] 
-            inps["inps"]["nth_eq"] = [nth_eq] 
-            inps["inps"]["nrho_eq_geo"] = [nrho_eq_geo]
-            inps.write("inps")
-    
-            os.system(pstool+" geqdsk 1.0e-6 >& pstool_geqdsk.log")
-    
-            self.nc = netCDF4.Dataset("ps.nc","r",format='NETCDF4')
+            self.ps = zplasmastate.zplasmastate('ips',1)
+            self.ps.init_from_geqdsk (file_geqdsk,nrho=129,nth=101)
 
     def __getitem__(self, key):
 
         if key in self.data.keys(): return self.data[key]
-        elif key in self.nc.variables: return self.nc.variables[key]
-        else: return []
+        else: return self.ps[key]
 
 if __name__ == "__main__":
 
-    ps = efitdata("geqdsk_test")
+    ps = efitdata("geqdsk")
     print ps["psipol"][:]
 
 

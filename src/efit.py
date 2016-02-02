@@ -3,7 +3,6 @@
 """
  -----------------------------------------------------------------------
  efit component 
- JM
  -----------------------------------------------------------------------
 """
 
@@ -12,11 +11,12 @@ import subprocess
 from numpy import *
 import time as timer
 
+#--- ips framework
 from  component import Component
 
-#--- zcode libraries ---
+#--- zcode libraries
 import zefit, zefitutil
-from zplasmastate import plasma_state_file
+import zplasmastate
 
 class efit(Component):
 
@@ -147,17 +147,7 @@ class efit(Component):
 
         #--- load geqdsk to plasma state file
 
-        shutil.copyfile("g%06d.%05d"%(shot,time), "geqdsk")
-        shutil.copyfile(cur_state_file,"ps.nc")
-
-        try:
-            FASTRAN_ROOT = os.environ["FASTRAN_ROOT"]
-            DIR_BIN = os.path.join(FASTRAN_ROOT,"bin")
-            pstool_bin = os.path.join(DIR_BIN,"pstool")
-        except:
-            pstool_bin = 'pstool'
-
-        geq = zefitutil.readg("geqdsk") 
+        geq = zefitutil.readg(cur_eqdsk_file) 
         r0  = geq["rzero" ]
         b0  = abs(geq["bcentr"])
         ip  = geq['cpasma']
@@ -165,23 +155,14 @@ class efit(Component):
         print 'b0 = ',b0
         print 'ip = ',ip 
 
-        ps = plasma_state_file("ps.nc",r0=r0,b0=b0,ip=ip)
-        j_tot = ps.dump_j_parallel()
-        ps.close()
+        ps = zplasmastate.zplasmastate('ips',1)
+        ps.read(cur_state_file)
 
-        logfile = open('pstool.log', 'w')
-        retcode = subprocess.call([pstool_bin, "load", "geqdsk", "1.0d-6"],
-                      stdout=logfile,stderr=logfile)
-        logfile.close()
-        if (retcode != 0):
-           print 'Error executing ', pstool_bin
-           raise
+        j_tot = 1.e-6*ps.dump_j_parallel(ps["rho"],"rho_eq","curt",r0,b0,tot=True)
+        ps.load_geqdsk(cur_eqdsk_file)
+        ps.load_j_parallel(ps["rho"],j_tot,"rho_eq","curt",r0,b0,tot=True)
 
-        ps = plasma_state_file("ps.nc",r0=r0,b0=b0,ip=ip)
-        ps.load_j_parallel(j_tot)
-        ps.close()
-
-        shutil.copyfile("ps.nc",cur_state_file)
+        ps.store(cur_state_file)
 
         #--- update plasma state files
 

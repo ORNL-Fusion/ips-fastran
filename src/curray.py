@@ -3,7 +3,6 @@
 """
  -----------------------------------------------------------------------
  curray component 
- JM
  -----------------------------------------------------------------------
 """
 
@@ -13,7 +12,6 @@ from numpy import *
 
 from  component import Component
 
-#-------------------
 #--- zcode libraries
 import zcurray
 
@@ -32,9 +30,6 @@ class curray(Component):
 
         #--- entry
 
-        if (self.services == None) :
-            print 'Error in curray_init: step () : No services'
-            raise Exception('Error in curray_init: step (): No services')
         services = self.services
 
         #--- stage plasma state files
@@ -65,11 +60,6 @@ class curray(Component):
         zcurray.wrt_curray_input(cur_state_file,"incurray",cur_eqdsk_file)
 
         #--- run curray
-
-        #logfile=open("xcurray.log","w")
-        #retcode = subprocess.call([curray_bin],
-        #              stdout=logfile,stderr=logfile)
-        #logfile.close()
 
         cwd = services.get_working_dir()
         task_id = services.launch_task(1, cwd, curray_bin, "curray_in", logfile='xcurray.log')

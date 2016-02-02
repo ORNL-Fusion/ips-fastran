@@ -3,7 +3,6 @@
 """
  ------------------------------------------------------------------------------
   utils for toray
-  JM
  ------------------------------------------------------------------------------
 """
 
@@ -370,122 +369,6 @@ def adjust_qec_asym(width,width2,xmid,fmax,Pec,nrho,geq):
     return y
 
 ###############################################################################
-# io instate
-
-def io_input_from_instate(instate,intoray,k):
-
-    nrho = 101 
-    rho = arange(nrho)/(nrho-1.0)
-    
-    rho_in = instate["instate"]["rho"]
-    zeff_in = instate["instate"]["zeff"]
-    ne_in = instate["instate"]["ne"]
-    te_in = instate["instate"]["te"]
-
-    zeff = interp1d(rho_in,zeff_in,kind='cubic')(rho)
-    ne = interp1d(rho_in,ne_in,kind='cubic')(rho)
-    te = interp1d(rho_in,te_in,kind='cubic')(rho)
-    prof = {"nrho":nrho,"rho":rho,"zeff":zeff,"ne":ne,"te":te}
-
-    intoray_k = {}
-    for v in intoray["intoray"].keys():
-        if v not in ["ntoray"]:
-            intoray_k[v] = intoray["intoray"][v][k]
-    
-    return prof,intoray_k
-
-def io_update_instate(geq,f_instate,intoray):
-
-    ntoray = intoray["intoray"]["ntoray"][0]
-
-    for k in range(ntoray):
-
-        rfpow = intoray["intoray"]["rfpow"][k]*1.0e-6 #[MW]
-
-        f_ncfile = "toray_%d.nc"%k
-        outtoray = read_toray_output(f_ncfile)
-
-        nrho = outtoray["outtoray"]["nrho"][0]
-        rho  = outtoray["outtoray"]["rho" ]     #[] 
-        jec  = outtoray["outtoray"]["jec" ]     #[A/m^2/W]
-        qec  = outtoray["outtoray"]["qec" ]     #[W/m^3/W]
-        Pec  = outtoray["outtoray"]["Pec" ][0]  #[]
-        Iec  = outtoray["outtoray"]["Iec" ][0]  #[A/W]
-
-        try:
-           j_multi = intoray["adjust"]["j_multi"][k]
-        except:
-           j_multi = 1.0
-           print 'no j_multi inuput, set 1.0'
-        jec = j_multi*array(jec)
-
-        try:
-           width = intoray["adjust"]["width"][k]
-        except:
-           width = 0.0
-           print 'no width inuput, set 0'
-        try:
-           width2 = intoray["adjust"]["width2"][k]
-        except:
-           width2 = 0.0
-           print 'no width2 inuput, set 0'
-        print 'width: ',width,width2
-
-        if width > 0.0:
-
-            print 'adjust width'
-
-            fit_coeff = fit_gaussian(rho,jec)
-
-            jec_max=0.0
-            for k in range(len(rho)):
-                if jec[k] > jec_max:
-                   jec_max = jec[k]
-                   k_find = k
-            print 72*"-"
-           #print jec
-            print 'rho_EC, find = ',rho[k_find]
-            print 'jec_max = ',jec_max
-          
-            #fit = adjust_jec(
-            #          0.5*width,fit_coeff[1],fit_coeff[0],Iec,nrho,geq)
-
-            if width2 > 0.0:
-                print 'call asym'
-                fit = adjust_jec_asym(
-                          0.5*width,0.5*width2,rho[k_find],jec_max,Iec,nrho,geq)
-                jec = fit
-    
-                fit = adjust_qec_asym(
-                          0.5*width,0.5*width2,rho[k_find],qec[k_find],Pec,nrho,geq)
-                qec = fit
-
-
-            else: 
-                fit = adjust_jec(
-                          0.5*width,rho[k_find],jec_max,Iec,nrho,geq)
-                jec = fit
-    
-                fit = adjust_qec(
-                          0.5*width,rho[k_find],qec[k_find],Pec,nrho,geq)
-                qec = fit
-
-        if k==0:
-           jec_sum = jec*rfpow
-           qec_sum = qec*rfpow
-        else:
-           jec_sum+= jec*rfpow
-           qec_sum+= qec*rfpow
-
-    # update local infastran
-
-    instate = Namelist(f_instate)
-    rho_in = instate["instate"]["rho"]
-    instate["instate"]["j_ec" ] = interp1d(rho,jec_sum,kind='cubic')(rho_in)
-    instate["instate"]["pe_ec"] = interp1d(rho,qec_sum,kind='cubic')(rho_in)
-    instate.write(f_instate)
-
-###############################################################################
 # io plasma state
 
 def io_input_from_state(geq,ps,intoray,k,nrho=101):
@@ -569,32 +452,23 @@ def io_update_state(geq,ps,intoray):
                    j_find = j
             print 'rho_peak, jec_peak :',rho[j_find],jec_max
           
-            #fit = adjust_jec(
-            #          0.5*width,rho[j_find],jec_max,Iec,nrho,ps)
-            #jec = fit
-
-            #fit = adjust_qec(
-            #          0.5*width,rho[j_find],qec[j_find],Pec,nrho,ps)
-            #qec = fit
-
             if width2 > 0.0:
                 print 'call asym'
                 fit = adjust_jec_asym(
-                          0.5*width,0.5*width2,rho[j_find],jec_max,Iec,nrho,ps)
+                    0.5*width,0.5*width2,rho[j_find],jec_max,Iec,nrho,ps)
                 jec = fit
     
                 fit = adjust_qec_asym(
-                          0.5*width,0.5*width2,rho[j_find],qec[j_find],Pec,nrho,ps)
+                    0.5*width,0.5*width2,rho[j_find],qec[j_find],Pec,nrho,ps)
                 qec = fit
-
 
             else: 
                 fit = adjust_jec(
-                          0.5*width,rho[j_find],jec_max,Iec,nrho,ps)
+                    0.5*width,rho[j_find],jec_max,Iec,nrho,ps)
                 jec = fit
     
                 fit = adjust_qec(
-                          0.5*width,rho[j_find],qec[j_find],Pec,nrho,ps)
+                    0.5*width,rho[j_find],qec[j_find],Pec,nrho,ps)
                 qec = fit
 
         if k==0:
@@ -615,15 +489,17 @@ def io_update_state(geq,ps,intoray):
        jec_seed = j0_seed*exp(-rho**2/(2*drho_seed**2))
        jec_sum += jec_seed
 
+    # update plasma state file
 
-    # update local infastran
+    r0  = geq["rzero" ]
+    b0  = abs(geq["bcentr"])
 
     rho_ps = ps["rho"][:]
     jec_ps = 1.0e6*interp1d(rho,jec_sum,kind='cubic')(rho_ps)
     pec_ps = 1.0e6*interp1d(rho,qec_sum,kind='cubic')(rho_ps)
 
-    ps.load_j_parallel_CD(rho_ps,jec_ps,"ec")
-    ps.load_profile(rho_ps,pec_ps,"peech","vol")
+    ps.load_j_parallel(rho_ps,jec_ps,"rho_ecrf","curech",r0,b0)
+    ps.load_vol_profile(rho_ps,pec_ps,"rho_ecrf","peech")
     
 
 ###############################################################################

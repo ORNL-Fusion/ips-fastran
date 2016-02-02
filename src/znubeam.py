@@ -3,7 +3,6 @@
 """
  -----------------------------------------------------------------------
  utils for nubeam IO
- JM
  -----------------------------------------------------------------------
 """
 
@@ -11,9 +10,10 @@ import sys,os,glob,pickle,shutil
 from numpy import * 
 from scipy.interpolate import interp1d
 
+#--- zcode libraries
 import Namelist
-from zplasmastate import plasma_state_file
 from zefitutil import readg
+import zplasmastate
 
 ########################################################################
 # io
@@ -27,7 +27,9 @@ def update_ps_profile(f_state,f_eqdsk):
     r0  = geq["rzero" ]
     b0  = abs(geq["bcentr"])
     ip  = geq['cpasma']
-    ps  = plasma_state_file(f_state,r0=r0,b0=b0,ip=ip)
+
+    ps = zplasmastate.zplasmastate('ips',1)
+    ps.read(f_state)
 
     ps_xe  = 1.6022e-19
     ps_mp  = 1.6726e-27
@@ -36,7 +38,7 @@ def update_ps_profile(f_state,f_eqdsk):
     a_spec = [round(x) for x in ps["m_S"][1:]/ps_mp ]
     n_spec = len(z_spec)
 
-    n_imp = len(ps.data.dimensions["dim_nspec_imp0"])
+    n_imp = len(ps["m_SIMPI"])
     n_ion = n_spec-n_imp
 
     z_ion = z_spec[0:n_ion]
@@ -47,7 +49,7 @@ def update_ps_profile(f_state,f_eqdsk):
     ns_ion = ps["ns"][1:n_ion+1]
     ns_imp = ps["ns"][n_ion+1:n_imp+n_ion+1]
 
-    nrho  = ps.nrho
+    nrho  = len(ps["rho"])
     rho   = ps["rho"][:]
     ne    = ps["ns"][0,:]
     density_beam = ps["nbeami"][0,:]
@@ -112,4 +114,4 @@ def update_ps_profile(f_state,f_eqdsk):
         ps["ns"][k+1] = density_ion[k]
         #print ps["ns"][k+1][:]
 
-    ps.close()
+    ps.store(f_state)
