@@ -19,6 +19,7 @@ import zefit
 import netCDF4
 import zefitutil
 from zplasmastate import plasma_state_file,instate2ps
+from plasmastate import *
 
 class fastran_init_from_ps (Component):
 
@@ -87,6 +88,7 @@ class fastran_init_from_ps (Component):
             #-- get plasma state file names
 
             cur_state_file = services.get_config_param('CURRENT_STATE')
+            prior_state_file = services.get_config_param('PRIOR_STATE')
             cur_eqdsk_file = services.get_config_param('CURRENT_EQDSK')
             cur_bc_file = services.get_config_param('CURRENT_BC')
 
@@ -102,10 +104,14 @@ class fastran_init_from_ps (Component):
             #-- plasma state file
 
             try:
-                shutil.copyfile("inps.nc",cur_state_file)
-            except Exception,e:
-                print e
-                raise Exception('no plasma state file provided')
+                existing_state_file = self.EXISTING_PLASMA_STATE_FILE
+                shutil.copyfile(existing_state_file,cur_state_file)
+                shutil.copyfile(existing_state_file,prior_state_file)
+            except:
+                print existing_state_file
+                logMsg = 'Existing plasma state file could not be opened'
+                self.services.exception(logMsg)
+                raise 
 
             #----------------------------------------------------------
             #-- plasma state file
@@ -120,13 +126,22 @@ class fastran_init_from_ps (Component):
 
                 shutil.copyfile(cur_state_file,"ps.nc")
 
-                logfile = open('pstool_geqdsk.log', 'w')
-                retcode = subprocess.call([pstool_bin, "dump", "geqdsk"],
-                              stdout=logfile,stderr=logfile)
-                if (retcode != 0):
-                    print 'Error executing ', pstool_bin
+                #logfile = open('pstool_geqdsk.log', 'w')
+                #retcode = subprocess.call([pstool_bin, "dump", "geqdsk"],
+                #              stdout=logfile,stderr=logfile)
+                #if (retcode != 0):
+                #    print 'Error executing ', pstool_bin
+                #    raise
+                #logfile.close()
+
+                try:
+                    ps = PlasmaState("ips",1)
+                    ps.read(cur_state_file)
+                    ps.writeGeqdsk("geqdsk")
+                except:
+                    logMsg = "Error creating eqdsk file from existing plasma state"
+                    self.services.exception(logMsg)
                     raise
-                logfile.close()
 
             #----------------------------------------------------------
             #-- boundary condition plasma state file

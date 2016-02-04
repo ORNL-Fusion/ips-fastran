@@ -17,7 +17,12 @@ class plasma_state_file():
 
     def __init__(self,f_ps,mode='r+',r0=0.0,b0=0.0,ip=0.0):
 
-        self.data = netCDF4.Dataset(f_ps,mode,format='NETCDF4')
+        print f_ps
+        try:
+            self.data = netCDF4.Dataset(f_ps,mode,format='NETCDF4')
+        except:
+            print f_ps
+            raise
 
         self.nrho = len(self.data.dimensions["dim_nrho"])
         self.nrho_eq = len(self.data.dimensions["dim_nrho_eq"])

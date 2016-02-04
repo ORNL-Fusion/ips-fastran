@@ -80,7 +80,7 @@ class genray(Component):
         except:
             genray_bin = os.path.join(self.BIN_PATH, 'xgenray')
             logMsg = 'Using default binary path for GENRAY'
-            services.info(logMsg)
+            services.warning(logMsg)
         print genray_bin
 
         #--- stage plasma state files
@@ -151,7 +151,7 @@ class genray(Component):
 
     def restart(self, timeStamp=0.0):
 
-        self.services.info('restart() called for GENRAY')
+        self.services.warning('restart() called for GENRAY')
         restart_root = self.services.get_config_param('RESTART_ROOT')
         self.services.get_restart_files(restart_root, timeStamp, self.RESTART_FILES)
 
@@ -162,7 +162,7 @@ class genray(Component):
 
         services = self.services
 
-        services.info('checkpoint() called for genray')
+        services.warning('checkpoint() called for genray')
 
         services.save_restart_files(timestamp, self.RESTART_FILES)
 

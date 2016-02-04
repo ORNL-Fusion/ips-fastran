@@ -323,7 +323,7 @@ class nubeam(Component):
 
             os.environ['NUBEAM_REPEAT_COUNT'] = '%dx%f'%(1,dt_nubeam)
             for k in range(navg):
-                task_id = services.launch_task(self.NPROC, workdir, nubeam_bin, logfile = 'log.nubeam2')
+                task_id = services.launch_task(self.NPROC, workdir, nubeam_bin, logfile = 'log.nubeam_%d'%k)
                 retcode = services.wait_task(task_id)
                 if (retcode != 0):
                     logMsg = 'Error executing command:  mpi_nubeam_comp_exec: step avg '

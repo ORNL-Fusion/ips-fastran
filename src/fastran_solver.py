@@ -41,8 +41,10 @@ class fastran_solver(Component):
 
         try:
             services.stage_plasma_state()
-        except Exception, e:
-            print 'Error in call to stage_plasma_state()', e
+        except:
+            logMsg = 'Error in call to stage_plasma_state()'
+            self.services.exception(logMsg)
+            raise
 
         #--- get plasma state file name
 
@@ -52,7 +54,12 @@ class fastran_solver(Component):
 
         #--- stage input files
 
-        services.stage_input_files(self.INPUT_FILES)
+        try:
+            services.stage_input_files(self.INPUT_FILES)
+        except:
+            logMsg = 'Error trying to stage input files'
+            self.services.exception(logMsg)
+            raise
 
         #--- generate fastran input
 
@@ -94,17 +101,19 @@ class fastran_solver(Component):
 
         try:
             services.update_plasma_state()
-        except Exception, e:
-            print 'Error in call to update_plasma_state()', e
-            raise Exception, e
+        except:
+            logMsg = 'Error in call to update_plasma_state()'
+            self.services.exception(logMsg)
+            raise
 
         #--- archive output files
 
         try:
             services.stage_output_files(timeStamp, self.OUTPUT_FILES)
-        except Exception, e:
-            print 'Error in call to stage_output_files()', e
-            raise Exception, e
+        except:
+            logMsg = 'Error in call to stage_output_files()'
+            self.services.exception(logMsg)
+            raise 
 
         return
     

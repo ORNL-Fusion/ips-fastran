@@ -48,6 +48,7 @@ class esc(Component):
             services.stage_plasma_state()
         except Exception, e:
             print 'Error in call to stage_plasma_state()', e
+            raise
 
         #--- get plasma state file names
 
@@ -66,9 +67,18 @@ class esc(Component):
             esc_bin = os.path.join(self.BIN_PATH, self.BIN)
         except:
             esc_bin = os.path.join(self.BIN_PATH, 'xesc')
+            pass
         print esc_bin
 
-        wgeqdsk_bin = os.path.join(self.BIN_PATH, 'wgeqdsk')
+        try:
+            wgeqdsk_bin = self.WGEQDSK_PATH
+        except:
+            logMsg = "No WGEQDSK_PATH variable found in config file, setting default"
+            self.services.info(logMsg)
+            wgeqdsk_bin = os.path.join(self.BIN_PATH, 'wgeqdsk')
+            pass
+
+        print "wgeqdsk_bin: "
         print wgeqdsk_bin
 
         pstool_bin = os.path.join(self.BIN_PATH, 'pstool')
@@ -143,7 +153,7 @@ class esc(Component):
             services.stage_output_files(timeStamp, self.OUTPUT_FILES)
         except Exception, e:
             print 'Error in call to stage_output_files()', e
-            raise Exception, e
+            raise
  
         return
     
