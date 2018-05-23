@@ -7,18 +7,27 @@
  ----------------------------------------------------------------------
 """
 
-import os,sys,pickle,glob
+import os,sys,pickle,glob,shutil
 from numpy import *
 from scipy import interpolate
 import Namelist
 import pmds
 
 import netCDF4
-import zefitutil,zefitdata
-import zinterp
-import zplot
+import efit_eqdsk,plasmastate
+from zinterp import zinterp
 
 import xfastran_env
+
+def cell2node(cell):
+
+    nrho = len(cell)+1
+    node = zeros(nrho)
+    node[0] = cell[0]
+    for i in range(1,nrho-1):
+        node[i] = 0.5*(cell[i-1]+cell[i])
+    node[-1] = cell[-1]
+    return node
 
 def boxsmooth(y,n):
     ys = zeros(len(y))
@@ -35,28 +44,21 @@ def get_shot_time(fname):
     time = int(os.path.basename(fname).split('.')[-1].split('_')[0])
     return (shot,time)
 
-def get_efit(shot,tmin=2000,tmax=6000,outdir='.',efitdir='.'):
+def get_efit(shot,tmin=2000,tmax=6000,outdir='.',efitdir='.',efit_id=''):
 
     nrho = 101
     rho = arange(nrho)/(nrho-1.0)
 
     nbdry_max = 201
 
-    gfiles = glob.glob(os.path.join(efitdir,'g%06d.?????'%shot))
+    gfiles = glob.glob(os.path.join(efitdir,'g%06d.?????%s'%(shot,efit_id)))
     gfiles.sort()
 
     times = []
-    geqs = []
-
     for gfile in gfiles:
-
         time = get_shot_time(gfile)[-1]
         if time<tmin or time>tmax: continue
-
-        print 'processing: %s'%gfile
         times.append(time)
-       #geqs.append(zefitutil.readg(gfile))
-        geqs.append(zefitdata.efitdata(gfile,"ps"))
 
     ntimes = len(times)
     ip = zeros(ntimes)
@@ -69,6 +71,8 @@ def get_efit(shot,tmin=2000,tmax=6000,outdir='.',efitdir='.'):
     r = zeros((ntimes,nrho))
     a = zeros((ntimes,nrho))
     jtot = zeros((ntimes,nrho))
+    jpar = zeros((ntimes,nrho))
+    jtor = zeros((ntimes,nrho))
     p_eq = zeros((ntimes,nrho))
     q_eq = zeros((ntimes,nrho))
     nbdry = zeros(ntimes,'i4')
@@ -77,29 +81,79 @@ def get_efit(shot,tmin=2000,tmax=6000,outdir='.',efitdir='.'):
     zbdry = zeros((ntimes,nbdry_max))
     rlim = zeros((ntimes,nbdry_max))
     zlim = zeros((ntimes,nbdry_max))
+    r_out = zeros((ntimes,nrho))
+    r_in = zeros((ntimes,nrho))
+
     
     for k in range(ntimes):
-        geq = geqs[k]
-        ip[k] = geq["cpasma"]
-        b0[k] = geq["bcentr"]
-        r0[k] = geq["rzero"]
-        rmajor[k] = geq["ps"]["Rmajor_mean"][-1]
-        aminor[k] = geq["ps"]["rMinor_mean"][-1]
-        kappa[k] = geq["ps"]["elong"][-1]
-        delta[k] = geq["ps"]["triang"][-1]
-        jtot[k,:] = geq["ps"]["jdotb"]/b0[k]
-        p_eq[k,:] = geq["ps"]["P_eq"]
-        q_eq[k,:] = geq["ps"]["q_eq"]
-        r[k,:]    = geq["ps"]["Rmajor_mean"]
-        a[k,:]    = geq["ps"]["rMinor_mean"]
 
-        bdry = zefitutil.getbdry(geq,nskip=1)
+        gfile = os.path.join(efitdir,'g%06d.%05d%s'%(shot,times[k],efit_id))
+        print 'processing',gfile
+
+        bin_fluxsurf = os.path.join(os.environ["FLUXSURF_BIN_PATH"],os.environ["FLUXSURF_BIN_NAME"])
+        print bin_fluxsurf
+        os.system(bin_fluxsurf+" %s"%gfile)
+        current = loadtxt("current.dat").transpose()
+        jpar[k,:] = current[1]
+        jtor[k,:] = current[2]
+
+        g  = efit_eqdsk.readg(gfile)
+        ps = plasmastate.plasmastate('ips',1)
+        ps.init_from_geqdsk(gfile)
+   
+        ip[k] = g["cpasma"]
+        b0[k] = g["bcentr"]
+        r0[k] = g["rzero"]
+        rmajor[k] = ps["Rmajor_mean"][-1]
+        aminor[k] = ps["rMinor_mean"][-1]
+        kappa[k]  = ps["elong"][-1]
+        delta[k]  = ps["triang"][-1]
+        jtot[k,:] = ps["jdotb"][:]/b0[k]
+        p_eq[k,:] = ps["P_eq"][:]
+        q_eq[k,:] = ps["q_eq"][:]
+        r[k,:]    = ps["Rmajor_mean"][:]
+        a[k,:]    = ps["rMinor_mean"][:]
+        bdry = efit_eqdsk.getbdry(g,nskip=1)
         nbdry[k] = bdry["nbdry"]
         nlim[k] = bdry["nlim"]
-        rbdry[k,0:nbdry[k]] = bdry["rbdry"] #[0:nbdry[k]]
+        rbdry[k,0:nbdry[k]] = bdry["rbdry"] 
         zbdry[k,0:nbdry[k]] = bdry["zbdry"]
         rlim[k,0:nlim[k]] = bdry["rlim"]
         zlim[k,0:nlim[k]] = bdry["zlim"]
+
+        r_out[k,:] = ps["R_midp_out"][:]
+        r_in[k,:] = ps["R_midp_in"][:]
+
+        psi = ps["psipol"][:]/ps["psipol"][-1] 
+      # rho = sqrt(ps["phit"][:]/ps["phit"][-1])
+        rhob = (ps["phit"][-1]/pi/abs(b0[k]))**0.5 
+        rhopsi = zinterp(psi,rho)
+        ipol = ps["g_eq"][:]/(r0[k]*b0[k])
+        ipol = abs(ipol)
+
+        #ipol_tmp = g["fpol"]/(r0[k]*b0[k])
+        #psin = arange(len(ipol_tmp))/(len(ipol_tmp)-1.)
+        #print len(psin)
+        #ipol_spl = zinterp(psin,ipol_tmp)
+        #ipol = ipol_spl(psi)
+        #print ipol
+
+        volp = 4.0*pi*pi*rho*rhob*r0[k]/ipol/(r0[k]*r0[k]*ps["gr2i"][:])
+        g11 = volp*ps["grho2"][:]*rhob**2
+        g22 = r0[k]*volp/(4.0*pi*pi)*ps["grho2r2i"][:]*rhob**2
+        g33 = r0[k]*r0[k]*ps["gr2i"][:]
+
+#        psipol = 2.0*pi*ps["psipol"][:]
+#       #psipol = ( g["ssibry"] - g["ssimag"] ) * arange(nrho)/(nrho-1.0) +  g["ssimag"]
+#        drho = rhob/(nrho-1.0)
+#        jpar = zeros(nrho)
+#        for i in range(1,nrho-1):
+#           jpar[i] = (g22[i]+g22[i+1])*(psipol[i+1]-psipol[i])-(g22[i-1]+g22[i])*(psipol[i]-psipol[i-1])
+#           jpar[i] *= 5.*ipol[i]**2/volp[i]*0.5/drho**2
+#        jpar[-1] = 2.0*jpar[-2]-jpar[-3]
+#        jpar[0] = 2.0*jpar[1]-jpar[2]
+#        jtot[k,:] = jpar*1.0e6
+       
 
     #------------------------------------------------------------------
     # dump to netcdf
@@ -124,10 +178,15 @@ def get_efit(shot,tmin=2000,tmax=6000,outdir='.',efitdir='.'):
     var_kappa  = nc.createVariable('kappa','f8',('time',))
     var_delta  = nc.createVariable('delta','f8',('time',))
     var_jtot   = nc.createVariable('jtot','f8',('time','rho'))
+    var_jpar   = nc.createVariable('jpar','f8',('time','rho'))
+    var_jtor   = nc.createVariable('jtor','f8',('time','rho'))
     var_p_eq   = nc.createVariable('p_eq','f8',('time','rho'))
     var_q_eq   = nc.createVariable('q_eq','f8',('time','rho'))
     var_r      = nc.createVariable('r','f8',('time','rho'))
     var_a      = nc.createVariable('a','f8',('time','rho'))
+
+    var_r_out   = nc.createVariable('r_out','f8',('time','rho'))
+    var_r_in   = nc.createVariable('r_in','f8',('time','rho'))
 
     var_nbdry  = nc.createVariable('nbdry','i4',('time',))
     var_nlim   = nc.createVariable('nlim','i4',('time',))
@@ -146,10 +205,15 @@ def get_efit(shot,tmin=2000,tmax=6000,outdir='.',efitdir='.'):
     var_kappa[:]  = kappa
     var_delta[:]  = delta
     var_jtot[:,:] = jtot
+    var_jpar[:,:] = jpar
+    var_jtor[:,:] = jtor
     var_p_eq[:,:] = p_eq
     var_q_eq[:,:] = q_eq
     var_r[:,:] = r
     var_a[:,:] = a
+
+    var_r_out[:,:] = r_out
+    var_r_in[:,:] = r_in
 
     var_nbdry[:]  = nbdry
     var_nlim[:]   = nlim
@@ -157,6 +221,7 @@ def get_efit(shot,tmin=2000,tmax=6000,outdir='.',efitdir='.'):
     var_zbdry[:,:] = zbdry
     var_rlim[:,:] = rlim
     var_zlim[:,:] = zlim
+
 
     nc.close()
 

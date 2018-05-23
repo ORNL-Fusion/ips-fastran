@@ -15,7 +15,7 @@ import pmds
 
 import netCDF4
 import zinterp
-import zplot
+#import zplot
 
 import xfastran_env
 
@@ -96,14 +96,14 @@ def get_ech(shot,tmin=2000,tmax=6000,dt=20,outdir='.',iplot=False):
     #------------------------------------------------------------------
     # check plot
 
-    if iplot:
-        p = zplot.zplot("ech_%06d.pdf"%shot,size_x=8.0,size_y=4.0)
-        for k in range(num_systems):
-            zplot.plot_s(111,1.0e-3*times,1.0e-6*pinj[k,:]
-                 ,[0.0,7.0,1.0],[0.0,1.0,0.2]
-                ,iline='line',isym='',xlab='time',ylab='pinj')
-            p.savefig()
-        p.close()
+    #if iplot:
+    #    p = zplot.zplot("ech_%06d.pdf"%shot,size_x=8.0,size_y=4.0)
+    #    for k in range(num_systems):
+    #        zplot.plot_s(111,1.0e-3*times,1.0e-6*pinj[k,:]
+    #             ,[0.0,7.0,1.0],[0.0,1.0,0.2]
+    #            ,iline='line',isym='',xlab='time',ylab='pinj')
+    #        p.savefig()
+    #    p.close()
 
     #------------------------------------------------------------------
     # output

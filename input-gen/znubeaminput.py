@@ -229,56 +229,82 @@ def nbigeo(ps_rzt,pe_rzt,src_angle,iLR):
 def interp2d(x,y,z,x0,y0):
     return interpolate.RectBivariateSpline(x,y,z,kx=1,ky=1)(x0,y0)[0][0]
 
-def get_nubeam_geo(btilt,stilt_L,stilt_R,nbsrc=None):
-
-
-    # -----------------------------------------------------------------
-    # read 150 beamline geometry
-
-    if nbsrc == None:
-        f=open("oanb_parm_data.pickle","r")
-        nbsrc = pickle.load(f)
-        f.close()
+def get_nubeam_geo(btilt,stilt_L,stilt_R,nbsrc,LTO):
 
     # -----------------------------------------------------------------
     # return data
 
     nubeam_namelist = {}
 
-    # -----------------------------------------------------------------
-    # set
+    if LTO>=2:
 
-    segments = ["up","mu","ml","lo"]
-    x = nbsrc["stilt"]
-    y = nbsrc["btilt"]
+        # -----------------------------------------------------------------
+        # 15L - offaxis beam
+    
+        segments = ["up","mu","ml","lo"]
+        x = nbsrc["stilt"]
+        y = nbsrc["btilt"]
+    
+        ps = []; pa = []
+        for segment in segments:
+            id = "l"+segment
+            ps.append ([ interp2d(x,y,nbsrc["rs"][id],stilt_L,btilt),
+                         interp2d(x,y,nbsrc["zs"][id],stilt_L,btilt),
+                         interp2d(x,y,nbsrc["ts"][id],stilt_L,btilt) ] )
+            pa.append ([ interp2d(x,y,nbsrc["ra"][id],stilt_L,btilt),
+                         interp2d(x,y,nbsrc["za"][id],stilt_L,btilt),
+                         interp2d(x,y,nbsrc["ta"][id],stilt_L,btilt) ] )
+        nubeam_namelist["15L"] = nbigeo(ps,pa,stilt_L,"L")
+    
+        # -----------------------------------------------------------------
+        # 15R - offaxis beam
+    
+        ps = []; pa = []
+        for segment in segments:
+            id = "r"+segment
+            ps.append ([ interp2d(x,y,nbsrc["rs"][id],stilt_R,btilt),
+                         interp2d(x,y,nbsrc["zs"][id],stilt_R,btilt),
+                         interp2d(x,y,nbsrc["ts"][id],stilt_R,btilt) ] )
+            pa.append ([ interp2d(x,y,nbsrc["ra"][id],stilt_R,btilt),
+                         interp2d(x,y,nbsrc["za"][id],stilt_R,btilt),
+                         interp2d(x,y,nbsrc["ta"][id],stilt_R,btilt) ] )
+        nubeam_namelist["15R"] = nbigeo(ps,pa,stilt_R,"R")
 
-    # -----------------------------------------------------------------
-    # 150L
+    else:
 
-    ps = []; pa = []
-    for segment in segments:
-        id = "l"+segment
-        ps.append ([ interp2d(x,y,nbsrc["rs"][id],stilt_L,btilt),
-                     interp2d(x,y,nbsrc["zs"][id],stilt_L,btilt),
-                     interp2d(x,y,nbsrc["ts"][id],stilt_L,btilt) ] )
-        pa.append ([ interp2d(x,y,nbsrc["ra"][id],stilt_L,btilt),
-                     interp2d(x,y,nbsrc["za"][id],stilt_L,btilt),
-                     interp2d(x,y,nbsrc["ta"][id],stilt_L,btilt) ] )
-    nubeam_namelist["15L"] = nbigeo(ps,pa,stilt_L,"L")
-
-    # -----------------------------------------------------------------
-    # 150R
-
-    ps = []; pa = []
-    for segment in segments:
-        id = "r"+segment
-        ps.append ([ interp2d(x,y,nbsrc["rs"][id],stilt_R,btilt),
-                     interp2d(x,y,nbsrc["zs"][id],stilt_R,btilt),
-                     interp2d(x,y,nbsrc["ts"][id],stilt_R,btilt) ] )
-        pa.append ([ interp2d(x,y,nbsrc["ra"][id],stilt_R,btilt),
-                     interp2d(x,y,nbsrc["za"][id],stilt_R,btilt),
-                     interp2d(x,y,nbsrc["ta"][id],stilt_R,btilt) ] )
-    nubeam_namelist["15R"] = nbigeo(ps,pa,stilt_R,"R")
+        # -----------------------------------------------------------------
+        # 15L
+    
+        nubeam_namelist["15L"] = { 
+           "nlco"    : [True   ],
+           "nbshapa" : [1      ], "bmwidra" : [6.0   ], "bmwidza" : [24.0],
+           "foclra"  : [1.0e33 ], "foclza"  : [1.0e3 ],
+           "divra"   : [0.00873], "divza"   : [0.0227],
+           "rtcena"  : [114.6  ], "xlbtna"  : [802.8 ], "xybsca"  : [0.0 ],
+          #"xbzeta"  : [314.289],
+           "xlbapa"  : [186.1  ], "xybapa"  : [0.0   ],
+           "nbapsha" : [1      ], "rapedga" : [8.85  ], "xzpedga" : [24.0],
+           "xrapoffa": [0.0    ], "xzapoffa": [0.0   ],
+           "nbapsh2" : [0      ], "rapedg2" : [0.0   ], "xzpedg2" : [0.0 ], 
+           "xlbapa2" : [0.0    ], "xrapoff2": [0.0   ], "xzapoff2": [0.0 ]
+        } 
+    
+        # -----------------------------------------------------------------
+        # 15R
+    
+        nubeam_namelist["15R"] = { 
+           "nlco"    : [True   ],
+           "nbshapa" : [1      ], "bmwidra" : [6.0   ], "bmwidza" : [24.0],
+           "foclra"  : [1.0e33 ], "foclza"  : [1.0e3 ],
+           "divra"   : [0.00873], "divza"   : [0.0227],
+           "rtcena"  : [76.2   ], "xlbtna"  : [817.3 ], "xybsca"  : [0.0 ],
+          #"xbzeta"  : [320.16 ],
+           "xlbapa"  : [186.1  ], "xybapa"  : [0.0   ],
+           "nbapsha" : [1      ], "rapedga" : [8.85  ], "xzpedga" : [24.0],
+           "xrapoffa": [0.0    ], "xzapoffa": [0.0   ],
+           "nbapsh2" : [0      ], "rapedg2" : [0.0   ], "xzpedg2" : [0.0 ], 
+           "xlbapa2" : [0.0    ], "xrapoff2": [0.0   ], "xzapoff2": [0.0 ]
+        } 
 
     # -----------------------------------------------------------------
     # 30L
@@ -314,39 +340,78 @@ def get_nubeam_geo(btilt,stilt_L,stilt_R,nbsrc=None):
        "xlbapa2" : [0.0    ], "xrapoff2": [0.0   ], "xzapoff2": [0.0 ]
     } 
 
-    # -----------------------------------------------------------------
-    # 21L
+    if LTO>=1:
 
-    nubeam_namelist["21L"] = { 
-       "nlco"    : [False  ],
-       "nbshapa" : [1      ], "bmwidra" : [6.0   ], "bmwidza" : [24.0],
-       "foclra"  : [1.0e33 ], "foclza"  : [1.0e3 ],
-       "divra"   : [0.00873], "divza"   : [0.0227],
-       "rtcena"  : [76.2   ], "xlbtna"  : [817.3 ], "xybsca"  : [0.0 ],
-      #"xbzeta"  : [159.84 ],
-       "xlbapa"  : [186.1  ], "xybapa"  : [0.0   ],
-       "nbapsha" : [1      ], "rapedga" : [8.85  ], "xzpedga" : [24.0],
-       "xrapoffa": [0.0    ], "xzapoffa": [0.0   ],
-       "nbapsh2" : [0      ], "rapedg2" : [0.0   ], "xzpedg2" : [0.0 ], 
-       "xlbapa2" : [0.0    ], "xrapoff2": [0.0   ], "xzapoff2": [0.0 ]
-    } 
+        # -----------------------------------------------------------------
+        # 21L
+    
+        nubeam_namelist["21L"] = { 
+           "nlco"    : [False  ],
+           "nbshapa" : [1      ], "bmwidra" : [6.0   ], "bmwidza" : [24.0],
+           "foclra"  : [1.0e33 ], "foclza"  : [1.0e3 ],
+           "divra"   : [0.00873], "divza"   : [0.0227],
+           "rtcena"  : [76.2   ], "xlbtna"  : [817.3 ], "xybsca"  : [0.0 ],
+          #"xbzeta"  : [159.84 ],
+           "xlbapa"  : [186.1  ], "xybapa"  : [0.0   ],
+           "nbapsha" : [1      ], "rapedga" : [8.85  ], "xzpedga" : [24.0],
+           "xrapoffa": [0.0    ], "xzapoffa": [0.0   ],
+           "nbapsh2" : [0      ], "rapedg2" : [0.0   ], "xzpedg2" : [0.0 ], 
+           "xlbapa2" : [0.0    ], "xrapoff2": [0.0   ], "xzapoff2": [0.0 ]
+        } 
+    
+        # -----------------------------------------------------------------
+        # 21R
+    
+        nubeam_namelist["21R"] = { 
+           "nlco"    : [False  ],
+           "nbshapa" : [1      ], "bmwidra" : [6.0   ], "bmwidza" : [24.0],
+           "foclra"  : [1.0e33 ], "foclza"  : [1.0e3 ],
+           "divra"   : [0.00873], "divza"   : [0.0227],
+           "rtcena"  : [114.6  ], "xlbtna"  : [802.8 ], "xybsca"  : [0.0 ],
+          #"xbzeta"  : [165.711],
+           "xlbapa"  : [186.1  ], "xybapa"  : [0.0   ],
+           "nbapsha" : [1      ], "rapedga" : [8.85  ], "xzpedga" : [24.0],
+           "xrapoffa": [0.0    ], "xzapoffa": [0.0   ],
+           "nbapsh2" : [0      ], "rapedg2" : [0.0   ], "xzpedg2" : [0.0 ], 
+           "xlbapa2" : [0.0    ], "xrapoff2": [0.0   ], "xzapoff2": [0.0 ]
+        } 
+    
+    else: 
 
-    # -----------------------------------------------------------------
-    # 21R
+        # -----------------------------------------------------------------
+        # 21L
+        nubeam_namelist["21L"] = { 
+           "nlco"    : [True  ],
+           "nbshapa" : [1      ], "bmwidra" : [6.0   ], "bmwidza" : [24.0],
+           "foclra"  : [1.0e33 ], "foclza"  : [1.0e3 ],
+           "divra"   : [0.00873], "divza"   : [0.0227],
+           "rtcena"  : [114.6  ], "xlbtna"  : [802.8 ], "xybsca"  : [0.0 ],
+          #"xbzeta"  : [165.711],
+           "xlbapa"  : [186.1  ], "xybapa"  : [0.0   ],
+           "nbapsha" : [1      ], "rapedga" : [8.85  ], "xzpedga" : [24.0],
+           "xrapoffa": [0.0    ], "xzapoffa": [0.0   ],
+           "nbapsh2" : [0      ], "rapedg2" : [0.0   ], "xzpedg2" : [0.0 ], 
+           "xlbapa2" : [0.0    ], "xrapoff2": [0.0   ], "xzapoff2": [0.0 ]
+        } 
+    
+    
+        # -----------------------------------------------------------------
+        # 21R
+    
+        nubeam_namelist["21R"] = { 
+           "nlco"    : [True  ],
+           "nbshapa" : [1      ], "bmwidra" : [6.0   ], "bmwidza" : [24.0],
+           "foclra"  : [1.0e33 ], "foclza"  : [1.0e3 ],
+           "divra"   : [0.00873], "divza"   : [0.0227],
+           "rtcena"  : [76.2   ], "xlbtna"  : [817.3 ], "xybsca"  : [0.0 ],
+          #"xbzeta"  : [159.84 ],
+           "xlbapa"  : [186.1  ], "xybapa"  : [0.0   ],
+           "nbapsha" : [1      ], "rapedga" : [8.85  ], "xzpedga" : [24.0],
+           "xrapoffa": [0.0    ], "xzapoffa": [0.0   ],
+           "nbapsh2" : [0      ], "rapedg2" : [0.0   ], "xzpedg2" : [0.0 ], 
+           "xlbapa2" : [0.0    ], "xrapoff2": [0.0   ], "xzapoff2": [0.0 ]
+        } 
 
-    nubeam_namelist["21R"] = { 
-       "nlco"    : [False  ],
-       "nbshapa" : [1      ], "bmwidra" : [6.0   ], "bmwidza" : [24.0],
-       "foclra"  : [1.0e33 ], "foclza"  : [1.0e3 ],
-       "divra"   : [0.00873], "divza"   : [0.0227],
-       "rtcena"  : [114.6  ], "xlbtna"  : [802.8 ], "xybsca"  : [0.0 ],
-      #"xbzeta"  : [165.711],
-       "xlbapa"  : [186.1  ], "xybapa"  : [0.0   ],
-       "nbapsha" : [1      ], "rapedga" : [8.85  ], "xzpedga" : [24.0],
-       "xrapoffa": [0.0    ], "xzapoffa": [0.0   ],
-       "nbapsh2" : [0      ], "rapedg2" : [0.0   ], "xzpedg2" : [0.0 ], 
-       "xlbapa2" : [0.0    ], "xrapoff2": [0.0   ], "xzapoff2": [0.0 ]
-    } 
 
     # -----------------------------------------------------------------
     # 33L
@@ -603,7 +668,23 @@ def get_nubeam_namelist(shot,tmin,tmax
     out_namelist["nbdrive_naml"]["adiff_time" ] = [0.0,10.0]
     out_namelist["nbdrive_naml"]["adiff_xpin" ] = [2.0,2.0] 
     out_namelist["nbdrive_naml"]["adiff_xpout"] = [1.0,1.0] 
- 
+
+    out_namelist["nbi_init"]["wghta"] = [20.0]
+    out_namelist["nbi_init"]["nzones"] = [20]
+    out_namelist["nbi_init"]["nzone_fb"] = [10]
+    out_namelist["nbi_init"]["nznbma"] = [50]
+    out_namelist["nbi_init"]["nznbme"] = [100]
+    out_namelist["nbi_init"]["nptcls"] = [5000]
+    out_namelist["nbi_init"]["ndep0"] = [5000]
+    out_namelist["nbi_init"]["nsigexc"] = [1]
+    out_namelist["nbi_init"]["nmcurb"] = [4] 
+    out_namelist["nbi_init"]["nseed"] = [410338673]
+    out_namelist["nbi_init"]["nltest_output"] = [0]
+    out_namelist["nbi_init"]["nsdbgb"] = [2]
+    
+    out_namelist["nbi_update"]["NLTEST_OUTPUT"] = [0]
+    out_namelist["nbi_update"]["NBBCX_BB"] = [0]
+    
     if shot > 0:
        f_nubeam_namelist = "nubeam_%06d.dat"%shot
     else:

@@ -15,7 +15,7 @@ import pmds
 
 import netCDF4
 import zinterp
-import zplot
+#import zplot
 
 import xfastran_env
 
@@ -46,7 +46,7 @@ def get_nbi(shot,tmin=0,tmax=10000,dt=20,outdir='.',iplot=False):
     #------------------------------------------------------------------
     # get data
 
-    print 'get data'
+    print 'get data',shot
 
     time_mds = pmds.mdsvalue('DIM_OF(\\PINJ)')
     pinj_mds = {}
@@ -110,14 +110,14 @@ def get_nbi(shot,tmin=0,tmax=10000,dt=20,outdir='.',iplot=False):
     #------------------------------------------------------------------
     # check plot
 
-    if iplot:
-        p = zplot.zplot("nbi_%06d.pdf"%shot,size_x=8.0,size_y=4.0)
-        for k, src in enumerate(nb_list):
-            zplot.plot_s(111,1.0e-3*times,1.0e-6*pinj[k,:]
-                 ,[0.0,7.0,1.0],[0.0,3.0,1.0]
-                ,iline='line',isym='',xlab='time',ylab='pinj_%s'%src)
-            p.savefig()
-        p.close()
+    #if iplot:
+    #    p = zplot.zplot("nbi_%06d.pdf"%shot,size_x=8.0,size_y=4.0)
+    #    for k, src in enumerate(nb_list):
+    #        zplot.plot_s(111,1.0e-3*times,1.0e-6*pinj[k,:]
+    #             ,[0.0,7.0,1.0],[0.0,3.0,1.0]
+    #            ,iline='line',isym='',xlab='time',ylab='pinj_%s'%src)
+    #        p.savefig()
+    #    p.close()
 
     #------------------------------------------------------------------
     # output

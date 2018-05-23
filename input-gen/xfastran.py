@@ -1,24 +1,26 @@
-#!/usr/bin/env Python
+#!/usr/bin/env python
 
 """
  ======================================================================
- Last modified : Aug 2013
- driver for fastran/ips
- JM
+ input generator for fastran/ips
 """
 
-import os,sys,glob,shutil,pickle
-
+import os
+import sys
+import shutil
+import cPickle
 from numpy import *
-from scipy import interpolate
+
 import Namelist
 import netCDF4
-import zechdata,znbidata,zgaprofile,zgeqdsk,zefitdata,zefitutil
-import zd3dutil,znubeaminput
-import xfastran_input,xfastran_submitjob
+import zechdata
+import znbidata
+import zgaprofile
+import zgeqdsk
+import xfastran_input
 import xfastran_env
 
-#######################################################################
+#----------------------------------------------------------------------
 # common data
 #
 
@@ -31,9 +33,20 @@ define_jobs = {
 
 define_options = {
     "use_cache" : ["bool" , False],
+    "shot" : ["int" , -1],
+    "tmin" : ["int" , -1],
+    "tmax" : ["int" , -1],
+    "prof_dir" : ["string" , ''],
+    "efit_dir" : ["string" , ''],
+    "efit_id" : ["string" , ''],
+    "time_plasma_shape" : ["int" , -1],
+    "instate" : ["bool", False],
+    "innubeam": ["bool", False],
+    "intoray" : ["bool", False],
+    "ts_shift" : ["bool", False],
     }
                      
-#######################################################################
+#----------------------------------------------------------------------
 # utils
 #
 
@@ -43,7 +56,7 @@ def print_err():
     print '       job  :'
     print '              input, run, plot, check'
     print ''
-    sys.exit(-1)
+    raise Exception("input argument error")
 
 def call_external(exe,dir):
 
@@ -53,11 +66,106 @@ def call_external(exe,dir):
     os.system(exe)
     pp.backDir()
 
-########################################################################
+#----------------------------------------------------------------------
 # read parameters
 #
 
-def generate_input(input):
+def generate_input(input,infiles):
+
+    # read inscenario
+
+    shot = input["in_d3d"]["shot"][0]
+    tmin = input["in_d3d"]["tmin"][0]
+    tmax = input["in_d3d"]["tmax"][0]
+
+    prof_dir = input["in_d3d"]["prof_dir"][0]
+    efit_dir = input["in_d3d"]["efit_dir"][0]
+    input_dir = input["in_d3d"]["input_dir"][0]
+    data_dir = input["in_d3d"]["data_dir"][0]
+
+    time_plasma_shape = input["in_d3d"]["time_plasma_shape"][0]
+
+    if not os.path.exists(data_dir): os.makedirs(data_dir)
+    if not os.path.exists(input_dir): os.makedirs(input_dir)
+
+    #-------------------------------------------------------------------
+    # collect data
+
+    if not options.use_cache:
+       try:
+           zechdata.get_ech(shot,tmin,tmax,outdir=data_dir)
+           iech = True
+       except:
+           iech = False
+       znbidata.get_nbi(shot,tmin,tmax,outdir=data_dir)
+       if prof_dir:
+           prf=zgaprofile.readall(shot,rdir=prof_dir,tmin=tmin,tmax=tmax)
+           if options.ts_shift:
+               zgaprofile.ts_shift(prf)
+           zgaprofile.wrt_netcdf(shot,prf,outdir=data_dir)
+           cPickle.dump(prf,open("prof_%06d"%shot,"wb"))
+       if efit_dir:
+           zgeqdsk.get_efit(shot,tmin,tmax,outdir=data_dir,efitdir=efit_dir,efit_id=options.efit_id)
+
+    #-------------------------------------------------------------------
+    # write intoray
+
+    if "intoray" in infiles and iech:
+        print 'writing intoray'
+        xfastran_input.wrt_intoray(data_dir+'/ech_%06d.nc'%shot
+            ,shot,tmin,tmax,input_dir)
+        shutil.copyfile("intoray","intoray_%06d"%shot)
+
+    #-------------------------------------------------------------------
+    # write innubeam
+
+    if "innubeam" in infiles:
+        print 'writing innubeam'
+        xfastran_input.wrt_innubeam(data_dir+'/nbi_%06d.nc'%shot
+            ,shot,tmin,tmax,input_dir
+            ,Db=0.0)
+        shutil.copyfile("innubeam","innubeam_%06d"%shot)
+        print 'end'
+
+    #-------------------------------------------------------------------
+    # write instate
+
+    if "instate" in infiles:
+        print 'writing instate'
+        xfastran_input.wrt_instate(
+            data_dir+'/prf_%06d.nc'%shot,
+            data_dir+'/geq_%06d.nc'%shot,
+            shot,tmin,tmax,time_plasma_shape,input_dir)
+        shutil.copyfile("instate","instate_%06d"%shot)
+
+    #-------------------------------------------------------------------
+    # write infastran
+
+    if "infastran" in infiles:
+        print 'writing infastran'
+        xfastran_input.wrt_infastran(input,input_dir)
+
+    #-------------------------------------------------------------------
+    # write ingeqdsk
+
+    if "ingeqdsk" in infiles:
+        print 'writing ingeqdsk'
+        xfastran_input.wrt_ingeqdsk(input_dir)
+
+    #-------------------------------------------------------------------
+    # write configuration file
+
+    #print 'writing configuration file'
+    #xfastran_input.wrt_config(input,'.')
+
+    #-------------------------------------------------------------------
+    # clean-up temporary files
+
+    for file in ["bdry.dat","geqdsk_state","inps","log_tmp"]:
+        if os.path.exists(file): 
+            os.remove(file) 
+
+def generate_input_tdep(input,infiles):
 
     #-------------------------------------------------------------------
     # read inscenario
@@ -79,7 +187,6 @@ def generate_input(input):
     #-------------------------------------------------------------------
     # collect data
 
-
     if not options.use_cache:
        try:
            zechdata.get_ech(shot,tmin,tmax,outdir=data_dir)
@@ -87,14 +194,16 @@ def generate_input(input):
        except:
            iech = False
        znbidata.get_nbi(shot,tmin,tmax,outdir=data_dir)
-       prf=zgaprofile.readall(shot,rdir=prof_dir)
-       zgaprofile.wrt_netcdf(shot,prf,outdir=data_dir)
-       zgeqdsk.get_efit(shot,tmin,tmax,outdir=data_dir,efitdir=efit_dir)
+       if prof_dir:
+           prf=zgaprofile.readall(shot,rdir=prof_dir,tmin=tmin,tmax=tmax)
+           zgaprofile.wrt_netcdf(shot,prf,outdir=data_dir)
+       if efit_dir:
+           zgeqdsk.get_efit(shot,tmin,tmax,outdir=data_dir,efitdir=efit_dir)
 
     #-------------------------------------------------------------------
     # write intoray
 
-    if iech:
+    if "intoray" in infiles and iech:
         print 'writing intoray'
         xfastran_input.wrt_intoray(data_dir+'/ech_%06d.nc'%shot
             ,shot,tmin,tmax,input_dir)
@@ -102,37 +211,51 @@ def generate_input(input):
     #-------------------------------------------------------------------
     # write innubeam
 
-    print 'writing innubeam'
-    xfastran_input.wrt_innubeam(data_dir+'/nbi_%06d.nc'%shot
-        ,shot,tmin,tmax,input_dir
-        ,Db=0.0)
+    if "innubeam" in infiles:
+        print 'writing innubeam'
+        xfastran_input.wrt_innubeam(data_dir+'/nbi_%06d.nc'%shot
+            ,shot,tmin,tmax,input_dir
+            ,Db=0.0)
+        print 'end'
 
     #-------------------------------------------------------------------
     # write instate
 
-    print 'writing instate'
-    xfastran_input.wrt_instate(
-        data_dir+'/prf_%06d.nc'%shot,
-        data_dir+'/geq_%06d.nc'%shot,
-        shot,tmin,tmax,time_plasma_shape,input_dir)
+    ncfile_prf = data_dir+'/prf_%06d.nc'%shot
+    nc_prf = netCDF4.Dataset(ncfile_prf,'r',format='NETCDF4')
+    time_prf = nc_prf.variables["time"][:]
+
+    print time_prf
+
+    if "instate" in infiles:
+        for k in range(1,len(time_prf)-1):
+            tmin = time_prf[k-1]+1.0
+            tmax = time_prf[k+1]-1.0 
+            print 'writing instate', time_prf[k]
+            xfastran_input.wrt_instate(
+                data_dir+'/prf_%06d.nc'%shot,
+                data_dir+'/geq_%06d.nc'%shot,
+                shot,tmin,tmax,time_plasma_shape,input_dir,fn_instate="i%06d.%05d"%(shot,int(time_prf[k])))
 
     #-------------------------------------------------------------------
     # write infastran
 
-    print 'writing infastran'
-    xfastran_input.wrt_infastran(input,input_dir)
+    if "infastran" in infiles:
+        print 'writing infastran'
+        xfastran_input.wrt_infastran(input,input_dir)
 
     #-------------------------------------------------------------------
     # write ingeqdsk
 
-    print 'writing ingeqdsk'
-    xfastran_input.wrt_ingeqdsk(input_dir)
+    if "ingeqdsk" in infiles:
+        print 'writing ingeqdsk'
+        xfastran_input.wrt_ingeqdsk(input_dir)
 
     #-------------------------------------------------------------------
     # write configuration file
 
-    print 'writing configuration file'
-    xfastran_input.wrt_config(input,'.')
+    #print 'writing configuration file'
+    #xfastran_input.wrt_config(input,'.')
 
     #-------------------------------------------------------------------
     # clean-up temporary files
@@ -140,6 +263,7 @@ def generate_input(input):
     for file in ["bdry.dat","geqdsk_state","inps","log_tmp"]:
         if os.path.exists(file): 
             os.remove(file) 
+
 
 ########################################################################
 # driver
@@ -176,15 +300,37 @@ if __name__=="__main__":
     #-------------------------------------------------------------------
     # read inscenario
 
-    input = Namelist.Namelist("inscenario")
+    # input = Namelist.Namelist("inscenario")
 
     #-------------------------------------------------------------------
     # run
 
     if job=="input":
 
-       generate_input(input)
+       input = Namelist.Namelist()
+
+       input["in_d3d"]["shot"] = [options.shot]
+       input["in_d3d"]["tmin"] = [options.tmin]
+       input["in_d3d"]["tmax"] = [options.tmax]
+
+       input["in_d3d"]["prof_dir" ] = [options.prof_dir]
+       input["in_d3d"]["efit_dir" ] = [options.efit_dir]
+       input["in_d3d"]["input_dir"] = ['.']
+       input["in_d3d"]["data_dir" ] = ['.']
+
+       input["in_d3d"]["time_plasma_shape"] =  [options.time_plasma_shape]
+
+
+      #infiles = ["innubeam","intoray","instate"]
+       infiles = []
+       if options.innubeam: infiles += ["innubeam"]
+       if options.intoray: infiles += ["intoray"]
+       if options.instate: infiles += ["instate"]
+       print infiles
+
+       generate_input(input,infiles)
+     # generate_input_tdep(input,infiles)
 
     elif job=="run":
 
-       xfastran_submitjob.submitjob_venus('.')
+       print 'please use job batch system'

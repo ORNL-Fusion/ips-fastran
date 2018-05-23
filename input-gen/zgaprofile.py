@@ -20,22 +20,29 @@ Supports:
 -----------------------------------------------------------------------
 """
 
-import sys,os,pickle
+import sys
+import os
+import cPickle
+import glob
+from collections import OrderedDict
 from numpy import *
+import scipy.optimize
+from optparse import OptionParser
 import idlsave
 import netCDF4
-
+from zinterp import zinterp
 import xfastran_env
 
 #----------------------------------------------------------------------
-#   UTILITY
+# UTILITY
 #
 
 def fname_d3data(rdir,shot,time,prefix,ext=''):
+
     return rdir+'/'+'%s%06d.%05d'%(prefix,shot,time)+ext 
 
 def get_shot_time(fname):
-    import os
+
     shot = int(os.path.basename(fname).split('.')[0][-6:])
     #time = int(os.path.basename(fname).split('.')[-1].split('_')[0])
     tmp = os.path.basename(fname).split('.')[-1].split('_')[0]
@@ -47,6 +54,7 @@ def get_shot_time(fname):
     return shot,time
 
 def __screen_out(s):
+
     print 72*'#'
     print s+":"
     print 72*'#'
@@ -67,10 +75,12 @@ def read(v,shot,time,rdir='.'):
        f = fname_d3data(rdir,shot,time,prefix)
        d = idlsave.read(f,verbose=False)
        x = d.ne_str.rho_dens[0]
+       x2 = d.ne_str.psi_dens[0]
        y = d.ne_str.dens[0]
        e = d.ne_str.dens_err[0]
        ind = d.ne_str.valid[0] > 0
        dx = d.ne_str.ne_data[0].rho[0][ind]
+       dx2 = d.ne_str.ne_data[0].psi_norm[0][ind]
        dy = d.ne_str.ne_data[0].thom[0][ind]
        de = d.ne_str.ne_data[0].thom_err[0][ind]
        lasr = d.ne_str.ne_data[0].in_time_block[0]
@@ -90,10 +100,12 @@ def read(v,shot,time,rdir='.'):
        f = fname_d3data(rdir,shot,time,prefix)
        d = idlsave.read(f,verbose=False)
        x = d.te_str.rho_te[0]
+       x2 = d.te_str.psi_te[0]
        y = d.te_str.te[0]
        e = d.te_str.te_err[0]
        ind = d.te_str.valid[0] > 0
        dx = d.te_str.te_data[0].rho[0][ind]
+       dx2 = d.te_str.te_data[0].psi_norm[0][ind]
        dy = d.te_str.te_data[0].temp[0][ind]
        de = d.te_str.te_data[0].temp_err[0][ind]
 
@@ -105,16 +117,17 @@ def read(v,shot,time,rdir='.'):
        ry = d.te_str.te_data[0].temp[0][ind]
        re = d.te_str.te_data[0].temp_err[0][ind]
 
-
     elif prefix == 'dti':
 
        f = fname_d3data(rdir,shot,time,prefix)
        d = idlsave.read(f,verbose=False)
        x = d.ti_str.rho_ti[0]
+       x2 = d.ti_str.psi_ti[0]
        y = d.ti_str.ti[0]
        e = d.ti_str.ti_err[0]
        ind = d.ti_str.valid[0] > 0
        dx = d.ti_str.ti_data[0].rho[0][ind]
+       dx2 = d.ti_str.ti_data[0].psi[0][ind]
        dy = d.ti_str.ti_data[0].temp[0][ind]
        de = d.ti_str.ti_data[0].temp_err[0][ind]
 
@@ -131,10 +144,12 @@ def read(v,shot,time,rdir='.'):
        f = fname_d3data(rdir,shot,time,prefix)
        d = idlsave.read(f,verbose=False)
        x = d.tor_rot_str.rho_tor_rot[0]
+       x2 = d.tor_rot_str.psi_tor_rot[0]
        y = d.tor_rot_str.tor_rot_local[0]
        e = d.tor_rot_str.tor_rot_err[0]
        ind = d.tor_rot_str.valid[0] > 0
        dx = d.tor_rot_str.tor_rot_data[0].rho[0][ind]
+       dx2 = d.tor_rot_str.tor_rot_data[0].psi_norm[0][ind]
        try:
            dy = d.tor_rot_str.tor_rot_data[0].omega_cor[0][ind]
        except AttributeError:
@@ -159,10 +174,12 @@ def read(v,shot,time,rdir='.'):
        f = fname_d3data(rdir,shot,time,prefix,'_Carbon')
        d = idlsave.read(f,verbose=False)
        x = d.impdens_str.rho_imp[0]
+       x2 = d.impdens_str.psi_imp[0]
        y = d.impdens_str.zdens[0]
        e = d.impdens_str.zdens_err[0]
        ind = d.impdens_str.valid[0] > -10
        dx = d.impdens_str.impdens_data[0].rho[0][ind]
+       dx2 = d.impdens_str.impdens_data[0].psi[0][ind]
        dy = d.impdens_str.impdens_data[0].DATA[0][ind]
        de = d.impdens_str.impdens_data[0].data_err[0][ind]
 
@@ -179,9 +196,11 @@ def read(v,shot,time,rdir='.'):
        f = fname_d3data(rdir,shot,time,prefix)
        d = idlsave.read(f,verbose=False)
        x = d.prad_str.prad_rho[0]
+       x2 = array([-1])
        y = d.prad_str.prad_prof[0]
        e = d.prad_str.prad_err[0]
        dx = array([-1])
+       dx2 = array([-1])
        dy = array([-1])
        de = array([-1])
        dt = array([-1])
@@ -194,17 +213,19 @@ def read(v,shot,time,rdir='.'):
         ry = array([-1])
         re = array([-1])
 
-    return {'x':x,'y':y,'e':e,'dx':dx,'dy':dy,'de':de,'dt':dt,
+    return {'x':x,'x2':x2,'y':y,'e':e,'dx':dx,'dx2':dx2,'dy':dy,'de':de,'dt':dt,
             'rx':rx,'ry':ry,'re':re}
 
 def readall(shot,vars=['ne','te','ti','omega','nz','rad'],rdir='.',
         tmin=0,tmax=10000): 
+#def readall(shot,vars=['ne','te','ti','omega','nz'],rdir='.',
+#        tmin=0,tmax=10000): 
 
-    import glob
-    prof = {}
+    print rdir
+    prof = OrderedDict()
     for v in vars:
         print 'reading '+__vmap[v]
-        prof[v] = {}
+        prof[v] = OrderedDict()
         files = glob.glob("%s/%s%06d.?????*"%(rdir,__vmap[v],shot))
         files.sort()
         for file in files:
@@ -214,7 +235,7 @@ def readall(shot,vars=['ne','te','ti','omega','nz','rad'],rdir='.',
     prof['shot'] = shot
     for v in vars: print "number of %6s = %3d"%(v,len(prof[v]))
 
-    if 'nz':
+    if 'nz' in vars:
         prof['zeff'] = {}
         times = prof['nz'].keys()
         times.sort()
@@ -239,9 +260,63 @@ def readall(shot,vars=['ne','te','ti','omega','nz','rad'],rdir='.',
 #   MANIMUPLATE DATA
 #
 
-def time_avg(prof,time0,dtavg,include_rad=False,include_zeff=False):
+def mtanh(c,x,y,param=None):
+    z = 2.*(c[0]-x)/c[1]
+    pz = 1. + c[4]*z
+    mth = 0.5*( ( pz + 1.0 )*tanh(z) + pz - 1.0  ) 
+    yfit = 0.5*( (c[2]-c[3])*mth + c[2]+c[3] )
+    return yfit-y
 
-    vars = ['ne','te','ti','omega','nz']
+def fit_func(c,x,y,func,param=None):
+    rval = func(c,x)-y
+    return rval
+
+def ts_shift(prof):
+
+    times = prof["te"].keys()
+    times.sort()
+    print times
+
+    fit_func = mtanh
+
+    nrho = 101
+    rho = arange(nrho)/(nrho-1.0)
+
+    for time in times:
+
+        te_x = prof["te"][time]["x"]
+        te_y = prof["te"][time]["y"]
+        wped_input = 0.1
+        yped_input = te_x[90]
+        fit_coeff_input = [1.0-0.5*wped_input,wped_input,yped_input,0.0, te_y[0]-yped_input, 1.5, 1.5]
+        fit_coeff, success = scipy.optimize.leastsq(fit_func,fit_coeff_input,args=(te_x,te_y))
+        xmid = fit_coeff[0]
+        xwid = fit_coeff[1]
+        xsep = xmid+0.5*xwid
+        print time, xsep
+
+        te_s = zinterp(te_x,te_y)
+        te_shift = zeros(len(te_y))
+
+        ne_x = prof["ne"][time]["x"]
+        ne_y = prof["ne"][time]["y"]
+        ne_s = zinterp(ne_x,ne_y)
+        ne_shift = zeros(len(ne_y))
+
+        for k in range(len(te_y)):
+            te_shift[k] = te_s(te_x[k]*xsep)
+            ne_shift[k] = ne_s(ne_x[k]*xsep)
+
+        prof["te"][time]["y0"] = prof["te"][time]["y"] 
+        prof["ne"][time]["y0"] = prof["ne"][time]["y"] 
+
+        prof["te"][time]["y"] = te_shift 
+        prof["ne"][time]["y"] = ne_shift
+
+def time_avg(prof,time0,dtavg,
+    vars = ['ne','te','ti','omega','nz'],
+    include_rad=False,include_zeff=False):
+
     if include_rad: vars = vars+['rad']
     if include_zeff: vars = vars+['zeff']
     nrho = 101
@@ -274,6 +349,61 @@ def time_avg(prof,time0,dtavg,include_rad=False,include_zeff=False):
                     append(prof_avg[v][time0][d],prof[v][times[k]][d])
         print "profile average: [%5s]"%v,time0,dtavg,times
     return prof_avg
+
+def linear(t,t0,t1,y0,y1):
+
+    nj = len(y0)
+    y = zeros(nj)
+
+    t = float(t)
+    t0 = float(t0)
+    t1 = float(t1)
+
+    for j in range(nj):
+        f0 = y0[j]
+        f1 = y1[j]
+        y[j] = f0*(t-t1)/(t0-t1) + f1*(t-t0)/(t1-t0)
+
+    return y
+
+def time_interpolation(p,include_rad=False): #,tmin=None,tmax=None):
+
+    time = {}
+    vars = ['ne','te','ti','omega','nz']
+    if include_rad: vars = vars+['rad']
+    for v in vars:
+        tmp = p[v].keys()
+        tmp.sort()
+        time[v] = array(tmp)
+       #print v,time[v]
+    
+    if len(time['ne']) != len(time['te']) :
+       print 'ne, te time slices different...exit',len(time['ne']),len(time['te'])
+    #   sys.exit()
+
+    if include_rad:
+       if len(time['ne']) != len(time['rad']) :
+           print 'ne, rad time slices different...exit',len(time['ne']),len(time['rad'])
+           sys.exit()
+    
+    timeall = array(time['ne'])
+    #if tmin == None: tmin = timeall[0]
+    #if tmax == None: tmax = timeall[-1]
+    #id = timeall>=tmin and timeall<=tmax
+    #timeall = timeall[id]
+
+    for v in ['te','ti','omega','nz']:
+        for t in time['ne']:
+            if t not in time[v]:
+                t0 = time[v][where( time[v]<t)][-1]
+                t1 = time[v][where( time[v]>t)][0]
+                print '%s: mssing t = %04d...interpolation %04d %04d'%(v,t,t0,t1)
+                y0 = p[v][t0]['y']
+                y1 = p[v][t1]['y']
+                x = p[v][t0]['x']
+                y = linear(t,t0,t1,y0,y1)
+                p[v][t] = {'x':x,'y':y}
+    return p
 
 #----------------------------------------------------------------------
 #   PLOT UTILS
@@ -523,7 +653,11 @@ def wrt_netcdf(shot,prof,outdir='.'):
 
     for var in vars:
         for k,time in enumerate(times):
-            nc_vars[var][k,:] = prof[var][time]['y'][:nrho]
+            try:
+                nc_vars[var][k,:] = prof[var][time]['y'][:nrho]
+            except:
+                print 'no data', var 
+                nc_vars[var][k,:] = zeros(nrho)
 
     nc.close()
 
@@ -531,18 +665,61 @@ def wrt_netcdf(shot,prof,outdir='.'):
 #   TEST
 #
 
+define_jobs = {
+    "dump"   : [],
+    "plot"   : [],
+    "fit"    : [],
+    "check"  : [],
+    }
+
+define_options = {
+    "rad" : ["bool" , True],
+    "ts_shift" : ["bool" , False],
+    }
+                     
+def print_err():
+
+    print '\nusage: ped-profile.py job shot tmin tmax prof_dir [--option=...]\n'
+    print '       job  :'
+    print '              dump, plot,fit, check'
+    print ''
+    sys.exit(-1)
+
+
+def input_args():
+
+    parser = OptionParser()
+    for option in define_options:
+        type = define_options[option][0]
+        default = define_options[option][1]
+        if type == "bool": 
+            parser.add_option("--"+option,
+                action="store_true",dest=option,default=False)
+        else:
+            parser.add_option("--"+option,
+                action="store",type=type,dest=option,default=default)
+    (options,args) = parser.parse_args(sys.argv[1:])
+    return options
+
 if __name__=="__main__":
 
-    shot = 153646
-    rdir = '/u/parkjm/013/20132204/153646/fit02'
 
-    f=open("profile_%06d.save"%shot)
-    prof = pickle.load(f)
-    f.close()
+    if len(sys.argv) < 2: print_err()
+    job = sys.argv[1]
+    if job not in define_jobs: print_err()
 
-    wrt_netcdf(shot,prof)
+    shot = int(sys.argv[2])
+    tmin = int(sys.argv[3])
+    tmax = int(sys.argv[4])
+    prof_dir = sys.argv[5]
 
-   #plot(shot,rdir,prof=None,yrange=None,icommon_time=None,include_rad=False)
+    options = input_args()
 
+    if job=="dump":
 
+        prof = readall(shot,rdir=prof_dir)
+        if options.ts_shift:
+            ts_shift(prof)
+        cPickle.dump(prof,open("prof%06d_%s"%(shot,os.path.basename(prof_dir)),"wb"))
+        wrt_netcdf(shot,prof,outdir='.')
 

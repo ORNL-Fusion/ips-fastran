@@ -15,8 +15,8 @@ import Namelist
 __outoneBlock = []
 __outoneBlockPattern = {
       "current": [ ['j','r','curden','curohm','curboot'],
-                   ["curden","curohm","curboot","curbeam","currf","curpar"],
-                   [(2,2),(2,3),(2,4),(2,5),(2,8),(2,10)] ],
+                   ["curden","curohm","curboot","curbeam","curbe","curbet", "currf","curpar"],
+                   [(2,2),(2,3),(2,4),(2,5),(2,6),(2,7),(2,8),(2,10)] ],
       "energy":  [ ['j','r','r/a','te','ti','we'],
                    ["we","wi","wbeam","walp","te","ti" ],
                    [(2,5),(2,6),(2,7),(2,8),(2,3),(2,4)] ],
@@ -32,24 +32,34 @@ __outoneBlockPattern = {
       "rotation":[ ['j','r','omega'],
                    ["omega"],
                    [(3,2)] ],
+      #"qe1":     [ ['j','r','r/a','qbeame','qrfe'],
+      #             ["qbeame","qrfe","qtfuse"],
+      #             [(2,3), (2,4), (2,6)] ],
       "qe1":     [ ['j','r','r/a','qbeame','qrfe'],
-                   ["qbeame","qrfe","qtfuse"],
-                   [(2,3), (2,4), (2,6)] ],
+                   ["qbeame","qrfe"],
+                   [(2,3), (2,4)] ],
+
       "qe2":     [ ['j','r','r/a','1.*\s+ qconde'],
                    ["qconde","qconve","qdelt","qohm","qione","qrad"],
                    [(2,4),(2,5),(2,6),(2,8),(2,9),(2,10)]],
+      #"qi1":     [ ['j','r','r/a','qbeami'],
+      #             ["qbeami","qrfi","qtfusi"],
+      #             [(2,3),(2,4),(2,6)]],
       "qi1":     [ ['j','r','r/a','qbeami'],
-                   ["qbeami","qrfi","qtfusi"],
-                   [(2,3),(2,4),(2,6)]],
+                   ["qbeami","qrfi"],
+                   [(2,3),(2,4)]],
       "qi2":     [ ['j','r','r/a','1.*\s+ qcondi'],
                    ["qcondi","qconvi","qioni","qcx"],
                    [(2,4),(2,5),(2,8), (2,9)]],
       "torque":  [ ['j','r.*','spbolt'],
                    ["storqueb","storque"],
                    [(1,3),(1,4)]],
-      "particle":[ ['particle .* name: d'],
+#     "particle":[ ['particle .* name: d'],
+#                   ["sion","srecom","scx","sbeam","sbcx","sfusion","ssum"],
+#                   [(5,3),(5,4),(5,5),(5,6),(5,7),(5,8),(5,10) ]],
+      "particle":[ ['particle sources .* for electrons'],
                    ["sion","srecom","scx","sbeam","sbcx","sfusion","ssum"],
-                   [(5,3),(5,4),(5,5),(5,6),(5,7),(5,8),(5,10) ]],
+                   [(4,3),(4,4),(4,5),(4,6),(4,7),(4,8),(4,9) ]],
       "sigma":   [ ['j','r','ftrap'],
                    ["ftrap","eta"],
                    [(2,2),(2,3)]],
@@ -58,7 +68,7 @@ __outoneBlockPattern = {
                    [(2,2),(2,3),(2,4),(2,5)]],
       "flux":     [['j','r','cond', 'conv'],
                    ["fconde","fconve","ffluxe","fcondi","fconvi","ffluxi"],
-                   [(2,2),(2,3),(2,4),(2,5),(2,6),(2,7)]],
+                   [(2,2),(2,3),(2,4),(2,5),(2,6),(2,9)]],
       "chi":      [['selected transport coefficients'],
                    ["chiineo","chie","chii"],
                    [(5,2),(5,3),(5,4)] ]
@@ -214,6 +224,7 @@ def readoutone(foutone='outone',isummary=False,iverb=False):
 
                  vname   = p["vnames"][ivname]
                  offset  = p["offset"][ivname]
+                 print vname
                  y = []
                  if p["groupname"] in ['sigma','flux','chi']:
                      y.append(0.0)

@@ -13,7 +13,7 @@ from numpy import *
 from scipy import interpolate
 import Namelist
 import netCDF4
-import zechdata,znbidata,zgaprofile,zgeqdsk,zefitdata,zefitutil
+import zechdata,znbidata,zgaprofile,plasmastate,efit_eqdsk
 import zd3dutil,znubeaminput
 import xfastran_env
 
@@ -72,7 +72,8 @@ def wrt_intoray(ncfile,shot,tmin,tmax,outdir):
     intoray["intoray"]["thet"  ] = polang_avg[:]
     intoray["intoray"]["phai"  ] = aziang_avg[:]
     
-    intoray["control"]["width"] = nech*[0.0]
+    intoray["adjust"]["width"  ] = nech*[0.0]
+    intoray["adjust"]["j_multi"] = nech*[1.0]
 
     intoray["edata"]["igafit"]    = [1]
     intoray["edata"]["netcdfdat"] = [True]
@@ -142,6 +143,13 @@ def wrt_innubeam(ncfile,shot,tmin,tmax,outdir,Db=0.0):
        #print k,pinja[k],einja[k],ffulla[k],fhalfa[k]
 
     # -----------------------------------------------------------------
+    # LTO 1: after 210 counter, 2: after 150 off-axis
+
+    if shot > 143703: LTO = 2 
+    elif shot > 125042: LTO = 1
+    else: LTO = 0
+
+    # -----------------------------------------------------------------
     # distrbute power to 4 segments for 150LR
     # apply clipping loss power at absolute collimaor and port
 
@@ -165,7 +173,7 @@ def wrt_innubeam(ncfile,shot,tmin,tmax,outdir,Db=0.0):
     nubeam_nbi = {}
     for k, src in enumerate(nb_list):
        #print k,src
-        if src in ['15L','15R']:
+        if src in ['15L','15R'] and LTO==2:
             nubeam_nbi[src] = {
                 "pinja" :[ pinj_150[src][i] for i in range(4) ],
                 "einja" :4*[einja[k]],
@@ -187,7 +195,7 @@ def wrt_innubeam(ncfile,shot,tmin,tmax,outdir,Db=0.0):
     # get nubeam namelist for beam geomentry
 
     nubeam_geo = znubeaminput.get_nubeam_geo(
-                     btilt_15,stilt_15L,stilt_15R,nbsrc=nbsrc)
+                     btilt_15,stilt_15L,stilt_15R,nbsrc,LTO)
 
     geo_varlist = nubeam_geo["30L"].keys()
     nbi_varlist = ["pinja","einja","ffulla","fhalfa"]
@@ -213,22 +221,41 @@ def wrt_innubeam(ncfile,shot,tmin,tmax,outdir,Db=0.0):
     nbeam = len(nubeam_namelist["pinja"])
 
     out_namelist["nubeam_run"]["dt_nubeam"] = [0.020]
-    out_namelist["nubeam_run"]["nstep"]     = [15]
+    out_namelist["nubeam_run"]["nstep"]     = [20]
+    out_namelist["nubeam_run"]["navg"]     = [10]
 
     out_namelist["nbi_config"]["nbeam"] = [nbeam]
     out_namelist["nbi_config"]["abeama"] = nbeam*[2.0] # hard-coded
     out_namelist["nbi_config"]["xzbeama"] = nbeam*[1.0] # hard-coded
 
-    for v in nubeam_tmpl["nbi_nml"].keys():
-        out_namelist["nbi_nml"][v] = nubeam_tmpl["nbi_nml"][v]
+    for v in nubeam_tmpl["nbi_init"].keys():
+        out_namelist["nbi_init"][v] = nubeam_tmpl["nbi_init"][v]
+    for v in nubeam_tmpl["nbi_update"].keys():
+        out_namelist["nbi_update"][v] = nubeam_tmpl["nbi_update"][v]
     for v in nubeam_namelist:
         out_namelist["nbi_config"][v] = nubeam_namelist[v]
 
-    out_namelist["difb"]["difb_0"  ] = [Db]
-    out_namelist["difb"]["difb_a"  ] = [Db]
-    out_namelist["difb"]["difb_in" ] = [2]
-    out_namelist["difb"]["difb_out"] = [2]
-    out_namelist["difb"]["nkdifb"  ] = [3] 
+    out_namelist["nbi_model"]["difb_0"  ] = [Db]
+    out_namelist["nbi_model"]["difb_a"  ] = [Db]
+    out_namelist["nbi_model"]["difb_in" ] = [2]
+    out_namelist["nbi_model"]["difb_out"] = [2]
+    out_namelist["nbi_model"]["nkdifb"  ] = [3] 
+
+    out_namelist["nbi_init"]["wghta"] = [20.0]
+    out_namelist["nbi_init"]["nzones"] = [20]
+    out_namelist["nbi_init"]["nzone_fb"] = [10]
+    out_namelist["nbi_init"]["nznbma"] = [50]
+    out_namelist["nbi_init"]["nznbme"] = [100]
+    out_namelist["nbi_init"]["nptcls"] = [5000]
+    out_namelist["nbi_init"]["ndep0"] = [5000]
+    out_namelist["nbi_init"]["nsigexc"] = [1]
+    out_namelist["nbi_init"]["nmcurb"] = [4] 
+    out_namelist["nbi_init"]["nseed"] = [410338673]
+    out_namelist["nbi_init"]["nltest_output"] = [0]
+    out_namelist["nbi_init"]["nsdbgb"] = [2]
+    
+    out_namelist["nbi_update"]["nltest_output"] = [0]
+    out_namelist["nbi_update"]["nbbcx_bb"] = [0]
 
     f_nubeam_namelist = outdir+"/innubeam"
     out_namelist.write(f_nubeam_namelist)
@@ -236,7 +263,7 @@ def wrt_innubeam(ncfile,shot,tmin,tmax,outdir,Db=0.0):
 #-----------------------------------------------------------------------
 # instate
 
-def wrt_instate(ncfile_prf,ncfile_efit,shot,tmin,tmax,time_plasma_shape,outdir):
+def wrt_instate(ncfile_prf,ncfile_efit,shot,tmin,tmax,time_plasma_shape,outdir,fn_instate="instate"):
 
     #------------------
     # read profile data
@@ -286,7 +313,7 @@ def wrt_instate(ncfile_prf,ncfile_efit,shot,tmin,tmax,time_plasma_shape,outdir):
     efitdat["aminor"] = nc_efit.variables["aminor"][:]
     efitdat["kappa" ] = nc_efit.variables["kappa" ][:]
     efitdat["delta" ] = nc_efit.variables["delta" ][:]
-    efitdat["jtot"  ] = nc_efit.variables["jtot"  ][:,:] 
+    efitdat["jtot"  ] = nc_efit.variables["jpar"  ][:,:] # <====
     efitdat["p_eq"  ] = nc_efit.variables["p_eq"  ][:,:]
 
     nbdry = nc_efit.variables["nbdry"][:]
@@ -334,6 +361,7 @@ def wrt_instate(ncfile_prf,ncfile_efit,shot,tmin,tmax,time_plasma_shape,outdir):
     instate = Namelist.Namelist()
 
     instate["instate"]["tokamak_id"] = ["D3D"]
+    instate["instate"]["density_model"] = [0]
 
     for v in ["ip","b0","r0","rmajor","aminor","kappa","delta"]:
         instate["instate"][v] = [efit[v]['y']]
@@ -349,6 +377,16 @@ def wrt_instate(ncfile_prf,ncfile_efit,shot,tmin,tmax,time_plasma_shape,outdir):
     instate["instate"]["a_imp"] = [12]
     instate["instate"]["f_imp"] = [1.0]
 
+    instate["instate"]["n_min"] = [0]
+    instate["instate"]["z_min"] = [1]
+    instate["instate"]["a_min"] = [1]
+    instate["instate"]["n_beam"] = [1]
+    instate["instate"]["z_beam"] = [1]
+    instate["instate"]["a_beam"] = [2]
+    instate["instate"]["n_fusion"] = [1]
+    instate["instate"]["z_fusion"] = [2]
+    instate["instate"]["a_fusion"] = [4]
+
     instate["instate"]["nrho"] = [len(rho_prf)]
     instate["instate"]["rho"] = rho_prf
     instate["instate"]["ne" ] = prf["ne"]["y"] 
@@ -356,15 +394,16 @@ def wrt_instate(ncfile_prf,ncfile_efit,shot,tmin,tmax,time_plasma_shape,outdir):
     instate["instate"]["ti" ] = prf["ti"]["y"]
     instate["instate"]["omega" ] = prf["omega"]["y"]
     instate["instate"]["zeff" ] = prf["zeff"]["y"]
+    instate["instate"]["p_rad" ] = prf["rad"]["y"]
 
     instate["instate"]["j_tot"] = efit["jtot"]["y"]*1.0e-6
     instate["instate"]["p_eq" ] = efit["p_eq"]["y"]
 
     zero_list = [
         "j_oh","j_bs","j_nb","j_ec","j_ic",
-        "pe_nb","pe_ec","pe_ic","pe_fus","pe_ionization","p_rad",
+        "pe_nb","pe_ec","pe_ic","pe_fus","pe_ionization",#"p_rad",
         "pi_nb","pi_ec","pi_ic", "pi_fus","pi_ionization", "pi_cx",
-        "p_rad","p_ohm","p_ei",
+        "p_ohm","p_ei",
         "torque_nb","torque_in",
         "se_nb","se_ionization","si_nb","si_ionization",
         "q","psipol",
@@ -379,11 +418,11 @@ def wrt_instate(ncfile_prf,ncfile_efit,shot,tmin,tmax,time_plasma_shape,outdir):
     instate["instate"]["nbdry" ] = [nbdry]
     instate["instate"]["rbdry" ] = rbdry
     instate["instate"]["zbdry" ] = zbdry
-    instate["instate"]["nlim"  ] = [nlim]
-    instate["instate"]["rlim"  ] = rlim
-    instate["instate"]["zlim"  ] = zlim
+    instate["instate"]["nlim"  ] = [nlim-1]
+    instate["instate"]["rlim"  ] = rlim[:-1]
+    instate["instate"]["zlim"  ] = zlim[:-1]
 
-    instate.write(outdir+"/instate")
+    instate.write(outdir+"/"+fn_instate)
 
 #-----------------------------------------------------------------------
 # infastran
