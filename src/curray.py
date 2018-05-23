@@ -3,19 +3,12 @@
 """
  -----------------------------------------------------------------------
  curray component 
- JM
  -----------------------------------------------------------------------
 """
 
-import sys,os,shutil
-import subprocess
-from numpy import *
-
+import os
 from  component import Component
-
-#-------------------
-#--- zcode libraries
-import zcurray
+import curray_io
 
 class curray(Component):
 
@@ -24,25 +17,19 @@ class curray(Component):
         Component.__init__(self, services, config)
         print 'Created %s' % (self.__class__)
 
-    def init(self, timeStamp=0.0):
+    def init(self, timeStamp=0):
 
         return
 
-    def step(self, timeStamp=0.0):
+    def step(self, timeStamp=0):
 
         #--- entry
 
-        if (self.services == None) :
-            print 'Error in curray_init: step () : No services'
-            raise Exception('Error in curray_init: step (): No services')
         services = self.services
 
         #--- stage plasma state files
 
-        try:
-            services.stage_plasma_state()
-        except Exception, e:
-            print 'Error in call to stage_plasma_state()', e
+        services.stage_plasma_state()
 
         #--- get plasma state file names
 
@@ -55,51 +42,34 @@ class curray(Component):
 
         #--- excutable
 
-        try:
-            curray_bin = os.path.join(self.BIN_PATH, self.BIN)
-        except:
-            curray_bin = os.path.join(self.BIN_PATH, 'xcurray')
+        curray_bin = os.path.join(self.BIN_PATH, self.BIN)
 
         #--- generate curray input
 
-        zcurray.wrt_curray_input(cur_state_file,"incurray",cur_eqdsk_file)
+        curray_io.wrt_curray_input(cur_state_file,"incurray",cur_eqdsk_file)
 
         #--- run curray
-
-        #logfile=open("xcurray.log","w")
-        #retcode = subprocess.call([curray_bin],
-        #              stdout=logfile,stderr=logfile)
-        #logfile.close()
 
         cwd = services.get_working_dir()
         task_id = services.launch_task(1, cwd, curray_bin, "curray_in", logfile='xcurray.log')
         retcode = services.wait_task(task_id)
 
         if (retcode != 0):
-           print 'Error executing ', 'curray'
-           raise
+           raise Exception('Error executing curray')
 
         #--- get curray output
 
-        zcurray.read_curray_output()
+        curray_io.read_curray_output()
 
-        zcurray.io_update_state(cur_state_file,cur_eqdsk_file,"outcurray","incurray")
+        curray_io.update_state(cur_state_file,cur_eqdsk_file,"outcurray","incurray")
 
         #--- update plasma state files
 
-        try:
-            services.update_plasma_state()
-        except Exception, e:
-            print 'Error in call to update_plasma_state()', e
-            raise
+        services.update_plasma_state()
 
         #--- archive output files
 
-        try:
-            services.stage_output_files(timeStamp, self.OUTPUT_FILES)
-        except Exception, e:
-            print 'Error in call to stage_output_files()', e
-            raise Exception, e
+        services.stage_output_files(timeStamp, self.OUTPUT_FILES)
 
         return
     

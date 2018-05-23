@@ -2,20 +2,15 @@
 
 """
  -----------------------------------------------------------------------
- genray component 
- JM
+ genray component
  -----------------------------------------------------------------------
 """
 
-import sys,os,shutil
-import subprocess
-from numpy import *
-
+import os
+import shutil
 from component import Component
-
-#-------------------
-#--- zcode libraries
-import zgenray
+import genray_io
+from Namelist import Namelist
 
 class genray(Component):
 
@@ -24,33 +19,24 @@ class genray(Component):
         Component.__init__(self, services, config)
         print 'Created %s' % (self.__class__)
 
-    def init(self, timeStamp=0.0):
+    def init(self, timeStamp=0):
 
         return
 
-    def step(self, timeStamp=0.0):
+    def step(self, timeStamp=0):
 
         #--- entry
 
-        if (self.services == None) :
-            print 'Error in genray.step() : No services'
-            raise Exception('Error in genray.step(): No services')
         services = self.services
 
         #--- excutable
 
-        try:
-            genray_bin = os.path.join(self.BIN_PATH, self.BIN)
-        except:
-            genray_bin = os.path.join(self.BIN_PATH, 'xgenray')
+        genray_bin = os.path.join(self.BIN_PATH, self.BIN)
         print genray_bin
 
         #--- stage plasma state files
 
-        try:
-            services.stage_plasma_state()
-        except Exception, e:
-            print 'Error in call to stage_plasma_state()', e
+        services.stage_plasma_state()
 
         #--- get plasma state file names
 
@@ -61,19 +47,50 @@ class genray(Component):
 
         services.stage_input_files(self.INPUT_FILES)
 
-        #--- generate genray input
+        print self.INGENRAY
+        try:
+            shutil.copyfile(self.INGENRAY,"ingenray")
+        except:
+            pass
+
+        #--- dakota binding
 
         f_ingenray = "ingenray"
-        zgenray.io_write_inputfiles(cur_state_file,cur_eqdsk_file,f_ingenray)
+        ingenray = Namelist(f_ingenray,case="upper")
+        for key in ingenray.keys():
+            for var in ingenray[key].keys():
+                for k in range(len(ingenray[key][var])):
+                    if hasattr(self,"%s_%s_%d"%(key,var,k)):
+                        ingenray[key][var][k] = float(getattr(self,"%s_%s_%d"%(key,var,k)))
+                        print key,var,k,'updated'
+        ingenray.write(f_ingenray)
+
+        #--- generate genray input
+
+        try:
+            unit = self.UNIT
+        except:
+            unit = ""
+        if unit=="MKS":
+            MKS = True
+        else:
+            MKS = False
+        print 'GENRAY UNIT:', unit, MKS
+
+        try:
+            jmulti = float(self.JMULTI)
+        except:
+            jmulti = 1.0
+        print 'GENRAY JMULTI:', jmulti
+
+        genray_io.write_inputfiles(cur_state_file, cur_eqdsk_file, f_ingenray, MKS)
+
+        add = int(getattr(self,"ADD","0"))
+        print 'add = ',add
 
         #--- run genray
 
         print 'run genray'
-
-        #logfile=open("genray.log","w")
-        #retcode = subprocess.call([genray_bin],
-        #              stdout=logfile,stderr=logfile)
-        #logfile.close()
 
         cwd = services.get_working_dir()
         task_id = services.launch_task(1, cwd, genray_bin, logfile = 'xgenray.log')
@@ -85,26 +102,17 @@ class genray(Component):
 
         #--- get genray output
 
-        zgenray.io_update_state(cur_state_file,cur_eqdsk_file)
+        genray_io.update_state(cur_state_file, cur_eqdsk_file, imode='IC', jmulti=jmulti, add=add)
 
         #--- update plasma state files
 
-        try:
-            services.update_plasma_state()
-        except Exception, e:
-            print 'Error in call to update_plasma_state()', e
-            raise
+        services.update_plasma_state()
 
         #--- archive output files
 
-        try:
-            services.stage_output_files(timeStamp, self.OUTPUT_FILES)
-        except Exception, e:
-            print 'Error in call to stage_output_files()', e
-            raise Exception, e
+        services.stage_output_files(timeStamp, self.OUTPUT_FILES)
 
         return
-    
-    def finalize(self, timeStamp=0.0):
+
+    def finalize(self, timeStamp=0):
         return
-    

@@ -3,12 +3,11 @@
 """
  ------------------------------------------------------------------------------
   utils for toray
-  JM
  ------------------------------------------------------------------------------
 """
 
 import sys,os,shutil
-from numpy import * 
+from numpy import *
 import netCDF4
 from scipy.interpolate import interp1d
 from scipy import optimize
@@ -188,7 +187,7 @@ def read_toray_output(f_ncfile="toray.nc"):
     # read
 
     nc = netCDF4.Dataset(f_ncfile,'r',format='NETCDF4')
-    nrho = nc.variables["ledge"][0] 
+    nrho = nc.variables["ledge"][0]
     rho  = nc.variables["xrho"  ][:]  #normalized sqrt(tor flux), edge
     jec  = nc.variables["currf" ][:]  #A/cm^2 per incident W, cell
     qec  = nc.variables["weecrh"][:]  #W/cm^3 per incident W, cell
@@ -211,7 +210,7 @@ def read_toray_output(f_ncfile="toray.nc"):
 
     print "Pec abs. fraction = %5.3f"%Pec
     print "Iec (kA/MW) = %5.1f"%(Iec*1.0e3)
-    
+
     #------------------------------------------------------------------
     # return
 
@@ -227,7 +226,7 @@ def read_toray_output(f_ncfile="toray.nc"):
     return d
 
 ###############################################################################
-# utils read/write 
+# utils read/write
 
 def write_formatted(f,vec,desc,ncol):
 
@@ -240,7 +239,7 @@ def write_formatted(f,vec,desc,ncol):
 def line2vec(line,nlen=16):
     ncol = len(line)/nlen
     vec = zeros(ncol)
-    for k in range(ncol): 
+    for k in range(ncol):
         tmp = line[k*nlen:(k+1)*nlen]
         vec[k] = float(tmp)
     return vec
@@ -260,12 +259,12 @@ def get_nread(n,ncol=5):
 ###############################################################################
 # utils adjust
 
-def cur_integral(rho,jpar,geq):
+def cur_integral(rho,jpar,geq,r0,b0):
 
     vol  = zinterp(geq["rho"][:],geq["vol"][:])(rho)
     g_eq = zinterp(geq["rho"][:],geq["g_eq"][:])(rho)
-    r0 = geq.r0
-    b0 = abs(geq.b0)
+    #r0 = geq.r0
+    #b0 = abs(geq.b0)
 
     I = 0.0
     nrho = len(rho)
@@ -275,7 +274,7 @@ def cur_integral(rho,jpar,geq):
         ipol_m = 0.5*(g_eq[i]+g_eq[i-1])
         ipol_m/= r0*b0
         I += jpar_m*dvol/ipol_m**2/(2.0*pi*r0)
-    return I 
+    return I
 
 def vol_integral(rho,f,geq):
 
@@ -283,18 +282,17 @@ def vol_integral(rho,f,geq):
     nrho = len(rho)
     vol  = zinterp(geq["rho"][:],geq["vol"][:])(rho)
     for i in range(nrho-1):
-        f_m = 0.5*(f[i]+f[i-1])
+        f_m = 0.5*(f[i+1]+f[i])
         dvol = vol[i+1]-vol[i]
         val += f_m*dvol
     return val
 
 def fit_gaussian(rho,f):
 
-
     fitfunc = lambda p, x: p[0]*exp(-(x-p[1])**2/(2*p[2]**2))
     errfunc = lambda p, x, y: fitfunc(p, x)-y
 
-    p0 = [1.0,1.0,0.1] 
+    p0 = [1.0,1.0,0.1]
     try:
         p, success = optimize.leastsq(errfunc, p0[:], args=(rho,f))
     except:
@@ -302,14 +300,14 @@ def fit_gaussian(rho,f):
 
     return p
 
-def adjust_jec(width,xmid,fmax,Iec,nrho,geq):
+def adjust_jec(width,xmid,fmax,Iec,nrho,geq,r0,b0):
 
     gauss = lambda p, x: p[0]*exp(-(x-p[1])**2/(2*p[2]**2))
 
     def func(f):
         x = arange(nrho)/(nrho-1.0)
         y = gauss( [f,xmid,width], x )
-        return cur_integral(x,y,geq)-Iec
+        return cur_integral(x,y,geq,r0,abs(b0))-Iec
 
     tmp = optimize.bisect(func,0.0,10*fmax,xtol=1.0e-6)
 
@@ -334,110 +332,46 @@ def adjust_qec(width,xmid,fmax,Pec,nrho,geq):
 
     return y
 
-###############################################################################
-# io instate
+def gauss_asym(p,x):
 
-def io_input_from_instate(instate,intoray,k):
+    rvec = zeros(len(x))
+    for k in range(len(x)):
+        if x[k]>=p[1]: rvec[k] = p[0]*exp(-(x[k]-p[1])**2/(2*p[2]**2))
+        if x[k]< p[1]: rvec[k] = p[0]*exp(-(x[k]-p[1])**2/(2*p[3]**2))
+    return rvec
 
-    nrho = 101 
-    rho = arange(nrho)/(nrho-1.0)
-    
-    rho_in = instate["instate"]["rho"]
-    zeff_in = instate["instate"]["zeff"]
-    ne_in = instate["instate"]["ne"]
-    te_in = instate["instate"]["te"]
+def adjust_jec_asym(width,width2,xmid,fmax,Iec,nrho,geq,r0,b0):
 
-    zeff = interp1d(rho_in,zeff_in,kind='cubic')(rho)
-    ne = interp1d(rho_in,ne_in,kind='cubic')(rho)
-    te = interp1d(rho_in,te_in,kind='cubic')(rho)
-    prof = {"nrho":nrho,"rho":rho,"zeff":zeff,"ne":ne,"te":te}
+    def func(f):
+        x = arange(nrho)/(nrho-1.0)
+        y = gauss_asym( [f,xmid,width,width2], x )
+        return cur_integral(x,y,geq,r0,abs(b0))-Iec
 
-    intoray_k = {}
-    for v in intoray["intoray"].keys():
-        if v not in ["ntoray"]:
-            intoray_k[v] = intoray["intoray"][v][k]
-    
-    return prof,intoray_k
+    tmp = optimize.bisect(func,0.0,10*fmax,xtol=1.0e-6)
 
-def io_update_instate(geq,f_instate,intoray):
+    x = arange(nrho)/(nrho-1.0)
+    y = gauss_asym( [tmp,xmid,width,width2], x )
 
-    ntoray = intoray["intoray"]["ntoray"][0]
+    return y
 
-    for k in range(ntoray):
+def adjust_qec_asym(width,width2,xmid,fmax,Pec,nrho,geq):
 
-        rfpow = intoray["intoray"]["rfpow"][k]*1.0e-6 #[MW]
+    def func(f):
+        x = arange(nrho)/(nrho-1.0)
+        y = gauss_asym( [f,xmid,width,width2], x )
+        return vol_integral(x,y,geq)-Pec
 
-        f_ncfile = "toray_%d.nc"%k
-        outtoray = read_toray_output(f_ncfile)
+    tmp = optimize.bisect(func,0.0,10.0*fmax,xtol=1.0e-6)
 
-        nrho = outtoray["outtoray"]["nrho"][0]
-        rho  = outtoray["outtoray"]["rho" ]     #[] 
-        jec  = outtoray["outtoray"]["jec" ]     #[A/m^2/W]
-        qec  = outtoray["outtoray"]["qec" ]     #[W/m^3/W]
-        Pec  = outtoray["outtoray"]["Pec" ][0]  #[]
-        Iec  = outtoray["outtoray"]["Iec" ][0]  #[A/W]
+    x = arange(nrho)/(nrho-1.0)
+    y = gauss_asym( [tmp,xmid,width,width2], x )
 
-        try:
-           j_multi = intoray["adjust"]["j_multi"][k]
-        except:
-           j_multi = 1.0
-           print 'no j_multi inuput, set 1.0'
-        jec = j_multi*array(jec)
-
-        try:
-           width = intoray["adjust"]["width"][k]
-        except:
-           width = 0.0
-           print 'no width inuput, set 0'
-
-        if width > 0.0:
-
-            print 'adjust width'
-
-            fit_coeff = fit_gaussian(rho,jec)
-
-            jec_max=0.0
-            for k in range(len(rho)):
-                if jec[k] > jec_max:
-                   jec_max = jec[k]
-                   k_find = k
-            print 72*"-"
-           #print jec
-            print 'rho_EC, find = ',rho[k_find]
-            print 'jec_max = ',jec_max
-          
-            #fit = adjust_jec(
-            #          0.5*width,fit_coeff[1],fit_coeff[0],Iec,nrho,geq)
-
-            fit = adjust_jec(
-                      0.5*width,rho[k_find],jec_max,Iec,nrho,geq)
-
-            jec = fit
-
-            fit_coeff = fit_gaussian(rho,qec)
-            fit = adjust_qec(
-                      0.5*width,fit_coeff[1],fit_coeff[0],Pec,nrho,geq)
-            qec = fit
-
-        if k==0:
-           jec_sum = jec*rfpow
-           qec_sum = qec*rfpow
-        else:
-           jec_sum+= jec*rfpow
-           qec_sum+= qec*rfpow
-
-    # update local infastran
-
-    instate = Namelist(f_instate)
-    rho_in = instate["instate"]["rho"]
-    instate["instate"]["j_ec" ] = interp1d(rho,jec_sum,kind='cubic')(rho_in)
-    instate["instate"]["pe_ec"] = interp1d(rho,qec_sum,kind='cubic')(rho_in)
-    instate.write(f_instate)
+    return y
 
 ###############################################################################
 # io plasma state
 
-def io_input_from_state(geq,ps,intoray,k,nrho=101):
+def input_from_state(geq,ps,intoray,k,nrho=101):
 
     rho_in   = ps["rho"][:]
     ne_in    = ps["ns"][0,:]*1.0e-19
@@ -454,7 +388,7 @@ def io_input_from_state(geq,ps,intoray,k,nrho=101):
         "ne"   : interp1d(rho_in,ne_in,kind='cubic')(rho),
         "te"   : interp1d(rho_in,te_in,kind='cubic')(rho),
         "zeff" : interp1d(rho_in,zeff_in,kind='cubic')(rho)
-    }    
+    }
 
     intoray_k = {}
     for v in intoray["intoray"].keys():
@@ -470,9 +404,11 @@ def io_input_from_state(geq,ps,intoray,k,nrho=101):
 
     write_toray_input(geq,prof,intoray_k)
 
-def io_update_state(geq,ps,intoray):
+def update_state(geq,ps,intoray):
 
     ntoray = intoray["intoray"]["ntoray"][0]
+    r0  = geq["rzero" ]
+    b0  = abs(geq["bcentr"])
 
     for k in range(ntoray):
 
@@ -482,7 +418,7 @@ def io_update_state(geq,ps,intoray):
         outtoray = read_toray_output(f_ncfile)
 
         nrho = outtoray["outtoray"]["nrho"][0]
-        rho  = outtoray["outtoray"]["rho" ]     #[] 
+        rho  = outtoray["outtoray"]["rho" ]     #[]
         jec  = outtoray["outtoray"]["jec" ]     #[A/m^2/W]
         qec  = outtoray["outtoray"]["qec" ]     #[W/m^3/W]
         Pec  = outtoray["outtoray"]["Pec" ][0]  #[]
@@ -493,58 +429,98 @@ def io_update_state(geq,ps,intoray):
         except:
            j_multi = 1.0
            print 'no j_multi inuput, set 1.0'
-        jec = j_multi*array(jec)
 
         try:
            width = intoray["adjust"]["width"][k]
         except:
            width = 0.0
            print 'no width inuput, set 0'
+        try:
+           width2 = intoray["adjust"]["width2"][k]
+        except:
+           width2 = 0.0
+           print 'no width2 inuput, set 0'
+        print 'width: ',width,width2
 
         if width > 0.0:
 
             print 'adjust width'
-
-            #fit_coeff = fit_gaussian(rho,jec)
-            #print fit_coeff[1],fit_coeff[0]
-            #fit = adjust_jec(
-            #          0.5*width,fit_coeff[1],fit_coeff[0],Iec,nrho,ps) #geq)
-            #jec = fit
 
             jec_max=0.0
             for j in range(len(rho)):
                 if jec[j] > jec_max:
                    jec_max = jec[j]
                    j_find = j
-            #print 72*"-"
-            #print jec
             print 'rho_peak, jec_peak :',rho[j_find],jec_max
-          
-            fit = adjust_jec(
-                      0.5*width,rho[j_find],jec_max,Iec,nrho,ps)
-            jec = fit
 
-            #fit_coeff = fit_gaussian(rho,qec)
-            #fit = adjust_qec(
-            #          0.5*width,fit_coeff[1],fit_coeff[0],Pec,nrho,ps) #geq)
-            #qec = fit
+            if width2 > 0.0:
+                print 'call asym'
+                fit = adjust_jec_asym(
+                    0.5*width,0.5*width2,rho[j_find],jec_max,Iec,nrho,ps,r0,b0)
+                jec = fit
+
+                fit = adjust_qec_asym(
+                    0.5*width,0.5*width2,rho[j_find],qec[j_find],Pec,nrho,ps)
+                qec = fit
+
+            else:
+                fit = adjust_jec(
+                    0.5*width,rho[j_find],jec_max,Iec,nrho,ps,r0,b0)
+                jec = fit
+
+                fit = adjust_qec(
+                    0.5*width,rho[j_find],qec[j_find],Pec,nrho,ps)
+                qec = fit
+
+
+        # scale_pow = vol_integral(rho,qec,ps)
+        # print 'scale_pow =',scale_pow, rfpow/scale_pow
+        #
+        # scale_cur = cur_integral(rho,jec,ps,r0,abs(b0))
+        # print 'scale_cur =',scale_cur, Iec/scale_cur
+        #
+        # if k==0:
+        #    jec_sum = jec*rfpow*j_multi*Iec/scale_cur
+        #    qec_sum = qec*rfpow/scale_pow
+        # else:
+        #    jec_sum+= jec*rfpow*j_multi*Iec/scale_cur
+        #    qec_sum+= qec*rfpow/scale_pow
 
         if k==0:
-           jec_sum = jec*rfpow
+           jec_sum = jec*rfpow*j_multi
            qec_sum = qec*rfpow
         else:
-           jec_sum+= jec*rfpow
+           jec_sum+= jec*rfpow*j_multi
            qec_sum+= qec*rfpow
 
-    # update local infastran
+    try:
+       j0_seed = intoray["seed"]["j0"][0]
+       x0_seed = intoray["seed"]["x0"][0]
+       drho_seed = intoray["seed"]["drho"][0]
+    except:
+       j0_seed = 0.0
+       drho_seed = 0.0
+    print '***** seed current: j0,drho',j0_seed,drho_seed
+    if j0_seed > 0.0:
+        jec_seed = j0_seed*exp(-(rho-x0_seed)**2/(2*drho_seed**2))
+        jec_sum += jec_seed
+
+    # update plasma state file
 
     rho_ps = ps["rho"][:]
     jec_ps = 1.0e6*interp1d(rho,jec_sum,kind='cubic')(rho_ps)
-    pec_ps = 1.0e6*interp1d(rho,qec_sum,kind='cubic')(rho_ps)
+    qec_ps = 1.0e6*interp1d(rho,qec_sum,kind='cubic')(rho_ps)
 
-    ps.load_j_parallel_CD(rho_ps,jec_ps,"ec")
-    ps.load_profile(rho_ps,pec_ps,"peech","vol")
-    
+    ps.load_j_parallel(rho_ps,jec_ps,"rho_ecrf","curech",r0,b0)
+    ps.load_vol_profile(rho_ps,qec_ps,"rho_ecrf","peech")
+
+    # out = Namelist()
+    # out["check"]["rho"] = rho
+    # out["check"]["qec"] = qec_sum
+    # out["check"]["rho_ps"] = rho_ps
+    # out["check"]["qec_ps"] = qec_ps
+    # out.write("check.dat")
+
 
 ###############################################################################
 # check
@@ -555,7 +531,7 @@ if __name__ == "__main__":
 
 #------------------------------------------------------------------
 # NOTE
-    
+
     """
 
     *** psiin ***
@@ -564,7 +540,7 @@ if __name__ == "__main__":
     read (2, 200 )   rdim,zdim,rcenter,rinside
     read (2, 200 )   rmaxis,zmaxis,psimax,psilim,b0
     read (2, 200 )   gasep
-    read (2, 200 )   (fpsi(i),i=1,nr)                # same as geqdsk 
+    read (2, 200 )   (fpsi(i),i=1,nr)                # same as geqdsk
     read (2, 200 )   ((psi(i,j),i=1,nr),j=1,nz)      # same as geqdsk
     read (2, 200 )   (psir(i),i=1,ledge)             # normalized psi on rho grid
     read (2, 200 )   (qpsi(i),i=1,nr)                # same as geqdsk
@@ -576,7 +552,7 @@ if __name__ == "__main__":
     read (2, 200 ) (b_avg_rf(i),i=1,nr)     ! <B/B0>, B0==Btor # on equi normalized psi grid
     read (2, 200 ) (r0rinv_rf(i),i=1,nr)    ! <R0/R>           # on equi normalized psi grid, onetwo pass it using R0 = R(magnetic asis)
     200 format (5e16.9)
-    
+
     *** echin ***
 
     read (2, 1000) idamp,j12,nray,nbfld
@@ -612,13 +588,13 @@ if __name__ == "__main__":
 
     """
     time    = 1.8      ![sec]
-    
+
     idamp   = 8
     nrho    = 101
     nray    = 30
     nbfld   = 3
-    
-    freq    = 1.1e11   ! [Hz] 
+
+    freq    = 1.1e11   ! [Hz]
     wrfo    = 0.0      !
     xec     = 240.0    ! [cm]
     zec     = 67.94    ! [cm]

@@ -3,22 +3,18 @@
 """
  -----------------------------------------------------------------------
  esc component 
- JM
  -----------------------------------------------------------------------
 """
 
-import sys,os,shutil
+import os
+import shutil
 import subprocess
-from numpy import *
-from netCDF4 import *
 
 from  component import Component
 
-#-------------------
-#--- zcode libraries
 from Namelist import Namelist
-import zefitutil,zefit
-from zplasmastate import plasma_state_file
+import efit_io
+from plasmastate import plasmastate
 
 class esc(Component):
 
@@ -29,6 +25,16 @@ class esc(Component):
 
     def init(self, timeStamp=0.0):
 
+        print 'esc.init() entered'
+        try:
+           init_run = int(self.INIT_RUN)
+        except:
+           init_run = 0
+        print 'init_run = ',init_run
+
+        if init_run:
+            self.step(-1)
+
         return
 
     def step(self, timeStamp=0.0):
@@ -37,17 +43,11 @@ class esc(Component):
 
         print 'enter esc.step()'
 
-        if (self.services == None) :
-            print 'Error in esc.step () : No services'
-            raise Exception('Error in esc.step (): No services')
         services = self.services
 
         #--- stage plasma state files
 
-        try:
-            services.stage_plasma_state()
-        except Exception, e:
-            print 'Error in call to stage_plasma_state()', e
+        services.stage_plasma_state()
 
         #--- get plasma state file names
 
@@ -57,25 +57,15 @@ class esc(Component):
 
         #--- generate inefit
 
-        #zefit.io_input_from_state(
-        #    cur_eqdsk_file,cur_state_file,cur_bc_file)
-
-        zefit.io_input_from_state(
-            cur_state_file,cur_bc_file)
+        efit_io.io_input_from_state(cur_state_file,cur_bc_file,ismooth=1)
 
         #--- excutables
 
-        try:
-            esc_bin = os.path.join(self.BIN_PATH, self.BIN)
-        except:
-            esc_bin = os.path.join(self.BIN_PATH, 'xesc')
+        esc_bin = os.path.join(self.BIN_PATH, self.BIN)
         print esc_bin
 
         wgeqdsk_bin = os.path.join(self.BIN_PATH, 'wgeqdsk')
         print wgeqdsk_bin
-
-        pstool_bin = os.path.join(self.BIN_PATH, 'pstool')
-        print pstool_bin
 
         #--- run esc
 
@@ -104,49 +94,18 @@ class esc(Component):
 
         #--- load geqdsk to plasma state file
 
-        geq = zefitutil.readg("geqdsk") 
-        r0  = geq["rzero" ]
-        b0  = abs(geq["bcentr"])
-        ip  = geq['cpasma']
-        print 'r0 = ',r0
-        print 'b0 = ',b0
-        print 'ip = ',ip 
-
-        shutil.copyfile(cur_state_file,"ps.nc")
-
-        ps = plasma_state_file("ps.nc",r0=r0,b0=b0,ip=ip)
-        j_tot = ps.dump_j_parallel()
-        ps.close()
-
-        logfile = open('pstool.log', 'w')
-        retcode = subprocess.call([pstool_bin, "load", "geqdsk", "1.0d-6"],
-                      stdout=logfile,stderr=logfile)
-        logfile.close()
-        if (retcode != 0):
-           print 'Error executing ', pstool_bin
-           raise
-
-        ps = plasma_state_file("ps.nc",r0=r0,b0=b0,ip=ip)
-        ps.load_j_parallel(j_tot)
-        ps.close()
-
-        shutil.copyfile("ps.nc",cur_state_file)
+        ps = plasmastate('ips',1)
+        ps.read(cur_state_file)
+        ps.load_geqdsk(cur_eqdsk_file)
+        ps.store(cur_state_file)
 
         #--- update plasma state files
 
-        try:
-            services.update_plasma_state()
-        except Exception, e:
-            print 'Error in call to update_plasma_state()', e
-            raise
+        services.update_plasma_state()
 
         #--- archive output files
 
-        try:
-            services.stage_output_files(timeStamp, self.OUTPUT_FILES)
-        except Exception, e:
-            print 'Error in call to stage_output_files()', e
-            raise Exception, e
+        services.stage_output_files(timeStamp, self.OUTPUT_FILES)
  
         return
     
