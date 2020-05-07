@@ -1,5 +1,3 @@
-#! /usr/bin/env python
-
 """
  -----------------------------------------------------------------------
 plasma state, pyps backed
@@ -14,10 +12,9 @@ from efit_eqdsk import readg
 from PlasmaState import PlasmaState
 from plasmastate_base import plasmastate_base
 
-class plasmastate (PlasmaState,plasmastate_base):
+class plasmastate(PlasmaState, plasmastate_base):
 
-    def init (self, f_ps, **keyargs):
-
+    def init(self, f_ps, **keyargs):
         nrho = keyargs['nrho'][0]
         nth  = 101
         nlim = keyargs['nlim'][0]
@@ -62,13 +59,10 @@ class plasmastate (PlasmaState,plasmastate_base):
         self["nrho_fus"] = nrho
         self["nrho_anom"] = nrho
 
-        #-------
-
-        nicrf = 5
-        self["nicrf_src"] = nicrf #---- hard coded
+        nicrf = 5  #---- hard coded
+        self["nicrf_src"] = nicrf
 
         #-------
-
         self["global_label"] = keyargs['global_label'][0]
         self["tokamak_id"] = ''
         self["runid"] = keyargs['runid'][0]
@@ -81,7 +75,6 @@ class plasmastate (PlasmaState,plasmastate_base):
 
         self.alloc()
 
-        #print ['IC%02d'%k for k in range(nicrf)]
         self["icrf_src_name"] = ['IC%02d'%k for k in range(nicrf)]
 
         self.setThermalSpecies(-1, -1, 0)
@@ -98,16 +91,14 @@ class plasmastate (PlasmaState,plasmastate_base):
         for k in range(nspec_fusion):
             self.setFusionSpecies(z_fusion[k], z_fusion[k], a_fusion[k])
 
-        print 'before finishSpecies'
         self.finishSpecies()
-        print 'after finishSpecies'
 
-        rho =linspace(0.0,1.0,num=nrho)
-        rho_nbi =linspace(0.0,1.0,num=nrho_nbi)
+        rho =linspace(0.0, 1.0, num=nrho)
+        rho_nbi =linspace(0.0, 1.0, num=nrho_nbi)
 
         self["rho"] = rho
         self["rho_eq"] = rho
-        self["th_eq"] = linspace(0.0,2.0*pi,num=nth)
+        self["th_eq"] = linspace(0.0, 2.0*pi, num=nth)
         self["rho_eq_geo"] = rho
 
         self["rho_gas"] = rho
@@ -117,8 +108,7 @@ class plasmastate (PlasmaState,plasmastate_base):
         self["rho_fus"] = rho
         self["rho_anom"] = rho
 
-    def load_innubeam (self, fn="innubeam"):
-
+    def load_innubeam(self, fn="innubeam"):
         innubeam = Namelist(fn)
         nbi = innubeam["nbi_config"]
 
@@ -145,7 +135,6 @@ class plasmastate (PlasmaState,plasmastate_base):
 
         self["lbscap"] = 1.e-2*array(nbi["xlbapa"]) # dist., sce to aperture
         self["zbap"] = 1.e-2*array(nbi["xybapa"]) # height, aperture center
-
 
         zdivcon = 2.*pi/(360.0*sqrt(2.0))
         self["nbshape"] = [ ('','rectangle','circle')[s] for s in nbi["nbshapa"] ] # shape of source
@@ -183,13 +172,11 @@ class plasmastate (PlasmaState,plasmastate_base):
 
         self["dn0out"] = 0.5e18  #defalut:0.5e18
 
-    def load_geqdsk (self, fn_geqdsk, keep_cur_profile=True, bdy_crat=1.e-6):
-
+    def load_geqdsk(self, fn_geqdsk, keep_cur_profile=True, bdy_crat=1.e-6):
         kcur_option = 1
         rho_curbrk = 0.9
 
         if keep_cur_profile:
-
             geq = readg(fn_geqdsk)
             r0  = geq["rzero" ]
             b0  = abs(geq["bcentr"])
@@ -202,11 +189,9 @@ class plasmastate (PlasmaState,plasmastate_base):
         self.deriveMhdEq('everything')
 
         if keep_cur_profile:
+           self.load_j_parallel(self["rho"], j_tot, "rho_eq", "curt", r0, b0, tot=True)
 
-            self.load_j_parallel(self["rho"],j_tot,"rho_eq","curt",r0,b0,tot=True)
-
-    def init_from_geqdsk (self,fn_geqdsk,nrho=101,nth=101,shot=0,time=0,bdy_crat=1.e-6):
-
+    def init_from_geqdsk(self, fn_geqdsk, nrho=101, nth=101, shot=0, time=0, bdy_crat=1.e-6):
         self["nrho_eq"] = nrho
         self["nth_eq"] = nth
         self["nrho_eq_geo"] = nrho
@@ -228,23 +213,21 @@ class plasmastate (PlasmaState,plasmastate_base):
         self.deriveMhdEq('everything')
 
 #--test
-
 if __name__ == "__main__":
-
     ps = plasmastate("test",1)
     ps.init_from_instate()
     ps.load_innubeam()
     ps.load_geqdsk("g147634.03365")
-    print  ps["power_nbi"]
+    print  (ps["power_nbi"])
     ps.store("out.nc")
 
     nrho = 20
     rho = arange(nrho)/(nrho-1.0)
     pbe = rho**2
-    print pbe
+    print (pbe)
     ps.load_vol_profile(rho,pbe,"rho_nbi","pbe")
     pbe2 = ps.dump_vol_profile(rho,"rho_nbi","pbe")
-    print pbe2
+    print (pbe2)
 
     tmp = ps.dump_profile(rho,"rho_nbi","pbe")
-    print tmp
+    print (tmp)

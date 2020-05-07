@@ -1,29 +1,23 @@
-#!/usr/bin/env python
-
 """
  -----------------------------------------------------------------------
  convert ps to instate
- assume nrho = 51 or 101 or 201
  -----------------------------------------------------------------------
 """
 
-import os,sys,subprocess,glob
 from numpy import *
-import netCDF4
 from Namelist import Namelist
 from plasmastate  import plasmastate
 from efit_eqdsk import readg
 
 def instate_to_ps(fn_instate,ps):
-
+    #-----------------------------------------------------------
     #-- from instate
-
     instate = Namelist(fn_instate)["instate"]
 
     for key in instate.keys(): instate[key] = array(instate[key])
 
-    nrho  = instate["nrho"][0]
-    rho   = instate["rho"]
+    nrho = instate["nrho"][0]
+    rho = instate["rho"]
 
     n_ion = instate["n_ion"][0]
     z_ion = instate["z_ion"]
@@ -49,12 +43,11 @@ def instate_to_ps(fn_instate,ps):
     zeff[0] = zeff[1]
 
     r0 = instate["r0"][0]
-    b0 = instate["b0"][0]
+    b0 = abs(instate["b0"][0])
 
     density_model = instate["density_model"][0]
 
     #-- put zeros if not defined
-
     for key in [
         "j_oh", "j_bs", "j_nb", "j_ec", "j_ic", \
         "pe_nb", "pe_ec", "pe_ic", "pe_fus", "pe_ionization", "p_rad", \
@@ -68,11 +61,13 @@ def instate_to_ps(fn_instate,ps):
     density_beam = instate["density_beam"]
     density_alpha = instate["density_alpha"]
     wbeam = instate["wbeam"]
+    torque = instate["torque_nb"]
 
+    #-----------------------------------------------------------
+    #-- update ps
     rho = ps["rho"][:]
 
     #-- density
-
     density_ion = {}
     for k in range(n_ion):
         density_ion[k] = zeros(nrho)
@@ -87,8 +82,7 @@ def instate_to_ps(fn_instate,ps):
         raise Exception("density_model error")
 
     if density_model == 0:
-
-        print 'density_model = 0'
+        print ('density_model = 0')
 
         a=0; b=0; c=0; d=0
         for k in range(n_imp):
@@ -99,17 +93,14 @@ def instate_to_ps(fn_instate,ps):
             c = c+f_ion[k]*z_ion[k]*z_ion[k]
 
         for i in range(nrho):
-
             zne_adj = ne[i]
             zzne_adj = ne[i]*zeff[i]
 
             # depletion due to beam ions
-
             zne_adj = zne_adj - 1.0*density_beam[i]
             zzne_adj = zzne_adj - 1.0**2*density_beam[i]
 
             # effective main ion and impurity densities
-
             nion = (zne_adj *d-zzne_adj*b)/(a*d-b*c)
             nimp = (zzne_adj*a-zne_adj *c)/(a*d-b*c)
 
@@ -119,8 +110,7 @@ def instate_to_ps(fn_instate,ps):
                 density_imp[k][i] = f_imp[k]*nimp
 
     elif density_model == 1:
-
-        print 'density_model: impurity = f*ne'
+        print ('density_model = 1: impurity = f*ne')
 
         for k in range(n_imp):
             density_imp[k] = ne*f_imp[k]
@@ -133,7 +123,6 @@ def instate_to_ps(fn_instate,ps):
         for k in range(n_imp):
             zeff = zeff + z_imp[k]**2*density_imp[k]
         zeff = zeff/ne
-
 
     for k in range(n_ion):
         density_th = density_th + density_ion[k]
@@ -148,7 +137,6 @@ def instate_to_ps(fn_instate,ps):
     ps["ni"][:] = 1.0e19*ps.node2cell(density_th)
 
     #-- beam
-
     ps["nbeami"][0][:] = 1.0e19*ps.node2cell(density_beam)
     ps["eperp_beami"][0][:] = 2.0*20.0*ones(nrho-1)
     ps["epll_beami"][0][:] = 20.0*ones(nrho-1)
@@ -158,7 +146,6 @@ def instate_to_ps(fn_instate,ps):
     ps["epll_beami"][0][:] = ps.node2cell(tbeam/3.0)
 
     #-- temperature
-
     ps["Ts"][0,:] = ps.node2cell(te)
 
     for k in range(n_ion):
@@ -169,21 +156,18 @@ def instate_to_ps(fn_instate,ps):
     ps["Ti"][:] = ps.node2cell(ti)
 
     #-- zeff
-
     ps["Zeff"][:] = ps.node2cell(zeff)
     ps["Zeff_th"][:] = ps.node2cell(zeff)
 
     #-- rotation
-
     ps["omegat"][:] = ps.node2cell(omega)
 
     #-- current
-
     j_tot = 1.e6*instate["j_tot"]
     j_tot[0] = j_tot[1]
-    ps.load_j_parallel(rho,j_tot,"rho_eq","curt",r0,b0,tot=True)
+    ps.load_j_parallel(rho, j_tot, "rho_eq", "curt", r0, b0, tot=True)
 
-    for key in ["j_nb","j_ec","j_ic","j_bs","j_oh"]:
+    for key in ["j_nb", "j_ec", "j_ic", "j_bs", "j_oh"]:
         if key.upper() not in instate.keys(): instate[key] = zeros(nrho)
 
     j_nb  = 1.e6*instate["j_nb"]
@@ -192,19 +176,17 @@ def instate_to_ps(fn_instate,ps):
     j_bs  = 1.e6*instate["j_bs"]
     j_oh  = 1.e6*instate["j_oh"]
 
-    ps.load_j_parallel(rho,j_nb,"rho_nbi","curbeam",r0,b0)
-    ps.load_j_parallel(rho,j_ec,"rho_ecrf","curech",r0,b0)
-    ps.load_j_parallel(rho,j_ic,"rho_icrf","curich",r0,b0)
-    ps.load_j_parallel(rho,j_bs,"rho","curr_bootstrap",r0,b0)
-    ps.load_j_parallel(rho,j_oh,"rho","curr_ohmic",r0,b0)
+    ps.load_j_parallel(rho,j_nb, "rho_nbi", "curbeam", r0, b0)
+    ps.load_j_parallel(rho,j_ec, "rho_ecrf", "curech", r0, b0)
+    ps.load_j_parallel(rho,j_ic, "rho_icrf", "curich", r0, b0)
+    ps.load_j_parallel(rho,j_bs, "rho", "curr_bootstrap", r0, b0)
+    ps.load_j_parallel(rho,j_oh, "rho", "curr_ohmic", r0 ,b0)
 
     #-- MHD pressure
-
     ps["P_eq"][:] = instate["p_eq"]
 
     #-- heating
-
-    for key in ["pe_nb","pi_nb","pe_ec","pe_ic","pi_ic","pe_fus","pi_fus"]:
+    for key in ["pe_nb", "pi_nb", "pe_ec", "pe_ic", "pi_ic", "pe_fus", "pi_fus"]:
         if key.upper() not in instate.keys(): instate[key] = zeros(nrho)
 
     pe_nb  = 1.e6*instate["pe_nb" ]
@@ -215,32 +197,38 @@ def instate_to_ps(fn_instate,ps):
     pe_fus = 1.e6*instate["pe_fus"]
     pi_fus = 1.e6*instate["pi_fus"]
 
-    ps.load_vol_profile (rho,pe_nb,"rho_nbi","pbe")
-    ps.load_vol_profile (rho,pi_nb,"rho_nbi","pbi")
-    ps.load_vol_profile (rho,pe_ec,"rho_ecrf","peech")
-    ps.load_vol_profile (rho,pe_ic,"rho_icrf","picrf_totals",k=0)
-    ps.load_vol_profile (rho,pi_ic,"rho_icrf","picth")
+    ps.load_vol_profile (rho, pe_nb, "rho_nbi", "pbe")
+    ps.load_vol_profile (rho, pi_nb, "rho_nbi", "pbi")
+    ps.load_vol_profile (rho, pe_ec, "rho_ecrf", "peech")
+    ps.load_vol_profile (rho, pe_ic, "rho_icrf", "picrf_totals", k=0)
+    ps.load_vol_profile (rho, pi_ic, "rho_icrf", "picth")
+
+    #-- particle source
+    se_nb = 1.e19*instate["se_nb"]
+
+    ps.load_vol_profile (rho, se_nb, "rho_nbi", "sbedep")
+
+    #-- torque
+    ps.load_vol_profile(rho, torque, "rho_nbi", "tqbe")
 
     #-- limiter
-
     # ps["rlim"][:] = instate["rlim"]
     # ps["zlim"][:] = instate["zlim"]
 
     #-- temp
-
     # ps["sc0"][:] = 2.0e21
     # ps["n0norm"][:] = 1.0e-10
     # ps["T0sc0"][:] = 0.01
     # ps["sc0_to_sgas"][:] = 1
 
-def ps_to_instate(f_state,f_eqdsk,f_bc,f_instate,rdir='.'):
+def ps_to_instate(f_state, f_eqdsk, f_bc, f_instate, rdir='.'):
 
     geq = readg(f_eqdsk)
     r0  = geq["rzero" ]
     b0  = abs(geq["bcentr"])
     ip  = geq['cpasma']
 
-    ps = plasmastate('ips',1)
+    ps = plasmastate('ips', 1)
     ps.read(f_state)
 
     spec = ps.get_species()
@@ -270,63 +258,62 @@ def ps_to_instate(f_state,f_eqdsk,f_bc,f_instate,rdir='.'):
     q     = zeros(nrho)
     fp    = zeros(nrho)
 
-    j_tot = 1.e-6*ps.dump_j_parallel(rho,"rho_eq","curt",r0,b0,tot=True)
-    j_nb  = 1.e-6*ps.dump_j_parallel(rho,"rho_nbi","curbeam",r0,b0)
-    j_ec  = 1.e-6*ps.dump_j_parallel(rho,"rho_ecrf","curech",r0,b0)
-    j_ic  = 1.0e-6*ps.dump_j_parallel(rho,"rho_icrf","curich",r0,b0)
+    j_tot = 1.e-6*ps.dump_j_parallel(rho, "rho_eq", "curt", r0, b0, tot=True)
+    j_nb  = 1.e-6*ps.dump_j_parallel(rho, "rho_nbi", "curbeam", r0, b0)
+    j_ec  = 1.e-6*ps.dump_j_parallel(rho, "rho_ecrf", "curech", r0, b0)
+    j_ic  = 1.0e-6*ps.dump_j_parallel(rho, "rho_icrf", "curich", r0, b0)
     j_bs  = zeros(nrho)
     j_oh  = zeros(nrho)
 
-    density_beam = ps.dump_profile(rho,"rho_nbi","nbeami",k=0)*1.e-19
-    wbeam = ps.dump_profile(rho,"rho_nbi","eperp_beami",k=0) \
-          + ps.dump_profile(rho,"rho_nbi","epll_beami" ,k=0)
+    density_beam = ps.dump_profile(rho, "rho_nbi", "nbeami", k=0)*1.e-19
+    wbeam = ps.dump_profile(rho, "rho_nbi", "eperp_beami", k=0) \
+          + ps.dump_profile(rho, "rho_nbi", "epll_beami", k=0)
     wbeam = density_beam*wbeam*1.602e-3 #MJ/m**3
 
-    pe_nb  = ps.dump_vol_profile(rho,"rho_nbi","pbe" )*1.e-6
-    pi_nb  = (ps.dump_vol_profile(rho,"rho_nbi","pbi" )+ps.dump_vol_profile(rho,"rho_nbi","pbth" ))*1.e-6
-    pth_nb = ps.dump_vol_profile(rho,"rho_nbi","pbth")*1.e-6
+    pe_nb  = ps.dump_vol_profile(rho, "rho_nbi", "pbe" )*1.e-6
+    pi_nb  = (ps.dump_vol_profile(rho, "rho_nbi", "pbi" )+ps.dump_vol_profile(rho, "rho_nbi", "pbth"))*1.e-6
+    pth_nb = ps.dump_vol_profile(rho, "rho_nbi", "pbth")*1.e-6
 
-    density_alpha = ps.dump_profile(rho,"rho_fus","nfusi",k=0)*1.e-19
-    walpha = ps.dump_profile(rho,"rho_fus","eperp_fusi",k=0) \
-         + ps.dump_profile(rho,"rho_fus","epll_fusi",k=0)
+    density_alpha = ps.dump_profile(rho, "rho_fus", "nfusi", k=0)*1.e-19
+    walpha = ps.dump_profile(rho, "rho_fus", "eperp_fusi", k=0) \
+         + ps.dump_profile(rho, "rho_fus", "epll_fusi", k=0)
     walpha = density_alpha*walpha*1.602e-3 #MJ/m**3
 
-    pe_fus  = ps.dump_vol_profile(rho,"rho_fus","pfuse" )*1.e-6
-    pi_fus  = ps.dump_vol_profile(rho,"rho_fus","pfusi" )*1.e-6
-    pth_fus = ps.dump_vol_profile(rho,"rho_fus","pfusth")*1.e-6
+    pe_fus  = ps.dump_vol_profile(rho, "rho_fus", "pfuse" )*1.e-6
+    pi_fus  = ps.dump_vol_profile(rho, "rho_fus", "pfusi" )*1.e-6
+    pth_fus = ps.dump_vol_profile(rho, "rho_fus", "pfusth")*1.e-6
 
-    pe_ec  = 1.e-6*ps.dump_vol_profile(rho,"rho_ecrf","peech")
-    pe_ic  = 1.e-6*ps.dump_vol_profile(rho,"rho_icrf","picrf_totals",k=0)
+    pe_ec  = 1.e-6*ps.dump_vol_profile(rho, "rho_ecrf", "peech")
+    pe_ic  = 1.e-6*ps.dump_vol_profile(rho, "rho_icrf", "picrf_totals", k=0)
 
     pi_ec = zeros(nrho)
-    pi_ic  = 1.0e-6*ps.dump_vol_profile(rho,"rho_icrf","picrf_totals",k=1)
+    pi_ic  = 1.0e-6*ps.dump_vol_profile(rho, "rho_icrf", "picrf_totals", k=1)
 
-    tqbe = ps.dump_vol_profile(rho,"rho_nbi","tqbe")
-    tqbi = ps.dump_vol_profile(rho,"rho_nbi","tqbi")
-    tqbjxb = ps.dump_vol_profile(rho,"rho_nbi","tqbjxb")
-    tqbth = ps.dump_vol_profile(rho,"rho_nbi","tqbth")
+    tqbe = ps.dump_vol_profile(rho, "rho_nbi", "tqbe")
+    tqbi = ps.dump_vol_profile(rho, "rho_nbi", "tqbi")
+    tqbjxb = ps.dump_vol_profile(rho, "rho_nbi", "tqbjxb")
+    tqbth = ps.dump_vol_profile(rho, "rho_nbi", "tqbth")
 
     torque_nb= tqbe+tqbi+tqbjxb+tqbth
     torque_in= zeros(nrho)
 
-    se_nb = 1.e-19*(ps.dump_vol_profile(rho,"rho_nbi","sbedep")+ps.dump_vol_profile(rho,"rho_nbi","sbehalo"))
+    se_nb = 1.e-19*(ps.dump_vol_profile(rho, "rho_nbi", "sbedep")+ps.dump_vol_profile(rho, "rho_nbi", "sbehalo"))
 
     p_ei = zeros(nrho)
-    p_rad= zeros(nrho)
-    p_ohm= zeros(nrho)
-    pe_ionization= zeros(nrho)
-    pi_ionization= zeros(nrho)
-    pi_cx= zeros(nrho)
-    si_nb= zeros(nrho)
-    chie= zeros(nrho)
-    chii= zeros(nrho)
+    p_rad = zeros(nrho)
+    p_ohm = zeros(nrho)
+    pe_ionization = zeros(nrho)
+    pi_ionization = zeros(nrho)
+    pi_cx = zeros(nrho)
+    si_nb = zeros(nrho)
+    chie = zeros(nrho)
+    chii = zeros(nrho)
 
-    se_ionization= zeros(nrho)
-    si_ionization= zeros(nrho)
+    se_ionization = zeros(nrho)
+    si_ionization = zeros(nrho)
 
     #-------------------------------------------------------------------
     # write instate
-
     instate = Namelist(f_instate)
     TOKAMAK_ID = ['D3D']
     instate["instate"]["r0"    ] = [r0]
@@ -388,9 +375,3 @@ def ps_to_instate(f_state,f_eqdsk,f_bc,f_instate,rdir='.'):
     instate["instate"]["rlim" ]  = geq["rlim"]
     instate["instate"]["zlim" ]  = geq["zlim"]
     instate.write(f_instate)
-
-#f_state = "SIMULATION/153682.00001/work/plasma_state/s153682.00001"
-#f_eqdsk = "SIMULATION/153682.00001/work/plasma_state/g153682.00001"
-#f_bc = "SIMULATION/153682.00001/work/plasma_state/b153682.00001"
-#
-#io_write_input(f_state,f_eqdsk,f_bc)

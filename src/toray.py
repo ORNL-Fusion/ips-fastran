@@ -1,15 +1,15 @@
-#! /usr/bin/env python
-
 """
  -----------------------------------------------------------------------
- toray component 
+ toray component
  -----------------------------------------------------------------------
 """
 
 import os
 import shutil
+import subprocess
 
 from  component import Component
+
 from Namelist import Namelist
 import toray_io
 from efit_eqdsk import readg
@@ -18,55 +18,48 @@ from plasmastate import plasmastate
 class toray(Component):
 
     def __init__(self, services, config):
-
         Component.__init__(self, services, config)
-        print 'Created %s' % (self.__class__)
+        print('Created %s' % (self.__class__))
 
-    def init(self, timeStamp=0.0):
-
+    def init(self, timeid=0):
+        print('toray.init() called')
         return
 
-    def step(self, timeStamp=0.0):
+    def step(self, timeid=0):
+        print('toray.step() started')
 
         #-- entry
-
         services = self.services
 
         #-- stage plasma state files
-
         services.stage_plasma_state()
 
         #-- excutable
-
         toray_bin = os.path.join(self.BIN_PATH, self.BIN)
-        print toray_bin
+        print(toray_bin)
 
         #-- get plasma state file name
-
         cur_state_file = services.get_config_param('CURRENT_STATE')
         cur_eqdsk_file = services.get_config_param('CURRENT_EQDSK')
 
         #-- get input files
-
         services.stage_input_files(self.INPUT_FILES)
 
         #-- generate toray input
+        geq = readg(cur_eqdsk_file)
 
-        geq = readg(cur_eqdsk_file) 
-
-        ps = plasmastate('ips',1)
+        ps = plasmastate('ips', 1)
         ps.read(cur_state_file)
 
-        intoray = Namelist("intoray",case="lower")
-
-        var_list = [ var.upper() for var in intoray["intoray"].keys()]
-        for key in var_list: 
+        intoray = Namelist("intoray", case="lower")
+        var_list = [ var.upper() for var in intoray["intoray"].keys() ]
+        for key in var_list:
             for k in range(len( intoray["intoray"][key] )):
                 try:
                     intoray["intoray"][key][k] = float(getattr(self, key+"_%d"%k))
-                    print key,k, 'updated' 
+                    print(key,k, 'updated')
                 except AttributeError:
-                    pass 
+                    pass
         intoray.write("intoray")
 
         ntoray = intoray["intoray"]["ntoray"][0]
@@ -78,42 +71,37 @@ class toray(Component):
         toray_nml.write("toray.in")
 
         #-- loop over each source of ECH
-
         cwd = services.get_working_dir()
 
-        print 'number of gyrotron: ',ntoray
+        print('number of gyrotron: ',ntoray)
         for k in range(ntoray):
+            toray_io.input_from_state(geq, ps, intoray, k)
 
-            toray_io.input_from_state(geq,ps,intoray,k)
-            
             #-- run toray
-
-            task_id = services.launch_task(1, cwd, toray_bin, logfile = 'xtoray.log')
-            retcode = services.wait_task(task_id)
+            if int(getattr(self,'SERIAL','0')) == 1:
+                print('toray, subprocess')
+                logfile = open('xtoray.log', 'w')
+                retcode = subprocess.call([toray_bin], stdout=logfile, stderr=logfile, shell=True)
+                logfile.close()
+            else:
+                task_id = services.launch_task(1, cwd, toray_bin, logfile = 'xtoray.log')
+                retcode = services.wait_task(task_id)
 
             if retcode != 0:
-               print 'Error executing ', 'toray'
-               sys.exit(1)
+               raise Exception('Error executing ', 'toray')
 
             shutil.copyfile('toray.nc', 'toray_%d.nc'%k)
 
         #-- get toray output
+        toray_io.update_state(geq, ps, intoray)
 
-        toray_io.update_state(geq,ps,intoray)
-   
         ps.store(cur_state_file)
 
         #-- update plasma state files
-
         services.update_plasma_state()
 
         #-- archive output files
+        services.stage_output_files(timeid, self.OUTPUT_FILES)
 
-        services.stage_output_files(timeStamp, self.OUTPUT_FILES)
-
-        return
-    
-    def finalize(self, timeStamp=0.0):
-
-        return
-    
+    def finalize(self, timeid=0):
+        print('toray.finalized() called')

@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 """
 model equilibrium, profile adjust
 """
@@ -12,27 +10,14 @@ from modeleq_constraint_io import update_state, constraint_pedestal_width
 class modeleq_constraint(Component):
 
     def __init__(self, services, config):
-
         Component.__init__(self, services, config)
-        print 'Created %s' % (self.__class__)
+        print ('Created %s' % (self.__class__))
 
     def init(self, timestamp=0):
-
-        print 'modeleq_constraint.init() called'
-
-        services = self.services
-        services.stage_plasma_state()
-        cur_instate_file = services.get_config_param('CURRENT_INSTATE')
-
-        init_plasmastate(cur_instate_file)
-
-        services.update_plasma_state()
-
-        return
+        print ('modeleq_constraint.init() called')
 
     def step(self, timestamp=0):
-
-        #--- entry
+        print ('modeleq_constraint.step() called')
 
         services = self.services
         services.stage_plasma_state()

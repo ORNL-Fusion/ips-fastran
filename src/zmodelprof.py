@@ -1,79 +1,16 @@
-#!/usr/bin/env python
 """
  -----------------------------------------------------------------------
  model profile with tanh pedestal
  -----------------------------------------------------------------------
 """
 
-import os,sys
 from numpy import *
 import scipy.optimize
-
-import Namelist
 import zinterp
-
-def tanhg(c,x,param=None):
-    """
-      Taken from Osborne pyped routine
-      c[0] = SYMMETRY POINT
-      c[1] = FULL WIDTH
-      c[2] = HEIGHT
-      c[3] = OFFSET
-    """
-    z = 2.*(c[0]-x)/c[1]
-    pz1  = 1.+ c[4]*z + c[5]*z*z + c[6]*z*z*z
-    pz2  = 1.+ c[7]*z
-    mth = 0.5*( ( pz1 + pz2 )*tanh(z) + pz1 - pz2  )
-    y = 0.5*( (c[2]-c[3])*mth + c[2]+c[3] )
-    return y
-
-def fit_func(c,x,y,func,param=None):
-    rval = func(c,x)-y
-    return rval
-
-class profile_pedestal_smooth():
-
-    def __init__(self,nx,xmid,xwidth,yped,ysep,yaxis,alpha,beta,ytop=0):
-
-        xped = xmid-xwidth/2
-        xtop = xmid-xwidth
-
-        a0 = (yped-ysep)/(tanh(2.0*(1-xmid)/xwidth)-tanh(2.0*(xmid-0.5*xwidth-xmid)/xwidth))
-        a1 = yaxis - ysep - a0*(tanh(2.0*(1-xmid)/xwidth)-tanh(2.0*(0.0-xmid)/xwidth))
-        if ytop > 0.0:
-            yy = ysep + a0*(tanh(2.0*(1-xmid)/xwidth)-tanh(2.0*(xtop-xmid)/xwidth))
-            a1 = (ytop - yy)/(1.0-(xtop/xped)**alpha)**beta
-
-        x = arange(nx)/(nx-1.0)
-        y_edge = ysep + a0*(tanh(2.0*(1-xmid)/xwidth)-tanh(2.0*(x-xmid)/xwidth))
-
-        y_core = zeros(nx)
-        if yaxis > 0.0 or ytop > 0:
-            for k,xval in enumerate(x):
-                if xval < xped: y_core[k] = a1*(1.0-(xval/xped)**alpha)**beta
-                else: y_core[k] = 0.0
-
-        y = y_edge+y_core
-
-        self.nx = nx
-        self.x  = x
-        self.y  = y
-
-        c0 = [xmid,xwidth,yped,ysep,0.0,0.0,0.0] + 10*[0.0]
-        self.c, success = scipy.optimize.leastsq(fit_func,c0,args=(x,y,tanhg))
-
-    def info(self):
-        pass
-
-    def __call__(self,xval):
-        return tanhg(self.c,self.x)
-
-    def __getitem__(self,xvec):
-        return 0.0
 
 class profile_pedestal():
 
-    def __init__(self,nx,xmid,xwidth,yped,ysep,yaxis,alpha,beta,ytop=0):
+    def __init__(self, nx, xmid, xwidth, yped, ysep, yaxis, alpha, beta, ytop=0, ifit=0):
 
         xped = xmid-xwidth/2
         xtop = xmid-xwidth
@@ -82,7 +19,7 @@ class profile_pedestal():
         a1 = yaxis - ysep - a0*(tanh(2.0*(1-xmid)/xwidth)-tanh(2.0*(0.0-xmid)/xwidth))
         if ytop > 0.0:
             yy = ysep + a0*(tanh(2.0*(1-xmid)/xwidth)-tanh(2.0*(xtop-xmid)/xwidth))
-            a1 = (ytop - yy)/(1.0-(xtop/xped)**alpha)**beta
+            a1 = (ytop-yy)/(1.0-(xtop/xped)**alpha)**beta
 
         x = arange(nx)/(nx-1.0)
         y_edge = ysep + a0*(tanh(2.0*(1-xmid)/xwidth)-tanh(2.0*(x-xmid)/xwidth))
@@ -99,27 +36,56 @@ class profile_pedestal():
         self.x  = x
         self.y  = y
 
-        self.prof = zinterp.zinterp(x,y)
+        if ifit == 0:
+            self.prof = zinterp.zinterp(x, y)
+        elif ifit == 1:
+            c0 = [xmid, xwidth, yped, ysep, 0.0, 0.0, 0.0] + 10*[0.0]
+            self.c, success = scipy.optimize.leastsq(self.fit_func, c0, args=(x, y, self.tanhg))
+            self.prof = self.call_tanhg
+        else:
+            Exception ('profile_pedestal: ifit option not valid')
+
+    def __call__(self, xval):
+        return self.prof(xval);
+
+    def __getitem__(self, xvec):
+        return 0.0
 
     def info(self):
         pass
 
-    def __call__(self,xval):
-        return self.prof(xval);
 
-    def __getitem__(self,xvec):
-        return 0.0
+    def tanhg(self, c, x, param=None):
+        """
+          Taken from Osborne pyped routine
+          c[0] = SYMMETRY POINT
+          c[1] = FULL WIDTH
+          c[2] = HEIGHT
+          c[3] = OFFSET
+        """
+        z = 2.*(c[0]-x)/c[1]
+        pz1  = 1.+ c[4]*z + c[5]*z*z + c[6]*z*z*z
+        pz2  = 1.+ c[7]*z
+        mth = 0.5*( ( pz1 + pz2 )*tanh(z) + pz1 - pz2  )
+        y = 0.5*( (c[2]-c[3])*mth + c[2]+c[3] )
+        return y
+
+    def fit_func(self, c, x, y, func, param=None):
+        rval = func(c,x)-y
+        return rval
+
+    def call_tanhg(self, xval):
+        return self.tanhg(self.c, xval)
 
 class profile_spline():
 
-    def __init__(self,x,y,yp):
+    def __init__(self, x, y, yp):
         self.n = len(x)
         self.x = x
         self.y = y
         self.yp = yp
 
-    def __call__(self,x):
-
+    def __call__(self, x):
         if x <= self.x[0]:
            return(self.y[0])
         elif x >= self.x[-1]:
@@ -147,8 +113,7 @@ class profile_spline():
 
 class profile_hat():
 
-    def __init__(self,nx,r0,dr):
-
+    def __init__(self, nx, r0, dr):
         x = arange(nx)/(nx-1.0)
         y = 1-tanh( 2.0*(x-r0)/dr )
 
@@ -176,4 +141,4 @@ if __name__ == "__main__":
 
     x = linspace(0.0,0.8,num=100)
     y = [ spl(xx) for xx in x ]
-    print y
+    print (y)

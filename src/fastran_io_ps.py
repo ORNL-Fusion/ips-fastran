@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 """
  ----------------------------------------------------------------------
  fastran solver component IO, plasma state backend
@@ -15,31 +13,21 @@ from zinterp import zinterp
 import zfdat
 from efit_eqdsk import readg
 from plasmastate import plasmastate
-import znubeam
-
-# ======================================================================
-# io
 
 def write_input(f_state,f_eqdsk,rdir='.'):
-
-    gauss = lambda p, x: exp(-(x-p[0])**2/(2*p[1]**2))
-
     #-------------------------------------------------------------------
     # read geqdsk and plasma state file
-
     geq = readg(f_eqdsk)
     r0  = geq["rzero" ]
     b0  = abs(geq["bcentr"])
-    ip  = geq['cpasma']
+    ip  = geq["cpasma"]
 
-    ps = plasmastate('ips',1)
+    ps = plasmastate('ips', 1)
     ps.read(f_state)
-
     spec = ps.get_species()
 
     #-------------------------------------------------------------------
     # profiles
-
     nrho  = len(ps["rho"])
     rho   = ps["rho"][:]
     ne    = ps["ns"][0,:]*1.0e-19
@@ -55,46 +43,45 @@ def write_input(f_state,f_eqdsk,rdir='.'):
     q     = zeros(nrho)
     fp    = zeros(nrho)
 
-    j_tot = 1.e-6*ps.dump_j_parallel(rho,"rho_eq","curt",r0,b0,tot=True)
-
-    j_nb = 1.e-6*ps.dump_j_parallel(rho,"rho_nbi","curbeam",r0,b0)
-    j_rf = 1.e-6*(ps.dump_j_parallel(rho,"rho_ecrf","curech",r0,b0)+ps.dump_j_parallel(rho,"rho_icrf","curich",r0,b0))
+    j_tot = 1.e-6*ps.dump_j_parallel(rho, "rho_eq", "curt", r0, b0, tot=True)
+    j_nb = 1.e-6*ps.dump_j_parallel(rho, "rho_nbi", "curbeam", r0, b0)
+    j_rf = 1.e-6*(ps.dump_j_parallel(rho, "rho_ecrf", "curech", r0, b0) + ps.dump_j_parallel(rho, "rho_icrf", "curich", r0, b0))
     j_bs  = zeros(nrho)
 
-    density_beam = ps.dump_profile(rho,"rho_nbi","nbeami",k=0)*1.e-19
-    wbeam = ps.dump_profile(rho,"rho_nbi","eperp_beami",k=0) \
-          + ps.dump_profile(rho,"rho_nbi","epll_beami" ,k=0)
+    density_beam = ps.dump_profile(rho, "rho_nbi", "nbeami", k=0)*1.e-19
+    wbeam = ps.dump_profile(rho, "rho_nbi", "eperp_beami", k=0) \
+          + ps.dump_profile(rho, "rho_nbi", "epll_beami", k=0)
     wbeam = density_beam*wbeam*1.602e-3 #MJ/m**3
 
-    pe_nb  = ps.dump_vol_profile(rho,"rho_nbi","pbe" )*1.e-6
-    pi_nb  = (ps.dump_vol_profile(rho,"rho_nbi","pbi" )+ps.dump_vol_profile(rho,"rho_nbi","pbth" ))*1.e-6
-    pth_nb = ps.dump_vol_profile(rho,"rho_nbi","pbth")*1.e-6
+    pe_nb  = ps.dump_vol_profile(rho, "rho_nbi", "pbe" )*1.e-6
+    pi_nb  = (ps.dump_vol_profile(rho, "rho_nbi", "pbi" ) + ps.dump_vol_profile(rho, "rho_nbi", "pbth" ))*1.e-6
+    pth_nb = ps.dump_vol_profile(rho, "rho_nbi", "pbth")*1.e-6
 
-    density_alpha = ps.dump_profile(rho,"rho_fus","nfusi",k=0)*1.e-19
-    walpha = ps.dump_profile(rho,"rho_fus","eperp_fusi",k=0) \
-         + ps.dump_profile(rho,"rho_fus","epll_fusi",k=0)
+    density_alpha = ps.dump_profile(rho, "rho_fus", "nfusi", k=0)*1.e-19
+    walpha = ps.dump_profile(rho, "rho_fus", "eperp_fusi", k=0) \
+         + ps.dump_profile(rho, "rho_fus", "epll_fusi", k=0)
     walpha = density_alpha*walpha*1.602e-3 #MJ/m**3
 
-    pe_fus  = ps.dump_vol_profile(rho,"rho_fus","pfuse" )*1.e-6
-    pi_fus  = ps.dump_vol_profile(rho,"rho_fus","pfusi" )*1.e-6
-    pth_fus = ps.dump_vol_profile(rho,"rho_fus","pfusth")*1.e-6
+    pe_fus  = ps.dump_vol_profile(rho, "rho_fus", "pfuse" )*1.e-6
+    pi_fus  = ps.dump_vol_profile(rho, "rho_fus", "pfusi" )*1.e-6
+    pth_fus = ps.dump_vol_profile(rho, "rho_fus", "pfusth")*1.e-6
 
-    pe_rf  = ps.dump_vol_profile(rho,"rho_ecrf","peech") \
-           + ps.dump_vol_profile(rho,"rho_icrf","picrf_totals",k=0)
+    pe_rf  = ps.dump_vol_profile(rho, "rho_ecrf", "peech") \
+           + ps.dump_vol_profile(rho, "rho_icrf", "picrf_totals", k=0)
     pe_rf *= 1.e-6
 
-    pi_rf  = ps.dump_vol_profile(rho,"rho_icrf","picrf_totals",k=1)
+    pi_rf  = ps.dump_vol_profile(rho, "rho_icrf", "picrf_totals", k=1)
     pi_rf *= 1.e-6
 
-    tqbe = ps.dump_vol_profile(rho,"rho_nbi","tqbe")
-    tqbi = ps.dump_vol_profile(rho,"rho_nbi","tqbi")
-    tqbjxb = ps.dump_vol_profile(rho,"rho_nbi","tqbjxb")
-    tqbth = ps.dump_vol_profile(rho,"rho_nbi","tqbth")
+    tqbe = ps.dump_vol_profile(rho, "rho_nbi", "tqbe")
+    tqbi = ps.dump_vol_profile(rho, "rho_nbi", "tqbi")
+    tqbjxb = ps.dump_vol_profile(rho, "rho_nbi", "tqbjxb")
+    tqbth = ps.dump_vol_profile(rho, "rho_nbi", "tqbth")
 
     torque_nb= tqbe+tqbi+tqbjxb+tqbth
     torque_in= zeros(nrho)
 
-    se_nb = 1.e-19*(ps.dump_vol_profile(rho,"rho_nbi","sbedep")+ps.dump_vol_profile(rho,"rho_nbi","sbehalo"))
+    se_nb = 1.e-19*(ps.dump_vol_profile(rho, "rho_nbi", "sbedep") + ps.dump_vol_profile(rho, "rho_nbi", "sbehalo"))
 
     p_rad= zeros(nrho)
     p_ohm= zeros(nrho)
@@ -118,7 +105,6 @@ def write_input(f_state,f_eqdsk,rdir='.'):
 
     #------------------------------------------------------------------
     # metrics
-
     psi     = ps["psipol"][:]/ps["psipol"][-1]  # equi-drho grid
     rho     = sqrt(ps["phit"][:]/ps["phit"][-1])
     rhob    = (ps["phit"][-1]/pi/b0)**0.5
@@ -150,11 +136,8 @@ def write_input(f_state,f_eqdsk,rdir='.'):
 
     #------------------------------------------------------------------
     # write inprof
-
     f = open(os.path.join(rdir,"inprof"),"w")
-
     f.write(" # generated by zfastran.py Ver+Oct2009\n")
-
     zfdat.write_f('inflag'  , [1.0],'',f)
     zfdat.write_f('time0'   , [0.0],'s',f)
     zfdat.write_f('ip'      , [geq['cpasma']*1.0e-6],'',f )
@@ -201,14 +184,11 @@ def write_input(f_state,f_eqdsk,rdir='.'):
     zfdat.write_f("sion"    , se_nb,'', f)
     zfdat.write_f("chie"    , chie,'', f)
     zfdat.write_f("chii"    , chii,'', f)
-
     f.close()
 
     #------------------------------------------------------------------
     # write inmetric
-
     f = open(os.path.join(rdir,"inmetric"),"w")
-
     zfdat.write_f('Ip'     , [ip]        , '', f)
     zfdat.write_f('bcentr' , [b0]        , '', f)
     zfdat.write_f('rmajor' , [r0]        , '', f)
@@ -236,16 +216,13 @@ def write_input(f_state,f_eqdsk,rdir='.'):
     zfdat.write_f('nc1'    , nc1         , '', f)
     zfdat.write_f('hfac1'  , hfac1       , '', f)
     zfdat.write_f('hfac2'  , hfac2       , '', f)
-
     f.close()
 
 def update_state(
-        f_state, f_eqdsk, f_fastran, f_bc, time='', relax=1.0, relax_J=1.0, adjust_ip = 0):
-
+        f_state, f_eqdsk, f_fastran, f_bc, time='', relax=1.0, relax_J=1.0, adjust_ip = 0, fni_target = 1.0, relax_ip = 0.3):
     # -----------------------------------------------------------------
     # read geqdsk and plasma state
-
-    ps = plasmastate('ips',1)
+    ps = plasmastate('ips', 1)
     ps.read(f_state)
     spec = ps.get_species()
 
@@ -256,13 +233,12 @@ def update_state(
 
     # -----------------------------------------------------------------
     # read fastran
-
-    fastran = netCDF4.Dataset(f_fastran,'r',format='NETCDF4')
+    fastran = netCDF4.Dataset(f_fastran, 'r', format='NETCDF4')
     rho = fastran.variables["rho"][:]
     nrho = len(rho)
 
     if nrho != len(ps["rho"]):
-        raise Exception('nrho differ, fastran: %d, ps: %s'%(nrho,ps.nrho))
+        raise Exception('nrho differ, fastran: %d, ps: %s'%(nrho, ps.nrho))
 
     ne = fastran.variables["ne"][-1,:]
     te = fastran.variables["te"][-1,:]
@@ -284,36 +260,28 @@ def update_state(
     nz = array(nz)
 
     if adjust_ip > 0:
-
         ibs = fastran.variables["ibs"][-1]
         inb = fastran.variables["inb"][-1]
         irf = fastran.variables["irf"][-1]
         fni = (ibs+inb+irf)/(ip*1.0e-6)
-        ip1 = ibs+inb+irf
+        ip1 = (ibs+inb+irf)*fni_target
 
-        relax_ip = 0.3
         inbc = Namelist(f_bc)
-
         ip0 = inbc["inbc"]["ip"][0]
-
         inbc["inbc"]["ip"][0] = (1.0-relax_ip)*ip0 + relax_ip*ip1
         inbc.write(f_bc)
 
-        #j_tot = (1.0-relax_ip)*j_tot + relax_ip*j_tot/fni
+        # j_tot = (1.0-relax_ip)*j_tot + relax_ip*j_tot/fni
 
-        print '******* IP ADJUST', ip, ip/fni
+        print ('******* IP ADJUST (OLD, NEW):', ip0, ip1)
 
-
-    #j_tot_prev = ps.dump_j_parallel(rho,"rho_eq","curt",r0,b0,tot=True)
-    #j_tot = relax_J*j_tot + (1.-relax_J)*j_tot_prev
+    # j_tot_prev = ps.dump_j_parallel(rho, "rho_eq", "curt", r0, b0, tot=True)
+    # j_tot = relax_J*j_tot + (1.-relax_J)*j_tot_prev
 
     # -----------------------------------------------------------------
     # update plasma state
 
-    #-----------
     #ps["ns"][0] = (1.0-relax)*ps["ns"][0] + 1.0e19*relax*ps.node2cell(ne)
-    #-----------
-
     ps["ns"][0] = 1.0e19*ps.node2cell(ne)
     for k in range(spec["n_ion"]):
         ps["ns"][spec["k_ion"][k],:] = 1.0e19*ps.node2cell(ni*spec["f_ion"][k])
@@ -326,27 +294,30 @@ def update_state(
 
     ps["Ts"][0,:] = (1.0-relax)*ps["Ts"][0,:] + relax*ps.node2cell(te)
     nspec_th = len(ps["Ts"])-1
-    print 'nspec_th =',nspec_th
+    print ('nspec_th =',nspec_th)
     for k in range(nspec_th):
         ps["Ts"][k+1,:] = (1.0-relax)*ps["Ts"][k+1,:] + relax*ps.node2cell(ti)
     ps["Ti"][:] = (1.0-relax)*ps["Ti"][:] + relax*ps.node2cell(ti)
 
     ps["omegat"][:] = (1.0-relax)*ps["omegat"][:] + relax*ps.node2cell(omega)
 
-    ps.load_j_parallel(rho,j_tot,"rho_eq","curt",r0,b0,tot=True)
-    ps.load_j_parallel(rho,j_bs,"rho","curr_bootstrap",r0,b0)
-    ps.load_j_parallel(rho,j_oh,"rho","curr_ohmic",r0,b0)
+    ps.load_j_parallel(rho,j_tot, "rho_eq", "curt", r0, b0, tot=True)
+    ps.load_j_parallel(rho,j_bs, "rho", "curr_bootstrap", r0, b0)
+    ps.load_j_parallel(rho,j_oh, "rho", "curr_ohmic", r0, b0)
+
+    pe_fus = fastran.variables["pe_fus"][-1,:]*1.e6
+    pi_fus = fastran.variables["pi_fus"][-1,:]*1.e6
+
+    ps.load_vol_profile(rho, pe_fus, "rho_fus", "pfuse")
+    ps.load_vol_profile(rho, pi_fus, "rho_fus", "pfusi")
+
+    ps.update_particle_balance()
 
     #------------------------------------------------------------------
     # write plasma state
-
     ps.store(f_state)
-
-    znubeam.update_ps_profile(f_state)
 
 #-----------------------------------------------------------------------
 # test
-
 if __name__ == "__main__":
-
     pass

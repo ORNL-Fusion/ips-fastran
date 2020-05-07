@@ -39,7 +39,7 @@ def readvec(lines,k0,nread):
     return array(tmp),k0+nread
 
 def get_nread(n,ncol=5):
-    nr= n/ncol
+    nr= n//ncol
     if n%ncol>0: nr+=1
     return nr
 
@@ -74,10 +74,10 @@ def wrt_curray_input(f_state,f_incurray,f_geqdsk):
 
     n_imp =  len(ps["m_SIMPI"])
 
-    print "n_ion = ",n_ion
-    print "z_ion = ",z_ion
-    print "a_ion = ",a_ion
-    print "n_imp = ",n_imp
+    print("n_ion = ",n_ion)
+    print("z_ion = ",z_ion)
+    print("a_ion = ",a_ion)
+    print("n_imp = ",n_imp)
 
     # --------------------
     # write trxplt.out
@@ -150,8 +150,8 @@ def read_curray_output():
     nrho  = int(lines[0].split()[0])
     nspec = int(lines[0].split()[1])
 
-    print 'nrho = ',nrho
-    print 'nspec = ',nspec
+    print('nrho = ',nrho)
+    print('nspec = ',nspec)
 
     k = 1
 
@@ -204,7 +204,7 @@ def update_state(f_state,f_geq,f_outcurray,f_incurray):
        j_multi = incurray["adjust"]["j_multi"][0]
     except:
        j_multi = 1.0
-       print 'no j_multi inuput, set 1.0'
+       print('no j_multi inuput, set 1.0')
 
     # read outcurray
 

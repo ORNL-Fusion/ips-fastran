@@ -1,33 +1,36 @@
-#!/usr/bin/env python
-
 #-----------------------------------------------------------------------------#
-# efit eqdsk 
+# efit eqdsk
 #-----------------------------------------------------------------------------#
 
 from numpy import *
 
-def line2vec(line,nlen=16):
-    ncol = len(line)/nlen
+def line2vec(line, nlen=16):
+    ncol = len(line)//nlen
     vec = zeros(ncol)
-    for k in range(ncol): 
+    for k in range(ncol):
         tmp = line[k*nlen:(k+1)*nlen]
         vec[k] = float(tmp)
     return vec
 
-def readvec(lines,k0,nread):
+def readvec(lines, k0, nread):
     tmp = []
-    for k in range(k0,k0+nread):
+    for k in range(k0, k0+nread):
         vec = line2vec(lines[k])
         for i in range(len(vec)): tmp.append(vec[i])
     return array(tmp),k0+nread
 
-def get_nread(n,ncol=5):
-    nr= n/ncol
+def get_nread(n, ncol=5):
+    nr= n//ncol
     if n%ncol>0: nr+=1
     return nr
 
+def write_line(f, vec):
+   for k in range(len(vec)):
+       f.write("%16.9E"%vec[k])
+       if k%5 == 4: f.write("\n")
+   if len(vec)%5!=0: f.write("\n")
+
 def readg(fname):
-    
     #-------------------------------------
     # read
 
@@ -139,8 +142,7 @@ def readg(fname):
 
     return geq
 
-def getbdry(geq,nskip=2):
-
+def getbdry(geq, nskip=2):
     nbdry = geq['nbdry']
     rb = geq['rbdry']
     zb = geq['zbdry']
@@ -149,7 +151,7 @@ def getbdry(geq,nskip=2):
     zb0 = []
     for i in range(0,nbdry,nskip):
         rb0.append(rb[i])
-        zb0.append(zb[i]) 
+        zb0.append(zb[i])
 
     nlim = geq['nlim']
     rlim = geq['rlim']
@@ -162,16 +164,8 @@ def getbdry(geq,nskip=2):
             'rlim':rlim,
             'zlim':zlim}
 
-def write_line(f,vec):
-   for k in range(len(vec)):
-       f.write("%16.9E"%vec[k])
-       if k%5 == 4: f.write("\n")
-   if len(vec)%5!=0: f.write("\n")
-
-def writeg(geq,shot,time,ngrid=129):
-
-    fname = "g%06d.%05d"%(shot,time)  
-
+def writeg(geq, shot, time, ngrid=129):
+    fname = "g%06d.%05d"%(shot,time)
     f=open(fname,"w")
     header = '  EFITD    01/01/2017    #%06d%6dms           3 %3d %3d\n'%(shot,time,ngrid,ngrid)
     f.write(header)
@@ -191,7 +185,6 @@ def writeg(geq,shot,time,ngrid=129):
     f.write("%5d%16.9E%5d"%(0,geq["bcentr"],0)+"\n")
 
 def reada(fname):
-    
     #-------------------------------------
     # read
 
@@ -221,8 +214,6 @@ def reada(fname):
     qmin = line2vec(lines[-11 ][1:])[1]
     rho_qmin = line2vec(lines[-10 ][1:])[3]
 
-    # print lines[-1], qmin, rho_qmin
-
     return {
         "qaxis":qaxis,
         "rout":rout*0.01,
@@ -247,15 +238,15 @@ def reada(fname):
 #    read (neqdsk,1060) time(jj),jflag(jj),lflag,limloc(jj),
 # .                      mco2v,mco2r,qmflag,nlold,nlnew
 #    read (neqdsk,1040) tsaisq(jj),rcencm,bcentr(jj),pasmat(jj)          4
-#    read (neqdsk,1040) cpasma(jj),rout(jj),zout(jj),aout(jj)            5 
+#    read (neqdsk,1040) cpasma(jj),rout(jj),zout(jj),aout(jj)            5
 #    read (neqdsk,1040) eout(jj),doutu(jj),doutl(jj),vout(jj)            6
 #    read (neqdsk,1040) rcurrt(jj),zcurrt(jj),qsta(jj),betat(jj)         7
 #    read (neqdsk,1040) betap(jj),ali(jj),oleft(jj),oright(jj)           8
 #    read (neqdsk,1040) otop(jj),obott(jj),qpsib(jj),vertn(jj)           9
 #    read (neqdsk,1040) (rco2v(k,jj),k=1,mco2v) 10
-#    read (neqdsk,1040) (dco2v(jj,k),k=1,mco2v) 11 
+#    read (neqdsk,1040) (dco2v(jj,k),k=1,mco2v) 11
 #    read (neqdsk,1040) (rco2r(k,jj),k=1,mco2r) 12
-#    read (neqdsk,1040) (dco2r(jj,k),k=1,mco2r) 13 
+#    read (neqdsk,1040) (dco2r(jj,k),k=1,mco2r) 13
 #    read (neqdsk,1040) shearb(jj),bpolav(jj),s1(jj),s2(jj)      14
 #    read (neqdsk,1040) s3(jj),qout(jj),olefs(jj),orighs(jj)      15
 #    read (neqdsk,1040) otops(jj),sibdry(jj),areao(jj),wplasm(jj)  16
@@ -288,9 +279,8 @@ def reada(fname):
 #    read (neqdsk,1040) rq32in(jj),rq21top(jj),chilibt,ali3(jj)   -3
 #    read (neqdsk,1040) xbetapr,tflux(jj),xdum,xdum        -2
 
-def scaleg(geq,R0=1.,B0=1.):
-
-    print geq["ssimag"], geq["ssibry"], geq["psirz" ].min()
+def scaleg(geq, R0=1., B0=1.):
+    print(geq["ssimag"], geq["ssibry"], geq["psirz" ].min())
 
     geq["nw"    ]  = geq["nw"]
     geq["nh"    ]  = geq["nh"]
@@ -301,7 +291,7 @@ def scaleg(geq,R0=1.,B0=1.):
     geq["zmid"  ]  = geq["zmid"]*R0
     geq["rmaxis"]  = geq["rmaxis"]*R0
     geq["zmaxis"]  = geq["zmaxis"]*R0
-    geq["ssimag"]  = geq["ssimag"]*B0*R0**2 
+    geq["ssimag"]  = geq["ssimag"]*B0*R0**2
     geq["ssibry"]  = geq["ssibry"]*B0*R0**2
     geq["bcentr"]  = geq["bcentr"]*B0
     geq["cpasma"]  = geq["cpasma"]*R0*B0
@@ -318,41 +308,4 @@ def scaleg(geq,R0=1.,B0=1.):
     geq["rlim"  ]  = geq["rlim"]*R0
     geq["zlim"  ]  = geq["zlim"]*R0
 
-    print geq["ssimag"], geq["ssibry"], geq["psirz" ].min()
-
-########################################################################
-#  Check
-
-if __name__ == "__main__":
-
-#   g = readg('g000000.00000')
-    g = readg('g222001.00004')
-    scaleg(g,2.647,3.5)
-    print g["nw"]
-    writeg(g,1,3,129)
-    print g["ssimag"]
-
-    from zplotbase import * 
-    
-    pdf=PdfPages("rzpsi.pdf")
-    plt.figure(figsize=(8,11))
-    plt.subplot(1, 1, 1,aspect='equal')
-
-#    plt.axis([1.0,2.4,-1.5, 1.5])
-    plt.title('rzpsi')
-    lw = 0.01
-    
-    x=range(129)
-    y=range(129)
-    z=g["psirz"]
-    CS = plt.contour(x,y,z)
-    plt.clabel(CS, inline=1, fontsize=10)
-    
-    pdf.savefig()
-    pdf.close()
-
-
-
-
-
-
+    print(geq["ssimag"], geq["ssibry"], geq["psirz" ].min())

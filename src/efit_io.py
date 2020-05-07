@@ -1,17 +1,14 @@
-#!/usr/bin/env python
-
 """
  -----------------------------------------------------------------------
   fixed boundary efit solver
  -----------------------------------------------------------------------
 """
 
-import sys,os,glob,pickle,shutil
+import shutil
 from numpy import *
-from scipy.interpolate import splrep,splev,interp1d
+from scipy.interpolate import interp1d
 
 from Namelist import Namelist
-import zutil
 from zinterp import *
 from plasmastate import plasmastate
 
@@ -20,8 +17,7 @@ import time as timer
 ########################################################################
 #   compose kfile
 
-def fixbdry_kfile(shot,time,inefit,inmetric,relax=0,topology='',error=1.0e-4):
-
+def fixbdry_kfile(shot, time, inefit, inmetric, relax=0, topology='', error=1.0e-4):
     mu0 = 4.e-7*pi
 
     #-------------------------------------------------------------------
@@ -53,7 +49,7 @@ def fixbdry_kfile(shot,time,inefit,inmetric,relax=0,topology='',error=1.0e-4):
     npsi = nrho
     psi = arange(npsi)/(npsi-1.0)
 
-    rhopsi_spl = interp1d(psirho,rho,kind='cubic')
+    rhopsi_spl = interp1d(psirho, rho, kind='cubic')
     rho_eval = rhopsi_spl(psi)
     rho_eval[0]  = 0.0
     rho_eval[-1] = 1.0
@@ -65,13 +61,13 @@ def fixbdry_kfile(shot,time,inefit,inmetric,relax=0,topology='',error=1.0e-4):
     #-------------------------------------------------------------------
     # spline profiles
 
-    ipol_spl = zinterp(rho,ipol)
-    ipol_der = ipol_spl(rho,der=1)
+    ipol_spl = zinterp(rho, ipol)
+    ipol_der = ipol_spl(rho, der=1)
 
-    jpar_spl = zinterp(rho_in,jpar_in)
+    jpar_spl = zinterp(rho_in, jpar_in)
     jpar = jpar_spl(rho)
 
-    rm2_spl = zinterp(rho,rm2)
+    rm2_spl = zinterp(rho, rm2)
     rm2_psi = rm2_spl(rho_eval)
 
     curt = zeros(nrho)
@@ -93,14 +89,14 @@ def fixbdry_kfile(shot,time,inefit,inmetric,relax=0,topology='',error=1.0e-4):
     rho_cell[0] = 0.0
     rho_cell[-1] = 1.0
 
-    jtor_spl = zinterp(rho_cell,jtor)
+    jtor_spl = zinterp(rho_cell, jtor)
     jtor_psi = jtor_spl(rho_eval)
 
-    press_spl = zinterp(rho_in,press_in,s=0)
-    press_psi = press_spl(rho_eval,der=0)
+    press_spl = zinterp(rho_in, press_in, s=0)
+    press_psi = press_spl(rho_eval, der=0)
 
-    tmp = zinterp(psi,press_psi,s=0)
-    pprim_psi = tmp(psi,der=1)
+    tmp = zinterp(psi, press_psi, s=0)
+    pprim_psi = tmp(psi, der=1)
     pprim_psi = pprim_psi/dpsi
 
     #-------------------------------------------------------------------
@@ -112,7 +108,7 @@ def fixbdry_kfile(shot,time,inefit,inmetric,relax=0,topology='',error=1.0e-4):
         rho_m  = 0.5*(rho[i+1]+rho[i])
         ip_temp += dV*jtor_spl(rho_m)
     ip_temp /= 2.0*pi*r0
-    print 'Ip = %5.3f %5.3f %5.3f'%(ip*1.0e-6,ip_temp*1.0e-6,ip/ip_temp)
+    print ('Ip = %5.3f %5.3f %5.3f'%(ip*1.0e-6, ip_temp*1.0e-6, ip/ip_temp))
 
     for i in range(len(jtor_psi)):
         jtor_psi[i] = ip/ip_temp*jtor_psi[i]
@@ -121,20 +117,20 @@ def fixbdry_kfile(shot,time,inefit,inmetric,relax=0,topology='',error=1.0e-4):
     # calculate p' and ff'
 
     x0 = [0.1,0.15,0.2]
-    extrapolation(psi,pprim_psi,x0,y0=None)
+    extrapolation(psi, pprim_psi, x0, y0=None)
 
     ffprim_psi = zeros(npsi)
     for i in range(npsi):
         ffprim_psi[i] = -mu0*r0/(r0**2*rm2_psi[i])*(jtor_psi[i]+r0*pprim_psi[i])
 
     eval = extrapolation_sep(
-              [psi[-4],psi[-3],psi[-2]],
-              [pprim_psi[-4],pprim_psi[-3],pprim_psi[-2]])
+              [psi[-4], psi[-3], psi[-2]],
+              [pprim_psi[-4], pprim_psi[-3], pprim_psi[-2]])
     pprim_psi[-1] = eval
 
     eval = extrapolation_sep(
-              [psi[-4],psi[-3],psi[-2]],
-              [ffprim_psi[-4],ffprim_psi[-3],ffprim_psi[-2]])
+              [psi[-4], psi[-3], psi[-2]],
+              [ffprim_psi[-4], ffprim_psi[-3], ffprim_psi[-2]])
     ffprim_psi[-1] = eval
 
     #-------------------------------------------------------------------
@@ -150,7 +146,7 @@ def fixbdry_kfile(shot,time,inefit,inmetric,relax=0,topology='',error=1.0e-4):
     # write kfile
 
     if relax:
-       kfile_old = Namelist("k%06d.%05d"%(shot,time))
+       kfile_old = Namelist("k%06d.%05d"%(shot, time))
 
     kfile = Namelist()
 
@@ -195,13 +191,24 @@ def fixbdry_kfile(shot,time,inefit,inmetric,relax=0,topology='',error=1.0e-4):
     kfile['in1']['prbdry'] = [press_in[-1]]
     kfile['in1']['kbetapr'] = [1]
 
-    if topology in ['USN','DN'] :
-        for k in range(k_x1-1,k_x1+3):
-            kfile['in1']['fwtbdry(%d)'%k] = [10.]
-    if topology == ['LSN','DN']:
-        print 'weigting lower xpoint'
-        for k in range(k_x2-1,k_x2+3):
-            kfile['in1']['fwtbdry(%d)'%k] = [10.]
+    if topology in ['LSN', 'USN', 'DN'] :
+       kfile['in1']['fwtbdry'] = inefit["inefit"]["nbdry"][0] * [1.0]
+    if topology in ['USN', 'DN'] :
+        print ('weigting upper xpoint:', list(range(k_x1-1, k_x1+3)))
+        for k in range(k_x1-1, k_x1+3):
+            if k<=0:
+               _k =  inefit["inefit"]["nbdry"][0] + k
+            else:
+               _k = k
+            kfile['in1']['fwtbdry(%d)'%_k] = [10.]
+    if topology in ['LSN', 'DN']:
+        print ('weigting lower xpoint:', list(range(k_x2-1, k_x2+3)))
+        for k in range(k_x2-1, k_x2+3):
+            if k<=0:
+               _k =  inefit["inefit"]["nbdry"][0] + k
+            else:
+               _k = k
+            kfile['in1']['fwtbdry(%d)'%_k] = [10.]
 
     kfile['profile_ext']['npsi_ext'] = [npsi]
     kfile['profile_ext']['psin_ext'] = psi
@@ -212,7 +219,7 @@ def fixbdry_kfile(shot,time,inefit,inmetric,relax=0,topology='',error=1.0e-4):
         kfile['profile_ext']['pprime_ext'] = -pprim_psi
         kfile['profile_ext']['ffprim_ext'] =-ffprim_psi
 
-    kfile.write("k%06d.%05d"%(shot,time))
+    kfile.write("k%06d.%05d"%(shot, time))
 
     #-------------------------------------------------------------------
     # convergence check
@@ -229,23 +236,20 @@ def fixbdry_kfile(shot,time,inefit,inmetric,relax=0,topology='',error=1.0e-4):
            diff_p_sum += abs(kfile['profile_ext']['pprime_ext'][k])
            diff_f += abs(kfile['profile_ext']['ffprim_ext'][k] - kfile_old['profile_ext']['ffprim_ext'][k] )
            diff_f_sum += abs(kfile['profile_ext']['ffprim_ext'][k])
-       print 'diff=',diff_p/diff_p_sum
-       print 'diff=',diff_f/diff_f_sum
+       print ('diff=',diff_p/diff_p_sum)
+       print ('diff=',diff_f/diff_f_sum)
        if diff_p/diff_p_sum < max_error and diff_f/diff_f_sum < max_error: iconv = 1
     return iconv
 
-def fixbdry_kfile_init(shot,time,f_inefit):
-
+def fixbdry_kfile_init(shot, time, f_inefit):
     #-------------------------------------------------------------------
     # read input
     #
 
-    print f_inefit
+    print (f_inefit)
 
     inefit = Namelist(f_inefit,"r")
     rho_in = inefit["inefit"]["rho"]
-    press_in = inefit["inefit"]["press"]
-    jtor_in = inefit["inefit"]["jpar"]
 
     ip = inefit["inefit"]['ip'][0]
     b0 = inefit["inefit"]['b0'][0]
@@ -259,7 +263,6 @@ def fixbdry_kfile_init(shot,time,f_inefit):
     #
 
     kfile = Namelist()
-
     kfile['in1']['iconvr'] = [3]
     kfile['in1']['mxiter'] = [-1]
     kfile['in1']['nxiter'] = [51]
@@ -303,14 +306,14 @@ def fixbdry_kfile_init(shot,time,f_inefit):
     kfile['profile_ext']['psin_ext'] = psi
     kfile['profile_ext']['pprime_ext'] = npsi*[1.0]
     kfile['profile_ext']['ffprim_ext'] = npsi*[0.0]
-
     kfile.write("k%06d.%05d"%(shot,time))
 
     return 0
 
-def scale_kfile(shot,time,Rs,Bs):
+def scale_kfile(shot, time, Rs, Bs):
 
     kfile = Namelist("k%06d.%05d"%(shot,time))
+    # shutil.copyfile("k%06d.%05d"%(shot,time), "k%06d.%05d_s"%(shot,time))
 
     kfile['in1']['plasma'] = array(kfile['in1']['plasma'])/(Rs*Bs)
     kfile['in1']['btor'  ] = array(kfile['in1']['btor'  ])/Bs
@@ -330,49 +333,45 @@ def scale_kfile(shot,time,Rs,Bs):
 ########################################################################
 #   UTILS
 
-def inverse3x3(x,y):
-
+def inverse3x3(x, y):
     a = array(
-      [ [x[0]**2,x[0],1.0],
-        [x[1]**2,x[1],1.0],
-        [x[2]**2,x[2],1.0] ] )
+      [ [x[0]**2, x[0], 1.0],
+        [x[1]**2, x[1], 1.0],
+        [x[2]**2, x[2], 1.0] ] )
     a_inv = linalg.inv(a)
     return dot(a_inv,y)
 
-def cubic(p,x0):
+def cubic(p, x0):
     return p[0]*x0**2+p[1]*x0+p[2]
 
-def extrapolation(rho,f,x0,y0):
-
-    spl = zinterp(rho,f,s=0) #splrep(rho,f,s=0)
+def extrapolation(rho, f, x0, y0):
+    spl = zinterp(rho,f,s=0)
 
     if y0 == None:
-        #p = inverse3x3(x0,[spl(x) for x in x0])
-        tmp = spl(x0,der=0) # splev(x0,spl,der=0)
-        p = inverse3x3(x0,tmp)
+        #p = inverse3x3(x0, [spl(x) for x in x0])
+        tmp = spl(x0, der=0)
+        p = inverse3x3(x0, tmp)
         for k in range(len(rho)):
             if rho[k] < x0[0]:
-                f[k] = cubic(p,rho[k])
+                f[k] = cubic(p, rho[k])
     else:
-        #p = inverse3x3(x0,[y0,spl(x0[1]),spl(x0[2])])
-        tmp = spl([x0[1],x0[2]],der=0) #  splev([x0[1],x0[2]],spl,der=0)
-        p = inverse3x3(x0,[y0,tmp[0],tmp[1]])
+        #p = inverse3x3(x0, [y0, spl(x0[1]), spl(x0[2])])
+        tmp = spl([x0[1], x0[2]], der=0)
+        p = inverse3x3(x0, [y0, tmp[0], tmp[1]])
         for k in range(len(rho)):
             if rho[k] < x0[1]:
-                f[k] = cubic(p,rho[k])
+                f[k] = cubic(p, rho[k])
 
-def extrapolation_sep(x0,y0):
-
-    p = inverse3x3(x0,y0)
-    return cubic(p,1.0)
+def extrapolation_sep(x0, y0):
+    p = inverse3x3(x0, y0)
+    return cubic(p, 1.0)
 
 ########################################################################
 #  STATE IO
 
-def io_input_from_instate(f_instate,f_inefit="inefit",mode='kinetic'):
+def io_input_from_instate(f_instate, f_inefit="inefit", mode='kinetic'):
 
-    instate = Namelist(f_instate)
-    instate = instate['instate']
+    instate = Namelist(f_instate)['instate']
 
     nrho  = instate['nrho'][0]
     rho   = array(instate['rho'])
@@ -406,22 +405,18 @@ def io_input_from_instate(f_instate,f_inefit="inefit",mode='kinetic'):
     jpar  = array(instate['j_tot'])*1.0e6
 
     tmp = zmain*zimp*(zimp-zmain)
-    ni = (zimp**2*(ne-nbfast-2.0*(nalpha+nhe))
-         -zimp*(zeff*ne-nbfast-4.0*(nalpha+nhe))
-             )/tmp;
+    ni = (zimp**2*(ne-nbfast-2.0*(nalpha+nhe))-zimp*(zeff*ne-nbfast-4.0*(nalpha+nhe)))/tmp;
     nz = (ne*(zeff-1.0)-2.0*(nalpha+nhe))/tmp;
 
     if mode == 'kinetic':
-       print 'mode = kinetic'
-       pmhd = 1.602e3*(ne*te +(ni+nz)*ti) \
-             +2.0/3.0*1.0e6*(wbeam+walp)
+       print('mode = kinetic')
+       pmhd = 1.602e3*(ne*te +(ni+nz)*ti)+2.0/3.0*1.0e6*(wbeam+walp)
     else:
-       print 'mode = total'
-       pmhd = instate['pmhd']
-
+       print('mode = total')
+       #pmhd = instate['pmhd']
+       pmhd = instate['p_eq']
 
     inefit = Namelist()
-
     inefit["inefit"]["ip"   ] = [instate["ip"][0]*1.0e6]
     inefit["inefit"]["r0"   ] = instate["r0"]
     inefit["inefit"]["b0"   ] = instate["b0"]
@@ -435,17 +430,13 @@ def io_input_from_instate(f_instate,f_inefit="inefit",mode='kinetic'):
     inefit["inefit"]["nbdry"] = instate["nbdry"]
     inefit["inefit"]["rbdry"] = instate["rbdry"]
     inefit["inefit"]["zbdry"] = instate["zbdry"]
-
     inefit.write(f_inefit)
 
-def io_input_from_state(f_ps,f_inbc,f_inefit="inefit",mode='kinetic',ismooth=0, betan_target=-1.):
-
+def io_input_from_state(f_ps, f_inbc, f_inefit="inefit", mode="kinetic", ismooth=0, betan_target=-1.):
     # read inbc
-
     inbc = Namelist(f_inbc)["inbc"]
 
     # read plasma state
-
     r0 = inbc["r0"][0]
     b0 = abs(inbc["b0"][0])
     ip = inbc['ip'][0]*1.0e6
@@ -464,25 +455,24 @@ def io_input_from_state(f_ps,f_inbc,f_inefit="inefit",mode='kinetic',ismooth=0, 
     te    = ps.cell2node(te)
     ti    = ps.cell2node(ti)
 
-    density_beam = ps.dump_profile(rho,"rho_nbi","nbeami",k=0)*1.e-19
-    wbeam = ps.dump_profile(rho,"rho_nbi","eperp_beami",k=0) \
-        + ps.dump_profile(rho,"rho_nbi","epll_beami" ,k=0)
+    density_beam = ps.dump_profile(rho, "rho_nbi", "nbeami", k=0)*1.e-19
+    wbeam = ps.dump_profile(rho, "rho_nbi", "eperp_beami", k=0) \
+        + ps.dump_profile(rho, "rho_nbi", "epll_beami", k=0)
     wbeam = density_beam*wbeam
 
-    density_alpha = ps.dump_profile(rho,"rho_fus","nfusi",k=0)*1.e-19
-    walpha = ps.dump_profile(rho,"rho_fus","eperp_fusi",k=0) \
-        + ps.dump_profile(rho,"rho_fus","epll_fusi",k=0)
+    density_alpha = ps.dump_profile(rho, "rho_fus", "nfusi", k=0)*1.e-19
+    walpha = ps.dump_profile(rho, "rho_fus", "eperp_fusi", k=0) \
+        + ps.dump_profile(rho, "rho_fus", "epll_fusi", k=0)
     walpha = density_alpha*walpha
 
     if mode == 'kinetic':
-       print 'mode = kinetic'
+       print('mode = kinetic')
        pmhd = 1.602e3*(ne*te+ni*ti)+2.0/3.0*1.602e3*(wbeam+walpha)
-
     else:
-       print 'mode = total'
+       print('mode = total')
        pmhd = ps["P_eq"][:]
 
-    jpar = ps.dump_j_parallel(rho,"rho_eq","curt",r0,b0,tot=True)
+    jpar = ps.dump_j_parallel(rho, "rho_eq", "curt", r0, b0, tot=True)
 
     #---------------------
 
@@ -498,9 +488,9 @@ def io_input_from_state(f_ps,f_inbc,f_inefit="inefit",mode='kinetic',ismooth=0, 
     betan *= 2.0*mu0/b0**2
     betan /= fabs(ip/(a0*b0))
     betan *= 1.0e2
-    print 'BETAN=',betan
+    print ('BETAN=',betan)
 
-    if betan_target>0 and betan > betan_target:
+    if betan_target > 0 and betan > betan_target:
         pmhd = pmhd*betan_target/betan
 
     #---------------------
@@ -536,30 +526,12 @@ def io_input_from_state(f_ps,f_inbc,f_inefit="inefit",mode='kinetic',ismooth=0, 
         inefit["inefit"]["nlim" ] = inbc["nlim"]
         inefit["inefit"]["rlim" ] = inbc["rlim"]
         inefit["inefit"]["zlim" ] = inbc["zlim"]
-
     inefit["inefit"]["nbdry"] = inbc["nbdry"]
     inefit["inefit"]["rbdry"] = inbc["rbdry"]
     inefit["inefit"]["zbdry"] = inbc["zbdry"]
     inefit.write(f_inefit)
 
-# def scale_input(f_inefit, R0_target, B0_target, pscale=1.0):
-#
-#     inefit = Namelist(f_inefit)
-#     Rs = inefit["inefit"]["r0"][0]/R0_target
-#     Bs = inefit["inefit"]["b0"][0]/B0_target
-#     inefit["inefit"]["ip"   ] = array(inefit["inefit"]["ip"   ])/(Rs*Bs)
-#     inefit["inefit"]["r0"   ] = array(inefit["inefit"]["r0"   ])/Rs
-#     inefit["inefit"]["b0"   ] = array(inefit["inefit"]["b0"   ])/Bs
-#     inefit["inefit"]["press"] = pscale*array(inefit["inefit"]["press"])/Bs**2
-#     inefit["inefit"]["jpar" ] = array(inefit["inefit"]["jpar" ])*Rs/Bs
-#     inefit["inefit"]["rlim" ] = array(inefit["inefit"]["rlim" ])/Rs
-#     inefit["inefit"]["zlim" ] = array(inefit["inefit"]["zlim" ])/Rs
-#     inefit["inefit"]["rbdry"] = array(inefit["inefit"]["rbdry"])/Rs
-#     inefit["inefit"]["zbdry"] = array(inefit["inefit"]["zbdry"])/Rs
-#     inefit.write(f_inefit)
-
 def io_input_init(f_instate):
-
     instate = Namelist(f_instate)['instate']
 
     nrho  = instate['nrho'][0]
@@ -569,7 +541,6 @@ def io_input_init(f_instate):
     pmhd  = zeros(nrho)
 
     inefit = Namelist()
-
     inefit["inefit"]["ip"   ] = [instate["ip"][0]*1.0e6]
     inefit["inefit"]["r0"   ] = instate["r0"]
     inefit["inefit"]["b0"   ] = instate["b0"]
@@ -583,17 +554,14 @@ def io_input_init(f_instate):
     inefit["inefit"]["nbdry"] = instate["nbdry"]
     inefit["inefit"]["rbdry"] = instate["rbdry"]
     inefit["inefit"]["zbdry"] = instate["zbdry"]
-
     inefit.write("inefit")
 
-###
-def io_input_init2(**keyargs):
+def io_input_init_keyargs(**keyargs):
 
     nrho  = keyargs['nrho']
     rho = arange(nrho)/(nrho-1.0)
 
     inefit = Namelist()
-
     inefit["inefit"]["ip"   ] = [keyargs["ip"]*1.0e6]
     inefit["inefit"]["r0"   ] = [keyargs["r0"]]
     inefit["inefit"]["b0"   ] = [keyargs["b0"]]
@@ -607,54 +575,4 @@ def io_input_init2(**keyargs):
     inefit["inefit"]["nbdry"] = [keyargs["nbdry"]]
     inefit["inefit"]["rbdry"] = [keyargs["rbdry"]]
     inefit["inefit"]["zbdry"] = [keyargs["zbdry"]]
-
     inefit.write("inefit")
-
-
-########################################################################
-#  STAND ALONE
-
-if __name__ == "__main__":
-
-    #---------------------------------------------------
-    # run time options
-
-    from optparse import OptionParser
-
-    parser = OptionParser()
-
-    parser.add_option("--shot",
-        action="store",type="int",dest="shot")
-    parser.add_option("--time",
-        action="store",type="int",dest="time")
-    parser.add_option("--efitdir",
-        action="store",type="string",dest="efitdir",default=".")
-    parser.add_option("--niter",
-        action="store",type="int",dest="niter",default=5)
-    (options,args) = parser.parse_args(sys.argv[1:])
-
-    shot = options.shot
-    time = options.time
-    efitdir = options.efitdir
-    niter = options.niter
-
-    runefit = 'efitd90 129 129'
-
-    f_inefit='inefit'
-
-    for k in range(niter):
-
-        zutil.outscreen("efit iteration = %d/%d"%(k,niter))
-
-        print "generate kfile"
-        if k == 0:
-            fixbdry_kfile_init(shot,time,f_inefit)
-        else:
-            fixbdry_kfile(shot,time,f_inefit)
-
-        print "run efit"
-        kfilename = "k%06d.%05d"%(shot,time)
-        f = open("efparm","w")
-        f.write("2\n1\n%s\n"%kfilename)
-        f.close()
-        os.system(runefit+" <efparm"+" >& elog%05d_%d"%(time,k))

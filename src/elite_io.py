@@ -4,8 +4,7 @@ from numpy import *
 
 class elite_data():
 
-    def __init__(self, slef.nmodes = [5,10,15,20,25] ):
-
+    def __init__(self, slef.nmodes = [5, 10, 15, 20, 25] ):
         keylist_eq = [
             "alpha_max",
             "pprime_max",
@@ -27,17 +26,15 @@ class elite_data():
         ]
 
         self.data = {}
-
         for key in keylist_eq: self.data[key] = 0.0
         for key in keylist: self.data[key] = zeros(len(self.nmodes))
 
         self.runid = 'serdel2an'
 
-    def read(self,rdir):
-
+    def read(self, rdir):
         for k in range(len(self.nmodes)):
-            fname = os.path.join(rdir,self.runid+"%d.gamma"%self.nmodes[k])
-            lines = open(fname,"r").readlines()
+            fname = os.path.join(rdir, self.runid+"%d.gamma"%self.nmodes[k])
+            lines = open(fname, "r").readlines()
             tmp = [ float(v) for v in lines[1].split() ]
             self.data["gamma0"][k] = tmp[1]
             self.data["gamma1"][k] = tmp[2]
@@ -47,8 +44,8 @@ class elite_data():
             self.data["gamr2"][k] = tmp[6]
             self.data["tmatasym"][k] = tmp[7]
 
-        fname = os.path.join(rdir,self.runid+"%d.jedge"%self.nmodes[-1])
-        lines = open(fname,"r").readlines()
+        fname = os.path.join(rdir, self.runid+"%d.jedge"%self.nmodes[-1])
+        lines = open(fname, "r").readlines()
         tmp = [ float(v) for v in lines[7].split() ]
         self.data["alpha_max"] = tmp[0]
         self.data["pprime_max"] = tmp[1]
@@ -60,13 +57,10 @@ class elite_data():
         self.data["loc_jedgen1_max"] = tmp[2]
 
 def collect():
-
     pass
 
 if __name__ == "__main__":
-
     rdir = 'n00020'
-    
     elite = elite_data()
     elite.read(rdir)
-    print elite.data
+    print(elite.data)

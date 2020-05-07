@@ -1,19 +1,14 @@
-#!/usr/bin/env python
-
 """
  ------------------------------------------------------------------------------
   metric from efit
  ------------------------------------------------------------------------------
 """
 
-import sys,os,re,pickle,glob
 from numpy import *
-from scipy.interpolate import interp1d
 import Namelist
-
 from zinterp import zinterp
 
-def zinmetric(ps,r0,b0,ip,nrho=51,iwrt=False):
+def ps_to_inmetric(ps, r0, b0, ip, nrho=51, iwrt=False):
 
     psi     = ps["psipol"][:]/ps["psipol"][-1]
     rho     = sqrt(ps["phit"][:]/ps["phit"][-1])

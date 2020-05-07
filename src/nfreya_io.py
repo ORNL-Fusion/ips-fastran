@@ -6,9 +6,7 @@ import zoutone
 from efit_eqdsk import readg
 
 def set_default():
-
     inone = Namelist()
-
     inone["namelis1"]["btor"     ] = [0.0]
     inone["namelis1"]["rmajor"   ] = [0.0]
     inone["namelis1"]["rminor"   ] = [200.0]
@@ -39,13 +37,13 @@ def set_default():
     inone["namelis1"]["itti"     ] = [0]
     inone["namelis1"]["itxj"     ] = [0]
     inone["namelis1"]["inenez"   ] = [0]
-    inone["namelis1"]["nprim"    ] = [2]
-    inone["namelis1"]["namep"    ] = ['d', 't']
-   #inone["namelis1"]["zfrac"    ] = [0.5]
-    inone["namelis1"]["nimp"     ] = [2]
-    inone["namelis1"]["namei"    ] = ['c', 'he']
-    inone["namelis1"]["nneu"     ] = [2]
-    inone["namelis1"]["namen"    ] = ['d', 't']
+    inone["namelis1"]["nprim"    ] = [1]
+    inone["namelis1"]["namep"    ] = ['d']
+    inone["namelis1"]["zfrac"    ] = [1.0]
+    inone["namelis1"]["nimp"     ] = [1]
+    inone["namelis1"]["namei"    ] = ['c']
+    inone["namelis1"]["nneu"     ] = [1]
+    inone["namelis1"]["namen"    ] = ['d']
     inone["namelis1"]["no_te_convection"] = [0]
     inone["namelis1"]["no_ti_convection"] = [0]
     inone["namelis1"]["taupin"   ] = [12.5]
@@ -99,9 +97,8 @@ def set_default():
 
     return inone
 
-def write_inputfiles(f_state,f_eqdsk,f_infreya,dir_data=''):
-
-    ps = plasmastate('ips',1)
+def write_inputfiles(f_state, f_eqdsk, f_infreya, dir_data=''):
+    ps = plasmastate('ips', 1)
     ps.read(f_state)
 
     nrho  = len(ps["rho"])
@@ -127,42 +124,42 @@ def write_inputfiles(f_state,f_eqdsk,f_infreya,dir_data=''):
     nz = []
 
     spec_list = [ key.strip() for key in ps["S_name"][1:] ]
-    print spec_list
+    print(spec_list)
     namep = []
     namei = ['c']
 
-
     for k in range(n_spec):
-        if spec_list[k] in ['H','D','T']:
-           print 'ion',spec_list[k]
+        if spec_list[k] in ['H', 'D', 'T']:
+           print('ion', spec_list[k])
            z_ion.append(z_spec[k])
            a_ion.append(a_spec[k])
            np.append(ps.cell2node_bdry(ps["ns"][k+1,:]))
            namep.append(spec_list[k].lower())
         elif spec_list[k] == 'He4':
-           print 'He4 found'
+           print('He4 found')
            nhe4 = ps.cell2node_bdry(ps["ns"][k+1,:])
            namei.append('he')
            if min(nhe4) == 0:
-               print 'nhe4 zero'
+               print('nhe4 zero')
                nhe4 = ones(len(nhe4))
            nhe4[-1] = abs(nhe4[-1]) #<=====
         else:
-           print 'imp',spec_list[k]
+           print('imp', spec_list[k])
            z_imp.append(z_spec[k])
            a_imp.append(a_spec[k])
            nz.append(ps.cell2node_bdry(ps["ns"][k+1,:]))
-           nhe4 = zeros(nrho)
+#          nhe4 = zeros(nrho)
+           nhe4 = ones(nrho)
 
     n_ion = len(z_ion)
     n_imp = len(z_imp)
 
-    print 'z_ion', z_ion
-    print 'a_ion', a_ion
-    print 'z_imp', z_imp
-    print 'a_imp', a_imp
-    print 'namep', namep
-    print 'namei', namei
+    print('z_ion', z_ion)
+    print('a_ion', a_ion)
+    print('z_imp', z_imp)
+    print('a_imp', a_imp)
+    print('namep', namep)
+    print('namei', namei)
 
     Z_C = 6.0
     Z_imp = zeros(nrho)
@@ -187,26 +184,24 @@ def write_inputfiles(f_state,f_eqdsk,f_infreya,dir_data=''):
     if dir_data:
        inone["namelis1"]["onetwo_xsct_ext"] = [dir_data]
 
-    inone["namelis1"]["rmajor"   ] = [0.0]
-    inone["namelis1"]["rminor"   ] = [60.0]
-    inone["namelis1"]["rin"      ] = [84.0]
-    inone["namelis1"]["rout"     ] = [243.0]
-    inone["namelis1"]["inenez"   ] = [1]
-
     innfreya = Namelist(f_infreya)
     for key in innfreya["innfreya"].keys():
-        inone["namelis2"][key] = innfreya["innfreya"][key]
+        if key.lower() in ["rmajor","rminor","rin","rout","inenez","zfrac"]:
+            inone["namelis1"][key] = innfreya["innfreya"][key]
+        else:
+            inone["namelis2"][key] = innfreya["innfreya"][key]
 
-    inone["namelis1"]["nprim"    ] = [len(namep)]
-    inone["namelis1"]["namep"    ] = namep
-    inone["namelis1"]["nimp"     ] = [len(namei)]
-    inone["namelis1"]["namei"    ] = namei
-    inone["namelis1"]["nneu"     ] = [len(namep)]
-    inone["namelis1"]["namen"    ] = namep
+    inone["namelis1"]["nprim"] = [len(namep)]
+    inone["namelis1"]["namep"] = namep
+    inone["namelis1"]["nimp"] = [len(namei)]
+    inone["namelis1"]["namei"] = namei
+    inone["namelis1"]["nneu"] = [len(namep)]
+    inone["namelis1"]["namen"] = namep
 
+    inone["namelis1"]["inenez"] = [0]
     inone["namelis1"]["nj"] = [nrho]
     inone["namelis1"]["njene"] = [nrho]
-    inone["namelis1"]["enein"] =  ne*1.0e-6
+    inone["namelis1"]["enein"] = ne*1.0e-6
     inone["namelis1"]["renein"] = rho
     inone["namelis1"]["njte"] =  [nrho]
     inone["namelis1"]["rtein"] = rho
@@ -220,26 +215,23 @@ def write_inputfiles(f_state,f_eqdsk,f_infreya,dir_data=''):
     inone["namelis1"]["rangrot"] = rho
     inone["namelis1"]["angrotin"] = omega
 
+    inone["namelis1"]["njenp"] =len(namep)*[nrho]
+    for k in range(len(namep)):
+        inone["namelis1"]["renpin(1,%d)"%(k+1)] = rho
+        inone["namelis1"]["enp(1,%d)"%(k+1)] = np[k]*1.0e-6
 
-    # inone["namelis1"]["njenp"] = 2*[nrho]
-    # inone["namelis1"]["renpin(1,1)"] = rho
-    # inone["namelis1"]["renpin(1,2)"] = rho
-    # inone["namelis1"]["enp(1,1)"] = np[0]*1.0e-6
-    # inone["namelis1"]["enp(1,2)"] = np[1]*1.0e-6
-
-    # inone["namelis1"]["njeni"] = 2*[nrho]
-    # inone["namelis1"]["reniin(1,1)"] = rho
-    # inone["namelis1"]["reniin(1,2)"] = rho
-    # inone["namelis1"]["eni(1,1)"] = nc*1.0e-6
-    # inone["namelis1"]["eni(1,2)"] = nhe4*1.0e-6
+    inone["namelis1"]["njeni"] = len(namei)*[nrho]
+    inone["namelis1"]["reniin(1,1)"] = rho
+    inone["namelis1"]["reniin(1,2)"] = rho
+    inone["namelis1"]["eni(1,1)"] = nc*1.0e-6
+    if len(namei) > 1:
+        inone["namelis1"]["eni(1,2)"] = nhe4*1.0e-6
 
     inone["namelis3"]["EQDSKIN"] = [f_eqdsk]
 
     inone.write("inone")
 
-
-def write_inputfiles_instate(f_instate,f_eqdsk,f_infreya,dir_data=''):
-
+def write_inputfiles_instate(f_instate, f_eqdsk, f_infreya, dir_data=''):
     instate = Namelist(f_instate)
 
     rho = array(instate['instate']['rho'])
@@ -260,44 +252,35 @@ def write_inputfiles_instate(f_instate,f_eqdsk,f_infreya,dir_data=''):
     for key in innfreya["innfreya"].keys():
         inone["namelis2"][key] = innfreya["innfreya"][key]
 
-    inone["namelis1"]["rmajor"   ] = [0.0]
-    inone["namelis1"]["rminor"   ] = [60.0]
-    inone["namelis1"]["rin"      ] = [84.0]
-    inone["namelis1"]["rout"     ] = [243.0]
+    # inone["namelis1"]["inenez"] = [1]
+    # inone["namelis1"]["nprim"] = [2]
+    # inone["namelis1"]["namep"] = ['d', 't']
+    # inone["namelis1"]["zfrac"] = [0.5]
+    # inone["namelis1"]["nimp"] = [1]
+    # inone["namelis1"]["namei"] = ['c']
+    # inone["namelis1"]["nneu"] = [2]
+    # inone["namelis1"]["namen"] = ['d', 't']
 
-    # inone["namelis1"]["inenez"   ] = [1]
-    # inone["namelis1"]["nprim"    ] = [2]
-    # inone["namelis1"]["namep"    ] = ['d', 't']
-    # inone["namelis1"]["zfrac"    ] = [0.5]
-    # inone["namelis1"]["nimp"     ] = [1]
-    # inone["namelis1"]["namei"    ] = ['c']
-    # inone["namelis1"]["nneu"     ] = [2]
-    # inone["namelis1"]["namen"    ] = ['d', 't']
-
-    inone["namelis1"]["no_te_convection"   ] = [0]
-    inone["namelis1"]["no_ti_convection"   ] = [0]
-
-
-    inone["namelis1"]["inenez"   ] = [1]
-    inone["namelis1"]["nprim"    ] = [1]
-    inone["namelis1"]["namep"    ] = ['d']
-    inone["namelis1"]["zfrac"    ] = [1.0]
-    inone["namelis1"]["nimp"     ] = [1]
-    inone["namelis1"]["namei"    ] = ['c']
-    inone["namelis1"]["nneu"     ] = [1] #[2]
-    inone["namelis1"]["namen"    ] = ['d'] #['d', 'c']
+    inone["namelis1"]["inenez"] = [1]
+    inone["namelis1"]["nprim"] = [1]
+    inone["namelis1"]["namep"] = ['d']
+    inone["namelis1"]["zfrac"] = [1.0]
+    inone["namelis1"]["nimp"] = [1]
+    inone["namelis1"]["namei"] = ['c']
+    inone["namelis1"]["nneu"] = [1] #[2]
+    inone["namelis1"]["namen"] = ['d'] #['d', 'c']
 
     inone["namelis1"]["nj"] = [nrho]
     inone["namelis1"]["njene"] = [nrho]
-    inone["namelis1"]["enein"] =  ne*1.0e13
+    inone["namelis1"]["enein"] = ne*1.0e13
     inone["namelis1"]["renein"] = rho
-    inone["namelis1"]["njte"] =  [nrho]
+    inone["namelis1"]["njte"] = [nrho]
     inone["namelis1"]["rtein"] = rho
     inone["namelis1"]["tein"] = te
     inone["namelis1"]["njti"] = [nrho]
     inone["namelis1"]["rtiin"] = rho
     inone["namelis1"]["tiin"] = ti
-    inone["namelis1"]["njzef"] =  [nrho]
+    inone["namelis1"]["njzef"] = [nrho]
     inone["namelis1"]["rzeffin"] = rho
     inone["namelis1"]["zeffin"] = zeff
     inone["namelis1"]["rangrot"] = rho
@@ -308,7 +291,6 @@ def write_inputfiles_instate(f_instate,f_eqdsk,f_infreya,dir_data=''):
     # inone["namelis1"]["renpin(1,2)"] = rho
     # inone["namelis1"]["enp(1,1)"] = np[0]*1.0e-6
     # inone["namelis1"]["enp(1,2)"] = np[1]*1.0e-6
-
     # inone["namelis1"]["njeni"] = 2*[nrho]
     # inone["namelis1"]["reniin(1,1)"] = rho
     # inone["namelis1"]["reniin(1,2)"] = rho
@@ -341,18 +323,14 @@ def write_inputfiles_instate(f_instate,f_eqdsk,f_infreya,dir_data=''):
     inone.write("inone")
 
 def read_output():
-
-    outone = zoutone.readoutone(foutone='outone',isummary=False,iverb=False)
+    outone = zoutone.readoutone(foutone='outone', isummary=False, iverb=False)
     pnbe = outone["qbeame"]["y"][-1]
     pnbe = outone["qbeami"]["y"][-1]
     pnbe = outone["enbeam"]["y"][-1]*1.0e-13
     pnbe = outone["curbeam"]["y"][-1]*0.01
 
-
-def update_state(f_state,f_eqdsk,scales={}):
-
+def update_state(f_state, f_eqdsk, scales={}):
     #-- read geqdsk and plasma state
-
     ps = plasmastate('ips',1)
     ps.read(f_state)
 
@@ -362,8 +340,8 @@ def update_state(f_state,f_eqdsk,scales={}):
     ip  = geq['cpasma']
 
     #-- read outone
+    outone = zoutone.readoutone(foutone='outone', isummary=False, iverb=False)
 
-    outone = zoutone.readoutone(foutone='outone',isummary=False,iverb=False)
     pnbe = outone["qbeame"]["y"][-1]
     pnbi = outone["qbeami"]["y"][-1]
     density_beam = outone["enbeam"]["y"][-1]*1.0e-13
@@ -381,48 +359,40 @@ def update_state(f_state,f_eqdsk,scales={}):
     tbeami = 2.0/3.0*1.0e3*wbeam/(1.602*density_beam)
 
     #--- scale
-
-    print 'len pnbe',len(pnbe),len(density_beam)
-    print 'tbeami =', tbeami[0]
-    print 'density_beam =', density_beam[0]
+    print('len pnbe', len(pnbe), len(density_beam))
+    print('tbeami =', tbeami[0])
+    print('density_beam =', density_beam[0])
 
     if 'current' in scales:
         j_nb = array(j_nb)*scales['current']
     if 'particle' in scales:
-        print 'particle source scaled ', scales['particle']
+        print('particle source scaled ', scales['particle'])
         ssum = array(ssum)*scales['particle']
     if 'torque' in scales:
         j_nb = array(torque)*scales['torque']
 
     #--- grid
-
     rho = ps["rho"][:]
     nrho = len(rho)
 
     #--- beam density, energy
-
     ps["nbeami"][0] = 1.0e19*ps.node2cell(density_beam)
     ps["eperp_beami"][0] = 2.0*ps.node2cell(tbeami)
     ps["epll_beami"][0] = ps.node2cell(tbeami)
 
     #--- current
-
-    ps.load_j_parallel(rho,1.0e6*j_nb,"rho_nbi","curbeam",r0,b0)
+    ps.load_j_parallel(rho, 1.0e6*j_nb, "rho_nbi", "curbeam", r0, b0)
 
     #--- heating
-
-    ps.load_vol_profile (rho,1.0e6*pnbe,"rho_nbi","pbe")
-    ps.load_vol_profile (rho,1.0e6*pnbi,"rho_nbi","pbi")
-
-    ps.load_vol_profile (rho,torque,"rho_nbi","tqbi")
-    ps.load_vol_profile (rho,ssum,"rho_nbi","sbedep")
+    ps.load_vol_profile (rho, 1.0e6*pnbe, "rho_nbi", "pbe")
+    ps.load_vol_profile (rho, 1.0e6*pnbi, "rho_nbi", "pbi")
+    ps.load_vol_profile (rho, torque, "rho_nbi", "tqbi")
+    ps.load_vol_profile (rho, ssum, "rho_nbi", "sbedep")
 
     #--- store plasma state
-
     ps.store(f_state)
 
 def read_outone_neutron(f):
-
     pat_1 = re.compile("\s*P DD")
     pat_2 = re.compile("\s*D\(D,n\)")
     pdd, neutron = 0.0, 0.0
@@ -435,9 +405,7 @@ def read_outone_neutron(f):
     return pdd, neutron
 
 def update_instate(f_instate,f_eqdsk,scales={}):
-
     #-- read geqdsk and plasma state
-
     instate = Namelist(f_instate)
 
     geq = readg(f_eqdsk)
@@ -446,8 +414,7 @@ def update_instate(f_instate,f_eqdsk,scales={}):
     ip  = geq['cpasma']
 
     #-- read outone
-
-    outone = zoutone.readoutone(foutone='outone',isummary=False,iverb=False)
+    outone = zoutone.readoutone(foutone='outone', isummary=False, iverb=False)
     pnbe = outone["qbeame"]["y"][-1]
     pnbi = outone["qbeami"]["y"][-1]
     density_beam = outone["enbeam"]["y"][-1]*1.0e-13
@@ -465,23 +432,20 @@ def update_instate(f_instate,f_eqdsk,scales={}):
     tbeami = 2.0/3.0*1.0e3*wbeam/(1.602*density_beam)
 
     #--- neutron
-
     pdd, neutron = read_outone_neutron('outone')
 
     #--- scale
-
-    print 'len pnbe',len(pnbe),len(density_beam)
-    print 'tbeami =', tbeami[0]
-    print 'density_beam =', density_beam[0]
+    print('len pnbe',len(pnbe),len(density_beam))
+    print('tbeami =', tbeami[0])
+    print('density_beam =', density_beam[0])
 
     if 'current' in scales:
         j_nb = array(j_nb)*scales['current']
     if 'particle' in scales:
-        print 'particle source scaled ', scales['particle']
+        print('particle source scaled ', scales['particle'])
         ssum = array(ssum)*scales['particle']
 
     #--- write instate
-
     rho = instate['instate']['rho']
     nrho = len(rho)
 

@@ -1,20 +1,19 @@
-#! /usr/bin/env python
-
 """
  -----------------------------------------------------------------------
  fastran instate file utility
  -----------------------------------------------------------------------
 """
 
-from plasmastate import *
+#from plasmastate import *
 from numpy import *
 from Namelist import Namelist
+from fastranutil import namelist_default
 from zinterp import zinterp
-from zmodelprof import profile_pedestal, profile_pedestal_smooth
-import eped_io
+from zmodelprof import profile_pedestal
+from formula import get_ni
+from shape_luce import boundaryShape
 
 def set_shape(R0, a0, kappa, delta, nt, dlim = 0.05):
-
     t = linspace(0.0, 2.*pi, nt)
     rb = R0 + a0*cos(t+delta*sin(t))
     zb = kappa*a0*sin(t)
@@ -28,106 +27,172 @@ def set_shape(R0, a0, kappa, delta, nt, dlim = 0.05):
 
     return rb, zb, rlim, zlim
 
-def instate_model(fn_instate, instate_method):
+def expand_profile(instate):
+    for key in instate["instate"].keys(): instate["instate"][key] = array(instate["instate"][key])
+    nrho       = instate["instate"]["nrho"       ][0]
+    n_ion      = instate["instate"]["n_ion"      ][0]
+    z_ion      = instate["instate"]["z_ion"      ]
+    a_ion      = instate["instate"]["a_ion"      ]
+    f_ion      = instate["instate"]["f_ion"      ]
+    n_imp      = instate["instate"]["n_imp"      ][0]
+    z_imp      = instate["instate"]["z_imp"      ]
+    a_imp      = instate["instate"]["a_imp"      ]
+    f_imp      = instate["instate"]["f_imp"      ]
+    ne_axis    = instate["instate"]["ne_axis"    ][0]
+    ne_ped     = instate["instate"]["ne_ped"     ][0]
+    ne_sep     = instate["instate"]["ne_sep"     ][0]
+    ne_alpha   = instate["instate"]["ne_alpha"   ][0]
+    ne_beta    = instate["instate"]["ne_beta"    ][0]
+    ne_xmid    = instate["instate"]["ne_xmid"    ][0]
+    ne_xwid    = instate["instate"]["ne_xwid"    ][0]
+    te_axis    = instate["instate"]["te_axis"    ][0]
+    te_ped     = instate["instate"]["te_ped"     ][0]
+    te_sep     = instate["instate"]["te_sep"     ][0]
+    te_alpha   = instate["instate"]["te_alpha"   ][0]
+    te_beta    = instate["instate"]["te_beta"    ][0]
+    te_xmid    = instate["instate"]["te_xmid"    ][0]
+    te_xwid    = instate["instate"]["te_xwid"    ][0]
+    ti_axis    = instate["instate"]["ti_axis"    ][0]
+    ti_ped     = instate["instate"]["ti_ped"     ][0]
+    ti_sep     = instate["instate"]["ti_sep"     ][0]
+    ti_alpha   = instate["instate"]["ti_alpha"   ][0]
+    ti_beta    = instate["instate"]["ti_beta"    ][0]
+    ti_xmid    = instate["instate"]["ti_xmid"    ][0]
+    ti_xwid    = instate["instate"]["ti_xwid"    ][0]
+    omega_axis = instate["instate"]["omega_axis" ][0]
+    omega_sep  = instate["instate"]["omega_sep"  ][0]
+    omega_alpha= instate["instate"]["omega_alpha"][0]
+    omega_beta = instate["instate"]["omega_beta" ][0]
+    zeff_axis  = instate["instate"]["zeff_axis"  ][0]
+    nbeam_axis = instate["instate"]["nbeam_axis" ][0]
+    nbeam_sep  = instate["instate"]["nbeam_sep"  ][0]
+    nbeam_alpha= instate["instate"]["nbeam_alpha"][0]
+    nbeam_beta = instate["instate"]["nbeam_beta" ][0]
+    tbeami     = instate["instate"]["tbeami"     ][0]
+    xmid       = instate["instate"]["xmid"       ][0]
+    xwid       = instate["instate"]["xwid"       ][0]
+    ne_fit     = instate["instate"]["ne_fit"     ][0]
+    te_fit     = instate["instate"]["te_fit"     ][0]
+    ti_fit     = instate["instate"]["ti_fit"     ][0]
 
-    if instate_method == 'model':
-        instate_model_default(fn_instate)
-    else:
-        eval("instate_model_%s(fn_instate)"%instate_method)
+    rho = arange(nrho)/(nrho-1.0)
 
-def instate_model_default(fn_instate):
+    ne = profile_pedestal(nrho, ne_xmid, ne_xwid, ne_ped, ne_sep, ne_axis, ne_alpha, ne_beta, ifit=ne_fit)(rho)
+    te = profile_pedestal(nrho, te_xmid, te_xwid, te_ped, te_sep, te_axis, te_alpha, te_beta, ifit=te_fit)(rho)
+    ti = profile_pedestal(nrho, ti_xmid, ti_xwid, ti_ped, ti_sep, ti_axis, ti_alpha, ti_beta, ifit=ti_fit)(rho)
 
-    #-- read
+    omega = (omega_axis-omega_sep)*(1.0-rho**omega_alpha)**omega_beta+omega_sep
+    zeff = zeff_axis*ones(nrho)
+    density_beam = (nbeam_axis-nbeam_sep)*(1.0-rho**nbeam_alpha)**nbeam_beta+nbeam_sep
+    density_alpha = zeros(nrho)
 
-    instate = Namelist(fn_instate)
+    a = sum(f_ion*z_ion)
+    b = sum(f_imp*z_imp)
+    c = sum(f_ion*z_ion)
+    d = sum(f_imp*z_imp*z_imp)
 
-    R0 = instate["instate"]["R0"][0]
-    B0 = instate["instate"]["B0"][0]
-    ip = instate["instate"]["ip"][0]
-    nt = instate["instate"]["nbdry"][0]
+    zne_adj = ne
+    zzne_adj = ne*zeff
 
-    nrho = instate["instate"]["nrho"][0]
-    xmid = instate["instate"]["xmid"][0]
-    xwid = instate["instate"]["xwid"][0]
+    zne_adj = zne_adj - 1.0*density_beam
+    zzne_adj = zzne_adj - 1.0**2*density_beam
 
-    ne0 = instate["instate"]["ne0"][0]
-    neped  = instate["instate"]["neped"][0]
-    nesep  = instate["instate"]["nesep"][0]
-    alpha_ne = instate["instate"]["alpha_ne"][0]
-    beta_ne = instate["instate"]["beta_ne"][0]
+    nion = (zne_adj *d-zzne_adj*b)/(a*d-b*c)
+    nimp = (zzne_adj*a-zne_adj *c)/(a*d-b*c)
 
-    te0 = instate["instate"]["te0"][0]
-    teped = instate["instate"]["teped"][0]
-    tesep = instate["instate"]["tesep"][0]
-    alpha_te = instate["instate"]["alpha_te"][0]
-    beta_te = instate["instate"]["beta_te"][0]
+    density_ion = array([f_ion[k]*nion for k in range(n_ion)])
+    density_imp = array([f_imp[k]*nimp for k in range(n_imp)])
 
-    ti0 = instate["instate"]["ti0"][0]
-    tiped = instate["instate"]["tiped"][0]
-    tisep = instate["instate"]["tisep"][0]
-    alpha_ti = instate["instate"]["alpha_ti"][0]
-    beta_ti = instate["instate"]["beta_ti"][0]
+    density_th = array([sum(tmp) for tmp in density_ion.transpose()])
+    density_th+= array([sum(tmp) for tmp in density_imp.transpose()])
 
-    zeff0 = instate["instate"]["zeff0"][0]
+    ni = array([sum(tmp) for tmp in density_ion.transpose()])
+    nz = array([sum(tmp) for tmp in density_imp.transpose()])
 
-    omega0 = instate["instate"]["omega0"][0]
-    alpha_omega = instate["instate"]["alpha_omega"][0]
-    beta_omega  = instate["instate"]["beta_omega"][0]
+    instate["instate"]["rho"] = rho
+    instate["instate"]["ne"] = ne
+    instate["instate"]["ni"] = ni
+    instate["instate"]["nz"] = nz
+    instate["instate"]["te"] = te
+    instate["instate"]["ti"] = ti
+    instate["instate"]["zeff"] = zeff
+    instate["instate"]["omega"] = omega
+    instate["instate"]["density_beam"] = density_beam
+    instate["instate"]["wbeam"] = 3./2.*1.602e3*density_beam*tbeami*1.0e-6
+    instate["instate"]["density_alpha"] = zeros(nrho)
+    instate["instate"]["walpha"] = zeros(nrho)
 
-    #-- pedestal
+def instate_model(f_instate):
+    #--- read instate
+    print("instate_model_new started")
+    instate = Namelist(f_instate)
+    for key in list(instate["instate"].keys()):
+        if key.upper() not in [ 'TOKAMAK_ID', 'PRESSURE_MODEL', 'CURRENT_MODEL' ]:
+            instate["instate"][key] = array(instate["instate"][key])
+    # for key in instate["instate"].keys():
+    #     instate["instate"][key] = array(instate["instate"][key])
 
-    if instate["instate"]["use_inped"][0] == 1:
+    nrho       = instate["instate"]["nrho"       ][0]
+    n_ion      = instate["instate"]["n_ion"      ][0]
+    z_ion      = instate["instate"]["z_ion"      ]
+    a_ion      = instate["instate"]["a_ion"      ]
+    f_ion      = instate["instate"]["f_ion"      ]
+    n_imp      = instate["instate"]["n_imp"      ][0]
+    z_imp      = instate["instate"]["z_imp"      ]
+    a_imp      = instate["instate"]["a_imp"      ]
+    f_imp      = instate["instate"]["f_imp"      ]
+    ne_axis    = instate["instate"]["ne_axis"    ][0]
+    ne_ped     = instate["instate"]["ne_ped"     ][0]
+    ne_sep     = instate["instate"]["ne_sep"     ][0]
+    ne_alpha   = instate["instate"]["ne_alpha"   ][0]
+    ne_beta    = instate["instate"]["ne_beta"    ][0]
+    ne_xmid    = instate["instate"]["ne_xmid"    ][0]
+    ne_xwid    = instate["instate"]["ne_xwid"    ][0]
+    ne_fit     = instate["instate"]["ne_fit"     ][0]
+    te_axis    = instate["instate"]["te_axis"    ][0]
+    te_ped     = instate["instate"]["te_ped"     ][0]
+    te_sep     = instate["instate"]["te_sep"     ][0]
+    te_alpha   = instate["instate"]["te_alpha"   ][0]
+    te_beta    = instate["instate"]["te_beta"    ][0]
+    te_xmid    = instate["instate"]["te_xmid"    ][0]
+    te_xwid    = instate["instate"]["te_xwid"    ][0]
+    te_fit     = instate["instate"]["te_fit"     ][0]
+    ti_axis    = instate["instate"]["ti_axis"    ][0]
+    ti_ped     = instate["instate"]["ti_ped"     ][0]
+    ti_sep     = instate["instate"]["ti_sep"     ][0]
+    ti_alpha   = instate["instate"]["ti_alpha"   ][0]
+    ti_beta    = instate["instate"]["ti_beta"    ][0]
+    ti_xmid    = instate["instate"]["ti_xmid"    ][0]
+    ti_xwid    = instate["instate"]["ti_xwid"    ][0]
+    ti_fit     = instate["instate"]["ti_fit"     ][0]
+    omega_axis = instate["instate"]["omega_axis" ][0]
+    omega_sep  = instate["instate"]["omega_sep"  ][0]
+    omega_alpha= instate["instate"]["omega_alpha"][0]
+    omega_beta = instate["instate"]["omega_beta" ][0]
+    jpar_axis  = instate["instate"]["jpar_axis"  ][0]
+    jpar_sep   = instate["instate"]["jpar_sep"   ][0]
+    jpar_alpha = instate["instate"]["jpar_alpha" ][0]
+    jpar_beta  = instate["instate"]["jpar_beta"  ][0]
+    zeff_axis  = instate["instate"]["zeff_axis"  ][0]
+    nbeam_axis = instate["instate"]["nbeam_axis" ][0]
+    nbeam_sep  = instate["instate"]["nbeam_sep"  ][0]
+    nbeam_alpha= instate["instate"]["nbeam_alpha"][0]
+    nbeam_beta = instate["instate"]["nbeam_beta" ][0]
+    tbeami     = instate["instate"]["tbeami"     ][0]
+    r0         = instate["instate"]["r0"         ][0]
+    ip         = instate["instate"]["ip"         ][0]
+    b0         = instate["instate"]["b0"         ][0]
+    xmid       = instate["instate"]["xmid"       ][0]
+    xwid       = instate["instate"]["xwid"       ][0]
+    print('here')
 
-        teped = instate["inped"]["teped_const"][0]
-        teped*= ip**instate["inped"]["teped_ip"][0]
-        teped*= B0**instate["inped"]["teped_bt"][0]
-        teped*= neped**instate["inped"]["teped_neped"][0]
+    b0 = abs(b0)
 
-        wped = instate["inped"]["wped_const"][0]
-        wped*= ip**instate["inped"]["wped_ip"][0]
-        wped*= B0**instate["inped"]["wped_bt"][0]
-        wped*= neped**instate["inped"]["wped_neped"][0]
+    #--- boundary shape
+    model_shape = namelist_default(instate,"instate","model_shape",[0])[0]
+    print ('model_shape:', model_shape)
 
-        xmid = 1.0-0.5*wped
-        xwid = wped
-
-        niped, nzped = eped_io.get_ni(neped,zeff=zeff0)
-        tiped = teped * neped / (niped+nzped)
-        ti0 = te0*tiped/teped
-
-        nesep = neped * instate["inped"]["nesep"][0]
-
-        tesep_model =  instate["inped"]["tesep"][0]
-        if tesep_model > 0:
-            tesep = tesep_model
-        else:
-            tesep = abs(tesep_model)*teped
-
-        tisep_model =  instate["inped"]["tisep"][0]
-        if tisep_model > 0:
-            tisep = tisep_model
-        else:
-            tisep = abs(tisep_model)*tiped
-
-        print 'teped, tiped = ', teped, tiped
-        print 'niped, nzped = ', niped, nzped
-        print 'nesep = ', nesep
-        print 'tesep, tisep = ', tesep, tisep
-
-    #-- make profiles
-
-    rho = linspace(0.0,1.0,nrho)
-    ne = profile_pedestal(nrho, xmid, xwid, neped, nesep, ne0, alpha_ne, beta_ne)(rho)
-    te = profile_pedestal(nrho, xmid, xwid, teped, tesep, te0, alpha_te, beta_te)(rho)
-    ti = profile_pedestal(nrho, xmid, xwid, tiped, tisep, ti0, alpha_ti, beta_ti)(rho)
-
-    zeff = nrho*[zeff0]
-    omega = omega0*(1.-rho**alpha_omega)**beta_omega
-    j_tot = 1.0-rho**2 + 0.05
-
-    #-- boundary
-
-    if instate["instate"]["model_shape"][0] == 1:
+    if model_shape == 1:
         rb, zb, rlim, zlim = \
             set_shape(
                 R0 = instate["instate"]["r0"][0],
@@ -135,55 +200,42 @@ def instate_model_default(fn_instate):
                 kappa = instate["instate"]["kappa"][0],
                 delta = instate["instate"]["delta"][0],
                 nt = instate["instate"]["nbdry"][0])
+    elif model_shape == 2:
+        print ("Luce Shape")
+        R0 = instate["instate"]["r0"][0]
+        a0 = instate["instate"]["a0"][0]
+        eps = a0/R0
+        kapu = instate["instate"]["kappa"][0]
+        kapl = instate["instate"]["kappa"][0]
+        delu = instate["instate"]["delta"][0]
+        dell = instate["instate"]["delta"][0]
+        np = instate["instate"]["nbdry"][0]
+
+        zetaou = 0.
+        zetaiu = 0.
+        zetail = 0.
+        zetaol = 0.
+        zoffset = 0.
+
+        rb, zb, zref = boundaryShape(a0, eps, kapu, kapl, delu, dell, zetaou, zetaiu, zetail, zetaol, zoffset,
+                          upnull=True, lonull=True, np=np, doPlot=False)
+
+        rb = append(rb, rb[0])
+        zb = append(zb, zb[0])
+
+        dlim = 0.05
+        rmax = max(rb) + dlim
+        rmin = min(rb) - dlim
+        zmax = max(zb) + dlim
+        zmin = min(zb) - dlim
+        rlim = [ rmax, rmin, rmin, rmax, rmax ]
+        zlim = [ zmax, zmax, zmin, zmin, zmax ]
     else:
         rb, zb, rlim, zlim = \
             instate["instate"]["rbdry"], \
             instate["instate"]["zbdry"], \
             instate["instate"]["rlim"], \
             instate["instate"]["zlim"]
-
-    #-- clean up
-
-    del instate["instate"]["nrho"]
-    del instate["instate"]["xmid"]
-    del instate["instate"]["xwid"]
-    del instate["instate"]["ne0"]
-    del instate["instate"]["neped"]
-    del instate["instate"]["nesep"]
-    del instate["instate"]["alpha_ne"]
-    del instate["instate"]["beta_ne"]
-    del instate["instate"]["te0"]
-    del instate["instate"]["teped"]
-    del instate["instate"]["tesep"]
-    del instate["instate"]["alpha_te"]
-    del instate["instate"]["beta_te"]
-    del instate["instate"]["ti0"]
-    del instate["instate"]["tiped"]
-    del instate["instate"]["tisep"]
-    del instate["instate"]["alpha_ti"]
-    del instate["instate"]["beta_ti"]
-    del instate["instate"]["omega0"]
-    del instate["instate"]["alpha_omega"]
-    del instate["instate"]["beta_omega"]
-    del instate["instate"]["zeff0"]
-
-    #-- put profiles to instate
-
-    instate["instate"]["nrho"] = [nrho]
-    instate["instate"]["rho"] = rho
-
-    instate["instate"]["ne"] = ne
-    instate["instate"]["te"] = te
-    instate["instate"]["ti"] = ti
-    instate["instate"]["omega"] = omega
-    instate["instate"]["zeff"] = zeff
-
-    instate["instate"]["density_alpha"] = zeros(nrho)
-    instate["instate"]["walpha"] = zeros(nrho)
-    instate["instate"]["density_beam"] = zeros(nrho)
-    instate["instate"]["wbeam"] = zeros(nrho)
-
-    instate["instate"]["j_tot"] = j_tot
 
     instate["instate"]["nbdry"] = [len(rb)]
     instate["instate"]["rbdry"] = rb
@@ -192,4 +244,145 @@ def instate_model_default(fn_instate):
     instate["instate"]["rlim"] = rlim
     instate["instate"]["zlim"] = zlim
 
-    instate.write(fn_instate)
+    #--- pedestal
+    if xmid > 0:
+        ne_xmid = te_xmid = ti_xmid =  xmid
+    if xwid > 0:
+        ne_xwid = te_xwid = ti_xwid =  xwid
+
+    betan_ped = instate["instate"]["betan_ped"][0]
+    print ('betan_ped = ',betan_ped)
+    if betan_ped > 0.0:
+        ne_xwid = te_xwid = ti_xwid = xwid
+        ne_xmid = te_xmid = ti_xmid = xmid
+
+        rb = array(instate["instate"]["rbdry"])
+        zb = array(instate["instate"]["zbdry"])
+        a0 = 0.5*( max(rb) - min(rb) )
+
+        c_betan = 4.0*1.602e5*ne_ped*fml.mu0/b0**2*(a0*b0/ip)
+        te_ped = betan_ped/c_betan
+        ti_ped = te_ped
+        print ("PEDEDSTAL BETAN = ",betan_ped, te_ped)
+
+        instate["instate"]["te_ped" ] = [te_ped ]
+        instate["instate"]["te_xwid"] = [te_xwid]
+        instate["instate"]["te_xmid"] = [te_xmid]
+
+        instate["instate"]["ti_ped" ] = [ti_ped ]
+        instate["instate"]["ti_xwid"] = [ti_xwid]
+        instate["instate"]["ti_xmid"] = [ti_xmid]
+
+    use_inped = instate["instate"]["use_inped"][0]
+    if  use_inped == 1:
+        nesep = ne_ped * instate["inped"]["nesep"][0]
+        tesep_inped = instate["inped"]["tesep"][0]
+        if tesep_inped > 0:
+            tesep = tesep_inped
+        else:
+            tesep = abs(tesep_model)*teped
+        tisep_inped = instate["inped"]["tisep"][0]
+        if tisep_inped > 0:
+            tisep = tisep_inped
+        else:
+            tisep = abs(tisep_inped)*ti_ped
+        neped = ne_ped
+
+        teped = instate["inped"]["teped_const"][0]
+        teped*= ip**instate["inped"]["teped_ip"][0]
+        teped*= b0**instate["inped"]["teped_bt"][0]
+        teped*= neped**instate["inped"]["teped_neped"][0]
+        teped*= nesep**instate["inped"]["teped_nesep"][0]
+
+        wped = instate["inped"]["wped_const"][0]
+        wped*= ip**instate["inped"]["wped_ip"][0]
+        wped*= b0**instate["inped"]["wped_bt"][0]
+        wped*= neped**instate["inped"]["wped_neped"][0]
+        wped*= nesep**instate["inped"]["wped_nesep"][0]
+
+        xmid = 1.0-0.5*wped
+        xwid = wped
+
+        niped, nzped = get_ni(neped, zeff=zeff_axis)
+        tiped = teped * neped / (niped+nzped)
+        ti0 = te_axis*tiped/teped
+
+        print ('teped, tiped = ', teped, tiped)
+        print ('niped, nzped = ', niped, nzped)
+        print ('nesep = ', nesep)
+        print ('tesep, tisep = ', tesep, tisep)
+
+        ne_xmid = te_xmid = ti_xmid =  xmid
+        ne_xwid = te_xwid = ti_xwid =  xwid
+
+        ne_ped = neped
+        ne_sep = nesep
+        te_ped = teped
+        ti_ped = teped
+
+    #--- construnct profile
+    rho = arange(nrho)/(nrho-1.0)
+    ne = profile_pedestal(nrho, ne_xmid, ne_xwid, ne_ped, ne_sep, ne_axis, ne_alpha, ne_beta, ifit=ne_fit)(rho)
+    te = profile_pedestal(nrho, te_xmid, te_xwid, te_ped, te_sep, te_axis, te_alpha, te_beta, ifit=te_fit)(rho)
+    ti = profile_pedestal(nrho, ti_xmid, ti_xwid, ti_ped, ti_sep, ti_axis, ti_alpha, ti_beta, ifit=ti_fit)(rho)
+
+    omega = (omega_axis-omega_sep)*(1.0-rho**omega_alpha)**omega_beta+omega_sep
+    zeff = zeff_axis*ones(nrho)
+    j_tot = (jpar_axis-jpar_sep)*(1.0-rho**jpar_alpha)**jpar_beta+jpar_sep
+    pmhd = 1.0e3*(1.0-rho**1.5)**1.5
+    density_beam = (nbeam_axis-nbeam_sep)*(1.0-rho**nbeam_alpha)**nbeam_beta+nbeam_sep
+    density_alpha = zeros(nrho)
+    tbeami = tbeami*ones(nrho)
+
+    #--- density
+    a = sum(f_ion*z_ion)
+    b = sum(f_imp*z_imp)
+    c = sum(f_ion*z_ion)
+    d = sum(f_imp*z_imp*z_imp)
+
+    zne_adj = ne
+    zzne_adj = ne*zeff
+
+    zne_adj = zne_adj - 1.0*density_beam
+    zzne_adj = zzne_adj - 1.0**2*density_beam
+
+    nion = (zne_adj *d-zzne_adj*b)/(a*d-b*c)
+    nimp = (zzne_adj*a-zne_adj *c)/(a*d-b*c)
+
+    density_ion = array([f_ion[k]*nion for k in range(n_ion)])
+    density_imp = array([f_imp[k]*nimp for k in range(n_imp)])
+
+    density_th = array([sum(tmp) for tmp in density_ion.transpose()])
+    density_th+= array([sum(tmp) for tmp in density_imp.transpose()])
+
+    ni = array([sum(tmp) for tmp in density_ion.transpose()])
+    nz = array([sum(tmp) for tmp in density_imp.transpose()])
+
+    #--- put to instate
+    instate["instate"]["rho"] = rho
+    instate["instate"]["ne"] = ne
+    instate["instate"]["ni"] = ni
+    instate["instate"]["nz"] = nz
+    instate["instate"]["te"] = te
+    instate["instate"]["ti"] = ti
+    instate["instate"]["zeff"] = zeff
+    instate["instate"]["omega"] = omega
+    instate["instate"]["density_beam"] = density_beam
+    instate["instate"]["wbeam"] = 3./2.*1.602e3*density_beam*tbeami*1.0e-6
+    instate["instate"]["density_alpha"] = zeros(nrho)
+    instate["instate"]["walpha"] = zeros(nrho)
+    instate["instate"]["j_tot"] = j_tot
+    instate["instate"]["pmhd"] = pmhd
+
+    #--- zeros
+    for key in [
+        "j_oh", "j_bs", "j_nb", "j_ec", "j_ic", \
+        "pe_nb", "pe_ec", "pe_ic", "pe_fus", "pe_ionization", "p_rad", \
+        "pi_nb", "pi_ec", "pi_ic", "pi_fus", "pi_ionization", "pi_cx", "p_ohm", "p_ei", \
+        "torque_nb", "torque_in", "se_nb", "se_ionization", "si_nb", "si_ionization", \
+        "q", "psipol",  \
+        "chie", "chii", "p_eq" ]:
+        instate["instate"][key] = zeros(nrho)
+
+    #--- write
+    instate.write(f_instate)

@@ -1,67 +1,57 @@
-#! /usr/bin/env python
-
 """
  -----------------------------------------------------------------------
  nubeam component for steady-state solution
  -----------------------------------------------------------------------
 """
 
-import sys,os,os.path,shutil,pickle,glob
-import subprocess
+import os
+import shutil
 from numpy import *
 import netCDF4
 
-#--- ips framework
-
 from  component import Component
 
-#--- zcode libraries
 from Namelist import Namelist
 from plasmastate import plasmastate
-import znubeam
 
 class nubeam(Component):
 
     def __init__(self, services, config):
-
         Component.__init__(self, services, config)
-        print 'Created %s' % (self.__class__)
+        print('Created %s' % (self.__class__))
 
-    def init(self, timeStamp=0.0):
+    def init(self, timeid=0):
+        print('nubeam.init() called')
 
         #--- entry
-
         services = self.services
 
         #--- get plasma state file name
-
         cur_state_file = services.get_config_param('CURRENT_STATE')
         cur_eqdsk_file = services.get_config_param('CURRENT_EQDSK')
 
         #--- stage input files
-
         services.stage_input_files(self.INPUT_FILES)
 
         #--- get work directory
-
         workdir = services.get_working_dir()
 
-        #--- load nubeam geometry
-
+        #--- stage plasma state files
         services.stage_plasma_state()
 
-        print 'load innubeam'
+        #--- load nubeam geometry
+        print('load innubeam')
 
         ps = plasmastate('ips',1)
         ps.read(cur_state_file)
 
         innubeam = Namelist("innubeam")
-        var_list = [ var.upper() for var in innubeam["nbi_config"].keys()]
+        var_list = [ var.upper() for var in list(innubeam["nbi_config"].keys())]
         for key in var_list:
             for k in range(len( innubeam["nbi_config"][key] )):
                 try:
                     innubeam["nbi_config"][key][k] = float(getattr(self, key+"_%d"%k))
-                    print key,k, 'updated'
+                    print(key,k, 'updated')
                 except AttributeError:
                     pass
         innubeam.write("innubeam")
@@ -70,31 +60,21 @@ class nubeam(Component):
 
         ps.store(cur_state_file)
 
+        #--- update plasma state files
         services.update_plasma_state()
-        services.stage_plasma_state()
 
         #--- generate nubeam input
 
         nubeam_files = Namelist()
-        nubeam_files["NUBEAM_FILES"]["INPUT_PLASMA_STATE"] = \
-            [cur_state_file]
-        #nubeam_files["NUBEAM_FILES"]["OUTPUT_PLASMA_STATE"] = \
-        #    [cur_state_file]
-        nubeam_files["NUBEAM_FILES"]["PLASMA_STATE_UPDATE"] = \
-            ["state_changes.cdf"]
-        nubeam_files["NUBEAM_FILES"]["INIT_NAMELIST"] = \
-            ["nubeam_init_input.dat"]
+        nubeam_files["NUBEAM_FILES"]["INPUT_PLASMA_STATE"] = [cur_state_file]
+        nubeam_files["NUBEAM_FILES"]["PLASMA_STATE_UPDATE"] = ["state_changes.cdf"]
+        nubeam_files["NUBEAM_FILES"]["INIT_NAMELIST"] = ["nubeam_init_input.dat"]
         nubeam_files.write("nubeam_init_files.dat")
 
         nubeam_files = Namelist()
-        nubeam_files["NUBEAM_FILES"]["INPUT_PLASMA_STATE"] = \
-            [cur_state_file]
-        #nubeam_files["NUBEAM_FILES"]["OUTPUT_PLASMA_STATE"] = \
-        #    [cur_state_file]
-        nubeam_files["NUBEAM_FILES"]["PLASMA_STATE_UPDATE"] = \
-            ["state_changes.cdf"]
-        nubeam_files["NUBEAM_FILES"]["STEP_NAMELIST"] = \
-            ["nubeam_step_input.dat"]
+        nubeam_files["NUBEAM_FILES"]["INPUT_PLASMA_STATE"] = [cur_state_file]
+        nubeam_files["NUBEAM_FILES"]["PLASMA_STATE_UPDATE"] = ["state_changes.cdf"]
+        nubeam_files["NUBEAM_FILES"]["STEP_NAMELIST"] = ["nubeam_step_input.dat"]
         nubeam_files.write("nubeam_step_files.dat")
 
         innubeam = Namelist("innubeam")
@@ -113,113 +93,62 @@ class nubeam(Component):
             services.exeception('no ADAS parameter')
 
         try:
-            preact =  self.PREACT
-            print "preact = ", preact
+            os.environ['PREACTDIR'] = self.PREACT
         except Exception:
             services.exeception('no PREACT parameter')
 
-        try:
-            copy_preact = int(self.COPY_PREACT)
-        except:
-            copy_preact = 1
-
-        if copy_preact:
-            try:
-                shutil.copytree(preact, os.path.join(workdir, "PREACT"))
-            except:
-                print 'PREACT directory not copied or already there.'
-            os.environ['PREACTDIR'] = 'PREACT'
-        else:
-            os.environ['PREACTDIR'] = self.PREACT
-
         #--- stage plasma state files
-
         services.stage_plasma_state()
 
         #--- setup nubeam_comp_exec run
-
         os.environ['NUBEAM_ACTION'] = 'INIT'
         try:
             del os.environ['FRANTIC_ACTION']
         except:
             pass
 
-        try:
-            nubeam_bin = os.path.join(self.BIN_PATH, self.BIN)
-        except:
-            nubeam_bin = os.path.join(self.BIN_PATH, 'mpi_nubeam_comp_exec')
-        print nubeam_bin
+        nubeam_bin = os.path.join(self.BIN_PATH, self.BIN)
+        print(nubeam_bin)
 
-        task_id = services.launch_task(1, workdir, nubeam_bin,
-                      logfile = 'log.nubeam_init')
+        task_id = services.launch_task(1, workdir, nubeam_bin, logfile = 'log.nubeam_init')
         retcode = services.wait_task(task_id)
         if (retcode != 0):
-            e = 'Error executing command:  mpi_nubeam_comp_exec: init '
-            print e
-            raise Exception(e)
+            raise Exception('Error executing command:  mpi_nubeam_comp_exec: init ')
 
-#        #--- update plasma state
-#
-#        # services.update_plasma_state() #<== ugly
-#        services.merge_current_plasma_state("state_changes.cdf",
-#                     logfile='log.update_state')
-#
-#        services.stage_plasma_state()
-#        znubeam.update_ps_profile(cur_state_file,cur_eqdsk_file)
-#        services.update_plasma_state()
-#
-#        #--- archive output files
-#
-#        services.stage_output_files(timeStamp, self.OUTPUT_FILES)
-#
-        return
+    def step(self, timeid=0):
+        print('nubeam.step() started')
 
-    def step(self, timeStamp=0.0):
-
-        if (self.services == None) :
-            print 'Error in nubeam.step() : No services'
-            raise Exception('Error in nubeam.step(): No services')
+        #--- entry
         services = self.services
 
         #--- stage plasma state files
-
-        try:
-            services.stage_plasma_state()
-        except Exception, e:
-            print 'Error in call to stage_plasma_state()', e
+        services.stage_plasma_state()
 
         #--- get plasma state file name
-
         cur_state_file = services.get_config_param('CURRENT_STATE')
         cur_eqdsk_file = services.get_config_param('CURRENT_EQDSK')
 
         #--- stage input files
-
         services.stage_input_files(self.INPUT_FILES)
 
         #--- get work directory
-
         workdir = services.get_working_dir()
 
         #--- set nubeam_comp_exec run
-
         innubeam = Namelist("innubeam")
 
         ncpu =  int(self.NPROC)
         nstep = innubeam["nubeam_run"]["nstep"][0]
-        try:
-            navg = innubeam["nubeam_run"]["navg"][0]
-        except:
-            navg = 0
+        navg = innubeam["nubeam_run"]["navg"][0]
         if nstep-navg < 0:
            raise Exception("nubeam.py: nstep < navg")
 
         dt_nubeam = innubeam["nubeam_run"]["dt_nubeam"][0]
 
-        print "ncpu  = ",ncpu
-        print "dt    = ",dt_nubeam
-        print "nstep = ",nstep
-        print "navg  = ",navg
+        print("ncpu  = ", ncpu)
+        print("dt    = ", dt_nubeam)
+        print("nstep = ", nstep)
+        print("navg  = ", navg)
 
         difb_0  = innubeam["nbi_model"]["difb_0"  ][0]
         difb_a  = innubeam["nbi_model"]["difb_a"  ][0]
@@ -227,30 +156,25 @@ class nubeam(Component):
         difb_out= innubeam["nbi_model"]["difb_out"][0]
 
         try:
-            difb_0 = float(getattr(self,"DB"))
-            print 'DB updated'
+            difb_0 = float(getattr(self, "DB"))
+            print('DB updated')
         except AttributeError:
             pass
-        print 'DB: ',difb_0
+        print('DB: ',difb_0)
 
-        ps = plasmastate('ips',1)
+        ps = plasmastate('ips', 1)
         ps.read(cur_state_file)
 
         rho_anom = ps["rho_anom"][:]
-        ps["difb_nbi"][:] = difb_a \
-            +(difb_0-difb_a)*(1.0-rho_anom**difb_in)**difb_out
+        ps["difb_nbi"][:] = difb_a + (difb_0-difb_a)*(1.0-rho_anom**difb_in)**difb_out
 
         ps.store(cur_state_file)
 
-        shutil.copyfile(cur_state_file,"ps0.nc")
+        shutil.copyfile(cur_state_file, "ps0.nc")
 
         services.update_plasma_state()
 
-        try:
-            nubeam_bin = os.path.join(self.BIN_PATH, self.BIN)
-        except:
-            nubeam_bin = os.path.join(self.BIN_PATH, 'mpi_nubeam_comp_exec')
-
+        nubeam_bin = os.path.join(self.BIN_PATH, self.BIN)
         os.environ['NUBEAM_ACTION'] = 'STEP'
         os.environ['NUBEAM_REPEAT_COUNT'] = '%dx%f'%(nstep-navg,dt_nubeam)
         os.environ['STEPFLAG'] = 'TRUE'
@@ -263,10 +187,7 @@ class nubeam(Component):
 
         #--- run nstep-navg
 
-        #----**********0000000
-        #znubeam.update_ps_profile(cur_state_file,cur_eqdsk_file)
-
-        print os.environ['NUBEAM_REPEAT_COUNT']
+        print(os.environ['NUBEAM_REPEAT_COUNT'])
         task_id = services.launch_task(self.NPROC, workdir, nubeam_bin, logfile = 'log.nubeam')
         retcode = services.wait_task(task_id)
         if (retcode != 0):
@@ -274,36 +195,26 @@ class nubeam(Component):
             raise Exception(e)
 
         if navg > 0:
+            print('run navg')
 
-            print 'run navg'
-
-            #services.merge_current_plasma_state("state_changes.cdf", logfile='log.update_state')
-
-            #services.stage_plasma_state()
-            #znubeam.update_ps_profile(cur_state_file,cur_eqdsk_file)
-            #services.update_plasma_state()
-
-             #--- run navg
-
-            os.environ['NUBEAM_REPEAT_COUNT'] = '%dx%f'%(1,dt_nubeam)
-
+            #--- run navg
+            os.environ['NUBEAM_REPEAT_COUNT'] = '%dx%f'%(1, :# WARNING: dt_nubeam)
             for k in range(navg):
                 task_id = services.launch_task(self.NPROC, workdir, nubeam_bin, logfile = 'log.nubeam_%d'%k)
                 retcode = services.wait_task(task_id)
                 if (retcode != 0):
                     e = 'Error executing command:  mpi_nubeam_comp_exec: step avg '
                     raise Exception(e)
-                shutil.copyfile("state_changes.cdf","state_changes_%d.cdf"%k)
+                shutil.copyfile("state_changes.cdf", "state_changes_%d.cdf"%k)
 
-             #--- avgerage
-
+            #--- avgerage
             data = {}
             for k in range(navg):
                 filename = "state_changes_%d.cdf"%k
                 data[k] = netCDF4.Dataset(filename,'r+',format='NETCDF4')
 
             vars = []
-            for v in data[0].variables.keys():
+            for v in list(data[0].variables.keys()):
                 if v not in ["ps_partial_update", "version_id"]: vars.append(v)
 
             for var in vars:
@@ -319,10 +230,7 @@ class nubeam(Component):
             shutil.copyfile ("state_changes_0.cdf","state_changes.cdf")
 
         #--- update plasma state
-
-        shutil.copyfile(cur_state_file,"ps1.nc")
-
-        # services.update_plasma_state()
+        #shutil.copyfile(cur_state_file, "ps1.nc")
 
         ps = plasmastate('ips',1)
         ps.read(cur_state_file)
@@ -330,24 +238,19 @@ class nubeam(Component):
 
         services.merge_current_plasma_state("state_changes.cdf", logfile='log.update_state')
 
+        #---
         services.stage_plasma_state()
-
         ps = plasmastate('ips',1)
         ps.read(cur_state_file)
         ps["vol"][:] = vol
+        ps.update_particle_balance()
         ps.store(cur_state_file)
-
-        znubeam.update_ps_profile(cur_state_file,cur_eqdsk_file)
         services.update_plasma_state()
 
         #--- archive output files
+        services.stage_output_files(timeid, self.OUTPUT_FILES)
 
-        services.stage_output_files(timeStamp, self.OUTPUT_FILES)
+        #shutil.copyfile(cur_state_file,"ps2.nc")
 
-        shutil.copyfile(cur_state_file,"ps2.nc")
-
-        return
-
-    def finalize(self, timeStamp=0.0):
-
-        return
+    def finalize(self, timeid=0):
+        print('nubeam.finalize() called')

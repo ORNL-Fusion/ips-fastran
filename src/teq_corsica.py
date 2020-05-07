@@ -1,5 +1,3 @@
-#! /usr/bin/env python
-
 """
  -----------------------------------------------------------------------
  teq component
@@ -15,47 +13,39 @@ from plasmastate import plasmastate
 class teq(Component):
 
     def __init__(self, services, config):
-
         Component.__init__(self, services, config)
-        print 'Created %s' % (self.__class__)
+        print('Created %s' % (self.__class__))
 
-    def init(self, timeStamp=0):
+    def init(self, timeid=0):
+        print('teq.init() called')
 
-        pass
-
-    def step(self, timeStamp=0):
+    def step(self, timeid=0):
+        print('teq.step() started')
 
         #-- entry
-
         services = self.services
 
         #-- excutable
-
         teq_bin = os.path.join(self.BIN_PATH, self.BIN)
-        print 'teq_bin = ',teq_bin
+        print('teq_bin = ',teq_bin)
 
         #-- stage plasma state files
-
         services.stage_plasma_state()
 
         #-- get plasma state file names
-
         cur_state_file = services.get_config_param('CURRENT_STATE')
         cur_eqdsk_file = services.get_config_param('CURRENT_EQDSK')
 
         #-- stage input files
-
         services.stage_input_files(self.INPUT_FILES)
 
         #-- prepare run
-
-        shutil.copyfile(cur_eqdsk_file,'eqdsk')
+        shutil.copyfile(cur_eqdsk_file, 'eqdsk')
 
         f_inbas = getattr(self,'INBAS')
 
         #-- run teq
-
-        print 'run corsica-teq'
+        print('run corsica-teq')
 
         try:
             cwd = services.get_working_dir()
@@ -65,29 +55,22 @@ class teq(Component):
             raise Exception('...in launch_task, teq')
 
         if (retcode != 0):
-            print 'retcode = ',retcode
+            print('retcode = ',retcode)
 
         #-- get output
-
         shutil.copy(cur_eqdsk_file+"_inv_teq", cur_eqdsk_file)
 
         #--- load geqdsk to plasma state file
-
-        ps = plasmastate('ips',1)
+        ps = plasmastate('ips', 1)
         ps.read(cur_state_file)
         ps.load_geqdsk(cur_eqdsk_file)
         ps.store(cur_state_file)
 
         #-- update plasma state files
-
         ervices.update_plasma_state()
 
         #-- archive output files
+        services.stage_output_files(timeid, self.OUTPUT_FILES)
 
-        services.stage_output_files(timeStamp, self.OUTPUT_FILES)
-
-        return
-
-    def finalize(self, timeStamp=0):
-
-        return
+    def finalize(self, timeid=0):
+        print('teq.step() finalized')

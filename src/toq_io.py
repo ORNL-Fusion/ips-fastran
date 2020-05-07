@@ -1,34 +1,29 @@
-#!/usr/bin/env python
-
 import string
 from numpy import *
 import re
 
 def __line2vec(line, itype=0):
-
     if itype==1:
-        ipos = [0,6,14,22,30,38,46,54,61,68,75]
+        ipos = [0, 6, 14, 22, 30, 38, 46, 54, 61, 68, 75]
         vec = [float(line[ipos[k]:ipos[k+1]]) for k in range(len(ipos)-1)]
     elif itype==2:
-        ipos = [0,8,15,23,31,39,47,55,62,69,77]
+        ipos = [0, 8, 15, 23, 31, 39, 47, 55, 62, 69, 77]
         vec = [float(line[ipos[k]:ipos[k+1]]) for k in range(len(ipos)-1)]
     else:
         str = string.split(string.strip(line))
         vec = [ float(v) for v in str ]
-
     return vec
 
 def read_peddata_profile(filename='peddata'):
-
-    print "read",filename
+    print ("read",filename)
     lines = open(filename,"r").readlines()
 
     data = []
-    for k in range(12,len(lines),2):
+    for k in range(12, len(lines), 2):
         try:
-            data.append(__line2vec(lines[k],1)+__line2vec(lines[k+1],2))
+            data.append(__line2vec(lines[k], 1) + __line2vec(lines[k+1], 2))
         except:
-            print 'skip data from %d to %d'%(k/2,len(lines)/2)
+            print ('skip data from %d to %d'%(k//2, len(lines)//2))
             break
     data = array(data).transpose()
     peddata = {
@@ -52,13 +47,12 @@ def read_peddata_profile(filename='peddata'):
     return peddata
 
 def read_peddata(filename='peddata'):
-
-    print "read",filename
-    file = open(filename,"r")
+    print ("read", filename)
+    file = open(filename, "r")
     lines = file.readlines()
     file.close()
 
-    data = {"ped":{},"top":{} }
+    data = {"ped":{}, "top":{}}
 
     line_1 = __line2vec(lines[2])
     line_2 = __line2vec(lines[3])
@@ -91,9 +85,8 @@ def read_peddata(filename='peddata'):
     return data
 
 def read_dskbal(filename='dskbal'):
-
-    print "read",filename
-    file = open(filename,"r")
+    print ("read", filename)
+    file = open(filename, "r")
     lines = []
     for k in range(100):
         lines.append(file.readline())
@@ -101,7 +94,6 @@ def read_dskbal(filename='dskbal'):
     file.close()
 
     data = {}
-
     for line in lines:
        if re.search(r'.*q\(95\)',line):
           data['q95'] = float(line.split()[2])
@@ -115,13 +107,11 @@ def read_dskbal(filename='dskbal'):
           data['li'] = float(line.split()[2])
           data['li3'] = float(line.split()[-1])
        if re.search(r'.*end',line): break
-
     return data
 
 def read_dskfixb(filename='dskfixb'):
-
-    print "read",filename
-    lines = open(filename,"r").readlines()
+    print ("read", filename)
+    lines = open(filename, "r").readlines()
 
     R = []
     Z = []
@@ -130,7 +120,7 @@ def read_dskfixb(filename='dskfixb'):
        if re.search(r'npsi,ngeom',lines[k]):
           npsi, ngeom = [ int(v) for v in lines[k+1].split() ]
           k+=2
-          print npsi, ngeom
+          print (npsi, ngeom)
        elif re.search(r'R of boundary points',lines[k]):
           nt = 0
           while len(R) < ngeom:
@@ -146,5 +136,4 @@ def read_dskfixb(filename='dskfixb'):
                   Z += [ float(lines[k][i*19:i*19+19]) for i in range(4) ]
        else:
            k+=1
-
     return R, Z

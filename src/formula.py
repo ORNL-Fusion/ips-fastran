@@ -27,8 +27,13 @@ def qmhd(a0,r0,b0,ip,kappa,delta):
     eps = a0/r0
     return 5.*a0**2/r0*b0/ip*(1.+kappa**2*(1.+2.*delta**2-1.2*delta**3))/2.*(1.17-0.65*eps)/(1.-eps**2)**2
 
-def calculate_ion_density(z_ion,z_imp,f_ion,f_imp,ne,zeff,density_beam):
+def get_ni(ne, zeff, zmain=1., zimp=6., nbfast=0., nalpha=0., nhe=0.):
+    tmp = zmain*zimp*(zimp-zmain)
+    ni = (zimp**2*(ne-nbfast-2.0*(nalpha+nhe))-zimp*(zeff*ne-nbfast-4.0*(nalpha+nhe)))/tmp
+    nz = (ne*(zeff-1.0)-2.0*(nalpha+nhe))/tmp
+    return ni, nz
 
+def calculate_ion_density(z_ion, z_imp, f_ion, f_imp, ne, zeff, density_beam):
     a = sum(f_ion*z_ion)
     b = sum(f_imp*z_imp)
     c = sum(f_ion*z_ion)
@@ -46,7 +51,7 @@ def calculate_ion_density(z_ion,z_imp,f_ion,f_imp,ne,zeff,density_beam):
     density_ion = array([f_ion[k]*nion for k in range(n_ion)])
     density_imp = array([f_imp[k]*nimp for k in range(n_imp)])
 
-    density_th = array([sum(tmp) for tmp in density_ion.transpose()]) 
-    density_th+= array([sum(tmp) for tmp in density_imp.transpose()]) 
+    density_th = array([sum(tmp) for tmp in density_ion.transpose()])
+    density_th+= array([sum(tmp) for tmp in density_imp.transpose()])
 
     return density_ion, density_imp, density_th
