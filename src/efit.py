@@ -322,5 +322,14 @@ class efit(Component):
             ps.store(cur_state_file)
 
         elif ps_backend == 'INSTATE':
+            ps = plasmastate('ips',1)
+            geqdsk = readg(cur_eqdsk_file)
+            r0 = geqdsk["rzero" ]
+            b0 = abs(geqdsk["bcentr"])
+            ip = geqdsk['cpasma']
+            ps.init_from_geqdsk (cur_eqdsk_file,nrho=nrho,nth=101)
+            inmetric = ps_to_inmetric(ps, r0, b0, ip)
+
+            instate = Namelist(cur_instate_file)
             instate["inmetric"] = inmetric["inmetric"]
             instate.write(cur_instate_file)

@@ -198,7 +198,7 @@ class nubeam(Component):
             print('run navg')
 
             #--- run navg
-            os.environ['NUBEAM_REPEAT_COUNT'] = '%dx%f'%(1, :# WARNING: dt_nubeam)
+            os.environ['NUBEAM_REPEAT_COUNT'] = '%dx%f'%(1, dt_nubeam)
             for k in range(navg):
                 task_id = services.launch_task(self.NPROC, workdir, nubeam_bin, logfile = 'log.nubeam_%d'%k)
                 retcode = services.wait_task(task_id)

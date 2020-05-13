@@ -3,8 +3,6 @@ model equilibrium, profile adjust
 """
 
 from component import Component
-
-from modeleq_constraint_io import init_plasmastate
 from modeleq_constraint_io import update_state, constraint_pedestal_width
 
 class modeleq_constraint(Component):
