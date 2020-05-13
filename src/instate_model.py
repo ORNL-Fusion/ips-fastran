@@ -10,22 +10,8 @@ from Namelist import Namelist
 from fastranutil import namelist_default
 from zinterp import zinterp
 from zmodelprof import profile_pedestal
-from formula import get_ni
-from shape_luce import boundaryShape
-
-def set_shape(R0, a0, kappa, delta, nt, dlim = 0.05):
-    t = linspace(0.0, 2.*pi, nt)
-    rb = R0 + a0*cos(t+delta*sin(t))
-    zb = kappa*a0*sin(t)
-
-    rmax = max(rb) + dlim
-    rmin = min(rb) - dlim
-    zmax = max(zb) + dlim
-    zmin = min(zb) - dlim
-    rlim = [ rmax, rmin, rmin, rmax, rmax ]
-    zlim = [ zmax, zmax, zmin, zmin, zmax ]
-
-    return rb, zb, rlim, zlim
+from formula import get_ni, mu0
+from shape_io import boundaryShape, set_shape
 
 def expand_profile(instate):
     for key in instate["instate"].keys(): instate["instate"][key] = array(instate["instate"][key])
@@ -260,7 +246,7 @@ def instate_model(f_instate):
         zb = array(instate["instate"]["zbdry"])
         a0 = 0.5*( max(rb) - min(rb) )
 
-        c_betan = 4.0*1.602e5*ne_ped*fml.mu0/b0**2*(a0*b0/ip)
+        c_betan = 4.0*1.602e5*ne_ped*mu0/b0**2*(a0*b0/ip)
         te_ped = betan_ped/c_betan
         ti_ped = te_ped
         print ("PEDEDSTAL BETAN = ",betan_ped, te_ped)
