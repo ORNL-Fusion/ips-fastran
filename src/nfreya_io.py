@@ -2,7 +2,7 @@ import re
 from numpy import *
 from Namelist import Namelist
 from plasmastate import plasmastate
-import zoutone
+import outone_io
 from efit_eqdsk import readg
 
 def set_default():
@@ -323,7 +323,7 @@ def write_inputfiles_instate(f_instate, f_eqdsk, f_infreya, dir_data=''):
     inone.write("inone")
 
 def read_output():
-    outone = zoutone.readoutone(foutone='outone', isummary=False, iverb=False)
+    outone = outone_io.readoutone(foutone='outone', isummary=False, iverb=False)
     pnbe = outone["qbeame"]["y"][-1]
     pnbe = outone["qbeami"]["y"][-1]
     pnbe = outone["enbeam"]["y"][-1]*1.0e-13
@@ -340,7 +340,7 @@ def update_state(f_state, f_eqdsk, scales={}):
     ip  = geq['cpasma']
 
     #-- read outone
-    outone = zoutone.readoutone(foutone='outone', isummary=False, iverb=False)
+    outone = outone_io.readoutone(foutone='outone', isummary=False, iverb=False)
 
     pnbe = outone["qbeame"]["y"][-1]
     pnbi = outone["qbeami"]["y"][-1]
@@ -414,7 +414,7 @@ def update_instate(f_instate,f_eqdsk,scales={}):
     ip  = geq['cpasma']
 
     #-- read outone
-    outone = zoutone.readoutone(foutone='outone', isummary=False, iverb=False)
+    outone = outone_io.readoutone(foutone='outone', isummary=False, iverb=False)
     pnbe = outone["qbeame"]["y"][-1]
     pnbi = outone["qbeami"]["y"][-1]
     density_beam = outone["enbeam"]["y"][-1]*1.0e-13
