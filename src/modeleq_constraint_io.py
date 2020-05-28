@@ -11,13 +11,10 @@ from zmodelprof import profile_hat, profile_spline, profile_pedestal
 from zinterp import zinterp
 import formula as fml 
 from instate_model import expand_profile
-from fastranutil import namelist_default
 
-def update_state(kiter,f_instate,nmax_iter=100,const=None):
-
+def update_state(kiter, f_instate, nmax_iter=100, const=None):
     #------------------------------------------------------------------
     # entry
-
     print ("\n"+72*"=")
     print ('= model driver: adjust profiles ')
 
@@ -25,15 +22,12 @@ def update_state(kiter,f_instate,nmax_iter=100,const=None):
 
     #------------------------------------------------------------------
     # read plasma state
-
     instate = Namelist(f_instate)
     for key in instate["instate"].keys():
         if key.upper() not in [ 'TOKAMAK_ID', 'PRESSURE_MODEL', 'CURRENT_MODEL' ]:
             instate["instate"][key] = array(instate["instate"][key])
         else:
             print (key)
-    # for key in instate["instate"].keys():
-    #     instate["instate"][key] = array(instate["instate"][key])
 
     nrho = instate["instate"]["nrho"][0]
 
@@ -41,30 +35,29 @@ def update_state(kiter,f_instate,nmax_iter=100,const=None):
     b0 = abs(instate["instate"]["b0"][0])
     ip = instate["instate"]['ip'][0]
 
-    vol  = instate["inmetric"]["vol" ]
+    vol = instate["inmetric"]["vol"]
     area = instate["inmetric"]["area"]
     ipol = instate["inmetric"]["ipol"]
-#   a0   = instate["inmetric"]["aminor"][0]
-    a0   = instate["inmetric"]["rminor"][-1]
-
+#   a0 = instate["inmetric"]["aminor"][0]
+    a0 = instate["inmetric"]["rminor"][-1]
     rhob = instate["inmetric"]["rhob" ][0]
     volp = array(instate["inmetric"]["volp"])
-    g22  = array(instate["inmetric"]["g22"])
+    g22 = array(instate["inmetric"]["g22"])
 
-    rho  = instate["instate"]["rho"]
-    ne   = instate["instate"]["ne"]
-    ni   = instate["instate"]["ni"]
-    nz   = instate["instate"]["nz"]
-    te   = instate["instate"]["te"]
-    ti   = instate["instate"]["ti"]
+    rho = instate["instate"]["rho"]
+    ne = instate["instate"]["ne"]
+    ni = instate["instate"]["ni"]
+    nz = instate["instate"]["nz"]
+    te = instate["instate"]["te"]
+    ti = instate["instate"]["ti"]
 
     density_beam = array(instate["instate"]["density_beam"])
     wbeam = array(instate["instate"]["wbeam"])
 
-    j_bs  = instate["instate"]["j_bs"]
+    j_bs = instate["instate"]["j_bs"]
 
-    qmhd  = instate["inmetric"]["qmhd" ]
-    pmhd  = instate["inmetric"]["pmhd" ]
+    qmhd = instate["inmetric"]["qmhd"]
+    pmhd = instate["inmetric"]["pmhd"]
 
     n_ion = instate["instate"]["n_ion"][0]
     z_ion = instate["instate"]["z_ion"]
@@ -75,34 +68,34 @@ def update_state(kiter,f_instate,nmax_iter=100,const=None):
     a_imp = instate["instate"]["a_imp"]
     f_imp = instate["instate"]["f_imp"]
 
-    jpar_axis  = instate["instate"]["jpar_axis"  ][0]
-    jpar_sep   = instate["instate"]["jpar_sep"   ][0]
-    jpar_alpha = instate["instate"]["jpar_alpha" ][0]
-    jpar_beta  = instate["instate"]["jpar_beta"  ][0]
-    zeff       = instate["instate"]["zeff"       ][0]
-    nbeam_axis = instate["instate"]["nbeam_axis" ][0]
-    nbeam_sep  = instate["instate"]["nbeam_sep"  ][0]
-    nbeam_alpha= instate["instate"]["nbeam_alpha"][0]
-    nbeam_beta = instate["instate"]["nbeam_beta" ][0]
-    tbeami     = instate["instate"]["tbeami"     ][0]
-    ptot_alpha = instate["instate"]["ptot_alpha" ][0]
-    ptot_beta  = instate["instate"]["ptot_beta"  ][0]
-    xmid       = instate["instate"]["xmid"][0]
-    xwid       = instate["instate"]["xwid"][0]
-    te_xmid    = instate["instate"]["te_xmid"    ][0]
-    te_xwid    = instate["instate"]["te_xwid"    ][0]
-    te_axis    = instate["instate"]["te_axis"    ][0]
-    te_ped     = instate["instate"]["te_ped"     ][0]
-    te_sep     = instate["instate"]["te_sep"     ][0]
-    te_alpha   = instate["instate"]["te_alpha"   ][0]
-    te_beta    = instate["instate"]["te_beta"    ][0]
-    ti_xmid    = instate["instate"]["ti_xmid"    ][0]
-    ti_xwid    = instate["instate"]["ti_xwid"    ][0]
-    ti_axis    = instate["instate"]["ti_axis"    ][0]
-    ti_ped     = instate["instate"]["ti_ped"     ][0]
-    ti_sep     = instate["instate"]["ti_sep"     ][0]
-    ti_alpha   = instate["instate"]["ti_alpha"   ][0]
-    ti_beta    = instate["instate"]["ti_beta"    ][0]
+    jpar_axis = instate["instate"]["jpar_axis"][0]
+    jpar_sep = instate["instate"]["jpar_sep"][0]
+    jpar_alpha = instate["instate"]["jpar_alpha"][0]
+    jpar_beta = instate["instate"]["jpar_beta"][0]
+    zeff = instate["instate"]["zeff"][0]
+    nbeam_axis = instate["instate"]["nbeam_axis"][0]
+    nbeam_sep = instate["instate"]["nbeam_sep"][0]
+    nbeam_alpha = instate["instate"]["nbeam_alpha"][0]
+    nbeam_beta = instate["instate"]["nbeam_beta"][0]
+    tbeami = instate["instate"]["tbeami"][0]
+    ptot_alpha = instate["instate"]["ptot_alpha"][0]
+    ptot_beta = instate["instate"]["ptot_beta"][0]
+    xmid = instate["instate"]["xmid"][0]
+    xwid = instate["instate"]["xwid"][0]
+    te_xmid = instate["instate"]["te_xmid"][0]
+    te_xwid = instate["instate"]["te_xwid"][0]
+    te_axis = instate["instate"]["te_axis"][0]
+    te_ped = instate["instate"]["te_ped"][0]
+    te_sep = instate["instate"]["te_sep"][0]
+    te_alpha = instate["instate"]["te_alpha"][0]
+    te_beta = instate["instate"]["te_beta"][0]
+    ti_xmid = instate["instate"]["ti_xmid"][0]
+    ti_xwid = instate["instate"]["ti_xwid"][0]
+    ti_axis = instate["instate"]["ti_axis"][0]
+    ti_ped = instate["instate"]["ti_ped"][0]
+    ti_sep = instate["instate"]["ti_sep"][0]
+    ti_alpha = instate["instate"]["ti_alpha"][0]
+    ti_beta = instate["instate"]["ti_beta"][0]
     tbeami = instate["instate"]["tbeami"][0]
 
     ne_fit = instate["instate"]["ne_fit"][0]
@@ -111,7 +104,7 @@ def update_state(kiter,f_instate,nmax_iter=100,const=None):
 
     print ("SMOOTH :", ne_fit, te_fit, ti_fit)
 
-    iterate_beam = namelist_default(instate,"instate","iterate_beam",[1])[0]
+    iterate_beam = namelist_default(instate, "instate", "iterate_beam", [1])[0]
 
     betan_th_target = instate["instate"]["betan_th"][0]
     betan_beam_target = instate["instate"]["betan_beam"][0]
@@ -121,21 +114,21 @@ def update_state(kiter,f_instate,nmax_iter=100,const=None):
     current_model = instate["instate"]["current_model"][0].strip().lower()
     print ("current_model = ", current_model)
 
-    cboot = namelist_default(instate,"instate","cboot",[1.0])[0]
+    cboot = namelist_default(instate, "instate", "cboot", [1.0])[0]
 
-    rho_jbdry = namelist_default(instate,"instate","rho_jbdry",[0.85])[0]
+    rho_jbdry = namelist_default(instate, "instate", "rho_jbdry", [0.85])[0]
 
-    rho_jhat = namelist_default(instate,"instate","rho_jhat",[0.5])[0]
-    wid_jhat = namelist_default(instate,"instate","wid_jhat",[0.2])[0]
+    rho_jhat = namelist_default(instate, "instate", "rho_jhat", [0.5])[0]
+    wid_jhat = namelist_default(instate, "instate", "wid_jhat", [0.2])[0]
 
-    q0 = namelist_default(instate,"instate","q0",[1.2])[0]
-    j_alpha = namelist_default(instate,"instate","j_alpha",[1.5])[0]
+    q0 = namelist_default(instate, "instate", "q0", [1.2])[0]
+    j_alpha = namelist_default(instate, "instate", "j_alpha", [1.5])[0]
 
-    rho_jpeak = namelist_default(instate,"instate","rho_jpeak",[0])[0]
-    jaxis = namelist_default(instate,"instate","jaxis",[0])[0]
-    jpeak = namelist_default(instate,"instate","jpeak",[0])[0]
-    jaxis1 = namelist_default(instate,"instate","jaxis_prime",[0])[0]
-    jbdry1 = namelist_default(instate,"instate","jbdry_prime",[0])[0]
+    rho_jpeak = namelist_default(instate, "instate", "rho_jpeak", [0])[0]
+    jaxis = namelist_default(instate, "instate", "jaxis", [0])[0]
+    jpeak = namelist_default(instate, "instate", "jpeak", [0])[0]
+    jaxis1 = namelist_default(instate, "instate", "jaxis_prime", [0])[0]
+    jbdry1 = namelist_default(instate, "instate", "jbdry_prime", [0])[0]
 
     if current_model == "para":
         print ('q0 = ', q0)
@@ -152,10 +145,9 @@ def update_state(kiter,f_instate,nmax_iter=100,const=None):
 
     #------------------------------------------------------------------
     # calculate betan
-
     wth  = 1.5*1.602e3*(ne*te+(ni+nz)*ti)
-    betan_th = fml.betan(w=wth,vol=vol,ip=ip,b0=bout,a0=a0)
-    betan_beam = fml.betan(w=wbeam*1.0e6,vol=vol,ip=ip,b0=bout,a0=a0)
+    betan_th = fml.betan(w=wth, vol=vol, ip=ip, b0=bout, a0=a0)
+    betan_beam = fml.betan(w=wbeam*1.0e6, vol=vol, ip=ip, b0=bout, a0=a0)
 
     print ('betan_th   =', betan_th)
     print ('betan_beam =', betan_beam)
@@ -164,43 +156,11 @@ def update_state(kiter,f_instate,nmax_iter=100,const=None):
 
     #------------------------------------------------------------------
     # scale : beam pressure
-
-    #if betan_beam_target > 0.0:
-
-    #    nbeam_scale_min = 0.0
-    #    nbeam_scale_max = 10.0
-
-    #    for iter_scale in range(nmax_iter):
-
-    #        nbeam_scale = 0.5*(nbeam_scale_min+nbeam_scale_max)
-
-    #        density_beam = nbeam_scale*(nbeam_axis-nbeam_sep)*(1.0-rho**nbeam_alpha)**nbeam_beta+nbeam_sep
-
-    #        wbeam = 3./2.*1.602e3*density_beam*tbeami
-    #        betan_beam = fml.betan(w=wbeam,vol=vol,ip=ip,b0=bout,a0=a0)
-    #        print ('betan_beam during iteraiton =',betan_beam)
-
-    #        if abs(betan_beam-betan_beam_target) < 0.001: break
-
-    #        if betan_beam > betan_beam_target:
-    #           nbeam_scale_max = nbeam_scale
-    #        else:
-    #           nbeam_scale_min = nbeam_scale
-
-    #        print ("scale to match betan_beam")
-    #        print ("nbeam_scale = %6.3e, betan = %6.3e, target %6.3f"%(nbeam_scale,betan_beam,betan_beam_target))
-
-    #        #ps.load_profile(rho,density_beam*1.0e19,"rho_nbi","nbeami",k=0)
-
-    #    print ("scale to match betan_beam : %6.3e,%6.3e %6.3f"%(nbeam_scale,betan_beam,betan_beam_target))
-
     pbeam = 2.0/3.0*wbeam
-
     if betan_beam_target > 0.0:
-
         density_beam = (nbeam_axis-nbeam_sep)*(1.0-rho**nbeam_alpha)**nbeam_beta+nbeam_sep
         wbeam = 3./2.*1.602e3*density_beam*tbeami
-        betan_beam = fml.betan(w=wbeam,vol=vol,ip=ip,b0=bout,a0=a0)
+        betan_beam = fml.betan(w=wbeam, vol=vol, ip=ip, b0=bout, a0=a0)
 
         scale_beam_density = betan_beam_target/betan_beam
         density_beam *=scale_beam_density
@@ -212,7 +172,6 @@ def update_state(kiter,f_instate,nmax_iter=100,const=None):
 
     #------------------------------------------------------------------
     # charge balance
-
     a = sum(f_ion*z_ion)
     b = sum(f_imp*z_imp)
     c = sum(f_ion*z_ion)
@@ -224,8 +183,8 @@ def update_state(kiter,f_instate,nmax_iter=100,const=None):
     zne_adj = zne_adj - 1.0*density_beam
     zzne_adj = zzne_adj - 1.0**2*density_beam
 
-    nion = (zne_adj *d-zzne_adj*b)/(a*d-b*c)
-    nimp = (zzne_adj*a-zne_adj *c)/(a*d-b*c)
+    nion = (zne_adj*d-zzne_adj*b)/(a*d-b*c)
+    nimp = (zzne_adj*a-zne_adj*c)/(a*d-b*c)
 
     density_ion = array([f_ion[k]*nion for k in range(n_ion)])
     density_imp = array([f_imp[k]*nimp for k in range(n_imp)])
@@ -233,35 +192,20 @@ def update_state(kiter,f_instate,nmax_iter=100,const=None):
     density_th = array([sum(tmp) for tmp in density_ion.transpose()])
     density_th+= array([sum(tmp) for tmp in density_imp.transpose()])
 
-#   ni = density_ion[0]
-#   nz = density_imp[0]
-
     ni = array([sum(tmp) for tmp in density_ion.transpose()])
     nz = array([sum(tmp) for tmp in density_imp.transpose()])
 
     #------------------------------------------------------------------
     # scale : thermal pressure
-
     if betan_th_target > 0.0:
-
         tscale_min = 0.0
         tscale_max = 10.0
 
         for iter_scale in range(nmax_iter):
-
             tscale = 0.5*(tscale_min+tscale_max)
 
-            #te = profile_pedestal(nrho,te_xmid,te_xwid,te_ped,te_sep,tscale*te_axis,te_alpha,te_beta)(rho)
-            #ti = profile_pedestal(nrho,ti_xmid,ti_xwid,ti_ped,ti_sep,tscale*ti_axis,ti_alpha,ti_beta)(rho)
-            if te_fit == 1:
-                te = profile_pedestal_smooth(nrho,te_xmid,te_xwid,te_ped,te_sep,tscale*te_axis,te_alpha,te_beta)(rho)
-            else:
-                te = profile_pedestal(nrho,te_xmid,te_xwid,te_ped,te_sep,tscale*te_axis,te_alpha,te_beta)(rho)
-            if ti_fit == 1:
-                ti = profile_pedestal_smooth(nrho,ti_xmid,ti_xwid,ti_ped,ti_sep,tscale*ti_axis,ti_alpha,ti_beta)(rho)
-            else:
-                ti = profile_pedestal(nrho,ti_xmid,ti_xwid,ti_ped,ti_sep,tscale*ti_axis,ti_alpha,ti_beta)(rho)
-
+            te = profile_pedestal(nrho, te_xmid, te_xwid, te_ped, te_sep, tscale*te_axis, te_alpha, te_beta, ifit=te_fit)(rho)
+            ti = profile_pedestal(nrho, ti_xmid, ti_xwid, ti_ped, ti_sep, tscale*ti_axis, ti_alpha, ti_beta, ifit=ti_fit)(rho)
 
             pth  = 1.602e3*(ne*te+(ni+nz)*ti)
             # betan_th = cal_betan(1.5*pth,vol,ip=ip,b0=bout,a0=a0)
@@ -276,7 +220,6 @@ def update_state(kiter,f_instate,nmax_iter=100,const=None):
 
             print ("scale to match betan_th : %6.3e, %6.3e, %6.3e %d"%(tscale,betan_th,betan_th_target,nmax_iter))
     else:
-
         pth  = 1.602e3*(ne*te+(ni+nz)*ti)
         tscale = 1.0
 
@@ -286,16 +229,13 @@ def update_state(kiter,f_instate,nmax_iter=100,const=None):
 
     #------------------------------------------------------------------
     # scale : total pressure
-
     if pressure_model == "kinetic":
-
         p_axis_min = 0.0
         p_axis_max = 1000.0e3
 
         pmhd = zeros(nrho)
 
         for iter_scale in range(nmax_iter):
-
             p_axis = 0.5*(p_axis_min+p_axis_max)
 
             xped = xmid-xwid/2
@@ -319,7 +259,6 @@ def update_state(kiter,f_instate,nmax_iter=100,const=None):
         print ('betan = ',betan)
 
     elif pressure_model == "total":
-
         ptot_axis    = instate["instate"]["ptot_axis" ][0]
         ptot_ped     = instate["instate"]["ptot_ped"  ][0]
         ptot_sep     = instate["instate"]["ptot_sep"  ][0]
@@ -331,14 +270,12 @@ def update_state(kiter,f_instate,nmax_iter=100,const=None):
 
         pmhd = zeros(nrho)
 
-        for iter_scale in range(100):
-
+        for iter_scale in range(nmax_iter):
             p_axis = 0.5*(p_axis_min+p_axis_max)
 
-            pmhd = profile_pedestal(nrho,xmid,xwid,ptot_ped,ptot_sep,p_axis,ptot_alpha,ptot_beta)(rho)
+            pmhd = profile_pedestal(nrho, xmid, xwid, ptot_ped, ptot_sep, p_axis, ptot_alpha, ptot_beta)(rho)
 
-            # betan = cal_betan(1.5*pmhd,vol,ip=ip,b0=bout,a0=a0)
-            betan = fml.betan(w=1.5*pmhd,vol=vol,ip=ip,b0=bout,a0=a0)
+            betan = fml.betan(w=1.5*pmhd, vol=vol, ip=ip, b0=bout, a0=a0)
 
             if abs(betan-betan_target) < 0.01: break
 
@@ -353,12 +290,10 @@ def update_state(kiter,f_instate,nmax_iter=100,const=None):
         print ('betan = ',betan)
 
     elif pressure_model == "full":
-
         pmhd = pth + pbeam
 
     else:
-        print ("check pressumre_model")
-        raise
+        raise Exception ("check pressumre_model")
 
     #------------------------------------------------------------------
     # scale : current
@@ -367,7 +302,6 @@ def update_state(kiter,f_instate,nmax_iter=100,const=None):
     jbdry = j_bs[ibdry]
 
     def total_current(rho_jhat):
-
         jpeak_min = 0.1
         jpeak_max = 10.0
 
@@ -377,7 +311,7 @@ def update_state(kiter,f_instate,nmax_iter=100,const=None):
         j_tot = zeros(nrho)
         curt = zeros(nrho)
 
-        for iter_scale in range(100):
+        for iter_scale in range(nmax_iter):
 
             jpeak = 0.5*(jpeak_min+jpeak_max)
 
@@ -392,15 +326,11 @@ def update_state(kiter,f_instate,nmax_iter=100,const=None):
                 curt[i+1] = (curt[i]/ipol[i]+jparm*dV/(2.0*pi*r0*ipolm**2))*ipol[i+1]
 
             if abs(curt[-1]-ip) < 1.0e-5: break
-            #print "%6.3f %6.3f %6.3f %6.3f"%(curt[-1], ip, jpeak_min, jpeak_max)
 
             if curt[-1] > ip:
                jpeak_max = jpeak
             else:
                jpeak_min = jpeak
-
-        #print ('jpeak =',jpeak)
-        #print ('ip_cal = ',curt[-1])
 
         rhob = instate["inmetric"]["rhob"][0]
         g22  = array(instate["inmetric"]["g22"])
@@ -413,32 +343,17 @@ def update_state(kiter,f_instate,nmax_iter=100,const=None):
         dpsidrho = 0.2/g22[1]*(jpar0*volp0*drho/ipol0**2)
         q0_cal = 2.0*pi*b0*rho[1]*rhob/dpsidrho
 
-        #print ("q0_cal = ", q0_cal)
-
         return q0_cal, j_tot
 
     if current_model == "hat":
-
         if q0>0.0:
-
             if kiter > 0: dq0 = 0.5*(q0 - instate["afile"]["qaxis"])
             else: dq0 = 0.0
 
-            try:
-                rho_jhat_min = instate["instate"]["rho_jhat_min" ][0]
-            except:
-                rho_jhat_min = 0.1
+            rho_jhat_min = namelist_default(instate, "instate", "rho_jhat_min", [0.1])[0]
+            rho_jhat_max = namelist_default(instate, "instate", "rho_jhat_max", [0.6])[0]
 
-            try:
-                rho_jhat_max = instate["instate"]["rho_jhat_max" ][0]
-            except:
-                rho_jhat_max = 0.6
-
-            #rho_jhat_min = 0.1
-            #rho_jhat_max = 0.6
-
-            for iter_scale in range(100):
-
+            for iter_scale in range(nmax_iter):
                 rho_jhat = 0.5*(rho_jhat_min+rho_jhat_max)
                 q0_cal, j_tot = total_current(rho_jhat)
                 if abs(q0_cal-q0) < 0.001: break
@@ -453,28 +368,26 @@ def update_state(kiter,f_instate,nmax_iter=100,const=None):
             print ("%6.3f %6.3f %6.3f %6.3f: dq0=%6.3f"%(q0_cal, q0, rho_jhat_min, rho_jhat_max,dq0))
 
         else:
-
             q0_cal, j_tot = total_current(rho_jhat)
 
         const["rho_jhat"] = rho_jhat
 
     elif current_model == "broad":
-
         jpeak_min = 0.1
         jpeak_max = 10.0
 
         j_tot = zeros(nrho)
         curt = zeros(nrho)
 
-        for iter_scale in range(100):
+        for iter_scale in range(nmax_iter):
 
             x = 0.5*(jpeak_min+jpeak_max)
 
-            x0 = [0.0,rho_jpeak,rho_jbdry]
-            y0 = [jaxis/jpeak*x,x,jbdry]
+            x0 = [0.0, rho_jpeak, rho_jbdry]
+            y0 = [jaxis/jpeak*x, x, jbdry]
             jaxis1 = x*(1. - jaxis/jpeak)/rho_jpeak
-            yp = [jaxis1,0.0,jbdry1]
-            spl = profile_spline(x=x0,y=y0,yp=yp)
+            yp = [jaxis1, 0.0, jbdry1]
+            spl = profile_spline(x=x0, y=y0, yp=yp)
 
             j_tot = zeros(nrho)
             for i in range(nrho):
@@ -495,11 +408,10 @@ def update_state(kiter,f_instate,nmax_iter=100,const=None):
             else:
                jpeak_min = x
 
-        print ('jpeak =',jpeak_min, jpeak_max)
-        print ('ip_cal = ',curt[-1], ip)
+        print('jpeak =', jpeak_min, jpeak_max)
+        print('ip_cal = ', curt[-1], ip)
 
     elif current_model == "para":
-
         beta_min = 0.1
         beta_max = 5.0
 
@@ -547,7 +459,7 @@ def update_state(kiter,f_instate,nmax_iter=100,const=None):
     instate["instate"]["ti"] = ti
     if betan_beam_target > 0.0:
         instate["instate"]["density_beam"] =  density_beam
-        instate["instate"]["wbeam"] =  1.0e-6*wbeam
+        instate["instate"]["wbeam"] = 1.0e-6*wbeam
     instate["instate"]["ni"] = ni
     instate["instate"]["nz"] = nz
 
@@ -558,11 +470,9 @@ def update_state(kiter,f_instate,nmax_iter=100,const=None):
     instate.write(f_instate)
 
     iconv = 0
-    return iconv,const
+    return iconv, const
 
-
-def constraint_pedestal_width(f_instate): #,f_geqdsk):
-
+def constraint_pedestal_width(f_instate):
     #-- from efit
 
     instate = Namelist(f_instate)
@@ -589,18 +499,7 @@ def constraint_pedestal_width(f_instate): #,f_geqdsk):
 
     p_ped_in = zinterp(rho_in,pmhd_in)(rho_ped)
 
-    #-- from efit
-
-    # geq = readg(f_geqdsk)
-    #
-    # pmhd_efit = geq['pres']
-    # npsi_efit = geq['nw']
-    # psi_efit = linspace(0,1,npsi_efit)
-    #
-    # p_ped_efit = zinterp(psi_efit,pmhd_efit)(psi_ped)
-
     #-- pedestal betap
-
     mu0 = 4.*pi*1.e-7
     betap_ped = 2.0*mu0*p_ped/bp2[-1]
     xwid = 0.076*betap_ped**0.5
