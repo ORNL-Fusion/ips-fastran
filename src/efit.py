@@ -5,6 +5,7 @@
 """
 
 import os
+import re
 import shutil
 import glob
 import time as timer
@@ -134,6 +135,9 @@ class efit(Component):
         error = float(getattr(self, "ERROR", "1.0e-4"))
         print('error =', error)
 
+        max_error_efit = float(getattr(self, "MAX_EFIT_ERROR", "0.1"))
+        print('max_error_efit =', max_error_efit)
+
         #--- clean up
         try:
            for f in glob.glob("g000000.?????"): os.remove(f)
@@ -149,6 +153,7 @@ class efit(Component):
 
         niter = int(getattr(self, "NITER", "5"))
 
+        pat = re.compile("\s*it=")
         for k in range(niter):
             print ("*********************")
             print ("*** generate kfile %d"%k)
@@ -178,7 +183,10 @@ class efit(Component):
                 print ('b0 = ',b0)
                 print ('ip = ',ip)
 
-                ps.init_from_geqdsk (cur_eqdsk_file,nrho=nrho,nth=101)
+                try:
+                    ps.init_from_geqdsk (cur_eqdsk_file,nrho=nrho,nth=101)
+                except:
+                    raise Exception("erro in init_from_geqdsk")
                 inmetric = ps_to_inmetric(ps, r0, b0, ip)
 
                 iconv = efit_io.fixbdry_kfile(self.ishot, self.itime, Namelist(f_inefit,"r"), inmetric["inmetric"], relax=relax, topology=topology, error=error)
@@ -208,6 +216,18 @@ class efit(Component):
             t2 = timer.time()
 
             print ('**** %6.3f %6.3f'%(t1-t0, t2-t1))
+
+            error_efit = []
+            logfile = open("efit.log", "r")
+            lines = logfile.readlines()
+            for line in lines:
+                if pat.search(line):
+                    e = float(line.split("err=")[1].split()[0])
+                    error_efit.append(e)
+            logfile.close()
+            print ('error = ', error_efit[-1])
+            if abs(error_efit[-1]) > max_error_efit:
+               raise Exception("EFIT not converged")
 
             if scale_gs:
                 shutil.copyfile("g%06d.%05d"%(self.ishot, self.itime), "g%06d.%05d_s"%(self.ishot, self.itime))
