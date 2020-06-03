@@ -1,0 +1,4 @@
+[submodule "lib/pyps"]
+	path = lib/pyps
+	url = git@github.com:ORNL-Fusion/py-plasmastate.git
+	branch = master
