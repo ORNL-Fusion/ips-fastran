@@ -106,9 +106,10 @@ def update_state(kiter, f_instate, nmax_iter=100, const=None):
 
     iterate_beam = namelist_default(instate, "instate", "iterate_beam", [1])[0]
 
-    betan_th_target = instate["instate"]["betan_th"][0]
+    # betan_th_target = instate["instate"]["betan_th"][0]
     betan_beam_target = instate["instate"]["betan_beam"][0]
     betan_target = instate["instate"]["betan"][0]
+    betan_th_target =  betan_target - betan_beam_target
     pressure_model =  instate["instate"]["pressure_model"][0].strip().lower()
     print ("pressure_model = ", pressure_model)
     current_model = instate["instate"]["current_model"][0].strip().lower()
@@ -152,7 +153,6 @@ def update_state(kiter, f_instate, nmax_iter=100, const=None):
     print ('betan_th   =', betan_th)
     print ('betan_beam =', betan_beam)
 
-    #betan_th_target =  betan_th_target - betan_beam    #--------------
 
     #------------------------------------------------------------------
     # scale : beam pressure
