@@ -106,5 +106,13 @@ class nfreya(Component):
         #--- archive output files
         services.stage_output_files(timeid, self.OUTPUT_FILES)
 
+        #--- clean up
+        clean_after = int(getattr(self, "CLEAN_AFTER", "1"))
+        if clean_after:
+           delete_files = ["bpltfil", "eqpltfil", "namelists", "qikone", "isllog", "runlog", "test_trnspt_mhd.txt"] 
+           for f in delete_files:
+               if os.path.exists(f): 
+                   os.remove(f)
+
     def finalize(self, timeid=0):
         print('nfreya.finalize() called')
