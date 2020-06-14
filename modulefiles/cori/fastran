@@ -1,0 +1,53 @@
+#%Module
+# IPS-FASTRAN environment on CORI/NERSC
+
+module load python cray-netcdf gcc
+
+setenv ATOM_ROOT /global/common/software/atom/cori
+setenv CESOL_ROOT /global/common/software/atom/cori/cesol
+setenv IPSCONFIG_DIR $::env(CESOL_ROOT)/conf
+setenv ATOM_BIN_DIR $::env(ATOM_ROOT)/binaries
+
+setenv IPS_ROOT $::env(ATOM_ROOT)/ips-framework
+setenv DAKOTA_ROOT $::env(ATOM_ROOT)/dakota
+setenv FASTRAN_ROOT $::env(CESOL_ROOT)/ips-fastran
+setenv EPED_ROOT $::env(CESOL_ROOT)/ips-eped
+setenv DATA_ROOT $::env(ATOM_ROOT)/data
+
+prepend-path PATH $::env(DAKOTA_ROOT)/bin
+prepend-path PATH $::env(IPS_ROOT)/bin
+prepend-path PATH $::env(ATOM_ROOT)/share/ntcc_intel/bin
+
+prepend-path PYTHONPATH $::env(EPED_ROOT)/src
+prepend-path PYTHONPATH $::env(EPED_ROOT)/lib
+prepend-path PYTHONPATH $::env(FASTRAN_ROOT)/lib
+prepend-path PYTHONPATH $::env(FASTRAN_ROOT)/lib/python
+prepend-path PYTHONPATH $::env(FASTRAN_ROOT)/src
+prepend-path PYTHONPATH $::env(CESOL_ROOT)/share/pyps
+prepend-path PYTHONPATH $::env(IPS_ROOT)/bin
+
+setenv PSTOOL_BIN_DIR $::env(ATOM_BIN_DIR)/pstool/default
+setenv PSTOOL_BIN_NAME pstool
+setenv WGEQDSK_BIN_DIR $::env(ATOM_BIN_DIR)/wgeqdsk/default
+setenv WGEQDSK_BIN_NAME wgeqdsk
+setenv FASTRAN_BIN_DIR $::env(ATOM_BIN_DIR)/fastran/default
+setenv FASTRAN_BIN_NAME xfastran_ver0.93
+setenv FASTRAN_SERIAL_BIN_NAME xfastran_ver0.93_ser
+setenv EFIT_BIN_DIR $::env(ATOM_BIN_DIR)/efit/default
+setenv EFIT_BIN_NAME efitd90
+setenv ESC_BIN_DIR $::env(ATOM_BIN_DIR)/esc/default
+setenv ESC_BIN_NAME xesc
+setenv NUBEAM_BIN_DIR $::env(ATOM_BIN_DIR)/nubeam/default
+setenv NUBEAM_BIN_NAME mpi_nubeam_comp_exec
+setenv TORAY_BIN_DIR $::env(ATOM_BIN_DIR)/toray/default
+setenv TORAY_BIN_NAME xtoray
+setenv CURRAY_BIN_DIR $::env(ATOM_BIN_DIR)/curray/default
+setenv CURRAY_BIN_NAME xcurray
+setenv GENRAY_BIN_DIR $::env(ATOM_BIN_DIR)/genray/default
+setenv GENRAY_BIN_NAME xgenray.intel.edison
+setenv NFREYA_BIN_PATH $::env(ATOM_BIN_DIR)/onetwo/default
+setenv NFREYA_BIN_NAME onetwo_129_201
+setenv NFREYA_DATA_ROOT $::env(ATOM_ROOT)/data/onetwo
+setenv PSTOOL $::env(PSTOOL_BIN_DIR)/$::env(PSTOOL_BIN_NAME)
+
+setenv PS_BACKEND pyps
