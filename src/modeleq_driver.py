@@ -3,6 +3,8 @@
 """
 
 import os
+import glob
+import shutil
 import time as timer
 
 from component import Component
@@ -100,6 +102,14 @@ class modeleq_driver(Component):
        #f.write("%d scan_id\n"%0)
         f.write("%d\n"%0)
         f.close()
+
+        dir_summary = getattr(self, "SUMMARY", "")
+        if dir_summary != "":
+            if not os.path.exists(dir_summary): os.makedirs(dir_summary)
+            dir_state = services.get_config_param('PLASMA_STATE_WORK_DIR')
+            for filename in glob.glob(os.path.join(dir_state, "*.*")):
+                print(filename)
+                shutil.copy(filename, dir_summary)
 
     def component_call(self, services, port_name, comp, mode, time):
         comp_mode_string = port_name + ' ' + mode
