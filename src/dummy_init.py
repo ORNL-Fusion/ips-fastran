@@ -19,14 +19,6 @@ class dummy_init (Component):
 
         services = self.services
 
-        tokamak_id = services.get_config_param('TOKAMAK_ID')
-        shot_number = services.get_config_param('SHOT_NUMBER')
-        run_id = services.get_config_param('RUN_ID')
-
-        print('tokamak_id =', tokamak_id)
-        print('shot_number =', shot_number)
-        print('run_id =', run_id)
-
         plasma_state_files = services.get_config_param('PLASMA_STATE_FILES')
 
         print('plasma state files =', plasma_state_files)
