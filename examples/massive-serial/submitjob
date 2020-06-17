@@ -1,0 +1,15 @@
+#!/bin/bash -l
+
+#SBATCH -p debug
+#SBATCH --nodes=1
+#SBATCH -t 00:10:00
+#SBATCH -C haswell
+
+#SBATCH -J ips_fastran
+#SBATCH -e ips.err
+#SBATCH -o ips.out
+
+module use /global/common/software/atom/cori/cesol_dev/modulefiles/cori
+module load fastran
+
+python $IPS_ROOT/bin/ips.py --config=ips_massive_serial.config --platform=$IPSCONFIG_DIR/cori_haswell.conf --log=ips.log
