@@ -45,9 +45,7 @@ class ips_massive_serial(Component):
         nsim = len(inscan)-1
         header = inscan[0]
 
-        dask_nodes = int(getattr(self, "DASK_NODES", "-1"))
-        if dask_nodes < 0:
-           raise Exception("DASK_NODES undefined")
+        dask_nodes = int(getattr(self, "DASK_NODES", "1"))
 
         rank = int(getattr(self, "RANK", "0"))
         size = int(getattr(self, "SIZE", "1"))
@@ -97,7 +95,7 @@ class ips_massive_serial(Component):
             services.add_task(
                 'pool', 
                 'task_'+str(k), 
-                1, 
+                dask_nodes, 
                 cwd,
                 "sh", 
                 os.path.join(rundir, "ips_bin.sh"),
