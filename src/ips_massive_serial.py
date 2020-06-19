@@ -18,7 +18,8 @@ class ips_massive_serial(Component):
         print('Created %s' % (self.__class__))
 
     def init(self, timeStamp=0):
-        self.timeout = float(getattr(self, "TIME_OUT", "3600"))
+        self.clean_after = int(getattr(self, "CLEAN_AFTER", "0"))
+        self.time_out = int(getattr(self, "TIME_OUT", "3600000"))
 
     def step(self, timeStamp=0):
         #--- entry
@@ -46,12 +47,11 @@ class ips_massive_serial(Component):
         header = inscan[0]
 
         dask_nodes = int(getattr(self, "DASK_NODES", "1"))
+        task_ppn = int(getattr(self, "TASK_PPN", ""))
 
         rank = int(getattr(self, "RANK", "0"))
         size = int(getattr(self, "SIZE", "1"))
         print(('NSIM = %d at RANK = %d'%(nsim, rank)))
-
-        clean_after = int(getattr(self, "CLEAN_AFTER", "0"))
 
         #--- add to pool
         pool = services.create_task_pool('pool')
@@ -86,7 +86,7 @@ class ips_massive_serial(Component):
             ips_bin += " --config=run%05d.config"%k
             ips_bin += " --log=ips_%05d.log"%k
             ips_bin += " --platform=local.conf"
-            if clean_after: 
+            if self.clean_after: 
                 ips_bin += "\nrm -rf "+rundir
                 ips_bin += "\nrm -f "+rundir+".zip"
 
@@ -100,7 +100,8 @@ class ips_massive_serial(Component):
                 "sh", 
                 os.path.join(rundir, "ips_bin.sh"),
                 logfile=logfile,
-                timeout=-1)
+                timeout=self.time_out,
+                task_ppn=task_ppn)
 
         #--- run
         ret_val = services.submit_tasks('pool', use_dask=True, dask_nodes=dask_nodes)
