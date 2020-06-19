@@ -1,7 +1,13 @@
 #!/bin/bash -l
 
-#SBATCH -p debug
-#SBATCH --nodes=1
+##SBATCH -p debug
+##SBATCH --nodes=2
+##SBATCH -t 00:10:00
+##SBATCH -C haswell
+
+#SBATCH -p regular
+#SBATCH --qos=premium
+#SBATCH -N 2
 #SBATCH -t 00:10:00
 #SBATCH -C haswell
 
@@ -12,4 +18,5 @@
 module use /global/common/software/atom/cori/cesol_dev/modulefiles/cori
 module load fastran
 
-python $IPS_ROOT/bin/ips.py --config=ips_massive_serial.config --platform=$IPSCONFIG_DIR/cori_haswell.conf --log=ips.log
+#python $IPS_ROOT/bin/ips.py --config=ips_massive_serial.config --platform=$IPSCONFIG_DIR/cori_haswell.conf --log=ips.log
+python $IPS_ROOT/bin/ips.py --config=ips_massive_serial_global.config --platform=$IPSCONFIG_DIR/cori_haswell.conf --log=ips.log
