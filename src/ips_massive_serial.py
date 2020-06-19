@@ -53,6 +53,8 @@ class ips_massive_serial(Component):
         size = int(getattr(self, "SIZE", "1"))
         print(('NSIM = %d at RANK = %d'%(nsim, rank)))
 
+        clean_after = int(getattr(self, "CLEAN_AFTER", "0"))
+
         #--- add to pool
         pool = services.create_task_pool('pool')
         cwd = services.get_working_dir()
@@ -72,25 +74,35 @@ class ips_massive_serial(Component):
                 if comp == '': sim[vname] = val
                 else: sim[comp][vname] = val 
 
+            sim["PWD"] = os.environ["PWD"]
+            sim["RUN_ID"] = "run%05d"%k
             sim["SIM_ROOT"] = rundir
             sim["OUT_REDIRECT"] = "True"
-            sim["OUT_REDIRECT_FNAME"] = os.path.join(rundir, "run%05d.out"%k)
+            sim["OUT_REDIRECT_FNAME"] = os.path.join(cwd, "run%05d.out"%k)
             sim["USE_PORTAL"] = "False"
             driver = sim['PORTS']['DRIVER']['IMPLEMENTATION'] 
             sim[driver]["SUMMARY"] = dir_summary
             sim.write(open("run%05d.config"%k, "wb"))
 
             ips_bin = os.path.join(self.BIN_PATH, self.BIN) 
+            ips_bin += " --config=run%05d.config"%k
+            ips_bin += " --log=ips_%05d.log"%k
+            ips_bin += " --platform=local.conf"
+            if clean_after: 
+                ips_bin += "\nrm -rf "+rundir
+                ips_bin += "\nrm -f "+rundir+".zip"
+
+            with open(os.path.join(rundir, "ips_bin.sh"), "w") as f: f.write(ips_bin)
+
             services.add_task(
                 'pool', 
                 'task_'+str(k), 
                 1, 
-                cwd, 
-                ips_bin, 
-                "--config=run%05d.config"%k,
-                "--log=ips_%05d.log"%k,
-                "--platform=local.conf",
-                logfile=logfile)
+                cwd,
+                "sh", 
+                os.path.join(rundir, "ips_bin.sh"),
+                logfile=logfile,
+                timeout=-1)
 
         #--- run
         ret_val = services.submit_tasks('pool', use_dask=True, dask_nodes=dask_nodes)
@@ -109,7 +121,7 @@ class ips_massive_serial(Component):
 
 def wrt_localconf(fname="local.conf"):
     s = \
-"""HOST = edison
+"""HOST = local
 MPIRUN = eval
 NODE_DETECTION = manual
 TOTAL_PROCS = 1
