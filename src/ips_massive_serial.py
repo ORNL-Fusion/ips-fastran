@@ -10,6 +10,7 @@ import numpy as np
 import time
 from configobj import ConfigObj
 from component import Component
+import ipsutil
 
 class ips_massive_serial(Component):
 
@@ -37,7 +38,14 @@ class ips_massive_serial(Component):
         dir_summary = getattr(self, "SUMMARY", "SUMMARY")
         dir_summary = os.path.realpath(dir_summary)
         if not os.path.exists(dir_summary): os.makedirs(dir_summary)
-         
+
+        tmp_xfs = getattr(self, "TMPXFS", "")
+        # check tmp xfs filesystem is setup correctly
+        if tmp_xfs:
+            if os.system(f'findmnt -nt xfs -T {tmp_xfs}') != 0:
+                raise Exception(f"TMPXFS is set but this is either not running in a shifter container "
+                                f"or {tmp_xfs} is not mounted as a temporary xfs file")
+
         f_sim_config = getattr(self, "SIMULATION", "")
         sim = ConfigObj(f_sim_config, interpolation='template', file_error=True)
 
@@ -61,9 +69,21 @@ class ips_massive_serial(Component):
         #--- add to pool
         pool = services.create_task_pool('pool')
         cwd = services.get_working_dir()
+
+        if tmp_xfs:
+            # copy files needed by ips_massive_serial.py
+            ipsutil.copyFiles(".", getattr(self, "INPUT_FILES"), tmp_xfs)
+            # copy files needed for fastran_modeleq
+            ipsutil.copyFiles(os.path.join(pwd, "input"), "*", os.path.join(tmp_xfs, "input"))
+            ipsutil.copyFiles(".", "local.conf", tmp_xfs)
+            cwd = tmp_xfs
+            tmp_xfs_dir_summary = os.path.realpath(os.path.join(cwd, "SUMMARY"))
+            if not os.path.exists(tmp_xfs_dir_summary): os.makedirs(tmp_xfs_dir_summary)
+
+
         tasks = {}
-        for k in range(rank, nsim, size): 
-            rundir = os.path.realpath("run%05d"%k)
+        for k in range(rank, nsim, size):
+            rundir = os.path.realpath(os.path.join(cwd, "run%05d"%k))
             logfile = "ipslog.%05d"%k
             if not os.path.exists(rundir): os.makedirs(rundir)
 
@@ -77,15 +97,15 @@ class ips_massive_serial(Component):
                 if comp == '': sim[vname] = val
                 else: sim[comp][vname] = val 
 
-            sim["PWD"] = pwd #os.environ["PWD"]
+            sim["PWD"] = tmp_xfs if tmp_xfs else pwd
             sim["RUN_ID"] = "run%05d"%k
             sim["SIM_ROOT"] = rundir
             sim["OUT_REDIRECT"] = "True"
             sim["OUT_REDIRECT_FNAME"] = os.path.join(cwd, "run%05d.out"%k)
             sim["USE_PORTAL"] = "False"
             driver = sim['PORTS']['DRIVER']['IMPLEMENTATION'] 
-            sim[driver]["SUMMARY"] = dir_summary
-            sim.write(open("run%05d.config"%k, "wb"))
+            sim[driver]["SUMMARY"] = tmp_xfs_dir_summary if tmp_xfs else dir_summary
+            sim.write(open(os.path.join(cwd, "run%05d.config"%k), "wb"))
 
             ips_bin = os.path.join(self.BIN_PATH, self.BIN) 
             ips_bin += " --config=run%05d.config"%k
@@ -109,7 +129,7 @@ class ips_massive_serial(Component):
                 task_ppn=task_ppn)
 
         #--- run
-        ret_val = services.submit_tasks('pool', use_dask=True, dask_nodes=dask_nodes)
+        ret_val = services.submit_tasks('pool', use_dask=False, dask_nodes=dask_nodes)
         print('ret_val = ', ret_val)
         exit_status = services.get_finished_tasks('pool')
         print(exit_status)
@@ -119,6 +139,12 @@ class ips_massive_serial(Component):
 
         #--- archive output files
         services.stage_output_files(timeStamp, self.OUTPUT_FILES)
+
+        # Copy everything back we want from tmp xfs directory
+        if tmp_xfs:
+            ipsutil.copyFiles(tmp_xfs, "run*.*", cwd)
+            ipsutil.copyFiles(tmp_xfs, "ips*", cwd)
+            ipsutil.copyFiles(tmp_xfs_dir_summary, "*", dir_summary)
 
     def finalize(self, timeStamp=0):
         pass  

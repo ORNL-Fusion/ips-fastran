@@ -1,0 +1,18 @@
+#!/bin/bash -l
+
+#SBATCH --image=docker:registry.services.nersc.gov/rwp53/ips-massive-serial:latest
+#SBATCH --volume="/global/cscratch1/sd/rwp/tmpfiles:/tmp:perNodeCache=size=1G"
+
+#SBATCH -p debug
+#SBATCH --nodes=2
+#SBATCH -t 00:10:00
+#SBATCH -C haswell
+
+#SBATCH -J ips_fastran
+#SBATCH -e ips.err
+#SBATCH -o ips.out
+
+module use /global/common/software/atom/cori/cesol_dev/modulefiles/cori
+module load fastran
+
+python $IPS_ROOT/bin/ips.py --config=ips_massive_serial_global_shifter.config --platform=$IPSCONFIG_DIR/cori_haswell.conf --log=ips.log
