@@ -71,19 +71,18 @@ class ips_massive_serial(Component):
         cwd = services.get_working_dir()
 
         if tmp_xfs:
+            tmp_xfs_rank = os.path.join(tmp_xfs, str(rank)) # make unique folder per rank to work in the tmp xfs directory
             # copy files needed by ips_massive_serial.py
-            ipsutil.copyFiles(".", getattr(self, "INPUT_FILES"), tmp_xfs)
+            ipsutil.copyFiles(".", getattr(self, "INPUT_FILES"), tmp_xfs_rank)
             # copy files needed for fastran_modeleq
-            ipsutil.copyFiles(os.path.join(pwd, "input"), "*", os.path.join(tmp_xfs, "input"))
-            ipsutil.copyFiles(".", "local.conf", tmp_xfs)
-            cwd = tmp_xfs
-            tmp_xfs_dir_summary = os.path.realpath(os.path.join(cwd, "SUMMARY"))
+            ipsutil.copyFiles(os.path.join(pwd, "input"), "*", os.path.join(tmp_xfs_rank, "input"))
+            ipsutil.copyFiles(".", "local.conf", tmp_xfs_rank)
+            tmp_xfs_dir_summary = os.path.realpath(os.path.join(tmp_xfs_rank, "SUMMARY"))
             if not os.path.exists(tmp_xfs_dir_summary): os.makedirs(tmp_xfs_dir_summary)
-
 
         tasks = {}
         for k in range(rank, nsim, size):
-            rundir = os.path.realpath(os.path.join(cwd, "run%05d"%k))
+            rundir = os.path.realpath(os.path.join(tmp_xfs_rank, "run%05d"%k)) if tmp_xfs else os.path.realpath("run%05d"%k)
             logfile = "ipslog.%05d"%k
             if not os.path.exists(rundir): os.makedirs(rundir)
 
@@ -97,15 +96,15 @@ class ips_massive_serial(Component):
                 if comp == '': sim[vname] = val
                 else: sim[comp][vname] = val 
 
-            sim["PWD"] = tmp_xfs if tmp_xfs else pwd
+            sim["PWD"] = tmp_xfs_rank if tmp_xfs else pwd
             sim["RUN_ID"] = "run%05d"%k
             sim["SIM_ROOT"] = rundir
             sim["OUT_REDIRECT"] = "True"
-            sim["OUT_REDIRECT_FNAME"] = os.path.join(cwd, "run%05d.out"%k)
+            sim["OUT_REDIRECT_FNAME"] = os.path.join(tmp_xfs_rank if tmp_xfs else cwd, "run%05d.out"%k)
             sim["USE_PORTAL"] = "False"
             driver = sim['PORTS']['DRIVER']['IMPLEMENTATION'] 
             sim[driver]["SUMMARY"] = tmp_xfs_dir_summary if tmp_xfs else dir_summary
-            sim.write(open(os.path.join(cwd, "run%05d.config"%k), "wb"))
+            sim.write(open(os.path.join(tmp_xfs_rank, "run%05d.config"%k), "wb") if tmp_xfs else open("run%05d.config"%k, "wb"))
 
             ips_bin = os.path.join(self.BIN_PATH, self.BIN) 
             ips_bin += " --config=run%05d.config"%k
@@ -121,7 +120,7 @@ class ips_massive_serial(Component):
                 'pool', 
                 'task_'+str(k), 
                 dask_nodes, 
-                cwd,
+                tmp_xfs_rank if tmp_xfs else cwd,
                 "sh", 
                 os.path.join(rundir, "ips_bin.sh"),
                 logfile=logfile,
@@ -142,8 +141,8 @@ class ips_massive_serial(Component):
 
         # Copy everything back we want from tmp xfs directory
         if tmp_xfs:
-            ipsutil.copyFiles(tmp_xfs, "run*.*", cwd)
-            ipsutil.copyFiles(tmp_xfs, "ips*", cwd)
+            ipsutil.copyFiles(tmp_xfs_rank, "run*.*", cwd)
+            ipsutil.copyFiles(tmp_xfs_rank, "ips*", cwd)
             ipsutil.copyFiles(tmp_xfs_dir_summary, "*", dir_summary)
 
     def finalize(self, timeStamp=0):
