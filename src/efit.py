@@ -207,7 +207,7 @@ class efit(Component):
                               ,stdout=logfile,stderr=logfile,shell=True)
                 logfile.close()
             else:
-                task_id = services.launch_task(1, cwd, "sh xefit", logfile='efit.log')
+                task_id = services.launch_task(1, cwd, "sh xefit", logfile='efit.log', errfile='efit.err')
                 retcode = services.wait_task(task_id)
 
             if (retcode != 0):
