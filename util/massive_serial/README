@@ -1,0 +1,9 @@
+Start with https://docs.nersc.gov/development/shifter/how-to-use/#using-nerscs-private-registry
+
+To build
+
+`docker build --network host --build-arg GITHUB_USER=... --build-arg GITHUB_TOKEN=... -t registry.services.nersc.gov/rwp53/ips-massive-serial:latest .`
+
+Then push to NERSC registry
+
+`docker push registry.services.nersc.gov/rwp53/ips-massive-serial:latest`
