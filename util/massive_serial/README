@@ -7,3 +7,7 @@ To build
 Then push to NERSC registry
 
 `docker push registry.services.nersc.gov/rwp53/ips-massive-serial:latest`
+
+When on cori pull the image down with
+
+`shifterimg -v --group atom pull registry.services.nersc.gov/rwp53/ips-massive-serial:latest`
