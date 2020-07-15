@@ -28,25 +28,24 @@ ARG GITHUB_USER
 ARG GITHUB_TOKEN
 
 RUN cd /code && \
-    git clone --single-branch --branch separate_log --depth 1 https://github.com/HPC-SimTools/IPS-framework.git               && \
+    git clone --depth 1 https://github.com/HPC-SimTools/IPS-framework.git ips-framework              && \
     git clone --single-branch --branch massive-serial --depth 1 https://${GITHUB_USER}:${GITHUB_TOKEN}@github.com/ORNL-Fusion/ips-fastran.git
-
-RUN mkdir /code/ips-framework && cd /code/IPS-framework && cmake -DCMAKE_INSTALL_PREFIX:PATH=/code/ips-framework . && make && make install
 
 ENV IPS_DIR /code
 
 # byte-compile everything we might need, exclude a few files that can't compile
-RUN cd /code && py3compile ips-framework/bin                    \
-                           ips-fastran/lib/python/Namelist.py   \
-                           ips-fastran/src                      \
-                           -X ".*/elite_io.py"                  \
-                           -X ".*/modeleq_constraint_pscale.py" \
+RUN cd /code && py3compile ips-framework/framework/src           \
+                           ips-framework/framework/utils/HTML.py \
+                           ips-fastran/lib/python/Namelist.py    \
+                           ips-fastran/src                       \
+                           -X ".*/elite_io.py"                   \
+                           -X ".*/modeleq_constraint_pscale.py"  \
                            -X ".*/pest3.py"
 
 ENV IPS_PATH $IPS_DIR/ips-framework
 ENV IPS_ROOT $IPS_PATH
-ENV PATH $IPS_PATH/bin:$PATH
-ENV PYTHONPATH $IPS_PATH/bin:$PYTHONPATH
+ENV PATH $IPS_PATH/framework/src:$PATH
+ENV PYTHONPATH $IPS_PATH/framework/src:$IPS_PATH/framework/utils:$PYTHONPATH
 
 ENV FASTRAN_ROOT="${IPS_DIR}/ips-fastran"
 ENV PYTHONPATH="$FASTRAN_ROOT/lib:$PYTHONPATH"
@@ -59,7 +58,7 @@ RUN chmod 644 $FASTRAN_ROOT/lib/omfit/classes/fluxSurface.py
 RUN python3 -c "from omfit.classes.fluxSurface import boundaryShape"
 
 COPY pyps.tar.gz /code
-RUN cd /code && tar xf pyps.tar.gz
+RUN cd /code && tar xf pyps.tar.gz && chmod 755 pyps_new && chmod 644 pyps_new/*.py
 ENV PYTHONPATH="${IPS_DIR}/pyps_new:$PYTHONPATH"
 RUN cd /code/pyps_new/pyps_test3 && python3 test1.py && python3 test2.py && python3 test3.py
 
