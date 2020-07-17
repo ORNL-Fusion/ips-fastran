@@ -42,7 +42,7 @@ class ips_massive_serial_global(Component):
         f_machine_config = getattr(self, "MACHINE", "")
 
         ntasks = int(getattr(self, "NTASKS", "1"))
-        dask_nodes = 1 
+        dask_nodes = ntasks 
         task_ppn = 1
 
         print('NTASKS = %d'%ntasks)
@@ -82,7 +82,7 @@ class ips_massive_serial_global(Component):
             services.add_task(
                 'pool', 
                 'task_'+str(k), 
-                dask_nodes, 
+                1, 
                 cwd,
                 "sh", 
                 os.path.join(rundir, "ips_bin.sh"),
@@ -92,7 +92,7 @@ class ips_massive_serial_global(Component):
             )
 
         #--- run
-        ret_val = services.submit_tasks('pool', use_dask=True, dask_nodes=dask_nodes)
+        ret_val = services.submit_tasks('pool', use_dask=True, dask_nodes=dask_nodes, dask_ppn=1)
         print('ret_val = ', ret_val)
         exit_status = services.get_finished_tasks('pool')
         print(exit_status)
