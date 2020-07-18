@@ -103,7 +103,8 @@ class ips_massive_serial(Component):
             sim["OUT_REDIRECT_FNAME"] = os.path.join(tmp_xfs_rank if tmp_xfs else cwd, "run%05d.out"%k)
             sim["USE_PORTAL"] = "False"
             driver = sim['PORTS']['DRIVER']['IMPLEMENTATION'] 
-            sim[driver]["SUMMARY"] = tmp_xfs_dir_summary if tmp_xfs else dir_summary
+            #sim[driver]["SUMMARY"] = tmp_xfs_dir_summary if tmp_xfs else dir_summary
+            sim[driver]["SUMMARY"] = dir_summary
             sim.write(open(os.path.join(tmp_xfs_rank, "run%05d.config"%k), "wb") if tmp_xfs else open("run%05d.config"%k, "wb"))
 
             ips_bin = os.path.join(self.BIN_PATH, self.BIN) 
@@ -143,7 +144,7 @@ class ips_massive_serial(Component):
         if tmp_xfs:
             ipsutil.copyFiles(tmp_xfs_rank, "run*.*", cwd)
             ipsutil.copyFiles(tmp_xfs_rank, "ips*", cwd)
-            ipsutil.copyFiles(tmp_xfs_dir_summary, "*", dir_summary)
+            #ipsutil.copyFiles(tmp_xfs_dir_summary, "*", dir_summary)
 
     def finalize(self, timeStamp=0):
         pass  
