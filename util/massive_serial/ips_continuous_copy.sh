@@ -11,7 +11,8 @@ config=$(python3 -c "import argparse, sys; p=argparse.ArgumentParser(); p.add_ar
 # get TMPXFS, RUN_ID and RANK from config file
 source <(grep = "$config" | sed 's/ //g')
 
-INTERVAL=10
+CHECK_INTERVAL=10
+TAR_INTERVAL=300
 
 HOSTNAME=$(hostname)
 
@@ -26,14 +27,18 @@ run_tar () {
     ls -t "$RUN_ID"/*_"$HOSTNAME".tar.gz | tail +3 | xargs rm -f
 }
 
+last_tar_time=$(date +%s)
+
 if [ "$TMPXFS" ];
 then
-    sleep $INTERVAL
-    run_tar
     while ps -p ${ips_pid} > /dev/null ;
     do
-        sleep $INTERVAL
-        run_tar
+        if [ "$(($(date +%s)-$last_tar_time))" -gt $TAR_INTERVAL ]
+        then
+            run_tar
+            last_tar_time=$(date +%s)
+        fi
+        sleep $CHECK_INTERVAL
     done
     # Create one final tar file since ips.py is now done
     run_tar
