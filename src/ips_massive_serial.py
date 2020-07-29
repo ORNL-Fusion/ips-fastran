@@ -83,7 +83,7 @@ class ips_massive_serial(Component):
         tasks = {}
         for k in range(rank, nsim, size):
             rundir = os.path.realpath(os.path.join(tmp_xfs_rank, "run%05d"%k)) if tmp_xfs else os.path.realpath("run%05d"%k)
-            logfile = "ipslog.%05d"%k
+            logfile = os.path.realpath(os.path.join(tmp_xfs_rank, "ipslog.%05d"%k)) if tmp_xfs else "ipslog.%05d"%k
             if not os.path.exists(rundir): os.makedirs(rundir)
 
             data = inscan[k+1]
@@ -103,8 +103,7 @@ class ips_massive_serial(Component):
             sim["OUT_REDIRECT_FNAME"] = os.path.join(tmp_xfs_rank if tmp_xfs else cwd, "run%05d.out"%k)
             sim["USE_PORTAL"] = "False"
             driver = sim['PORTS']['DRIVER']['IMPLEMENTATION'] 
-            #sim[driver]["SUMMARY"] = tmp_xfs_dir_summary if tmp_xfs else dir_summary
-            sim[driver]["SUMMARY"] = dir_summary
+            sim[driver]["SUMMARY"] = tmp_xfs_dir_summary if tmp_xfs else dir_summary
             sim.write(open(os.path.join(tmp_xfs_rank, "run%05d.config"%k), "wb") if tmp_xfs else open("run%05d.config"%k, "wb"))
 
             ips_bin = os.path.join(self.BIN_PATH, self.BIN) 
@@ -139,12 +138,6 @@ class ips_massive_serial(Component):
 
         #--- archive output files
         services.stage_output_files(timeStamp, self.OUTPUT_FILES)
-
-        # Copy everything back we want from tmp xfs directory
-        if tmp_xfs:
-            ipsutil.copyFiles(tmp_xfs_rank, "run*.*", cwd)
-            ipsutil.copyFiles(tmp_xfs_rank, "ips*", cwd)
-            #ipsutil.copyFiles(tmp_xfs_dir_summary, "*", dir_summary)
 
     def finalize(self, timeStamp=0):
         pass  

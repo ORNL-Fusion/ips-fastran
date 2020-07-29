@@ -44,7 +44,7 @@ RUN cd /code && py3compile ips-framework/framework/src           \
 
 ENV IPS_PATH $IPS_DIR/ips-framework
 ENV IPS_ROOT $IPS_PATH
-ENV PATH $IPS_PATH/framework/src:$PATH
+ENV PATH $IPS_PATH/framework/src:/code/bin:$PATH
 ENV PYTHONPATH $IPS_PATH/framework/src:$IPS_PATH/framework/utils:$PYTHONPATH
 
 ENV FASTRAN_ROOT="${IPS_DIR}/ips-fastran"
@@ -83,3 +83,5 @@ ENV FASTRAN_SERIAL_BIN_NAME=xfastran_ver0.93_ser
 
 # https://stackoverflow.com/questions/51256738/multiple-instances-of-python-running-simultaneously-limited-to-35
 ENV OPENBLAS_NUM_THREADS=1
+
+COPY ips_continuous_copy.sh /code/bin
