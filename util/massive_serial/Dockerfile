@@ -12,6 +12,8 @@ RUN \
         cmake                \
         doxygen              \
         git                  \
+        mpich                \
+        python3-mpi4py       \
         python3-numpy        \
         python3-scipy        \
         python3-matplotlib   \
@@ -28,7 +30,7 @@ ARG GITHUB_USER
 ARG GITHUB_TOKEN
 
 RUN cd /code && \
-    git clone --depth 1 https://github.com/HPC-SimTools/IPS-framework.git ips-framework              && \
+    git clone --single-branch --branch v0.1.0 --depth 1 https://github.com/HPC-SimTools/IPS-framework.git ips-framework && \
     git clone --single-branch --branch massive-serial --depth 1 https://${GITHUB_USER}:${GITHUB_TOKEN}@github.com/ORNL-Fusion/ips-fastran.git
 
 ENV IPS_DIR /code
