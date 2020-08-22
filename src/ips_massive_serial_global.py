@@ -92,7 +92,7 @@ class ips_massive_serial_global(Component):
             )
 
         #--- run
-        ret_val = services.submit_tasks('pool', use_dask=True, dask_nodes=dask_nodes, dask_ppn=1)
+        ret_val = services.submit_tasks('pool', use_dask=False, dask_nodes=dask_nodes, dask_ppn=1)
         print('ret_val = ', ret_val)
         exit_status = services.get_finished_tasks('pool')
         print(exit_status)

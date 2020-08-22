@@ -128,7 +128,7 @@ class ips_massive_serial(Component):
                 task_ppn=task_ppn)
 
         #--- run
-        ret_val = services.submit_tasks('pool', use_dask=False, dask_nodes=dask_nodes)
+        ret_val = services.submit_tasks('pool', use_dask=True, dask_nodes=dask_nodes)
         print('ret_val = ', ret_val)
         exit_status = services.get_finished_tasks('pool')
         print(exit_status)
