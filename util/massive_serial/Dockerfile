@@ -26,6 +26,9 @@ RUN update-alternatives --install /usr/bin/python python /usr/bin/python3 10
 
 RUN mkdir /code
 
+COPY greentable.tar.gz /code
+RUN cd /code && tar xf greentable.tar.gz && rm greentable.tar.gz && chmod 755 greentable && chmod 644 greentable/*
+
 ARG GITHUB_USER
 ARG GITHUB_TOKEN
 
@@ -73,8 +76,8 @@ RUN chmod 755 /code/bin/efitd90_static
 ENV EFIT_BIN_DIR="${IPS_DIR}/bin"
 ENV EFIT_BIN_NAME=efitd90_static
 
-ENV EFIT_TABLE_DIR="/global/common/software/atom/cori/binaries/efit/greentable/"
-ENV EFIT_INPUT_DIR="/global/common/software/atom/cori/binaries/efit/greentable/"
+ENV EFIT_TABLE_DIR="${IPS_DIR}/greentable/"
+ENV EFIT_INPUT_DIR="${IPS_DIR}/greentable/"
 
 COPY xfastran_ver0.93_ser /code/bin
 RUN chmod 755 /code/bin/xfastran_ver0.93_ser
