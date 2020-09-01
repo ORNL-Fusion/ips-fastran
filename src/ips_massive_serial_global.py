@@ -8,11 +8,11 @@ import os
 import shutil
 import numpy as np
 import time
+import subprocess
 from configobj import ConfigObj
 from component import Component
 
 class ips_massive_serial_global(Component):
-
     def __init__(self, services, config):
         Component.__init__(self, services, config)
         print('Created %s' % (self.__class__))
@@ -42,13 +42,9 @@ class ips_massive_serial_global(Component):
         f_machine_config = getattr(self, "MACHINE", "")
 
         ntasks = int(getattr(self, "NTASKS", "1"))
-        dask_nodes = ntasks 
-        task_ppn = 1
-
         print('NTASKS = %d'%ntasks)
 
-        #--- add to pool
-        pool = services.create_task_pool('pool')
+        #--- generate simulation config file for each node
         cwd = services.get_working_dir()
         tasks = {}
         for k in range(ntasks): 
@@ -64,38 +60,39 @@ class ips_massive_serial_global(Component):
             sim["USE_PORTAL"] = "False"
 
             driver = sim['PORTS']['DRIVER']['IMPLEMENTATION'] 
-            sim[driver]["SUMMARY"] = dir_summary#+"%05d"%k
+            sim[driver]["SUMMARY"] = dir_summary
             sim[driver]["RANK"] = k
             sim[driver]["SIZE"] = ntasks 
             sim.write(open("run%05d.config"%k, "wb"))
 
-            ips_bin = os.path.join(self.BIN_PATH, self.BIN) 
-            ips_bin += " --config=run%05d.config"%k
-            ips_bin += " --log=ips_%05d.log"%k
-            ips_bin += " --platform=%s"%f_machine_config
-            if self.clean_after: 
-                ips_bin += "\nrm -rf "+rundir
-                ips_bin += "\nrm -f "+rundir+f_machine_config
+        #--- run script      
+        ips_bin = "runid=$(printf \"%05d\" ${SLURM_NODEID})\n"
+        ips_bin += "cd run${runid}\n"
+        ips_bin += os.path.join(self.BIN_PATH, self.BIN) 
+        ips_bin += " --config=../run${runid}.config"
+        ips_bin += " --log=../ips_${runid}.log"
+        ips_bin += " --platform=../%s"%f_machine_config
+        ips_bin += "\ncd .."
+        if self.clean_after: 
+            ips_bin += "\nrm -rf "+rundir
+            #ips_bin += "\nrm -f "+rundir+f_machine_config
 
-            with open(os.path.join(rundir, "ips_bin.sh"), "w") as f: f.write(ips_bin)
-
-            services.add_task(
-                'pool', 
-                'task_'+str(k), 
-                1, 
-                cwd,
-                "sh", 
-                os.path.join(rundir, "ips_bin.sh"),
-                logfile=logfile,
-                timeout=self.time_out,
-                task_ppn=task_ppn
-            )
+        print(ips_bin)
+        with open("ips_bin.sh", "w") as f: f.write(ips_bin)
 
         #--- run
-        ret_val = services.submit_tasks('pool', use_dask=False, dask_nodes=dask_nodes, dask_ppn=1)
-        print('ret_val = ', ret_val)
-        exit_status = services.get_finished_tasks('pool')
-        print(exit_status)
+        launch_task_option = getattr(self, "LAUNCH_TASK", "")
+        if launch_task_option == "srun": 
+        # This is a temperary implementation to make sure one task per one node on CORI.
+            logfile = open("tasks_srun.log", "w")
+            errfile = open("tasks_srun.err", "w")
+            retcode = subprocess.call(["srun -N %d -n %d -c 64 sh ips_bin.sh"%(ntasks, ntasks)], stdout=logfile, stderr=errfile, shell=True)
+        else:
+            task_id = services.launch_task(ntasks, cwd, "sh", "ips_bin.sh", logfile="tasks.log", errfile='tasks.err', task_ppn=1)
+            retcode = services.wait_task(task_id)
+
+        if (retcode != 0):
+            raise Exception('Error executing efit')
 
         #--- update plasma state files
         services.update_plasma_state()
