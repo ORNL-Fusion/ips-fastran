@@ -103,7 +103,7 @@ class fastran_driver(Component):
             for port_name in port_names:
 
                 if port_name in PREPROCESS: continue
-                if port_name in ['EQ', 'EC', 'IC', 'HC', 'LH', 'NB', 'TR', 'BC', 'MONITOR', 'PEDESTAL']:
+                if port_name in ['EQ', 'EC', 'IC', 'HC', 'LH', 'NB', 'TR', 'BC', 'FEEDBACK', 'MONITOR', 'PEDESTAL']:
                     self.component_call(services, port_name, port_dict[port_name], 'step', t)
 
             services.stage_plasma_state()
