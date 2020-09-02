@@ -34,6 +34,12 @@ class constraint_current(Component):
         #--- stage input files
         services.stage_input_files(self.INPUT_FILES)
 
+        #--- freeze
+        start_time = int(getattr(self, "START_TIME", "-1"))
+        end_time = int(getattr(self, "END_TIME", "1000"))
+        if timeid < start_time: return
+        if timeid > end_time: return
+
         #--- apply constraint to local plasma state
         rho_jbdry = float(getattr(self, "RHO_JBDRY", "0.85"))
 
