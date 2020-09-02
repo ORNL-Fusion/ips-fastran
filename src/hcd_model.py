@@ -133,7 +133,9 @@ class hcd_model(Component):
         #--- current
         if j0_seed > 0.0:
             jec_seed = j0_seed*exp(-(rho-x0_seed)**2/(2*drho_seed**2))
-            ps.load_j_parallel(rho,jec_seed*1.0e6,"rho_icrf","curich",r0,b0,add=add)
+        else:
+            jec_seed = zeros(nrho)
+        ps.load_j_parallel(rho,jec_seed*1.0e6,"rho_icrf","curich",r0,b0,add=add)
 
         #--- write to ps
         ps.store(cur_state_file)
@@ -189,7 +191,9 @@ class hcd_model(Component):
         #--- current
         if j0_seed > 0.0:
             jec_seed = j0_seed*exp(-(rho-x0_seed)**2/(2*drho_seed**2))
-            instate["instate"]["j_ic"] = jec_seed
+        else:
+            jec_seed = zeros(nrho)
+        instate["instate"]["j_ic"] = jec_seed
 
         #--- write to instate
         instate.write(cur_instate_file)
