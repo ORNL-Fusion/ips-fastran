@@ -447,7 +447,8 @@ def io_input_from_state(f_ps, f_inbc, f_inefit="inefit", mode="kinetic", ismooth
     nrho  = len(ps["rho"])
     rho   = ps["rho"][:]
     ne    = ps["ns"][0,:]*1.0e-19
-    ni    = ps["ni"][:]*1.0e-19
+#   ni    = ps["ni"][:]*1.0e-19
+    ni    = sum(ps["ns"][1:,:], axis=0)*1.0e-19
     te    = ps["Ts"][0,:]
     ti    = ps["Ti"][:]
     ne    = ps.cell2node(ne)
@@ -467,7 +468,7 @@ def io_input_from_state(f_ps, f_inbc, f_inefit="inefit", mode="kinetic", ismooth
 
     if mode == 'kinetic':
        print('mode = kinetic')
-       pmhd = 1.602e3*(ne*te+ni*ti)+2.0/3.0*1.602e3*(wbeam+walpha)
+       pmhd = 1.602e3*(ne*te+ni*ti)+2.0/3.0*1.602e3*(wbeam+walpha)# *1.1 #=========
     else:
        print('mode = total')
        pmhd = ps["P_eq"][:]
@@ -491,6 +492,7 @@ def io_input_from_state(f_ps, f_inbc, f_inefit="inefit", mode="kinetic", ismooth
     print ('BETAN=',betan)
 
     if betan_target > 0 and betan > betan_target:
+        print("betan scale", betan_target/betan)
         pmhd = pmhd*betan_target/betan
 
     #---------------------

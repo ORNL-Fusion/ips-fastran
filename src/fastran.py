@@ -6,11 +6,13 @@
 
 import os
 import shutil
-from  component import Component
+from component import Component
 from Namelist import Namelist
 import fastran_io_ps
 import fastran_io_instate
 import instate_io
+import zdata
+import numpy as np
 
 class fastran(Component):
 
@@ -63,11 +65,27 @@ class fastran(Component):
                 print("UPDATE_%s at %d : %d"%(key, self.icalled, infastran["infastran"][key][0]))
         infastran.write("infastran")
 
+        #--- freeze
+        ifreeze = int(getattr(self, "FREEZE", 10000))
+        irefreeze = int(getattr(self, "REFREEZE", -10000))
+        if timeid > ifreeze and timeid < irefreeze:
+            print("FASTRAN FREEZE: timeid = %d, ifreeze = %d"%(timeid, ifreeze))
+            inmetric_0 = zdata.zdata()
+            inmetric_0.read("inmetric") 
+
         #--- generate fastran input
         if self.PS_BACKEND=="instate":
            fastran_io_instate.write_input(cur_instate_file)
         else:
            fastran_io_ps.write_input(cur_state_file, cur_eqdsk_file)
+
+        if timeid > ifreeze and timeid < irefreeze:
+            inmetric = zdata.zdata()
+            inmetric.read("inmetric") 
+            inmetric["SHIFT"] = 0.5*np.array(inmetric_0["SHIFT"]) + 0.5*np.array(inmetric["SHIFT"])
+            inmetric["PMHD"] = 0.5*np.array(inmetric_0["PMHD"]) + 0.5*np.array(inmetric["PMHD"])
+            inmetric.write("inmetric")  
+        shutil.copyfile('inmetric', 'inmetric_%d'%timeid)
 
         #--- run fastran
         fastran_bin = os.path.join(self.BIN_PATH, self.BIN)
@@ -77,9 +95,9 @@ class fastran(Component):
         nky  = int(self.NPROC_KY)
         n1d  = ncpu/nky
 
-        print("ncpu = ",ncpu)
-        print("n1d  = ",n1d)
-        print("nky  = ",nky)
+        print("ncpu = ", ncpu)
+        print("n1d  = ", n1d)
+        print("nky  = ", nky)
 
         cwd = services.get_working_dir()
         task_id = services.launch_task(ncpu, cwd, fastran_bin, "%d"%n1d, "%d"%nky, logfile = 'xfastran.log')

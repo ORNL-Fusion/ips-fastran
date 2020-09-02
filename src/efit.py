@@ -187,8 +187,18 @@ class efit(Component):
                     ps.init_from_geqdsk (cur_eqdsk_file,nrho=nrho,nth=101)
                 except:
                     raise Exception("erro in init_from_geqdsk")
+                if k > 0:
+                    inmetric_prev = inmetric
                 inmetric = ps_to_inmetric(ps, r0, b0, ip)
-
+                inmetric_keys = [
+                  'volp', 'ipol', 'g11', 'g22', 'g33', 'gradrho', 'area', 'rminor', 'rmajor',
+                  'shift', 'kappa', 'delta', 'pmhd', 'qmhd', 
+                  'er', 'nc1', 'hfac1', 'hfac2', 'psi', "vol", "gr2i", "bp2"]
+                if k > 0:
+                    print ("inmtric under-relax")
+                    for key in inmetric_keys:
+                        inmetric["inmetric"][key] = 0.5*array(inmetric_prev["inmetric"][key]) + 0.5*array(inmetric["inmetric"][key])
+                    
                 iconv = efit_io.fixbdry_kfile(self.ishot, self.itime, Namelist(f_inefit,"r"), inmetric["inmetric"], relax=relax, topology=topology, error=error)
                 if scale_gs: efit_io.scale_kfile(self.ishot, self.itime, Rs=Rs, Bs=Bs)
 
@@ -207,7 +217,7 @@ class efit(Component):
                               ,stdout=logfile,stderr=logfile,shell=True)
                 logfile.close()
             else:
-                task_id = services.launch_task(1, cwd, "sh xefit", logfile='efit.log', errfile='efit.err')
+                task_id = services.launch_task(1, cwd, "sh xefit", logfile='efit.log')
                 retcode = services.wait_task(task_id)
 
             if (retcode != 0):
