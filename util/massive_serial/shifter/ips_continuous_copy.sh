@@ -4,14 +4,20 @@
 
 echo $(date --iso-8601=seconds) - ips_continuous_copy started
 
-"$@" &
-ips_pid=$!
-
 # get which config is used from ips command
 config=$(python3 -c "import argparse, sys; p=argparse.ArgumentParser(); p.add_argument('-i','-j','--config','--simulation',type=str,action='store'); print(p.parse_known_args(sys.argv)[0].config)" "$@")
 
-# get TMPXFS, RUN_ID, RANK and SUMMARY from config file
+# get TMPXFS, RUN_ID, RANK, SUMMARY and FILES_TO_ARCHIVE from config file
 source <(grep = "$config" | sed 's/ //g')
+
+# clean the temporary xfs before we start
+if [ "$TMPXFS" ];
+then
+    rm -rf "${TMPXFS:?}/*"
+fi
+
+"$@" &
+ips_pid=$!
 
 CHECK_INTERVAL=${CHECK_INTERVAL:-10}
 TAR_INTERVAL=${TAR_INTERVAL:-300}
