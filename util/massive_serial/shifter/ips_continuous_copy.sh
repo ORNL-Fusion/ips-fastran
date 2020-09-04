@@ -13,7 +13,10 @@ source <(grep = "$config" | sed 's/ //g')
 # clean the temporary xfs before we start
 if [ "$TMPXFS" ];
 then
-    rm -rf "${TMPXFS:?}/*"
+    echo rm -vrf "${TMPXFS:?}/"*
+    rm -vrf "${TMPXFS:?}/"*
+    echo ls -R "$TMPXFS"
+    ls -R "$TMPXFS"
 fi
 
 "$@" &
