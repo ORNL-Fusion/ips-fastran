@@ -54,6 +54,7 @@ class ips_massive_serial(Component):
         nsim = len(inscan)-1
         header = inscan[0]
 
+        use_dask = bool(int(getattr(self, "USE_DASK", "0")))
         dask_nodes = int(getattr(self, "DASK_NODES", "1"))
         task_ppn = int(getattr(self, "TASK_PPN", ""))
 
@@ -119,7 +120,7 @@ class ips_massive_serial(Component):
             services.add_task(
                 'pool', 
                 'task_'+str(k), 
-                dask_nodes, 
+                1, 
                 tmp_xfs_rank if tmp_xfs else cwd,
                 "sh", 
                 os.path.join(rundir, "ips_bin.sh"),
@@ -128,7 +129,7 @@ class ips_massive_serial(Component):
                 task_ppn=task_ppn)
 
         #--- run
-        ret_val = services.submit_tasks('pool', use_dask=True, dask_nodes=dask_nodes)
+        ret_val = services.submit_tasks('pool', use_dask=use_dask, dask_nodes=dask_nodes)
         print('ret_val = ', ret_val)
         exit_status = services.get_finished_tasks('pool')
         print(exit_status)
