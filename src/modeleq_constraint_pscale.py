@@ -10,7 +10,7 @@ class modeleq_constraint_pscale(Component):
 
     def __init__(self, services, config):
         Component.__init__(self, services, config)
-        print('Created %s' % (self.__class__)
+        print('Created %s' % (self.__class__))
 
     def init(self, timeid=0):
         print('modeleq_constraint_pscale.init() called')

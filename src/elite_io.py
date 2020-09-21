@@ -4,7 +4,7 @@ from numpy import *
 
 class elite_data():
 
-    def __init__(self, slef.nmodes = [5, 10, 15, 20, 25] ):
+    def __init__(self, nmodes = [5, 10, 15, 20, 25] ):
         keylist_eq = [
             "alpha_max",
             "pprime_max",
@@ -24,6 +24,8 @@ class elite_data():
            "gamr2",
            "tmatasym",
         ]
+
+        self.nmodes = nmodes
 
         self.data = {}
         for key in keylist_eq: self.data[key] = 0.0
