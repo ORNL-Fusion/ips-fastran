@@ -40,6 +40,10 @@ class ips_massive_serial(Component):
         if not os.path.exists(dir_summary): os.makedirs(dir_summary)
 
         tmp_xfs = getattr(self, "TMPXFS", "")
+        if tmp_xfs.upper() == "NONE":
+            print ("TMPXFS = ", "NONE")
+            tmp_xfs = ""
+
         # check tmp xfs filesystem is setup correctly
         if tmp_xfs:
             if os.system(f'findmnt -nt xfs -T {tmp_xfs}') != 0:
@@ -62,7 +66,7 @@ class ips_massive_serial(Component):
         size = int(getattr(self, "SIZE", "1"))
         print(('NSIM = %d at RANK = %d'%(nsim, rank)))
 
-        try: 
+        try:
             pwd = services.get_config_param("PWD")
         except:
             pwd = os.environ["PWD"]
@@ -90,12 +94,12 @@ class ips_massive_serial(Component):
             data = inscan[k+1]
             for i, key in enumerate(header.split()):
                 print (i, key)
-                comp, vname, vtype = key.split(':') 
-                d = data.split() 
+                comp, vname, vtype = key.split(':')
+                d = data.split()
                 if vtype == 'str': val = str(d[i])
                 else: val = eval(vtype+"("+d[i]+")")
                 if comp == '': sim[vname] = val
-                else: sim[comp][vname] = val 
+                else: sim[comp][vname] = val
 
             sim["PWD"] = tmp_xfs_rank if tmp_xfs else pwd
             sim["RUN_ID"] = "run%05d"%k
@@ -103,26 +107,26 @@ class ips_massive_serial(Component):
             sim["OUT_REDIRECT"] = "True"
             sim["OUT_REDIRECT_FNAME"] = os.path.join(tmp_xfs_rank if tmp_xfs else cwd, "run%05d.out"%k)
             sim["USE_PORTAL"] = "False"
-            driver = sim['PORTS']['DRIVER']['IMPLEMENTATION'] 
+            driver = sim['PORTS']['DRIVER']['IMPLEMENTATION']
             sim[driver]["SUMMARY"] = tmp_xfs_dir_summary if tmp_xfs else dir_summary
             sim.write(open(os.path.join(tmp_xfs_rank, "run%05d.config"%k), "wb") if tmp_xfs else open("run%05d.config"%k, "wb"))
 
-            ips_bin = os.path.join(self.BIN_PATH, self.BIN) 
+            ips_bin = os.path.join(self.BIN_PATH, self.BIN)
             ips_bin += " --config=run%05d.config"%k
             ips_bin += " --log=ips_%05d.log"%k
             ips_bin += " --platform=local.conf"
-            if self.clean_after: 
+            if self.clean_after:
                 ips_bin += "\nrm -rf "+rundir
                 ips_bin += "\nrm -f "+rundir+".zip"
 
             with open(os.path.join(rundir, "ips_bin.sh"), "w") as f: f.write(ips_bin)
 
             services.add_task(
-                'pool', 
-                'task_'+str(k), 
-                1, 
+                'pool',
+                'task_'+str(k),
+                1,
                 tmp_xfs_rank if tmp_xfs else cwd,
-                "sh", 
+                "sh",
                 os.path.join(rundir, "ips_bin.sh"),
                 logfile=logfile,
                 timeout=self.time_out,
@@ -141,7 +145,7 @@ class ips_massive_serial(Component):
         services.stage_output_files(timeStamp, self.OUTPUT_FILES)
 
     def finalize(self, timeStamp=0):
-        pass  
+        pass
 
 def wrt_localconf(fname="local.conf"):
     s = \
@@ -159,4 +163,3 @@ USE_ACCURATE_NODES = ON
     f=open(fname, "w")
     f.write(s)
     f.close()
-
