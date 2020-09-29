@@ -1,0 +1,4 @@
+python routine for plot to check the convergence for pest3
+needs pest3 results as increase grid number before executing this routine
+the directory structure for pest results maybe need to be updated (fixed now)
+
