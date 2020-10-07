@@ -1,0 +1,14 @@
+#!/bin/bash -l
+#SBATCH -p regular
+#SBATCH -N 1
+#SBATCH -t 00:30:00
+#SBATCH -J ips_fastran 
+#SBATCH -e ips.err
+#SBATCH -o ips.out
+#SBATCH -C haswell
+module use /global/common/software/atom/cori/cesol/modulefiles/cori
+module load fastran
+export SHOT_NUMBER=219004
+export TIME_ID=03110
+$IPS_ROOT/bin/ips.py --config=fastran_scenario.config --platform=$IPSCONFIG_DIR/cori_haswell.conf --log=ips.log
+#$IPS_ROOT/bin/ips_dakota_dynamic.py --dakotaconfig=dakota.in --simulation=fastran_scenario.config --platform=$IPSCONFIG_DIR/cori_haswell.conf --log=ips_sweep.log

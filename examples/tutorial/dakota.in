@@ -1,0 +1,67 @@
+
+strategy
+  single_method
+  tabular_graphics_data
+
+model
+  single
+
+interface
+  fork asynchronous evaluation_concurrency = 4 file_tag, file_save
+  analysis_driver = 'ips_dakota_client.py'
+  parameters_file = 'params.in'
+  results_file    = 'results.out'
+  failure_capture = recover -1.0 -1.0
+
+responses
+  num_objective_functions = 2
+  no_gradients
+  no_hessians
+
+variables
+  continuous_design = 36
+  descriptors
+ 'efit__TIME_ID'
+ 'fastran_init__R0'
+ 'fastran_init__A0'
+ 'fastran_init__KAPPA'
+ 'fastran_init__DELTA'
+ 'fastran_init__B0'
+ 'fastran_init__IP'
+ 'fastran_init__XMID'
+ 'fastran_init__XWID'
+ 'fastran_init__NE_AXIS'
+ 'fastran_init__NE_PED'
+ 'fastran_init__NE_SEP'
+ 'fastran_init__NE_XMID'
+ 'fastran_init__NE_XWID'
+ 'fastran_init__NE_ALPHA'
+ 'fastran_init__NE_BETA'
+ 'fastran_init__TE_AXIS'
+ 'fastran_init__TE_PED'
+ 'fastran_init__TE_SEP'
+ 'fastran_init__TE_XMID'
+ 'fastran_init__TE_XWID'
+ 'fastran_init__TE_ALPHA'
+ 'fastran_init__TE_BETA'
+ 'fastran_init__TI_AXIS'
+ 'fastran_init__TI_PED'
+ 'fastran_init__TI_SEP'
+ 'fastran_init__TI_XMID'
+ 'fastran_init__TI_XWID'
+ 'fastran_init__TI_ALPHA'
+ 'fastran_init__TI_BETA'
+ 'hcd_model__PE'
+ 'nfreya__BPTOR_0'
+ 'fastran_init__BETAN_INPUT'
+ 'fastran_init__ARATIO_INPUT'
+ 'fastran_init__Q95_INPUT'
+ 'fastran_init__FGW_PED_INPUT'
+
+method
+  list_parameter_study
+  list_of_points =
+     0 1.250000e+00 5.000000e-01 2.000000e+00 6.500000e-01 7.000000e+00 2.784145e+00 -1.000000e+00 -1.000000e+00 3.722128e+01 2.481418e+01 1.240709e+01 9.444852e-01 1.110297e-01 1.500000e+00 1.100000e+00 7.853982e+00 2.041473e+00 7.500000e-02 9.444852e-01 1.110297e-01 1.500000e+00 1.500000e+00 7.853982e+00 2.041473e+00 7.500000e-02 9.444852e-01 1.110297e-01 1.500000e+00 1.500000e+00 2.500000e+01 5.000000e+06 3.000000e+00 2.500000e+00 1.000000e+01 7.000000e-01 
+     1 1.250000e+00 5.000000e-01 2.000000e+00 6.500000e-01 7.000000e+00 2.784145e+00 -1.000000e+00 -1.000000e+00 3.722128e+01 2.481418e+01 1.240709e+01 9.444852e-01 1.110297e-01 1.500000e+00 1.100000e+00 7.853982e+00 2.041473e+00 7.500000e-02 9.444852e-01 1.110297e-01 1.500000e+00 1.500000e+00 7.853982e+00 2.041473e+00 7.500000e-02 9.444852e-01 1.110297e-01 1.500000e+00 1.500000e+00 3.000000e+01 5.000000e+06 3.000000e+00 2.500000e+00 1.000000e+01 7.000000e-01 
+     2 1.250000e+00 5.000000e-01 2.000000e+00 6.500000e-01 7.000000e+00 2.784145e+00 -1.000000e+00 -1.000000e+00 3.722128e+01 2.481418e+01 1.240709e+01 9.444852e-01 1.110297e-01 1.500000e+00 1.100000e+00 7.853982e+00 2.041473e+00 7.500000e-02 9.444852e-01 1.110297e-01 1.500000e+00 1.500000e+00 7.853982e+00 2.041473e+00 7.500000e-02 9.444852e-01 1.110297e-01 1.500000e+00 1.500000e+00 3.500000e+01 5.000000e+06 3.000000e+00 2.500000e+00 1.000000e+01 7.000000e-01 
+     3 1.250000e+00 5.000000e-01 2.000000e+00 6.500000e-01 7.000000e+00 2.784145e+00 -1.000000e+00 -1.000000e+00 3.722128e+01 2.481418e+01 1.240709e+01 9.444852e-01 1.110297e-01 1.500000e+00 1.100000e+00 7.853982e+00 2.041473e+00 7.500000e-02 9.444852e-01 1.110297e-01 1.500000e+00 1.500000e+00 7.853982e+00 2.041473e+00 7.500000e-02 9.444852e-01 1.110297e-01 1.500000e+00 1.500000e+00 4.000000e+01 5.000000e+06 3.000000e+00 2.500000e+00 1.000000e+01 7.000000e-01 
