@@ -5,6 +5,8 @@
 """
 
 import os
+import glob
+import shutil
 from component import Component
 
 class fastran_driver(Component):
@@ -39,6 +41,10 @@ class fastran_driver(Component):
             PREPROCESS = ports['PREPROCESS'].split()
         else:
             PREPROCESS = []
+        if 'POSTPROCESS' in ports:
+            POSTPROCESS = ports['POSTPROCESS'].split()
+        else:
+            POSTPROCESS = []
 
         #-- instantiate components in port_names list, except DRIVER itself
         port_dict = {}
@@ -103,23 +109,27 @@ class fastran_driver(Component):
             for port_name in port_names:
 
                 if port_name in PREPROCESS: continue
-                if port_name in ['EQ', 'EC', 'IC', 'HC', 'LH', 'NB', 'TR', 'BC', 'FEEDBACK', 'MONITOR', 'PEDESTAL']:
+                if port_name in POSTPROCESS: continue
+                if port_name in ['EQ', 'EC', 'IC', 'HC', 'LH', 'NB', 'TR', 'BC', 'MONITOR', 'PEDESTAL']:
                     self.component_call(services, port_name, port_dict[port_name], 'step', t)
 
             services.stage_plasma_state()
             services.stage_output_files(t, self.OUTPUT_FILES)
 
         #-- post process
-        if 'POST' in port_names:
+        if POSTPROCESS:
             nstep_post = int(services.sim_conf["ITERATION_LOOP"]["NSTEP_POST"])
             for kstep in range(nstep, nstep+nstep_post):
+                # t = kstep_prefix+"%d"%kstep
+                t = kstep
                 print('')
                 print(72*"=")
                 print('= POST PROCESS: iteration number = ', kstep)
                 print('')
-                # t = kstep_prefix+"%d"%kstep
-                t = kstep
-                self.component_call(services, 'POST', port_dict['POST'], 'step', t)
+                services.update_time_stamp(t)
+
+                for port_name in POSTPROCESS:
+                    self.component_call(services, port_name, port_dict[port_name], 'step', t)
 
         #-- call finalize on each component
         if self.SUB_WORKFLOW  == '':
@@ -141,6 +151,14 @@ class fastran_driver(Component):
         f.write("%6.3f\n"%0.0)
         f.close()
 
+        dir_summary = getattr(self, "SUMMARY", "")
+        if dir_summary != "":
+            if not os.path.exists(dir_summary): os.makedirs(dir_summary)
+            dir_state = self.services.get_config_param('PLASMA_STATE_WORK_DIR')
+            for filename in glob.glob(os.path.join(dir_state, "*.*")):
+                print(filename)
+                shutil.copy(filename, dir_summary)
+
     def component_call(self, services, port_name, comp, mode, time):
         comp_mode_string = port_name + ' ' + mode
         print (comp_mode_string)
@@ -151,3 +169,4 @@ class fastran_driver(Component):
             raise
         else:
             print(comp_mode_string + ' finished')
+
