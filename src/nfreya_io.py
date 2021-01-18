@@ -222,9 +222,9 @@ def write_inputfiles(f_state, f_eqdsk, f_infreya, dir_data=''):
 
     inone["namelis1"]["njeni"] = len(namei)*[nrho]
     inone["namelis1"]["reniin(1,1)"] = rho
-    inone["namelis1"]["reniin(1,2)"] = rho
     inone["namelis1"]["eni(1,1)"] = nc*1.0e-6
     if len(namei) > 1:
+        inone["namelis1"]["reniin(1,2)"] = rho
         inone["namelis1"]["eni(1,2)"] = nhe4*1.0e-6
 
     inone["namelis3"]["EQDSKIN"] = [f_eqdsk]
