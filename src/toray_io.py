@@ -194,9 +194,9 @@ def read_toray_output(f_ncfile="toray.nc"):
     for i in range(1,nrho-1):
         jec_out[i] = 0.5*(jec[i]+jec[i-1])*1.0e4
         qec_out[i] = 0.5*(qec[i]+qec[i-1])*1.0e6
-    jec_out[ 0] = 0.0
+    jec_out[ 0] = jec_out[1] #0.0
     jec_out[-1] = 0.0
-    qec_out[ 0] = 0.0
+    qec_out[ 0] = qec_out[1] #0.0
     qec_out[-1] = 0.0
 
     print("Pec abs. fraction = %5.3f"%Pec)
