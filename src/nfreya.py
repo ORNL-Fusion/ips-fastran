@@ -38,6 +38,7 @@ class nfreya(Component):
         ps_backend = getattr(self, 'PS_BACKEND', 'PS')
         if ps_backend == 'PS':
             cur_state_file = services.get_config_param('CURRENT_STATE')
+            cur_bc_file = services.get_config_param('CURRENT_BC')
         elif ps_backend == 'INSTATE':
             cur_instate_file = services.get_config_param('CURRENT_INSTATE')
 
@@ -56,6 +57,20 @@ class nfreya(Component):
                     print(key,k, 'updated')
                 except AttributeError:
                     pass
+        innfreya.write("innfreya")
+
+        FEEDBACK = int(getattr(self, 'FEEDBACK', '10000'))
+        inbc = Namelist(cur_bc_file)
+        innfreya = Namelist("innfreya", case="lower")
+        if timeid >= FEEDBACK:
+            pnb = inbc["feedback"]["pnb"][-1]
+            innfreya["innfreya"]["bptor"] = [pnb]
+            print("feedback:")
+            print(inbc["feedback"]["pnb"])
+            print(pnb)
+        else:
+            inbc["feedback"]["pnb"] = [innfreya["innfreya"]["bptor"][0]]
+        inbc.write(cur_bc_file)
         innfreya.write("innfreya")
 
         #--- generate input
