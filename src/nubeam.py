@@ -117,6 +117,12 @@ class nubeam(Component):
 
     def step(self, timeid=0):
         print('nubeam.step() started')
+        ifreeze = int(getattr(self, "FREEZE", -1))
+        iresume = int(getattr(self, "RESUME", -1))
+        if ifreeze >= 0 and timeid >= ifreeze:
+            if iresume < 0 or timeid < iresume:
+                print("nubeam skipped, FREEZE = %d, RESUME = %d, TIMEID = %d"%(ifreeze, iresume, timeid))
+                return None
 
         #--- entry
         services = self.services
