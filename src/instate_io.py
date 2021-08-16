@@ -261,7 +261,8 @@ def ps_to_instate(f_state, f_eqdsk, f_bc, f_instate, rdir='.'):
     j_tot = 1.e-6*ps.dump_j_parallel(rho, "rho_eq", "curt", r0, b0, tot=True)
     j_nb  = 1.e-6*ps.dump_j_parallel(rho, "rho_nbi", "curbeam", r0, b0)
     j_ec  = 1.e-6*ps.dump_j_parallel(rho, "rho_ecrf", "curech", r0, b0)
-    j_ic  = 1.0e-6*ps.dump_j_parallel(rho, "rho_icrf", "curich", r0, b0)
+    j_ic  = 1.e-6*ps.dump_j_parallel(rho, "rho_icrf", "curich", r0, b0)
+    j_lh  = 1.e-6*ps.dump_j_parallel(rho, "rho_lhrf", "curlh", r0, b0)
     j_bs  = zeros(nrho)
     j_oh  = zeros(nrho)
 
@@ -285,9 +286,11 @@ def ps_to_instate(f_state, f_eqdsk, f_bc, f_instate, rdir='.'):
 
     pe_ec  = 1.e-6*ps.dump_vol_profile(rho, "rho_ecrf", "peech")
     pe_ic  = 1.e-6*ps.dump_vol_profile(rho, "rho_icrf", "picrf_totals", k=0)
+    pe_lh  = 1.e-6*ps.dump_vol_profile(rho, "rho_lhrf", "pelh")
 
     pi_ec = zeros(nrho)
     pi_ic  = 1.0e-6*ps.dump_vol_profile(rho, "rho_icrf", "picrf_totals", k=1)
+    pi_lh  = 1.e-6*ps.dump_vol_profile(rho, "rho_lhrf", "pilh")
 
     tqbe = ps.dump_vol_profile(rho, "rho_nbi", "tqbe")
     tqbi = ps.dump_vol_profile(rho, "rho_nbi", "tqbi")
@@ -340,15 +343,18 @@ def ps_to_instate(f_state, f_eqdsk, f_bc, f_instate, rdir='.'):
     instate["instate"]["j_nb"  ] = j_nb
     instate["instate"]["j_ec"  ] = j_ec
     instate["instate"]["j_ic"  ] = j_ic
+    instate["instate"]["j_lh"  ] = j_lh
     instate["instate"]["pe_nb" ] = pe_nb
     instate["instate"]["pe_ec" ] = pe_ec
     instate["instate"]["pe_ic" ] = pe_ic
+    instate["instate"]["pe_lh" ] = pe_lh
     instate["instate"]["pe_fus"] = pe_fus
     instate["instate"]["pe_ionization"] = pe_ionization
     instate["instate"]["p_rad" ] = p_rad
     instate["instate"]["pi_nb" ] = pi_nb
     instate["instate"]["pi_ec" ] = pi_ec
     instate["instate"]["pi_ic" ] = pi_ic
+    instate["instate"]["pi_lh" ] = pi_lh
     instate["instate"]["pi_fus"] = pi_fus
     instate["instate"]["pi_ionization"]  = pi_ionization
     instate["instate"]["pi_cx" ] = pi_cx

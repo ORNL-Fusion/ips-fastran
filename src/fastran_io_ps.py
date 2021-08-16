@@ -45,7 +45,10 @@ def write_input(f_state,f_eqdsk,rdir='.'):
 
     j_tot = 1.e-6*ps.dump_j_parallel(rho, "rho_eq", "curt", r0, b0, tot=True)
     j_nb = 1.e-6*ps.dump_j_parallel(rho, "rho_nbi", "curbeam", r0, b0)
-    j_rf = 1.e-6*(ps.dump_j_parallel(rho, "rho_ecrf", "curech", r0, b0) + ps.dump_j_parallel(rho, "rho_icrf", "curich", r0, b0))
+    j_rf = ps.dump_j_parallel(rho, "rho_ecrf", "curech", r0, b0) \
+         + ps.dump_j_parallel(rho, "rho_icrf", "curich", r0, b0) \
+         + ps.dump_j_parallel(rho, "rho_lhrf", "curlh", r0, b0)
+    j_rf *= 1.e-6
     j_bs  = zeros(nrho)
 
     density_beam = ps.dump_profile(rho, "rho_nbi", "nbeami", k=0)*1.e-19
@@ -53,13 +56,13 @@ def write_input(f_state,f_eqdsk,rdir='.'):
           + ps.dump_profile(rho, "rho_nbi", "epll_beami", k=0)
     wbeam = density_beam*wbeam*1.602e-3 #MJ/m**3
 
-    pe_nb  = ps.dump_vol_profile(rho, "rho_nbi", "pbe" )*1.e-6
-    pi_nb  = (ps.dump_vol_profile(rho, "rho_nbi", "pbi" ) + ps.dump_vol_profile(rho, "rho_nbi", "pbth" ))*1.e-6
+    pe_nb  = ps.dump_vol_profile(rho, "rho_nbi", "pbe")*1.e-6
+    pi_nb  = (ps.dump_vol_profile(rho, "rho_nbi", "pbi") + ps.dump_vol_profile(rho, "rho_nbi", "pbth"))*1.e-6
     pth_nb = ps.dump_vol_profile(rho, "rho_nbi", "pbth")*1.e-6
 
     density_alpha = ps.dump_profile(rho, "rho_fus", "nfusi", k=0)*1.e-19
     walpha = ps.dump_profile(rho, "rho_fus", "eperp_fusi", k=0) \
-         + ps.dump_profile(rho, "rho_fus", "epll_fusi", k=0)
+           + ps.dump_profile(rho, "rho_fus", "epll_fusi", k=0)
     walpha = density_alpha*walpha*1.602e-3 #MJ/m**3
 
     pe_fus  = ps.dump_vol_profile(rho, "rho_fus", "pfuse" )*1.e-6
@@ -67,10 +70,12 @@ def write_input(f_state,f_eqdsk,rdir='.'):
     pth_fus = ps.dump_vol_profile(rho, "rho_fus", "pfusth")*1.e-6
 
     pe_rf  = ps.dump_vol_profile(rho, "rho_ecrf", "peech") \
-           + ps.dump_vol_profile(rho, "rho_icrf", "picrf_totals", k=0)
+           + ps.dump_vol_profile(rho, "rho_icrf", "picrf_totals", k=0) \
+           + ps.dump_vol_profile(rho, "rho_lhrf", "pelh")
     pe_rf *= 1.e-6
 
-    pi_rf  = ps.dump_vol_profile(rho, "rho_icrf", "picrf_totals", k=1)
+    pi_rf  = ps.dump_vol_profile(rho, "rho_icrf", "picrf_totals", k=1) \
+           + ps.dump_vol_profile(rho, "rho_lhrf", "pilh")
     pi_rf *= 1.e-6
 
     tqbe = ps.dump_vol_profile(rho, "rho_nbi", "tqbe")
@@ -78,7 +83,7 @@ def write_input(f_state,f_eqdsk,rdir='.'):
     tqbjxb = ps.dump_vol_profile(rho, "rho_nbi", "tqbjxb")
     tqbth = ps.dump_vol_profile(rho, "rho_nbi", "tqbth")
 
-    torque_nb= tqbe+tqbi+tqbjxb+tqbth
+    torque_nb= tqbe + tqbi + tqbjxb + tqbth
     torque_in= zeros(nrho)
 
     se_nb = 1.e-19*(ps.dump_vol_profile(rho, "rho_nbi", "sbedep") + ps.dump_vol_profile(rho, "rho_nbi", "sbehalo"))

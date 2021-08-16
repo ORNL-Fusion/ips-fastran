@@ -75,7 +75,7 @@ def write_inputfiles(f_state, f_eqdsk, f_ingenray, MKS=True):
     else:
         ingenray.write("genray.dat")
 
-def update_state(f_state, f_eqdsk, imode='EC', jmulti=1.0, add=0, rho_smooth=0.0):
+def update_state(f_state, f_eqdsk, imode='EC', jmulti=1.0, add=0, rho_smooth=0.0, id_src=0):
     #-- read genray output
     ncfile = "genray.nc"
     ncgenray = netCDF4.Dataset(ncfile, 'r', format='NETCDF4')
@@ -114,10 +114,15 @@ def update_state(f_state, f_eqdsk, imode='EC', jmulti=1.0, add=0, rho_smooth=0.0
         ps.load_j_parallel(rho_ps, jp_ps, "rho_ecrf", "curech", r0, b0)
         ps.load_vol_profile(rho_ps, pe_ps, "rho_ecrf", "peech")
     elif imode=='IC':
-        print('imode:EC')
+        print('imode:IC')
         ps.load_j_parallel(rho_ps, jp_ps, "rho_icrf", "curich", r0, b0, add=add)
         ps.load_vol_profile(rho_ps, pe_ps, "rho_icrf", "picrf_totals", k=0, add=add)
         ps.load_vol_profile(rho_ps, pi_ps, "rho_icrf", "picrf_totals", k=1, add=add)
+    elif imode=='LH':
+        print('imode:LH')
+        ps.load_j_parallel(rho_ps, jp_ps, "rho_lhrf", "curlh", r0, b0)
+        ps.load_vol_profile(rho_ps, pe_ps, "rho_lhrf", "pelh")
+        ps.load_vol_profile(rho_ps, pi_ps, "rho_lhrf", "pilh")
 
     ps.store(f_state)
 
