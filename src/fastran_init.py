@@ -16,9 +16,9 @@ import instate_model
 import instate_io
 import cesol_io
 from pedestal_io import update_instate_pedestal
+from fastranutil import namelist_default
 
 class fastran_init (Component):
-
     def __init__(self, services, config):
         Component.__init__(self, services, config)
         print('Created %s' % (self.__class__))
@@ -95,6 +95,8 @@ class fastran_init (Component):
         ps = plasmastate('ips', 1)
 
         instate = Namelist(f_instate)
+        nicrf_src =  namelist_default(instate, "instate", "nicrf_src", [1])
+        nlhrf_src =  namelist_default(instate, "instate", "nlhrf_src", [1])
 
         print('init from instate:', f_instate)
 
@@ -118,6 +120,8 @@ class fastran_init (Component):
             a_rfmin = instate["instate"]["a_min"],
             z_gas = instate["instate"]["z_ion"],
             a_gas = instate["instate"]["a_ion"],
+            nicrf_src = nicrf_src,
+            nlhrf_src = nlhrf_src,
             nrho = [101],
             time = [0.0],
             nlim = instate["instate"]["nlim"]

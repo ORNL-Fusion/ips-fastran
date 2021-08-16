@@ -40,6 +40,9 @@ class plasmastate(PlasmaState, plasmastate_base):
             z_rfmin = keyargs['z_rfmin']
             a_rfmin = keyargs['a_rfmin']
 
+        nicrf_src = keyargs['nicrf_src'][0]
+        nlhrf_src = keyargs['nlhrf_src'][0]
+
         self["nspec_th"] = nspec_th
         self["nspec_beam"] = nspec_beam
         self["nspec_fusion"] = nspec_fusion
@@ -56,11 +59,12 @@ class plasmastate(PlasmaState, plasmastate_base):
         self["nrho_nbi"] = nrho_nbi #nrho
         self["nrho_ecrf"] = nrho
         self["nrho_icrf"] = nrho
+        self["nrho_lhrf"] = nrho
         self["nrho_fus"] = nrho
         self["nrho_anom"] = nrho
 
-        nicrf = 5  #---- hard coded
-        self["nicrf_src"] = nicrf
+        self["nicrf_src"] = nicrf_src
+        self["nlhrf_src"] = nlhrf_src
 
         #-------
         self["global_label"] = keyargs['global_label'][0]
@@ -75,7 +79,8 @@ class plasmastate(PlasmaState, plasmastate_base):
 
         self.alloc()
 
-        self["icrf_src_name"] = ['IC%02d'%k for k in range(nicrf)]
+        self["icrf_src_name"] = ['IC%02d'%k for k in range(nicrf_src)]
+        self["lhrf_src_name"] = ['LH%02d'%k for k in range(nlhrf_src)]
 
         self.setThermalSpecies(-1, -1, 0)
 
@@ -105,6 +110,7 @@ class plasmastate(PlasmaState, plasmastate_base):
         self["rho_nbi"] = rho_nbi #rho
         self["rho_ecrf"] = rho
         self["rho_icrf"] = rho
+        self["rho_lhrf"] = rho
         self["rho_fus"] = rho
         self["rho_anom"] = rho
 
