@@ -10,7 +10,6 @@ import shutil
 from component import Component
 
 class fastran_driver(Component):
-
     def __init__(self, services, config):
         Component.__init__(self, services, config)
         print('Created %s' % (self.__class__))
@@ -93,7 +92,7 @@ class fastran_driver(Component):
 
         #-- pre process
         for port_name in PREPROCESS:
-            self.component_call(services, port_name, port_dict[port_name], 'step', 0)
+            self.component_call(services, port_name, port_dict[port_name], 'step', timeid)
 
         #-- main iteration
         for kstep in range(timeid, timeid+nstep):
@@ -107,11 +106,10 @@ class fastran_driver(Component):
             services.update_time_stamp(t)
 
             for port_name in port_names:
-
                 if port_name in PREPROCESS: continue
                 if port_name in POSTPROCESS: continue
-                if port_name in ['EQ', 'EC', 'IC', 'HC', 'LH', 'NB', 'TR', 'BC', 'MONITOR', 'PEDESTAL']:
-                    self.component_call(services, port_name, port_dict[port_name], 'step', t)
+
+                self.component_call(services, port_name, port_dict[port_name], 'step', t)
 
             services.stage_plasma_state()
             services.stage_output_files(t, self.OUTPUT_FILES)
@@ -124,7 +122,7 @@ class fastran_driver(Component):
                 t = kstep
                 print('')
                 print(72*"=")
-                print('= POST PROCESS: iteration number = ', kstep)
+                print('= POST PROCESS: iteration number = ', t)
                 print('')
                 services.update_time_stamp(t)
 
@@ -166,7 +164,5 @@ class fastran_driver(Component):
             services.call(comp, mode, time)
         except Exception:
             services.exception(comp_mode_string + ' failed')
-            raise
         else:
             print(comp_mode_string + ' finished')
-
