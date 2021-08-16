@@ -15,7 +15,6 @@ from Namelist import Namelist
 from plasmastate import plasmastate
 
 class nubeam(Component):
-
     def __init__(self, services, config):
         Component.__init__(self, services, config)
         print('Created %s' % (self.__class__))
@@ -58,6 +57,7 @@ class nubeam(Component):
 
         ps.load_innubeam()
 
+        ps.update_particle_balance()
         ps.store(cur_state_file)
 
         #--- update plasma state files
