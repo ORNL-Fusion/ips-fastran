@@ -12,7 +12,6 @@ import genray_io
 from Namelist import Namelist
 
 class genray(Component):
-
     def __init__(self, services, config):
         Component.__init__(self, services, config)
         print('Created %s' % (self.__class__))
@@ -24,6 +23,13 @@ class genray(Component):
         #--- entry
         print('genray.step() started')
         services = self.services
+
+        ifreeze = int(getattr(self, "FREEZE", -1))
+        iresume = int(getattr(self, "RESUME", -1))
+        if ifreeze >= 0 and timeid >= ifreeze:
+            if iresume < 0 or timeid < iresume:
+                print("genray skipped, FREEZE = %d, RESUME = %d, TIMEID = %d"%(ifreeze, iresume, timeid))
+                return None
 
         #--- excutable
         genray_bin = os.path.join(self.BIN_PATH, self.BIN)
@@ -67,7 +73,10 @@ class genray(Component):
         genray_io.write_inputfiles(cur_state_file, cur_eqdsk_file, f_ingenray, MKS)
 
         add = int(getattr(self, "ADD", "0"))
-        print('add = ',add)
+        print('add = ', add)
+
+        imode = getattr(self, "IMODE", "IC")
+        print('imode = ', imode)
 
         #--- run genray
         print('run genray')
@@ -85,7 +94,7 @@ class genray(Component):
            raise Exception('Error executing: xgenray')
 
         #--- get genray output
-        genray_io.update_state(cur_state_file, cur_eqdsk_file, imode='IC', jmulti=jmulti, add=add)
+        genray_io.update_state(cur_state_file, cur_eqdsk_file, imode=imode, jmulti=jmulti, add=add)
 
         #--- update plasma state files
         services.update_plasma_state()
