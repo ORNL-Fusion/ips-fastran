@@ -170,7 +170,6 @@ def instate_model(f_instate):
     b0         = instate["instate"]["b0"         ][0]
     xmid       = instate["instate"]["xmid"       ][0]
     xwid       = instate["instate"]["xwid"       ][0]
-    print('here')
 
     b0 = abs(b0)
 
@@ -195,6 +194,7 @@ def instate_model(f_instate):
         kapl = instate["instate"]["kappa"][0]
         delu = instate["instate"]["delta"][0]
         dell = instate["instate"]["delta"][0]
+        z0 = namelist_default(instate,"instate","z0",[0])[0]
         np = instate["instate"]["nbdry"][0]
 
         zetaou = 0.
@@ -208,6 +208,8 @@ def instate_model(f_instate):
 
         rb = append(rb, rb[0])
         zb = append(zb, zb[0])
+
+        zb += z0
 
         dlim = 0.05
         rmax = max(rb) + dlim
