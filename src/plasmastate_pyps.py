@@ -178,10 +178,7 @@ class plasmastate(PlasmaState, plasmastate_base):
 
         self["dn0out"] = 0.5e18  #defalut:0.5e18
 
-    def load_geqdsk(self, fn_geqdsk, keep_cur_profile=True, bdy_crat=1.e-6):
-        kcur_option = 1
-        rho_curbrk = 0.9
-
+    def load_geqdsk(self, fn_geqdsk, keep_cur_profile=True, bdy_crat=1.e-6, kcur_option=1, rho_curbrk=0.9):
         if keep_cur_profile:
             geq = readg(fn_geqdsk)
             r0  = geq["rzero" ]
@@ -195,7 +192,13 @@ class plasmastate(PlasmaState, plasmastate_base):
         self.deriveMhdEq('everything')
 
         if keep_cur_profile:
-           self.load_j_parallel(self["rho"], j_tot, "rho_eq", "curt", r0, b0, tot=True)
+            ps_geqdsk = plasmastate('ips',1)
+            ps_geqdsk.init_from_geqdsk (fn_geqdsk, nrho=self["nrho"], nth=101)
+
+            self["vol"][:] = ps_geqdsk["vol"][:]
+            self["g_eq"][:] = ps_geqdsk["g_eq"][:]
+            self.load_j_parallel(self["rho"], j_tot, "rho_eq", "curt", r0, b0, tot=True)
+            j_tot = self.dump_j_parallel(self["rho"],"rho_eq","curt",r0,b0,tot=True)
 
     def init_from_geqdsk(self, fn_geqdsk, nrho=101, nth=101, shot=0, time=0, bdy_crat=1.e-6):
         self["nrho_eq"] = nrho

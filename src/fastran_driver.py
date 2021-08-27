@@ -106,6 +106,7 @@ class fastran_driver(Component):
             services.update_time_stamp(t)
 
             for port_name in port_names:
+                if port_name in ["INIT", "DRIVER"]: continue
                 if port_name in PREPROCESS: continue
                 if port_name in POSTPROCESS: continue
 

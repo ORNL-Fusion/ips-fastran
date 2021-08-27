@@ -192,13 +192,13 @@ class efit(Component):
                 inmetric = ps_to_inmetric(ps, r0, b0, ip)
                 inmetric_keys = [
                   'volp', 'ipol', 'g11', 'g22', 'g33', 'gradrho', 'area', 'rminor', 'rmajor',
-                  'shift', 'kappa', 'delta', 'pmhd', 'qmhd', 
+                  'shift', 'kappa', 'delta', 'pmhd', 'qmhd',
                   'er', 'nc1', 'hfac1', 'hfac2', 'psi', "vol", "gr2i", "bp2"]
                 if k > 0:
                     print ("inmtric under-relax")
                     for key in inmetric_keys:
                         inmetric["inmetric"][key] = 0.5*array(inmetric_prev["inmetric"][key]) + 0.5*array(inmetric["inmetric"][key])
-                    
+
                 iconv = efit_io.fixbdry_kfile(self.ishot, self.itime, Namelist(f_inefit,"r"), inmetric["inmetric"], relax=relax, topology=topology, error=error)
                 if scale_gs: efit_io.scale_kfile(self.ishot, self.itime, Rs=Rs, Bs=Bs)
 
@@ -254,12 +254,6 @@ class efit(Component):
             ps = plasmastate('ips',1)
             ps.read(cur_state_file)
             ps.load_geqdsk(cur_eqdsk_file)
-
-            ps_geqdsk = plasmastate('ips',1)
-            ps_geqdsk.init_from_geqdsk (cur_eqdsk_file, nrho=ps["nrho"], nth=101)
-            ps["vol"][:] = ps_geqdsk["vol"][:]
-            ps["g_eq"][:] = ps_geqdsk["g_eq"][:]
-
             ps.store(cur_state_file)
 
         elif ps_backend == 'INSTATE':
@@ -345,10 +339,6 @@ class efit(Component):
             ps = plasmastate('ips',1)
             ps.read(cur_state_file)
             ps.load_geqdsk(cur_eqdsk_file)
-            ps_geqdsk = plasmastate('ips',1)
-            ps_geqdsk.init_from_geqdsk (cur_eqdsk_file, nrho=ps["nrho"], nth=101)
-            ps["vol"][:] = ps_geqdsk["vol"][:]
-            ps["g_eq"][:] = ps_geqdsk["g_eq"][:]
             ps.store(cur_state_file)
 
         elif ps_backend == 'INSTATE':

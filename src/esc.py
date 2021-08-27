@@ -87,10 +87,6 @@ class esc(Component):
         ps = plasmastate('ips', 1)
         ps.read(cur_state_file)
         ps.load_geqdsk(cur_eqdsk_file)
-        ps_geqdsk = plasmastate('ips', 1)
-        ps_geqdsk.init_from_geqdsk (cur_eqdsk_file, nrho=ps["nrho"], nth=101)
-        ps["vol"][:] = ps_geqdsk["vol"][:]
-        ps["g_eq"][:] = ps_geqdsk["g_eq"][:]
         ps.store(cur_state_file)
 
         #--- update plasma state files

@@ -15,14 +15,7 @@ class plasmastate_base():
 
     def analytic_volume(self, b0, r0, a0, kappa0, delta0):
         nrho_eq = 101 #self["nrho_eq"]
-
-        print('b0=',b0)
-        print('r0=',r0)
-        print('a0=',a0)
-        print('kappa0=',kappa0)
-        print('delta0=',delta0)
-        print(self['vol'][:])
-        print(len(self['vol'][:]))
+        print('analytic volume:')
 
         for i in range(nrho_eq):
             rho = self["rho_eq"][i]
