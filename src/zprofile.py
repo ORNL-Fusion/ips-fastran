@@ -58,7 +58,6 @@ def get_mtanh_parab(c,x):
     return yfit
 
 class zprofile():
-
     func_maps = {"mtanh":mtanh, "tanh0":tanh0, "mtanh_parab":mtanh_parab}
 
     def __init__(self, x, y, func="mtanh", wped=0.1):

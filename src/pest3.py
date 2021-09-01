@@ -13,7 +13,6 @@ from plasmastate import plasmastate
 from Namelist import Namelist
 
 class pest3(Component):
-
     def __init__(self, services, config):
         Component.__init__(self, services, config)
         print ('Created %s' % (self.__class__))
@@ -38,7 +37,7 @@ class pest3(Component):
         print('pest3_bin = ', pest3_bin)
 
         #-- stage plasma state files
-        services.stage_plasma_state()
+        services.stage_state()
 
         #-- get plasma state file names
         cur_instate_file = services.get_config_param('CURRENT_INSTATE')
@@ -89,7 +88,7 @@ class pest3(Component):
         instate.write(cur_instate_file)
 
         #-- update plasma state files
-        services.update_plasma_state()
+        services.update_state()
 
         #-- archive output files
         services.stage_output_files(timeid, self.OUTPUT_FILES)

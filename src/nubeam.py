@@ -36,7 +36,7 @@ class nubeam(Component):
         workdir = services.get_working_dir()
 
         #--- stage plasma state files
-        services.stage_plasma_state()
+        services.stage_state()
 
         #--- load nubeam geometry
         print('load innubeam')
@@ -61,7 +61,7 @@ class nubeam(Component):
         ps.store(cur_state_file)
 
         #--- update plasma state files
-        services.update_plasma_state()
+        services.update_state()
 
         #--- generate nubeam input
 
@@ -98,7 +98,7 @@ class nubeam(Component):
             services.exeception('no PREACT parameter')
 
         #--- stage plasma state files
-        services.stage_plasma_state()
+        services.stage_state()
 
         #--- setup nubeam_comp_exec run
         os.environ['NUBEAM_ACTION'] = 'INIT'
@@ -128,7 +128,7 @@ class nubeam(Component):
         services = self.services
 
         #--- stage plasma state files
-        services.stage_plasma_state()
+        services.stage_state()
 
         #--- get plasma state file name
         cur_state_file = services.get_config_param('CURRENT_STATE')
@@ -178,7 +178,7 @@ class nubeam(Component):
 
         shutil.copyfile(cur_state_file, "ps0.nc")
 
-        services.update_plasma_state()
+        services.update_state()
 
         nubeam_bin = os.path.join(self.BIN_PATH, self.BIN)
         os.environ['NUBEAM_ACTION'] = 'STEP'
@@ -242,16 +242,16 @@ class nubeam(Component):
         ps.read(cur_state_file)
         vol = ps["vol"][:]
 
-        services.merge_current_plasma_state("state_changes.cdf", logfile='log.update_state')
+        services.merge_current_state("state_changes.cdf", logfile='log.update_state')
 
         #---
-        services.stage_plasma_state()
+        services.stage_state()
         ps = plasmastate('ips',1)
         ps.read(cur_state_file)
         ps["vol"][:] = vol
         ps.update_particle_balance()
         ps.store(cur_state_file)
-        services.update_plasma_state()
+        services.update_state()
 
         #--- archive output files
         services.stage_output_files(timeid, self.OUTPUT_FILES)

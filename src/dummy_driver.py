@@ -9,7 +9,6 @@ from numpy import *
 from component import Component
 
 class dummy_driver(Component):
-
     def __init__(self, services, config):
         Component.__init__(self, services, config)
         print('Created %s' % (self.__class__))
@@ -24,10 +23,10 @@ class dummy_driver(Component):
 
         #-- stage input and plasma state files
         services.stage_input_files(self.INPUT_FILES)
-        services.stage_plasma_state()
+        services.stage_state()
 
         #-- get list of ports
-        ports = services.getGlobalConfigParameter('PORTS')
+        ports = services.get_config_param('PORTS')
         port_names = ports['NAMES'].split()
         print('PORTS =', port_names)
         port_dict = {}
@@ -50,7 +49,7 @@ class dummy_driver(Component):
             self.component_call(services, port_name, port_dict[port_name], init_mode, t)
 
         #-- get plasma state files into driver work directory
-        services.stage_plasma_state()
+        services.stage_state()
 
         #-- post init processing: stage output
         services.stage_output_files(t, self.OUTPUT_FILES)

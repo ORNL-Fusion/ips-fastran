@@ -11,7 +11,6 @@ from component import Component
 from Namelist import Namelist
 
 class modeleq_driver(Component):
-
     def __init__(self, services, config):
         Component.__init__(self, services, config)
         print ('Created %s' % (self.__class__))
@@ -25,10 +24,10 @@ class modeleq_driver(Component):
 
         #-- stage input and plasma state files
         services.stage_input_files(self.INPUT_FILES)
-        services.stage_plasma_state()
+        services.stage_state()
 
         #-- get list of ports
-        ports = services.getGlobalConfigParameter('PORTS')
+        ports = services.get_config_param('PORTS')
         port_names = ports['NAMES'].split()
         print ('PORTS =', port_names)
         port_dict = {}
@@ -48,7 +47,7 @@ class modeleq_driver(Component):
             self.component_call(services, port_name, port_dict[port_name], init_mode, 0)
 
         #-- get plasma state files into driver work directory
-        services.stage_plasma_state()
+        services.stage_state()
 
         #-- post init processing: stage output
         services.stage_output_files(0, self.OUTPUT_FILES)
@@ -70,17 +69,17 @@ class modeleq_driver(Component):
                 if port_name in ['INIT','DRIVER'] + post_names: continue
                 self.component_call(services, port_name, port_dict[port_name], 'step', time_id)
 
-            services.stage_plasma_state()
+            services.stage_state()
             services.stage_output_files(time_id, self.OUTPUT_FILES)
 
         #-- port in post process
         for port_name in post_names:
             self.component_call(services, port_name, port_dict[port_name], 'step', time_id)
 
-        services.stage_plasma_state()
+        services.stage_state()
         services.stage_output_files(time_id, self.OUTPUT_FILES)
 
-        services.update_plasma_state()
+        services.update_state()
 
         #-- call finalize on each component
         print ('')
@@ -95,7 +94,7 @@ class modeleq_driver(Component):
         print ('* DRIVER FINALIZE')
 
         services = self.services
-        sym_root = services.getGlobalConfigParameter('SIM_ROOT')
+        sym_root = services.get_config_param('SIM_ROOT')
         outfile = os.path.join(sym_root,'RESULT')
         print (outfile)
         f = open(outfile,"w")

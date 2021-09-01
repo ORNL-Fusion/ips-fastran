@@ -15,7 +15,6 @@ import zdata
 import numpy as np
 
 class fastran(Component):
-
     def __init__(self, services, config):
         Component.__init__(self, services, config)
         print ('Created %s' % (self.__class__))
@@ -35,7 +34,7 @@ class fastran(Component):
         services = self.services
 
         #--- stage plasma state files
-        services.stage_plasma_state()
+        services.stage_state()
 
         #--- get plasma state file name
         cur_state_file = services.get_config_param('CURRENT_STATE')
@@ -71,7 +70,7 @@ class fastran(Component):
         if timeid > ifreeze and timeid < irefreeze:
             print("FASTRAN FREEZE: timeid = %d, ifreeze = %d"%(timeid, ifreeze))
             inmetric_0 = zdata.zdata()
-            inmetric_0.read("inmetric") 
+            inmetric_0.read("inmetric")
 
         #--- generate fastran input
         if self.PS_BACKEND=="instate":
@@ -81,10 +80,10 @@ class fastran(Component):
 
         if timeid > ifreeze and timeid < irefreeze:
             inmetric = zdata.zdata()
-            inmetric.read("inmetric") 
+            inmetric.read("inmetric")
             inmetric["SHIFT"] = 0.5*np.array(inmetric_0["SHIFT"]) + 0.5*np.array(inmetric["SHIFT"])
             inmetric["PMHD"] = 0.5*np.array(inmetric_0["PMHD"]) + 0.5*np.array(inmetric["PMHD"])
-            inmetric.write("inmetric")  
+            inmetric.write("inmetric")
         shutil.copyfile('inmetric', 'inmetric_%d'%timeid)
 
         #--- run fastran
@@ -131,7 +130,7 @@ class fastran(Component):
         if self.USE_INSTATE == 'YES':
             instate_io.ps_to_instate(cur_state_file, cur_eqdsk_file, cur_bc_file, cur_instate_file)
 
-        services.update_plasma_state()
+        services.update_state()
 
         #--- archive output files
         services.stage_output_files(timeid, self.OUTPUT_FILES)

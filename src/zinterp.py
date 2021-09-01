@@ -9,7 +9,6 @@ from numpy import *
 from scipy.interpolate import interp1d, splrep, splev
 
 class zinterp():
-
     def __init__(self, x, y, s=0):
         self.x = x
         self.y = y

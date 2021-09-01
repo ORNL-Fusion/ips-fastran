@@ -10,7 +10,6 @@ from plasmastate import plasmastate
 import constraint_current_io
 
 class constraint_current(Component):
-
     def __init__(self, services, config):
         Component.__init__(self, services, config)
         print('Created %s' % (self.__class__))
@@ -25,7 +24,7 @@ class constraint_current(Component):
         services = self.services
 
         #--- stage plasma state files
-        services.stage_plasma_state()
+        services.stage_state()
 
         #--- get plasma state file name
         cur_state_file = services.get_config_param('CURRENT_STATE')
@@ -73,7 +72,7 @@ class constraint_current(Component):
             constraint_current_io.parabolicJ(cur_state_file, cur_eqdsk_file, rho_jbdry=rho_jbdry, alpha=alpha, q0=q0)
 
         #--- update plasma state files
-        services.update_plasma_state()
+        services.update_state()
 
         #--- archive output files
         services.stage_output_files(timeid, self.OUTPUT_FILES)

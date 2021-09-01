@@ -8,7 +8,6 @@ from  component import Component
 import cesol_io
 
 class call_fastran_driver(Component):
-
     def __init__(self, services, config):
         Component.__init__(self, services, config)
         print('Created %s' % (self.__class__))
@@ -58,9 +57,9 @@ class call_fastran_driver(Component):
 
         self.services.call(self.driver,'step', timeid)
 
-        self.services.stage_plasma_state()
+        self.services.stage_state()
         cesol_io.fastran_to_instate(cur_fastran_file, cur_instate_file)
-        self.services.update_plasma_state()
+        self.services.update_state()
 
         self.services.stage_subflow_output_files()
 

@@ -14,15 +14,14 @@ from plasmastate import plasmastate
 from efit_eqdsk import readg
 
 class fastran_init_restart (Component):
-
     def __init__(self, services, config):
         Component.__init__(self, services, config)
         print('Created %s' % (self.__class__))
 
-    def init(self, timestamp=0.0):
+    def init(self, timeid=0):
         print ('fastran_init_restart.init() called')
 
-    def step(self, timeStamp):
+    def step(self, timeid):
         #-- entry
         print ('fastran_init_restart.step() start')
         services = self.services
@@ -77,13 +76,13 @@ class fastran_init_restart (Component):
         inbc.write(cur_bc_file)
 
         #-- update plasma state
-        services.update_plasma_state()
+        services.update_state()
 
         #-- archive output files
-        services.stage_output_files(timeStamp, self.OUTPUT_FILES)
+        services.stage_output_files(timeid, self.OUTPUT_FILES)
 
         #-- exit
         print ('fastran_init_restart.step() done')
 
-    def finalize(self, timeStamp=0.0):
+    def finalize(self, timeid=0):
         print('fastran_init_restart.finalize() called')

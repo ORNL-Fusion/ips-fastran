@@ -24,11 +24,11 @@ class fastran_init (Component):
         print('Created %s' % (self.__class__))
 
     def init(self, timestamp=0.0):
-        print ('fastran_init.init() called')
+        print('fastran_init.init() called')
 
     def step(self, timeStamp):
         #-- entry
-        print ('fastran_init.step() started')
+        print('fastran_init.step() started')
         services = self.services
 
         #-- run identifiers
@@ -53,9 +53,9 @@ class fastran_init (Component):
         cur_instate_file = services.get_config_param('CURRENT_INSTATE')
 
         #-- set default
-        init_method = getattr(self,'INIT_METHOD', 'instate') # not used
-        instate_method = getattr(self,'INSTATE_METHOD', '')
-        f_instate = getattr(self,'INSTATE', '')
+        init_method = getattr(self, 'INIT_METHOD', 'instate') # not used
+        instate_method = getattr(self, 'INSTATE_METHOD', '')
+        f_instate = getattr(self, 'INSTATE', '')
         f_inps = getattr(self, 'INPS', '')
         f_ingeqdsk = getattr(self, 'INGEQDSK', '')
         f_eped = getattr(self, 'EPED', '')
@@ -129,15 +129,15 @@ class fastran_init (Component):
 
         #-- input equlibrium
         if f_ingeqdsk:
-            ps.load_geqdsk(f_ingeqdsk,keep_cur_profile=False,bdy_crat=0.01)
-            shutil.copyfile(f_ingeqdsk,cur_eqdsk_file)
+            ps.load_geqdsk(f_ingeqdsk, keep_cur_profile=False, bdy_crat=0.01)
+            shutil.copyfile(f_ingeqdsk, cur_eqdsk_file)
 
             geq = readg(f_ingeqdsk)
             r0  = geq["rzero" ]
             b0  = abs(geq["bcentr"])
             ip  = geq['cpasma']
-            print('haha')
-            ps.load_j_parallel(instate["instate"]["rho"], instate["instate"]["j_tot"],"rho_eq", "curt", r0, b0, tot=True)
+            
+            ps.load_j_parallel(instate["instate"]["rho"], instate["instate"]["j_tot"], "rho_eq", "curt", r0, b0, tot=True)
         else:
             r0 = instate["instate"]["r0"][0]
             b0 = instate["instate"]["b0"][0]
@@ -188,7 +188,7 @@ class fastran_init (Component):
             cesol_io.eped_to_plasmastate(cur_state_file, f_eped, cur_instate_file)
 
         #-- update plasma state
-        services.update_plasma_state()
+        services.update_state()
 
         #-- archive output files
         services.stage_output_files(timeStamp, self.OUTPUT_FILES)

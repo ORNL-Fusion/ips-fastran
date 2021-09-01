@@ -10,7 +10,6 @@ from zprofile import zprofile
 from formula import get_ni
 
 class eped_io():
-
     def __init__(self):
         pass
 
@@ -239,7 +238,6 @@ class eped_io():
         return ne, te, ti
 
     def write(self,inp):
-
         rb = array(inp["rb"])
         zb = array(inp["zb"])
 

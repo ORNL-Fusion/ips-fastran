@@ -14,7 +14,6 @@ from numpy import *
 from component import Component
 
 class dcon_corsica(Component):
-
     def __init__(self, services, config):
         Component.__init__(self, services, config)
         print('Created %s' % (self.__class__))
@@ -31,7 +30,7 @@ class dcon_corsica(Component):
         print('dcon_bin = ', dcon_bin)
 
         #-- stage plasma state files
-        services.stage_plasma_state()
+        services.stage_state()
 
         #-- get plasma state file names
         cur_state_file = services.get_config_param('CURRENT_STATE')
@@ -62,7 +61,7 @@ class dcon_corsica(Component):
         self.read_dcon("s%d.log"%(nmode))
 
         #-- update plasma state files
-        services.update_plasma_state()
+        services.update_state()
 
         #-- archive output files
         services.stage_output_files(timeid, self.OUTPUT_FILES)

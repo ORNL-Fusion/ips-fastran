@@ -9,7 +9,6 @@ from zinterp import zinterp
 from numpy import *
 
 class modeleq_constraint_perturb(Component):
-
     def __init__(self, services, config):
         Component.__init__(self, services, config)
         print('Created %s' % (self.__class__))
@@ -22,7 +21,7 @@ class modeleq_constraint_perturb(Component):
 
         #--- entry
         services = self.services
-        services.stage_plasma_state()
+        services.stage_state()
         cur_instate_file = services.get_config_param('CURRENT_INSTATE')
 
         width = float(self.WIDTH)
@@ -31,7 +30,7 @@ class modeleq_constraint_perturb(Component):
 
         perturb(cur_instate_file, width, jpert, ppert)
 
-        services.update_plasma_state()
+        services.update_state()
         services.stage_output_files(timeid, self.OUTPUT_FILES)
 
 def perturb(f_instate, w=0.3, jpert=0.0, ppert=0.0):

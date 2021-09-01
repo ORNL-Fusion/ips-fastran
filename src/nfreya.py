@@ -13,7 +13,6 @@ from Namelist import Namelist
 import nfreya_io
 
 class nfreya(Component):
-
     def __init__(self, services, config):
         Component.__init__(self, services, config)
         print('Created %s' % (self.__class__))
@@ -32,7 +31,7 @@ class nfreya(Component):
         print(nfreya_bin)
 
         #--- stage plasma state files
-        services.stage_plasma_state()
+        services.stage_state()
 
         #--- get plasma state file names
         ps_backend = getattr(self, 'PS_BACKEND', 'PS')
@@ -116,7 +115,7 @@ class nfreya(Component):
         update_state = int(getattr(self,'UPDATE_STATE','1'))
 
         if update_state:
-            services.update_plasma_state()
+            services.update_state()
 
         #--- archive output files
         services.stage_output_files(timeid, self.OUTPUT_FILES)
@@ -124,9 +123,9 @@ class nfreya(Component):
         #--- clean up
         clean_after = int(getattr(self, "CLEAN_AFTER", "1"))
         if clean_after:
-           delete_files = ["bpltfil", "eqpltfil", "namelists", "qikone", "isllog", "runlog", "test_trnspt_mhd.txt"] 
+           delete_files = ["bpltfil", "eqpltfil", "namelists", "qikone", "isllog", "runlog", "test_trnspt_mhd.txt"]
            for f in delete_files:
-               if os.path.exists(f): 
+               if os.path.exists(f):
                    os.remove(f)
 
     def finalize(self, timeid=0):

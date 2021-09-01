@@ -11,7 +11,6 @@ import shutil
 from component import Component
 
 class cesol_driver(Component):
-
     def __init__(self, services, config):
         Component.__init__(self, services, config)
         print('Created %s' % (self.__class__))
@@ -27,10 +26,10 @@ class cesol_driver(Component):
 
         #-- stage input and plasma state files
         services.stage_input_files(self.INPUT_FILES)
-        services.stage_plasma_state()
+        services.stage_state()
 
         #-- get list of ports
-        ports = services.getGlobalConfigParameter('PORTS')
+        ports = services.get_config_param('PORTS')
         port_names = ports['NAMES'].split()
         print('PORTS =', port_names)
 

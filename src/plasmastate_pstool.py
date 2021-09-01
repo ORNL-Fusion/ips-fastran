@@ -15,7 +15,6 @@ from Namelist import Namelist
 from plasmastate_base import plasmastate_base
 
 class plasmastate(plasmastate_base):
-
     def __init__(self,lable,level):
         self.pstool = os.environ["PSTOOL"]
 

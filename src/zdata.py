@@ -9,7 +9,6 @@ from numpy import *
 from collections import OrderedDict
 
 class zdata():
-
     def __init__(self):
         self.fdata = OrderedDict()
         self.ftype = OrderedDict()
@@ -74,7 +73,6 @@ class zdata():
                 self.write_i(var, '', f)
             else:
                 raise Exception('type mismatch')
-
         f.close()
 
     def write_f(self, name, unit, file):
@@ -97,12 +95,11 @@ class zdata():
 
 
 if __name__=="__main__":
+    data = zdata()
+    data.read("inmetric")
 
-   data = zdata()
-   data.read("inmetric")
+    print(data["PMHD"])
+    data["PMHD"] = [1.0]
+    data.write("aigo")
 
-   print(data["PMHD"])
-   data["PMHD"] = [1.0]
-   data.write("aigo")
-
-   pass
+    pass

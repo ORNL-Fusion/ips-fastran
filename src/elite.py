@@ -11,7 +11,6 @@ from Namelist import Namelist
 from pdata import pdata
 
 class elite(Component):
-
     def __init__(self, services, config):
         Component.__init__(self, services, config)
         print('Created %s' % (self.__class__))
@@ -29,7 +28,7 @@ class elite(Component):
         itime = int(services.get_config_param('TIME_ID'))
 
         #--- stage plasma state files
-        services.stage_plasma_state()
+        services.stage_state()
 
         #--- get plasma state file names
         cur_instate_file = services.get_config_param('CURRENT_INSTATE')
@@ -77,7 +76,7 @@ class elite(Component):
             if (retcode != 0): raise Exception('Error executing ELITE')
 
         #--- update plasma state files
-        services.update_plasma_state()
+        services.update_state()
 
         #--- archive output files
         services.stage_output_files(timeid, self.OUTPUT_FILES)

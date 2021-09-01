@@ -15,7 +15,6 @@ import efit_io
 from plasmastate import plasmastate
 
 class esc(Component):
-
     def __init__(self, services, config):
         Component.__init__(self, services, config)
         print('Created %s' % (self.__class__))
@@ -38,7 +37,7 @@ class esc(Component):
         services = self.services
 
         #--- stage plasma state files
-        services.stage_plasma_state()
+        services.stage_state()
 
         #--- get plasma state file names
         cur_state_file = services.get_config_param('CURRENT_STATE')
@@ -90,7 +89,7 @@ class esc(Component):
         ps.store(cur_state_file)
 
         #--- update plasma state files
-        services.update_plasma_state()
+        services.update_state()
 
         #--- archive output files
         services.stage_output_files(timeid, self.OUTPUT_FILES)

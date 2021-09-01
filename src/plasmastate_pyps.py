@@ -13,7 +13,6 @@ from PlasmaState import PlasmaState
 from plasmastate_base import plasmastate_base
 
 class plasmastate(PlasmaState, plasmastate_base):
-
     def init(self, f_ps, **keyargs):
         nrho = keyargs['nrho'][0]
         nth  = 101
@@ -184,7 +183,6 @@ class plasmastate(PlasmaState, plasmastate_base):
             r0  = geq["rzero" ]
             b0  = abs(geq["bcentr"])
             ip  = geq['cpasma']
-
             j_tot = self.dump_j_parallel(self["rho"],"rho_eq","curt",r0,b0,tot=True)
 
         self["EQ_Code_Info"] = 'efit'
@@ -198,7 +196,6 @@ class plasmastate(PlasmaState, plasmastate_base):
             self["vol"][:] = ps_geqdsk["vol"][:]
             self["g_eq"][:] = ps_geqdsk["g_eq"][:]
             self.load_j_parallel(self["rho"], j_tot, "rho_eq", "curt", r0, b0, tot=True)
-            j_tot = self.dump_j_parallel(self["rho"],"rho_eq","curt",r0,b0,tot=True)
 
     def init_from_geqdsk(self, fn_geqdsk, nrho=101, nth=101, shot=0, time=0, bdy_crat=1.e-6):
         self["nrho_eq"] = nrho

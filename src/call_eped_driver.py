@@ -7,7 +7,6 @@ import shutil
 import cesol_io
 
 class call_eped_driver(Component):
-
     def __init__(self, services, config):
         Component.__init__(self, services, config)
         print('Created %s' % (self.__class__))
@@ -49,20 +48,20 @@ class call_eped_driver(Component):
     def step(self, timeid=0):
         print('>>> entry: call_eped_driver step')
 
-        self.services.stage_plasma_state()
+        self.services.stage_state()
 
         cur_state_file = self.services.get_config_param('CURRENT_STATE')
         cur_eqdsk_file = self.services.get_config_param('CURRENT_EQDSK')
         cur_instate_file = self.services.get_config_param('CURRENT_INSTATE')
         cur_eped_state = self.services.get_config_param('EPED_STATE')
 
-        self.services.stage_plasma_state()
+        self.services.stage_state()
         cesol_io.plasmastate_to_eped(cur_state_file, cur_eqdsk_file, cur_eped_state, cur_instate_file)
-        self.services.update_plasma_state()
+        self.services.update_state()
 
         self.services.call(self.driver,'step', timeStamp)
 
-        self.services.stage_plasma_state()
+        self.services.stage_state()
         cesol_io.eped_to_plasmastate(cur_state_file, cur_eped_state, cur_instate_file)
         cesol_io.plasmastate_to_eped(cur_state_file, cur_eqdsk_file, cur_eped_state, cur_instate_file)
 

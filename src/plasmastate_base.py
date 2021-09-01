@@ -9,7 +9,6 @@ from zinterp import zinterp as interp
 from Namelist import Namelist
 
 class plasmastate_base():
-
     def __init__(self):
         pass
 

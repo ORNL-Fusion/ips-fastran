@@ -13,21 +13,20 @@ from component import Component
 import ipsutil
 
 class ips_massive_serial(Component):
-
     def __init__(self, services, config):
         Component.__init__(self, services, config)
         print('Created %s' % (self.__class__))
 
-    def init(self, timeStamp=0):
+    def init(self, timeid=0):
         self.clean_after = int(getattr(self, "CLEAN_AFTER", "0"))
         self.time_out = int(getattr(self, "TIME_OUT", "3600000"))
 
-    def step(self, timeStamp=0):
+    def step(self, timeid=0):
         #--- entry
         services = self.services
 
         #--- stage plasma state files
-        services.stage_plasma_state()
+        services.stage_state()
 
         #--- stage input files
         services.stage_input_files(self.INPUT_FILES)
@@ -139,12 +138,12 @@ class ips_massive_serial(Component):
         print(exit_status)
 
         #--- update plasma state files
-        services.update_plasma_state()
+        services.update_state()
 
         #--- archive output files
-        services.stage_output_files(timeStamp, self.OUTPUT_FILES)
+        services.stage_output_files(timeid, self.OUTPUT_FILES)
 
-    def finalize(self, timeStamp=0):
+    def finalize(self, timeid=0):
         pass
 
 def wrt_localconf(fname="local.conf"):

@@ -22,7 +22,6 @@ from numpy import *
 import subprocess
 
 class efit(Component):
-
     def __init__(self, services, config):
         Component.__init__(self, services, config)
         print('Created %s' % (self.__class__))
@@ -56,9 +55,9 @@ class efit(Component):
 
         if init_run:
             print ('INIT EFIT, force free')
-            services.stage_plasma_state()
+            services.stage_state()
             self.initial_equilibrium()
-            services.update_plasma_state()
+            services.update_state()
 
     def step(self, timeid=0):
         #--- entry
@@ -75,7 +74,7 @@ class efit(Component):
             return
 
         #--- stage plasma state files
-        services.stage_plasma_state()
+        services.stage_state()
 
         #--- get plasma state file names
         ps_backend = getattr(self, 'PS_BACKEND', 'PS')
@@ -261,7 +260,7 @@ class efit(Component):
             instate.write(cur_instate_file)
 
         #--- update plasma state files
-        services.update_plasma_state()
+        services.update_state()
 
         #--- archive output files
         services.stage_output_files(timeid, self.OUTPUT_FILES)

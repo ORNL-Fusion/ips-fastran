@@ -3,7 +3,6 @@ from Namelist import Namelist
 from zinterp import zinterp
 
 class pdata():
-
     def __init__(self):
         self.keylist = [
            "ne",

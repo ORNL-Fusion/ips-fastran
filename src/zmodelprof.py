@@ -9,9 +9,7 @@ import scipy.optimize
 import zinterp
 
 class profile_pedestal():
-
     def __init__(self, nx, xmid, xwidth, yped, ysep, yaxis, alpha, beta, ytop=0, ifit=0):
-
         xped = xmid-xwidth/2
         xtop = xmid-xwidth
 
@@ -54,7 +52,6 @@ class profile_pedestal():
     def info(self):
         pass
 
-
     def tanhg(self, c, x, param=None):
         """
           Taken from Osborne pyped routine
@@ -78,7 +75,6 @@ class profile_pedestal():
         return self.tanhg(self.c, xval)
 
 class profile_spline():
-
     def __init__(self, x, y, yp):
         self.n = len(x)
         self.x = x
@@ -112,7 +108,6 @@ class profile_spline():
         return (1-t)*y1 + t*y2 + t*(1.0-t)*(a*(1.0-t)+b*t)
 
 class profile_hat():
-
     def __init__(self, nx, r0, dr):
         x = arange(nx)/(nx-1.0)
         y = 1-tanh( 2.0*(x-r0)/dr )
@@ -133,7 +128,6 @@ class profile_hat():
         return 0.0
 
 if __name__ == "__main__":
-
     x0 = [0.0,0.6,0.8]
     y0 = [0.3,1.0,0.2]
     yp = [1.0,0.0,-1.0]

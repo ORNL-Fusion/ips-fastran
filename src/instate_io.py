@@ -9,7 +9,7 @@ from Namelist import Namelist
 from plasmastate  import plasmastate
 from efit_eqdsk import readg
 
-def instate_to_ps(fn_instate,ps):
+def instate_to_ps(fn_instate, ps):
     #-----------------------------------------------------------
     #-- from instate
     instate = Namelist(fn_instate)["instate"]
@@ -222,7 +222,6 @@ def instate_to_ps(fn_instate,ps):
     # ps["sc0_to_sgas"][:] = 1
 
 def ps_to_instate(f_state, f_eqdsk, f_bc, f_instate, rdir='.'):
-
     geq = readg(f_eqdsk)
     r0  = geq["rzero" ]
     b0  = abs(geq["bcentr"])

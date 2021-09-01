@@ -24,10 +24,10 @@ class fastran_driver(Component):
 
         #-- stage input and plasma state files
         services.stage_input_files(self.INPUT_FILES)
-        services.stage_plasma_state()
+        services.stage_state()
 
         #-- get list of ports
-        ports = services.getGlobalConfigParameter('PORTS')
+        ports = services.get_config_param('PORTS')
         #port_names = ports['NAMES'].split()
         port_names = []
         for port_name in ports['NAMES'].split():
@@ -55,7 +55,7 @@ class fastran_driver(Component):
             port_dict[port_name] = port
 
         #-- simulation mode
-        sim_mode = services.getGlobalConfigParameter('SIMULATION_MODE')
+        sim_mode = services.get_config_param('SIMULATION_MODE')
         print('SIMULATION_MODE =', sim_mode)
 
         #-- initial iteration id
@@ -81,7 +81,7 @@ class fastran_driver(Component):
                 #self.component_call(services, port_name, port_dict[port_name], init_mode, t0)
 
         #-- get plasma state files into driver work directory
-        services.stage_plasma_state()
+        services.stage_state()
 
         #-- post init processing: stage output
         services.stage_output_files(t0, self.OUTPUT_FILES)
@@ -112,7 +112,7 @@ class fastran_driver(Component):
 
                 self.component_call(services, port_name, port_dict[port_name], 'step', t)
 
-            services.stage_plasma_state()
+            services.stage_state()
             services.stage_output_files(t, self.OUTPUT_FILES)
 
         #-- post process
@@ -143,7 +143,7 @@ class fastran_driver(Component):
     def finalize(self, timeid = 0):
         print(80*'*')
         print('FASTRAN DIRVER FINALIZE')
-        sym_root = self.services.getGlobalConfigParameter('SIM_ROOT')
+        sym_root = self.services.get_config_param('SIM_ROOT')
         outfile = os.path.join(sym_root,'RESULT')
         f = open(outfile,"w")
         f.write("%6.3f\n"%0.0)

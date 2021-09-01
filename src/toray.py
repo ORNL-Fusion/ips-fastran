@@ -16,7 +16,6 @@ from efit_eqdsk import readg
 from plasmastate import plasmastate
 
 class toray(Component):
-
     def __init__(self, services, config):
         Component.__init__(self, services, config)
         print('Created %s' % (self.__class__))
@@ -32,7 +31,7 @@ class toray(Component):
         services = self.services
 
         #-- stage plasma state files
-        services.stage_plasma_state()
+        services.stage_state()
 
         #-- excutable
         toray_bin = os.path.join(self.BIN_PATH, self.BIN)
@@ -98,7 +97,7 @@ class toray(Component):
         ps.store(cur_state_file)
 
         #-- update plasma state files
-        services.update_plasma_state()
+        services.update_state()
 
         #-- archive output files
         services.stage_output_files(timeid, self.OUTPUT_FILES)

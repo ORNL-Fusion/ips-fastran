@@ -7,7 +7,6 @@ from Namelist import Namelist
 from instate_model import instate_model
 
 class modeleq_init(Component):
-
     def __init__(self, services, config):
         Component.__init__(self, services, config)
         print(('Created %s' % (self.__class__)))
@@ -49,7 +48,7 @@ class modeleq_init(Component):
         open(cur_eqdsk_file,"w")
 
         #-- update plasma state
-        services.update_plasma_state()
+        services.update_state()
 
         #-- archive output files
         services.stage_output_files(timeStamp, self.OUTPUT_FILES)

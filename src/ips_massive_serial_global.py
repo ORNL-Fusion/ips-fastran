@@ -17,16 +17,16 @@ class ips_massive_serial_global(Component):
         Component.__init__(self, services, config)
         print('Created %s' % (self.__class__))
 
-    def init(self, timeStamp=0):
+    def init(self, timeid=0):
         self.clean_after = int(getattr(self, "CLEAN_AFTER", "0"))
         self.time_out = int(getattr(self, "TIME_OUT", "3600000"))
 
-    def step(self, timeStamp=0):
+    def step(self, timeid=0):
         #--- entry
         services = self.services
 
         #--- stage plasma state files
-        services.stage_plasma_state()
+        services.stage_state()
 
         #--- stage input files
         services.stage_input_files(self.INPUT_FILES)
@@ -35,7 +35,7 @@ class ips_massive_serial_global(Component):
         dir_summary = getattr(self, "SUMMARY", "SUMMARY")
         dir_summary = os.path.realpath(dir_summary)
         if not os.path.exists(dir_summary): os.makedirs(dir_summary)
-         
+
         f_sim_config = getattr(self, "SIMULATION", "")
         sim = ConfigObj(f_sim_config, interpolation='template', file_error=True)
 
@@ -47,7 +47,7 @@ class ips_massive_serial_global(Component):
         #--- generate simulation config file for each node
         cwd = services.get_working_dir()
         tasks = {}
-        for k in range(ntasks): 
+        for k in range(ntasks):
             rundir = os.path.realpath("run%05d"%k)
             logfile = "ipslog.%05d"%k
             if not os.path.exists(rundir): os.makedirs(rundir)
@@ -59,21 +59,21 @@ class ips_massive_serial_global(Component):
             sim["OUT_REDIRECT_FNAME"] = os.path.join(cwd, "run%05d.out"%k)
             sim["USE_PORTAL"] = "False"
 
-            driver = sim['PORTS']['DRIVER']['IMPLEMENTATION'] 
+            driver = sim['PORTS']['DRIVER']['IMPLEMENTATION']
             sim[driver]["SUMMARY"] = dir_summary
             sim[driver]["RANK"] = k
-            sim[driver]["SIZE"] = ntasks 
+            sim[driver]["SIZE"] = ntasks
             sim.write(open("run%05d.config"%k, "wb"))
 
-        #--- run script      
+        #--- run script
         ips_bin = "runid=$(printf \"%05d\" ${SLURM_NODEID})\n"
         ips_bin += "cd run${runid}\n"
-        ips_bin += os.path.join(self.BIN_PATH, self.BIN) 
+        ips_bin += os.path.join(self.BIN_PATH, self.BIN)
         ips_bin += " --config=../run${runid}.config"
         ips_bin += " --log=../ips_${runid}.log"
         ips_bin += " --platform=../%s"%f_machine_config
         ips_bin += "\ncd .."
-        if self.clean_after: 
+        if self.clean_after:
             ips_bin += "\nrm -rf "+rundir
             #ips_bin += "\nrm -f "+rundir+f_machine_config
 
@@ -82,7 +82,7 @@ class ips_massive_serial_global(Component):
 
         #--- run
         launch_task_option = getattr(self, "LAUNCH_TASK", "")
-        if launch_task_option == "srun": 
+        if launch_task_option == "srun":
         # This is a temperary implementation to make sure one task per one node on CORI.
             logfile = open("tasks_srun.log", "w")
             errfile = open("tasks_srun.err", "w")
@@ -95,10 +95,10 @@ class ips_massive_serial_global(Component):
             raise Exception('Error executing efit')
 
         #--- update plasma state files
-        services.update_plasma_state()
+        services.update_state()
 
         #--- archive output files
-        services.stage_output_files(timeStamp, self.OUTPUT_FILES)
+        services.stage_output_files(timeid, self.OUTPUT_FILES)
 
-    def finalize(self, timeStamp=0):
-        pass  
+    def finalize(self, timeid=0):
+        pass

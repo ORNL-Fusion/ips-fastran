@@ -11,7 +11,6 @@ from component import Component
 import curray_io
 
 class curray(Component):
-
     def __init__(self, services, config):
         Component.__init__(self, services, config)
         print('Created %s' % (self.__class__))
@@ -24,7 +23,7 @@ class curray(Component):
         services = self.services
 
         #--- stage plasma state files
-        services.stage_plasma_state()
+        services.stage_state()
 
         #--- get plasma state file names
         cur_state_file = services.get_config_param('CURRENT_STATE')
@@ -52,7 +51,7 @@ class curray(Component):
         curray_io.update_state(cur_state_file, cur_eqdsk_file, "outcurray", "incurray")
 
         #--- update plasma state files
-        services.update_plasma_state()
+        services.update_state()
 
         #--- archive output files
         services.stage_output_files(timeid, self.OUTPUT_FILES)

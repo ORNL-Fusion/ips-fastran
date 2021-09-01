@@ -3,7 +3,6 @@ from glob import glob
 from numpy import *
 
 class elite_data():
-
     def __init__(self, nmodes = [5, 10, 15, 20, 25] ):
         keylist_eq = [
             "alpha_max",
