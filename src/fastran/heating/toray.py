@@ -7,13 +7,11 @@
 import os
 import shutil
 import subprocess
-
-from  component import Component
-
 from Namelist import Namelist
-import toray_io
-from efit_eqdsk import readg
-from plasmastate import plasmastate
+from fastran.heating import toray_io
+from fastran.equilibrium.efit_eqdsk import readg
+from fastran.plasmastate.plasmastate import plasmastate
+from ipsframework import Component
 
 class toray(Component):
     def __init__(self, services, config):

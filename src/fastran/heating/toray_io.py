@@ -8,9 +8,8 @@ from numpy import *
 import netCDF4
 from scipy.interpolate import interp1d
 from scipy import optimize
-
 from Namelist import Namelist
-from zinterp import zinterp
+from fastran.util.zinterp import zinterp
 
 def write_toray_input(geq, prof, intoray):
     #geq["__psipol__" ] = ps["psipol"][:]

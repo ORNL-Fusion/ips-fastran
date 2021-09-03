@@ -6,12 +6,10 @@
 
 from numpy import *
 from scipy import optimize
-
-from component import Component
-
-from plasmastate import plasmastate
 from Namelist import Namelist
-from efit_eqdsk import readg
+from fastran.plasmastate.plasmastate import plasmastate
+from fastran.equilibrium.efit_eqdsk import readg
+from ipsframework import Component
 
 class hcd_model(Component):
     def __init__(self, services, config):

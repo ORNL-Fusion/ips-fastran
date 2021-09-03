@@ -5,7 +5,7 @@
 """
 
 from numpy import *
-from zinterp import zinterp as interp
+from fastran.util.zinterp import zinterp as interp
 from Namelist import Namelist
 
 class plasmastate_base():

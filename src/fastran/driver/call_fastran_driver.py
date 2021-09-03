@@ -3,9 +3,8 @@
 import os
 import glob
 import shutil
-
-from  component import Component
-import cesol_io
+from fastran.driver import cesol_io
+from ipsframework import Component
 
 class call_fastran_driver(Component):
     def __init__(self, services, config):

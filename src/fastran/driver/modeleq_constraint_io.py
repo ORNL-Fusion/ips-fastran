@@ -1,16 +1,14 @@
 """
 model equilibrium, profile adjust
 """
-
-from component import Component
-
-from numpy import *
+import numpy as np
 from Namelist import Namelist
-from fastranutil import namelist_default
-from zmodelprof import profile_hat, profile_spline, profile_pedestal
-from zinterp import zinterp
-import formula as fml 
-from instate_model import expand_profile
+from fastran.util.fastranutil import namelist_default
+from fastran.util.modelprofile import profile_hat, profile_spline, profile_pedestal
+from fastran.util.zinterp import zinterp
+import fastran.util.formula as fml
+from fastran.instate.instate_model import expand_profile
+from ipsframework import Component
 
 def update_state(kiter, f_instate, nmax_iter=100, const=None):
     #------------------------------------------------------------------
@@ -25,7 +23,7 @@ def update_state(kiter, f_instate, nmax_iter=100, const=None):
     instate = Namelist(f_instate)
     for key in instate["instate"].keys():
         if key.upper() not in [ 'TOKAMAK_ID', 'PRESSURE_MODEL', 'CURRENT_MODEL' ]:
-            instate["instate"][key] = array(instate["instate"][key])
+            instate["instate"][key] = np.array(instate["instate"][key])
         else:
             print (key)
 
@@ -41,8 +39,8 @@ def update_state(kiter, f_instate, nmax_iter=100, const=None):
 #   a0 = instate["inmetric"]["aminor"][0]
     a0 = instate["inmetric"]["rminor"][-1]
     rhob = instate["inmetric"]["rhob" ][0]
-    volp = array(instate["inmetric"]["volp"])
-    g22 = array(instate["inmetric"]["g22"])
+    volp = np.array(instate["inmetric"]["volp"])
+    g22 = np.array(instate["inmetric"]["g22"])
 
     rho = instate["instate"]["rho"]
     ne = instate["instate"]["ne"]
@@ -51,8 +49,8 @@ def update_state(kiter, f_instate, nmax_iter=100, const=None):
     te = instate["instate"]["te"]
     ti = instate["instate"]["ti"]
 
-    density_beam = array(instate["instate"]["density_beam"])
-    wbeam = array(instate["instate"]["wbeam"])
+    density_beam = np.array(instate["instate"]["density_beam"])
+    wbeam = np.array(instate["instate"]["wbeam"])
 
     j_bs = instate["instate"]["j_bs"]
 
@@ -172,10 +170,10 @@ def update_state(kiter, f_instate, nmax_iter=100, const=None):
 
     #------------------------------------------------------------------
     # charge balance
-    a = sum(f_ion*z_ion)
-    b = sum(f_imp*z_imp)
-    c = sum(f_ion*z_ion)
-    d = sum(f_imp*z_imp*z_imp)
+    a = np.sum(f_ion*z_ion)
+    b = np.sum(f_imp*z_imp)
+    c = np.sum(f_ion*z_ion)
+    d = np.sum(f_imp*z_imp*z_imp)
 
     zne_adj = ne
     zzne_adj = ne*zeff
@@ -186,14 +184,14 @@ def update_state(kiter, f_instate, nmax_iter=100, const=None):
     nion = (zne_adj*d-zzne_adj*b)/(a*d-b*c)
     nimp = (zzne_adj*a-zne_adj*c)/(a*d-b*c)
 
-    density_ion = array([f_ion[k]*nion for k in range(n_ion)])
-    density_imp = array([f_imp[k]*nimp for k in range(n_imp)])
+    density_ion = np.array([f_ion[k]*nion for k in range(n_ion)])
+    density_imp = np.array([f_imp[k]*nimp for k in range(n_imp)])
 
-    density_th = array([sum(tmp) for tmp in density_ion.transpose()])
-    density_th+= array([sum(tmp) for tmp in density_imp.transpose()])
+    density_th = np.array([np.sum(tmp) for tmp in density_ion.transpose()])
+    density_th+= np.array([np.sum(tmp) for tmp in density_imp.transpose()])
 
-    ni = array([sum(tmp) for tmp in density_ion.transpose()])
-    nz = array([sum(tmp) for tmp in density_imp.transpose()])
+    ni = np.array([np.sum(tmp) for tmp in density_ion.transpose()])
+    nz = np.array([np.sum(tmp) for tmp in density_imp.transpose()])
 
     #------------------------------------------------------------------
     # scale : thermal pressure
@@ -223,7 +221,7 @@ def update_state(kiter, f_instate, nmax_iter=100, const=None):
         pth  = 1.602e3*(ne*te+(ni+nz)*ti)
         tscale = 1.0
 
-    pth_ped = pth[where( rho>=xmid-xwid/2)[0][0]]
+    pth_ped = pth[np.where( rho>=xmid-xwid/2)[0][0]]
 
     print ('Temperature scale: %5.3f %5.3f %5.3f %5.3f'%(te[0],ti[0],betan_th_target/betan_th,tscale))
 
@@ -233,7 +231,7 @@ def update_state(kiter, f_instate, nmax_iter=100, const=None):
         p_axis_min = 0.0
         p_axis_max = 1000.0e3
 
-        pmhd = zeros(nrho)
+        pmhd = np.zeros(nrho)
 
         for iter_scale in range(nmax_iter):
             p_axis = 0.5*(p_axis_min+p_axis_max)
@@ -268,7 +266,7 @@ def update_state(kiter, f_instate, nmax_iter=100, const=None):
         p_axis_min = 0.0
         p_axis_max = 100.0*ptot_axis
 
-        pmhd = zeros(nrho)
+        pmhd = np.zeros(nrho)
 
         for iter_scale in range(nmax_iter):
             p_axis = 0.5*(p_axis_min+p_axis_max)
@@ -298,7 +296,7 @@ def update_state(kiter, f_instate, nmax_iter=100, const=None):
     #------------------------------------------------------------------
     # scale : current
 
-    ibdry = where(rho>=rho_jbdry)[0][0]
+    ibdry = np.where(rho>=rho_jbdry)[0][0]
     jbdry = j_bs[ibdry]
 
     def total_current(rho_jhat):
@@ -308,8 +306,8 @@ def update_state(kiter, f_instate, nmax_iter=100, const=None):
         j_hat = profile_hat(nrho,rho_jhat,wid_jhat)
         j_core = j_hat(rho)-j_hat[ibdry]
 
-        j_tot = zeros(nrho)
-        curt = zeros(nrho)
+        j_tot = np.zeros(nrho)
+        curt = np.zeros(nrho)
 
         for iter_scale in range(nmax_iter):
 
@@ -323,7 +321,7 @@ def update_state(kiter, f_instate, nmax_iter=100, const=None):
                 dV = vol[i+1]-vol[i]
                 jparm = 0.5*(j_tot[i]+j_tot[i+1])
                 ipolm = 0.5*(ipol[i]+ipol[i+1])
-                curt[i+1] = (curt[i]/ipol[i]+jparm*dV/(2.0*pi*r0*ipolm**2))*ipol[i+1]
+                curt[i+1] = (curt[i]/ipol[i]+jparm*dV/(2.0*np.pi*r0*ipolm**2))*ipol[i+1]
 
             if abs(curt[-1]-ip) < 1.0e-5: break
 
@@ -333,15 +331,15 @@ def update_state(kiter, f_instate, nmax_iter=100, const=None):
                jpeak_min = jpeak
 
         rhob = instate["inmetric"]["rhob"][0]
-        g22  = array(instate["inmetric"]["g22"])
-        volp = array(instate["inmetric"]["volp"])
+        g22  = np.array(instate["inmetric"]["g22"])
+        volp = np.array(instate["inmetric"]["volp"])
 
         drho = rhob/(nrho-1.)
         jpar0 = 0.5*(j_tot[0]+j_tot[1])
         volp0 = 0.5*(volp[0]+volp[1])
         ipol0 = 0.5*(ipol[0]+ipol[1])
         dpsidrho = 0.2/g22[1]*(jpar0*volp0*drho/ipol0**2)
-        q0_cal = 2.0*pi*b0*rho[1]*rhob/dpsidrho
+        q0_cal = 2.0*np.pi*b0*rho[1]*rhob/dpsidrho
 
         return q0_cal, j_tot
 
@@ -376,8 +374,8 @@ def update_state(kiter, f_instate, nmax_iter=100, const=None):
         jpeak_min = 0.1
         jpeak_max = 10.0
 
-        j_tot = zeros(nrho)
-        curt = zeros(nrho)
+        j_tot = np.zeros(nrho)
+        curt = np.zeros(nrho)
 
         for iter_scale in range(nmax_iter):
 
@@ -389,17 +387,17 @@ def update_state(kiter, f_instate, nmax_iter=100, const=None):
             yp = [jaxis1, 0.0, jbdry1]
             spl = profile_spline(x=x0, y=y0, yp=yp)
 
-            j_tot = zeros(nrho)
+            j_tot = np.zeros(nrho)
             for i in range(nrho):
                 if rho[i]<rho_jbdry: j_tot[i] = spl(rho[i])
                 else: j_tot[i] = j_bs[i]
 
-            curt = zeros(nrho)
+            curt = np.zeros(nrho)
             for i in range(nrho-1):
                 dV = vol[i+1]-vol[i]
                 jparm = 0.5*(j_tot[i]+j_tot[i+1])
                 ipolm = 0.5*(ipol[i]+ipol[i+1])
-                curt[i+1] = (curt[i]/ipol[i]+jparm*dV/(2.0*pi*r0*ipolm**2))*ipol[i+1]
+                curt[i+1] = (curt[i]/ipol[i]+jparm*dV/(2.0*np.pi*r0*ipolm**2))*ipol[i+1]
 
             if abs(curt[-1]-ip) < 0.001: break
 
@@ -415,13 +413,13 @@ def update_state(kiter, f_instate, nmax_iter=100, const=None):
         beta_min = 0.1
         beta_max = 5.0
 
-        j_tot = zeros(nrho)
-        curt = zeros(nrho)
+        j_tot = np.zeros(nrho)
+        curt = np.zeros(nrho)
 
         drho = rhob/(nrho-1.)
         volp0 = 0.5*(volp[0]+volp[1])
         ipol0 = 0.5*(ipol[0]+ipol[1])
-        jpar0 = 2.0*pi*b0*rho[1]*rhob/q0
+        jpar0 = 2.0*np.pi*b0*rho[1]*rhob/q0
         jpar0 /= 0.2/g22[1]
         jpar0 /= volp0*drho/ipol0**2
 
@@ -434,12 +432,12 @@ def update_state(kiter, f_instate, nmax_iter=100, const=None):
                 if rho[i]<rho_jbdry: j_tot[i] = j_core[i]
                 else: j_tot[i] = j_bs[i]
 
-            curt = zeros(nrho)
+            curt = np.zeros(nrho)
             for i in range(nrho-1):
                 dV = vol[i+1]-vol[i]
                 jparm = 0.5*(j_tot[i]+j_tot[i+1])
                 ipolm = 0.5*(ipol[i]+ipol[i+1])
-                curt[i+1] = (curt[i]/ipol[i]+jparm*dV/(2.0*pi*r0*ipolm**2))*ipol[i+1]
+                curt[i+1] = (curt[i]/ipol[i]+jparm*dV/(2.0*np.pi*r0*ipolm**2))*ipol[i+1]
 
             if abs(curt[-1]-ip) < 0.001: break
 
@@ -478,14 +476,14 @@ def constraint_pedestal_width(f_instate):
     instate = Namelist(f_instate)
     for key in instate["instate"].keys():
         if key.upper() not in [ 'TOKAMAK_ID', 'PRESSURE_MODEL', 'CURRENT_MODEL' ]:
-            instate["instate"][key] = array(instate["instate"][key])
+            instate["instate"][key] = np.array(instate["instate"][key])
 
     pmhd_in = instate["instate"]["pmhd"]
     rho_in = instate["instate"]["rho"]
 
     pmhd = instate["inmetric"]["pmhd"]
     rho = instate["inmetric"]["rho"]
-    psi = array(instate["inmetric"]["psi"])
+    psi = np.array(instate["inmetric"]["psi"])
     psi = psi/psi[-1]
     bp2 = instate["inmetric"]["bp2"]
 
@@ -500,7 +498,7 @@ def constraint_pedestal_width(f_instate):
     p_ped_in = zinterp(rho_in,pmhd_in)(rho_ped)
 
     #-- pedestal betap
-    mu0 = 4.*pi*1.e-7
+    mu0 = 4.*np.pi*1.e-7
     betap_ped = 2.0*mu0*p_ped/bp2[-1]
     xwid = 0.076*betap_ped**0.5
     xmid = 1.0-0.5*xwid - 0.01 #---------

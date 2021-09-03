@@ -3,11 +3,9 @@
  constrain component
  -----------------------------------------------------------------------
 """
-
-from component import Component
-from plasmastate import plasmastate
-
-import constraint_current_io
+from fastran.plasmastate.plasmastate import plasmastate
+from fastran.constraint import constraint_current_io
+from ipsframework import Component
 
 class constraint_current(Component):
     def __init__(self, services, config):

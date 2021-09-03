@@ -1,5 +1,3 @@
-#! /usr/bin/env python
-
 """
  -----------------------------------------------------------------------
  curray component
@@ -7,8 +5,8 @@
 """
 
 import os
-from component import Component
-import curray_io
+from fastran.heating import curray_io
+from ipsframework import Component
 
 class curray(Component):
     def __init__(self, services, config):

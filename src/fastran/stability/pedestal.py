@@ -4,14 +4,14 @@
  -----------------------------------------------------------------------
 """
 
-from component import Component
-from plasmastate import plasmastate
+from ipsframework import Component
+from fastran.plasmastate.plasmastate import plasmastate
 
 from numpy import *
 from Namelist import Namelist
-from zmodelprof import profile_pedestal
-from zinterp import zinterp
-from formula import get_ni
+from fastran.util.modelprofile import profile_pedestal
+from fastran.util.zinterp import zinterp
+from fastran.util.formula import get_ni
 
 class model_pedestal(Component):
     def __init__(self, services, config):

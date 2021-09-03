@@ -3,14 +3,13 @@
  massive serial run
  -----------------------------------------------------------------------
 """
-
 import os
 import shutil
 import numpy as np
 import time
 import subprocess
-from configobj import ConfigObj
-from component import Component
+from ipsframework.configobj import ConfigObj
+from ipsframework import Component
 
 class ips_massive_serial_global(Component):
     def __init__(self, services, config):

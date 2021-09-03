@@ -6,11 +6,11 @@ plasma state, pyps backed
 
 from numpy import *
 from Namelist import Namelist
-from zinterp import zinterp
-from efit_eqdsk import readg
+from fastran.util.zinterp import zinterp
+from fastran.equilibrium.efit_eqdsk import readg
 
 from PlasmaState import PlasmaState
-from plasmastate_base import plasmastate_base
+from fastran.plasmastate.plasmastate_base import plasmastate_base
 
 class plasmastate(PlasmaState, plasmastate_base):
     def init(self, f_ps, **keyargs):

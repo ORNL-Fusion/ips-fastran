@@ -3,15 +3,13 @@
  fastran instate file utility
  -----------------------------------------------------------------------
 """
-
-#from plasmastate import *
 from numpy import *
 from Namelist import Namelist
-from fastranutil import namelist_default
-from zinterp import zinterp
-from zmodelprof import profile_pedestal
-from formula import get_ni, mu0
-from shape_io import boundaryShape, set_shape
+from fastran.util.fastranutil import namelist_default
+from fastran.util.zinterp import zinterp
+from fastran.util.modelprofile import profile_pedestal
+from fastran.util.formula import get_ni, mu0
+from fastran.util.shape_io import boundaryShape, set_shape
 
 def expand_profile(instate):
     for key in instate["instate"].keys(): instate["instate"][key] = array(instate["instate"][key])

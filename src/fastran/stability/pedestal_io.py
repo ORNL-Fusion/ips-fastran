@@ -6,10 +6,10 @@
 
 import numpy as np
 from Namelist import Namelist
-from zmodelprof import profile_pedestal
-from zinterp import zinterp
-from loglinear import loglinear
-from formula import get_ni
+from fastran.util.modelprofile import profile_pedestal
+from fastran.util.zinterp import zinterp
+from fastran.util.loglinear import loglinear
+from fastran.util.formula import get_ni
 
 def patch_pedestal(rho, yold, rhob, wped, yped, ysep, alpha=1.1, beta=1.1):
     nrho = len(rho)

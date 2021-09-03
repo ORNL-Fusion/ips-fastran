@@ -6,9 +6,9 @@
 
 import os
 import shutil
-from component import Component
+from ipsframework import Component
 from Namelist import Namelist
-from pdata import pdata
+from fastran.stability.pdata import pdata
 
 class elite(Component):
     def __init__(self, services, config):

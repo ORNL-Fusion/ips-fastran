@@ -1,6 +1,6 @@
 from numpy import *
 import scipy.optimize
-from zinterp import zinterp
+from fastran.util.zinterp import zinterp
 
 """
   tanh0, ..

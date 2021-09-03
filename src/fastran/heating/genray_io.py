@@ -3,14 +3,12 @@
  utils for genray IO
  -----------------------------------------------------------------------
 """
-
 from numpy import *
 import netCDF4
-
 from Namelist import Namelist
-from efit_eqdsk import readg
-from zinterp import zinterp
-from plasmastate import plasmastate
+from fastran.equlibrium.efit_eqdsk import readg
+from fastran.util.zinterp import zinterp
+from fastran.plasmastate.plasmastate import plasmastate
 
 def write_inputfiles(f_state, f_eqdsk, f_ingenray, MKS=True):
     #-- read plasma state file

@@ -3,12 +3,11 @@
  chease component
  -----------------------------------------------------------------------
 """
-
 import os
 import shutil
-from component import Component
 from Namelist import Namelist
-from plasmastate import plasmastate
+from fastran.plasmastate.plasmastate import plasmastate
+from ipsframework import Component
 
 class chease(Component):
     def __init__(self, services, config):

@@ -4,7 +4,7 @@
  -----------------------------------------------------------------------
 """
 
-from component import Component
+from ipsframework import Component
 
 class monitor(Component):
     def __init__(self, services, config):

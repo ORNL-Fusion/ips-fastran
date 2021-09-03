@@ -3,16 +3,13 @@
  esc component
  -----------------------------------------------------------------------
 """
-
 import os
 import shutil
 import subprocess
-
-from  component import Component
-
 from Namelist import Namelist
-import efit_io
-from plasmastate import plasmastate
+from fastran.equilibrium import efit_io
+from fastran.plasmastate.plasmastate import plasmastate
+from ipsframework import Component
 
 class esc(Component):
     def __init__(self, services, config):

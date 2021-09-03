@@ -6,12 +6,12 @@
 
 import os
 import shutil
-from component import Component
+from ipsframework import Component
 from Namelist import Namelist
-import fastran_io_ps
-import fastran_io_instate
-import instate_io
-import zdata
+from fastran.solver import fastran_io_ps
+from fastran.solver import fastran_io_instate
+from fastran.instate import instate_io
+from fastran.solver import zdata
 import numpy as np
 
 class fastran(Component):
@@ -146,7 +146,7 @@ class fastran(Component):
         ishot = int(services.get_config_param('SHOT_NUMBER'))
         itime = int(services.get_config_param('TIME_ID'))
 
-        dir_state = services.get_config_param('PLASMA_STATE_WORK_DIR')
+        dir_state = services.get_config_param('STATE_WORK_DIR')
         f = "f%06d.%05d"%(ishot, itime)
         shutil.copyfile("fastran.nc", os.path.join(dir_state, f))
 

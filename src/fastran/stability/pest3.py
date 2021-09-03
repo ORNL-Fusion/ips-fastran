@@ -8,9 +8,9 @@ import os
 import shutil
 import re
 from numpy import *
-from component import Component
-from plasmastate import plasmastate
 from Namelist import Namelist
+from fastran.plasmastate.plasmastate import plasmastate
+from ipsframework import Component
 
 class pest3(Component):
     def __init__(self, services, config):

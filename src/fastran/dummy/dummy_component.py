@@ -3,8 +3,7 @@
  dummy component
  -----------------------------------------------------------------------
 """
-
-from component import Component
+from ipsframework import Component
 
 class dummy_component(Component):
     def __init__(self, services, config):

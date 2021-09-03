@@ -8,10 +8,9 @@ import sys
 import os
 import shutil
 from numpy import *
-
-from zmodelprof import profile_hat, profile_spline
-from plasmastate import plasmastate
-from efit_eqdsk import readg
+from fastran.util.modelprofile import profile_hat, profile_spline
+from fastran.plasmastate.plasmastate import plasmastate
+from fastran.equilibrium.efit_eqdsk import readg
 
 def parabolicJ(f_state, f_eqdsk, rho_jbdry=0.8, q0=1.1, alpha=3.0, niter_max=100):
     ps = plasmastate('ips', 1)

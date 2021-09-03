@@ -6,7 +6,7 @@
 
 from numpy import *
 import Namelist
-from zinterp import zinterp
+from fastran.util.zinterp import zinterp
 
 def ps_to_inmetric(ps, r0, b0, ip, nrho=51, iwrt=False):
 

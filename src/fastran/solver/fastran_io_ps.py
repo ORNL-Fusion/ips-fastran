@@ -9,10 +9,10 @@ from numpy import *
 import netCDF4
 
 from Namelist import Namelist
-from zinterp import zinterp
-import zfdat
-from efit_eqdsk import readg
-from plasmastate import plasmastate
+from fastran.util.zinterp import zinterp
+from fastran.solver import zfdat
+from fastran.equilibrium.efit_eqdsk import readg
+from fastran.plasmastate.plasmastate import plasmastate
 
 def write_input(f_state,f_eqdsk,rdir='.'):
     #-------------------------------------------------------------------

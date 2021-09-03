@@ -1,20 +1,12 @@
-#! /usr/bin/env python
-
 """
  -----------------------------------------------------------------------
  utils for curray IO
  -----------------------------------------------------------------------
 """
-
-import sys,os,shutil
-import subprocess
 from numpy import *
-
-#-- zcode libraries
 from Namelist import Namelist
-from zinterp import *
-from efit_eqdsk import readg
-from plasmastate import plasmastate
+from fastran.equlibrium.efit_eqdsk import readg
+from fastran.plasmastate import plasmastate
 
 def write_f(fvec,num,ncol,file):
 
@@ -29,7 +21,7 @@ def line2vec(line):
     tmp = line.split()
     for k in range(len(tmp)):
         vec.append(float(tmp[k]))
-    return array(vec) 
+    return array(vec)
 
 def readvec(lines,k0,nread):
     tmp = []
@@ -47,7 +39,7 @@ def wrt_curray_input(f_state,f_incurray,f_geqdsk):
 
     # -----------------------
     # read plasma state file
-    
+
     ps = plasmastate('ips',1)
     ps.read(f_state)
 
@@ -181,7 +173,7 @@ def read_curray_output():
     outcurray.write("outcurray")
 
     return outcurray
-    
+
 ###############################################################################
 # io
 
@@ -192,7 +184,7 @@ def update_state(f_state,f_geq,f_outcurray,f_incurray):
     ps = plasmastate('ips',1)
     ps.read(f_state)
 
-    geq = readg(f_geq) 
+    geq = readg(f_geq)
     r0  = geq["rzero" ]
     b0  = abs(geq["bcentr"])
 
@@ -238,5 +230,3 @@ if __name__ == "__main__":
     wrt_curray_input("instate")
     outcurray = read_curray_output()
     io_update_instate("instate","outcurray")
-
-

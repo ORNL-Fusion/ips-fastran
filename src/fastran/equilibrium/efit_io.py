@@ -3,16 +3,13 @@
   fixed boundary efit solver
  -----------------------------------------------------------------------
 """
-
 import shutil
 from numpy import *
 from scipy.interpolate import interp1d
-
-from Namelist import Namelist
-from zinterp import *
-from plasmastate import plasmastate
-
 import time as timer
+from Namelist import Namelist
+from fastran.util.zinterp import zinterp
+from fastran.plasmastate.plasmastate import plasmastate
 
 ########################################################################
 #   compose kfile

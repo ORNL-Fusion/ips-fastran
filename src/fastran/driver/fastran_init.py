@@ -5,18 +5,16 @@
 """
 
 import shutil
-from numpy import *
-
-from component import Component
-
+import numpy as np
 from Namelist import Namelist
-from plasmastate import plasmastate
-from efit_eqdsk import readg
-import instate_model
-import instate_io
-import cesol_io
-from pedestal_io import update_instate_pedestal
-from fastranutil import namelist_default
+from fastran.plasmastate.plasmastate import plasmastate
+from fastran.equilibrium.efit_eqdsk import readg
+from fastran.instate import instate_model
+from fastran.instate import instate_io
+from fastran.driver import cesol_io
+from fastran.stability.pedestal_io import update_instate_pedestal
+from fastran.util.fastranutil import namelist_default
+from ipsframework import Component
 
 class fastran_init (Component):
     def __init__(self, services, config):
@@ -72,7 +70,7 @@ class fastran_init (Component):
 
             if hasattr(self, "SCALE_"+key):
                 scale = float(getattr(self, "SCALE_"+key))
-                instate["instate"][key] = scale*array(instate["instate"][key])
+                instate["instate"][key] = scale*np.array(instate["instate"][key])
                 print(key,'scaled',scale)
 
         var_list = [ var.upper() for var in instate["flux"].keys() ]
@@ -136,21 +134,21 @@ class fastran_init (Component):
             r0  = geq["rzero" ]
             b0  = abs(geq["bcentr"])
             ip  = geq['cpasma']
-            
+
             ps.load_j_parallel(instate["instate"]["rho"], instate["instate"]["j_tot"], "rho_eq", "curt", r0, b0, tot=True)
         else:
             r0 = instate["instate"]["r0"][0]
             b0 = instate["instate"]["b0"][0]
 
-            rb = array(instate["instate"]["rbdry"])
-            zb = array(instate["instate"]["zbdry"])
+            rb = np.array(instate["instate"]["rbdry"])
+            zb = np.array(instate["instate"]["zbdry"])
 
-            R = 0.5*( max(rb) + min(rb) )
-            Z = 0.5*( max(zb) + min(zb) )
-            a = 0.5*( max(rb) - min(rb) )
-            kappa = 0.5*( ( max(zb) - min(zb) )/ a )
-            delta_u = ( R - rb[argmax(zb)] )/a
-            delta_l = ( R - rb[argmin(zb)] )/a
+            R = 0.5*( np.max(rb) + np.min(rb) )
+            Z = 0.5*( np.max(zb) + np.min(zb) )
+            a = 0.5*( np.max(rb) - np.min(rb) )
+            kappa = 0.5*( ( np.max(zb) - np.min(zb) )/ a )
+            delta_u = ( R - rb[np.argmax(zb)] )/a
+            delta_l = ( R - rb[np.argmin(zb)] )/a
             delta = 0.5*( delta_u + delta_l )
 
             ps.analytic_volume(b0, r0, a, kappa, delta)

@@ -6,7 +6,7 @@
 
 from numpy import *
 import scipy.optimize
-import zinterp
+from fastran.util import zinterp
 
 class profile_pedestal():
     def __init__(self, nx, xmid, xwidth, yped, ysep, yaxis, alpha, beta, ytop=0, ifit=0):

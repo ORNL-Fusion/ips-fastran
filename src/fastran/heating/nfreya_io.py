@@ -1,9 +1,9 @@
 import re
 from numpy import *
 from Namelist import Namelist
-from plasmastate import plasmastate
-import outone_io
-from efit_eqdsk import readg
+from fastran.plasmastate.plasmastate import plasmastate
+from fastran.heating import outone_io
+from fastran.equilibrium.efit_eqdsk import readg
 
 def set_default():
     inone = Namelist()

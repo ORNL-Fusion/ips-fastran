@@ -7,9 +7,9 @@
 import os
 import shutil
 import subprocess
-from component import Component
-import genray_io
+from fastran.heating import genray_io
 from Namelist import Namelist
+from ipsframework import Component
 
 class genray(Component):
     def __init__(self, services, config):

@@ -1,15 +1,14 @@
-#!/usr/bin/env python
-
 """
 calculate critical_deltap with equilibrium, profile by Shaing model
 """
 
-from component import Component
+from ipsframework import Component
 from Namelist import Namelist
-from zinterp import zinterp
+from fastran.util.zinterp import zinterp
 from numpy import *
 from scipy import constants, interpolate, optimize, stats
-import efit_eqdsk, plasmastate
+from fastran.equilibrium import efit_eqdsk
+from fastran.plasmastate.plasmastate import plasmastate
 
 class critical_deltap(Component):
     def __init__(self, services, config):

@@ -3,7 +3,7 @@
  dummy init component
  -----------------------------------------------------------------------
 """
-from component import Component
+from ipsframework import Component
 
 class dummy_init (Component):
     def __init__(self, services, config):
@@ -18,12 +18,12 @@ class dummy_init (Component):
 
         services = self.services
 
-        plasma_state_files = services.get_config_param('PLASMA_STATE_FILES')
+        plasma_state_files = services.get_config_param('STATE_FILES')
 
         print('plasma state files =', plasma_state_files)
 
-        self.INIT_PLASMA_STATE_FILES = getattr(self,'INIT_PLASMA_STATE_FILES', '0')
-        if self.INIT_PLASMA_STATE_FILES != 0:
+        self.INIT_STATE_FILES = getattr(self,'INIT_STATE_FILES', '0')
+        if self.INIT_STATE_FILES != 0:
             for plasma_state_file in plasma_state_files.split():
                 print(plasma_state_file)
                 open(plasma_state_file, "w").close()

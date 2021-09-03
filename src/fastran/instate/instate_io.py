@@ -6,8 +6,8 @@
 
 from numpy import *
 from Namelist import Namelist
-from plasmastate  import plasmastate
-from efit_eqdsk import readg
+from fastran.plasmastate.plasmastate import plasmastate
+from fastran.equilibrium.efit_eqdsk import readg
 
 def instate_to_ps(fn_instate, ps):
     #-----------------------------------------------------------

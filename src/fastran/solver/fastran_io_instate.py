@@ -9,7 +9,7 @@ from numpy import *
 import netCDF4
 
 from Namelist import Namelist
-import zfdat
+from fastran.solver import zfdat
 
 def write_input(f_instate, rdir='.'):
     input = Namelist(f_instate)

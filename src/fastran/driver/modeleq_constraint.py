@@ -1,9 +1,8 @@
 """
 model equilibrium, profile adjust
 """
-
-from component import Component
-from modeleq_constraint_io import update_state, constraint_pedestal_width
+from fastran.driver.modeleq_constraint_io import update_state, constraint_pedestal_width
+from ipsframework import Component
 
 class modeleq_constraint(Component):
     def __init__(self, services, config):

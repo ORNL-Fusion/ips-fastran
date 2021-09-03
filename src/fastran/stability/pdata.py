@@ -1,6 +1,6 @@
 from numpy import *
 from Namelist import Namelist
-from zinterp import zinterp
+from fastran.util.zinterp import zinterp
 
 class pdata():
     def __init__(self):

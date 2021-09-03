@@ -4,14 +4,14 @@
  -----------------------------------------------------------------------
 """
 
-from component import Component
-from plasmastate import plasmastate
+from ipsframework import Component
 
-from numpy import *
+import numpy as np
 from Namelist import Namelist
-from zmodelprof import profile_pedestal
-from zinterp import zinterp
-from formula import get_ni
+from fastran.plasmastate.plasmastate import plasmastate
+from fastran.util.modelprofile import profile_pedestal
+from fastran.util.zinterp import zinterp
+from fastran.formula import get_ni
 
 class cesol_constraint(Component):
     def __init__(self, services, config):
@@ -90,9 +90,9 @@ class cesol_constraint(Component):
         te_top = zinterp(rho, te)(xtop)
         ti_top = zinterp(rho, ti)(xtop)
 
-        ne_update = zeros(nrho)
-        te_update = zeros(nrho)
-        ti_update = zeros(nrho)
+        ne_update = np.zeros(nrho)
+        te_update = np.zeros(nrho)
+        ti_update = np.zeros(nrho)
 
         print("ne top", ne_model_top , ne_top)
         print("te top", te_model_top , te_top)

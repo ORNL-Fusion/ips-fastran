@@ -1,10 +1,10 @@
 # nested workflow wrapper for eped workflow
 
-from  component import Component
 import os
 import glob
 import shutil
-import cesol_io
+from fastran.driver import cesol_io
+from ipsframework import Component
 
 class call_eped_driver(Component):
     def __init__(self, services, config):

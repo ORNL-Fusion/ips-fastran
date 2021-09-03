@@ -1,10 +1,9 @@
 """
 model equilibrium, profile adjust
 """
-
-from component import Component
+import numpy as np
 from Namelist import Namelist
-from numpy import *
+from ipsframework import Component
 
 class modeleq_constraint_pscale(Component):
     def __init__(self, services, config):
@@ -33,7 +32,7 @@ class modeleq_constraint_pscale(Component):
 def scale_pressure(f_instate, pscale=1.0):
     instate = Namelist(f_instate)
     rho = instate["inmetric"]["rho"]
-    pmhd = array(instate["instate"]["pmhd"])
+    pmhd = np.array(instate["instate"]["pmhd"])
 
     instate["instate"]["pmhd"] = pscale*pmhd
 

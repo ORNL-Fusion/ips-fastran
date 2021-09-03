@@ -4,15 +4,14 @@
  -----------------------------------------------------------------------
 """
 
-from numpy import *
+import numpy as np
 import netCDF4
-
 from Namelist import Namelist
-from plasmastate import plasmastate
-import eped_state
-import eped_io
-from efit_eqdsk import readg
-from zinterp import zinterp
+from fastran.plasmastate.plasmastate import plasmastate
+from eped import eped_state
+from fastran.stability import eped_io
+from fastran.equilibrium.efit_eqdsk import readg
+from fastran.util.zinterp import zinterp
 
 def eped_to_plasmastate(f_state, f_eped, f_instate):
     print('EPED TO PLASMA STATE')
@@ -166,7 +165,7 @@ def fastran_to_instate(f_fastran, f_instate):
 
     drho = rhob[1]-rhob[0]
     nrho = len(rho)
-    vol = zeros(nrho)
+    vol = np.zeros(nrho)
     for k in range(1,nrho):
         vol[k] = vol[k-1]+drho*(volp[k-1]+volp[k])*0.5
     def integrate(f):

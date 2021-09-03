@@ -7,8 +7,7 @@
 import sys
 import os
 import shutil
-
-from component import Component
+from ipsframework import Component
 
 class cesol_driver(Component):
     def __init__(self, services, config):

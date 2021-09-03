@@ -7,7 +7,7 @@
 import os
 import glob
 import shutil
-from component import Component
+from ipsframework import Component
 
 class fastran_driver(Component):
     def __init__(self, services, config):
@@ -153,7 +153,7 @@ class fastran_driver(Component):
         dir_summary = getattr(self, "SUMMARY", "")
         if dir_summary != "":
             if not os.path.exists(dir_summary): os.makedirs(dir_summary)
-            dir_state = self.services.get_config_param('PLASMA_STATE_WORK_DIR')
+            dir_state = self.services.get_config_param('STATE_WORK_DIR')
             for filename in glob.glob(os.path.join(dir_state, "*.*")):
                 print(filename)
                 shutil.copy(filename, dir_summary)

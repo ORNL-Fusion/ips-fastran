@@ -6,9 +6,8 @@ import os
 import glob
 import shutil
 import time as timer
-
-from component import Component
 from Namelist import Namelist
+from ipsframework import Component
 
 class modeleq_driver(Component):
     def __init__(self, services, config):
@@ -105,7 +104,7 @@ class modeleq_driver(Component):
         dir_summary = getattr(self, "SUMMARY", "")
         if dir_summary != "":
             if not os.path.exists(dir_summary): os.makedirs(dir_summary)
-            dir_state = services.get_config_param('PLASMA_STATE_WORK_DIR')
+            dir_state = services.get_config_param('STATE_WORK_DIR')
             for filename in glob.glob(os.path.join(dir_state, "*.*")):
                 print(filename)
                 shutil.copy(filename, dir_summary)
@@ -118,7 +117,6 @@ class modeleq_driver(Component):
             services.call(comp, mode, time)
         except Exception:
             services.exception(comp_mode_string + ' failed')
-            raise
         else:
             print((comp_mode_string + ' finished'))
         t1 = timer.time()

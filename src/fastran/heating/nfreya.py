@@ -7,10 +7,9 @@
 import os
 import subprocess
 from numpy import *
-
-from component import Component
 from Namelist import Namelist
-import nfreya_io
+from fastran.heating import nfreya_io
+from ipsframework import Component
 
 class nfreya(Component):
     def __init__(self, services, config):

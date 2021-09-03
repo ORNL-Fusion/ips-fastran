@@ -11,7 +11,7 @@ import re
 import subprocess
 from numpy import *
 
-from component import Component
+from ipsframework import Component
 
 class dcon_corsica(Component):
     def __init__(self, services, config):

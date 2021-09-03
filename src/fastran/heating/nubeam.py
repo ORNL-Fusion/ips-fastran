@@ -8,11 +8,9 @@ import os
 import shutil
 from numpy import *
 import netCDF4
-
-from  component import Component
-
 from Namelist import Namelist
-from plasmastate import plasmastate
+from fastran.plasmastate.plasmastate import plasmastate
+from ipsframework import Component
 
 class nubeam(Component):
     def __init__(self, services, config):

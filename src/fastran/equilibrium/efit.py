@@ -3,23 +3,19 @@
  efit component
  -----------------------------------------------------------------------
 """
-
 import os
 import re
 import shutil
 import glob
-import time as timer
-
-from component import Component
-
-from Namelist import Namelist
-import efit_io
-from plasmastate import plasmastate
-from inmetric_io import ps_to_inmetric
-from efit_eqdsk import readg, writeg, scaleg
-
-from numpy import *
 import subprocess
+import time as timer
+from numpy import *
+from Namelist import Namelist
+from fastran.equilibrium import efit_io
+from fastran.plasmastate.plasmastate import plasmastate
+from fastran.solver.inmetric_io import ps_to_inmetric
+from fastran.equilibrium.efit_eqdsk import readg, writeg, scaleg
+from ipsframework import Component
 
 class efit(Component):
     def __init__(self, services, config):
@@ -89,6 +85,7 @@ class efit(Component):
         #--- generate inefit
         f_inefit = "inefit"
         mode = getattr(self, "PRESSURE", "kinetic")
+        print ('mode = ', mode)
 
         profile_relax = int(getattr(self, "PROFILE_RELAX", "0"))
         if timeid > 0 and profile_relax:
@@ -151,6 +148,7 @@ class efit(Component):
         cwd = services.get_working_dir()
 
         niter = int(getattr(self, "NITER", "5"))
+        print ('niter = ', niter)
 
         pat = re.compile("\s*it=")
         for k in range(niter):
@@ -231,7 +229,10 @@ class efit(Component):
             lines = logfile.readlines()
             for line in lines:
                 if pat.search(line):
-                    e = float(line.split("err=")[1].split()[0])
+                    try:
+                        e = float(line.split("err=")[1].split()[0])
+                    except:
+                        e = 0.
                     error_efit.append(e)
             logfile.close()
             print ('error = ', error_efit[-1])
@@ -269,7 +270,7 @@ class efit(Component):
         print ('enter efit.step()')
         services = self.services
 
-        dir_state = services.get_config_param('PLASMA_STATE_WORK_DIR')
+        dir_state = services.get_config_param('STATE_WORK_DIR')
         for header in ['k','a']:
             f = "%s%06d.%05d"%(header,self.ishot,self.itime)
             shutil.copyfile(f, os.path.join(dir_state,f))

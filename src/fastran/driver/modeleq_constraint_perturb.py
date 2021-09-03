@@ -1,12 +1,11 @@
 """
 model equilibrium, profile adjust
 """
-
-from component import Component
-from Namelist import Namelist
+import numpy as np
 from scipy.optimize import bisect
-from zinterp import zinterp
-from numpy import *
+from Namelist import Namelist
+from fastran.util.zinterp import zinterp
+from ipsframework import Component
 
 class modeleq_constraint_perturb(Component):
     def __init__(self, services, config):
@@ -38,23 +37,23 @@ def perturb(f_instate, w=0.3, jpert=0.0, ppert=0.0):
     instate = Namelist(f_instate)
     rho = instate["inmetric"]["rho"]
     qmhd = instate["inmetric"]["qmhd"]
-    j_tot = array(instate["instate"]["j_tot"])
-    pmhd = array(instate["instate"]["pmhd"])
+    j_tot = np.array(instate["instate"]["j_tot"])
+    pmhd = np.array(instate["instate"]["pmhd"])
     nrho = len(rho)
 
     qmhd_s = zinterp(rho, qmhd)
     def q2(x):
         return qmhd_s(x) - 2.0
 
-    rho_min = rho[argmin(qmhd)]
+    rho_min = rho[np.argmin(qmhd)]
     rho_2 = bisect(q2, rho_min, 0.8)
     print(rho_2, rho_min, qmhd_s(rho_2))
 
     j_tot_2 = zinterp(rho, j_tot)(rho_2)
     pmhd_2 = zinterp(rho, pmhd)(rho_2)
 
-    jadd = zeros(nrho)
-    padd = zeros(nrho)
+    jadd = np.zeros(nrho)
+    padd = np.zeros(nrho)
     for i in range(nrho):
         if rho[i] < rho_2-w or rho[i] > rho_2+w :
             jadd[i] = 0.0

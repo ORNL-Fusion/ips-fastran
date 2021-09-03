@@ -3,12 +3,11 @@
  teq component
  -----------------------------------------------------------------------
 """
-
 import os
 import shutil
 from numpy import *
-from component import Component
-from plasmastate import plasmastate
+from fastran.plasmastate.plasmastate import plasmastate
+from ipsframework import Component
 
 class teq(Component):
     def __init__(self, services, config):

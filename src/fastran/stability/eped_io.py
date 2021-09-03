@@ -3,11 +3,11 @@ from numpy import *
 import netCDF4
 
 from Namelist import Namelist
-from zinterp import zinterp
+from fastran.util.zinterp import zinterp
 
-from zmodelprof import profile_pedestal
-from zprofile import zprofile
-from formula import get_ni
+from fastran.util.modelprofile import profile_pedestal
+from fastran.util.zprofile import zprofile
+from fastran.util.formula import get_ni
 
 class eped_io():
     def __init__(self):

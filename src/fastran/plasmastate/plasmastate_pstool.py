@@ -12,7 +12,7 @@ import netCDF4
 
 from Namelist import Namelist
 
-from plasmastate_base import plasmastate_base
+from fastran.plasmastate.plasmastate_base import plasmastate_base
 
 class plasmastate(plasmastate_base):
     def __init__(self,lable,level):

@@ -3,10 +3,8 @@
  dummy driver
  -----------------------------------------------------------------------
 """
-
 import os
-from numpy import *
-from component import Component
+from ipsframework import Component
 
 class dummy_driver(Component):
     def __init__(self, services, config):

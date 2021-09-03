@@ -2,9 +2,9 @@
  fastran model equilibrium init component
 """
 
-from component import Component
 from Namelist import Namelist
-from instate_model import instate_model
+from fastran.instate.instate_model import instate_model
+from ipsframework import Component
 
 class modeleq_init(Component):
     def __init__(self, services, config):

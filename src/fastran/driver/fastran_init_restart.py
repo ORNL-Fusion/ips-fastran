@@ -5,13 +5,9 @@
 """
 
 import shutil
-from numpy import *
-
-from component import Component
-
 from Namelist import Namelist
-from plasmastate import plasmastate
-from efit_eqdsk import readg
+from fastran.equilibrium.efit_eqdsk import readg
+from ipsframework import Component
 
 class fastran_init_restart (Component):
     def __init__(self, services, config):
