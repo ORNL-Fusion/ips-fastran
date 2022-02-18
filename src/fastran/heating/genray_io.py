@@ -6,7 +6,7 @@
 from numpy import *
 import netCDF4
 from Namelist import Namelist
-from fastran.equlibrium.efit_eqdsk import readg
+from fastran.equilibrium.efit_eqdsk import readg
 from fastran.util.zinterp import zinterp
 from fastran.plasmastate.plasmastate import plasmastate
 
@@ -59,6 +59,8 @@ def write_inputfiles(f_state, f_eqdsk, f_ingenray, MKS=True):
     #-- genray.dat
     ingenray = Namelist(f_ingenray)
     ingenray["TOKAMAK"]["EQDSKIN"] = [f_eqdsk]
+    ingenray["SPECIES"]["CHARGE"] = abs(ps["qatom_S"][:])/ps_xe
+    ingenray["SPECIES"]["DMAS"] = ps["m_S"][:]/ps["m_S"][0]
     ingenray["PLASMA"]["NDENS"] = [nrho]
     ingenray["PLASMA"]["NBULK"] = [nbulk]
     ingenray["PLASMA"]["IZEFF"] = [2]
@@ -72,6 +74,11 @@ def write_inputfiles(f_state, f_eqdsk, f_ingenray, MKS=True):
         ingenray.write("genray.in")
     else:
         ingenray.write("genray.dat")
+
+    check = Namelist()
+    for k in range(n_ion):
+        check["check"]["ni_{}".format(k)] = ni[k]
+    check.write("check.dat") 
 
 def update_state(f_state, f_eqdsk, imode='EC', jmulti=1.0, add=0, rho_smooth=0.0, id_src=0):
     #-- read genray output

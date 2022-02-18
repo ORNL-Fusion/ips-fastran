@@ -19,6 +19,9 @@ class genray(Component):
     def init(self, timeid=0):
         print('genray.init() called')
 
+        dir_state = self.services.get_config_param('STATE_WORK_DIR')
+        open(os.path.join(dir_state, "genray.nc"), "w").close()
+
     def step(self, timeid=0):
         #--- entry
         print('genray.step() started')
