@@ -165,5 +165,6 @@ class fastran_driver(Component):
             services.call(comp, mode, time)
         except Exception:
             services.exception(comp_mode_string + ' failed')
+            raise
         else:
             print(comp_mode_string + ' finished')
