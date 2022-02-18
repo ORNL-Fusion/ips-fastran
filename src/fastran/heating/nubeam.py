@@ -172,6 +172,8 @@ class nubeam(Component):
         rho_anom = ps["rho_anom"][:]
         ps["difb_nbi"][:] = difb_a + (difb_0-difb_a)*(1.0-rho_anom**difb_in)**difb_out
 
+        ps.update_particle_balance() #<--------
+
         ps.store(cur_state_file)
 
         shutil.copyfile(cur_state_file, "ps0.nc")
@@ -180,7 +182,7 @@ class nubeam(Component):
 
         nubeam_bin = os.path.join(self.BIN_PATH, self.BIN)
         os.environ['NUBEAM_ACTION'] = 'STEP'
-        os.environ['NUBEAM_REPEAT_COUNT'] = '%dx%f'%(nstep-navg,dt_nubeam)
+        os.environ['NUBEAM_REPEAT_COUNT'] = '%dx%f'%(nstep-navg, dt_nubeam)
         os.environ['STEPFLAG'] = 'TRUE'
         os.environ['NUBEAM_POSTPROC'] = 'summary_test' #'FBM_WRITE'
         try:
