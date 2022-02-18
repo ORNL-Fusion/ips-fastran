@@ -7,6 +7,7 @@
 import sys
 import os
 import shutil
+from collections import OrderedDict
 from ipsframework import Component
 
 class cesol_driver(Component):
@@ -14,64 +15,65 @@ class cesol_driver(Component):
         Component.__init__(self, services, config)
         print('Created %s' % (self.__class__))
 
-    def init(self, timestamp=0):
+    def init(self, timeid=0):
         print('>>> cesol_driver.init() called')
-
-    def step(self, timestamp=0):
-        print('>>> cesol_driver.step() started')
-
-        #-- entry
-        services = self.services
+        print('timeid =', timeid)
 
         #-- stage input and plasma state files
-        services.stage_input_files(self.INPUT_FILES)
-        services.stage_state()
+        self.services.stage_input_files(self.INPUT_FILES)
+        self.services.stage_state()
 
         #-- get list of ports
-        ports = services.get_config_param('PORTS')
-        port_names = ports['NAMES'].split()
-        print('PORTS =', port_names)
+        ports_names = getattr(self, "PORTS", "").split()
+        if len(ports_names) == 0:
+            ports_names = self.services.get_config_param('PORTS')['NAMES'].split()
+        print('PORTS =', ports_names)
 
-        #-- instantiate components in port_names list, except DRIVER itself
-        port_dict = {}
-        for port_name in port_names:
-            if port_name in ["DRIVER"]: continue
-            port = services.get_port(port_name)
-            port_dict[port_name] = port
+        self.ports = OrderedDict() 
+        for port_name in ports_names:
+            if port_name in ["INIT", "DRIVER"]: continue
+            self.ports[port_name] = self.services.get_port(port_name)
 
-        #-- initial time stamp
-        t = 0
-
-        #-- initialize components in PORTS list for startup or restart
+        #-- initialize components in PORTS list 
         init_mode = 'init'
-        for port_name in port_names:
-            if port_name in ['INIT', 'DRIVER']: continue
-            services.call(port_dict[port_name], init_mode, t)
+        for port_name in self.ports:
+            self.services.call(self.ports[port_name], init_mode, timeid)
 
-        #-- post init processing: stage output
-        services.stage_output_files(t, self.OUTPUT_FILES)
+        #-- stage output
+        self.services.stage_output_files(timeid, self.OUTPUT_FILES)
+
+    def step(self, timeid=0):
+        print('>>> cesol_driver.step() started')
+        print('timeid =', timeid)
+
+        #-- stage input and plasma state files
+        self.services.stage_input_files(self.INPUT_FILES)
+        self.services.stage_state()
 
         #-- iteration
-        nstep = int(services.sim_conf["ITERATION_LOOP"]["NSTEP"])
+        nstep = int(self.services.sim_conf["ITERATION_LOOP"]["NSTEP"])
         print("number of interation :", nstep)
 
         for kstep in range(nstep):
-            t = kstep
-            for port_name in port_names:
-                if port_name in ["INIT", "DRIVER"]: continue
-                services.call(port_dict[port_name], 'step', t)
+            print('\n'+72*'='+'\n= cesol driver: iteration number = {}'.format(kstep))
+
+            for port_name in self.ports:
+                self.services.call(self.ports[port_name], 'step', kstep)
+
+            self.services.stage_state()
+            self.services.stage_output_files(kstep, self.OUTPUT_FILES)
+
+    def finalize(self, timeid=0):
+        print('>>> cesol_driver.finalized() started')
+        print('timeid =', timeid)
 
         #-- call finalize on each component
-        for port_name in port_names:
-            if port_name in ['INIT', 'DRIVER']: continue
-            services.call(port_dict[port_name], 'finalize', t)
+        for port_name in self.ports:
+            self.services.call(self.ports[port_name], 'finalize', timeid)
 
-    def finalize(self, timestamp = 0):
-        print('>>> cesol_driver.finalized() started')
-
-        sym_root = self.services.getGlobalConfigParameter('SIM_ROOT')
+        sym_root = self.services.get_config_param('SIM_ROOT')
         outfile = os.path.join(sym_root, 'RESULT')
         f = open(outfile,"w")
-        f.write("%6.3f 0.0\n")
-        f.write("%6.3f 0.0\n")
+        f.write("0.0\n")
+        f.write("0.0\n")
         f.close()
