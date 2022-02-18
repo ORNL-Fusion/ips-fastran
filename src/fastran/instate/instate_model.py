@@ -108,7 +108,7 @@ def expand_profile(instate):
 
 def instate_model(f_instate):
     #--- read instate
-    print("instate_model_new started")
+    print("instate_model started")
     instate = Namelist(f_instate)
     for key in list(instate["instate"].keys()):
         if key.upper() not in [ 'TOKAMAK_ID', 'PRESSURE_MODEL', 'CURRENT_MODEL' ]:
@@ -359,6 +359,11 @@ def instate_model(f_instate):
     instate["instate"]["walpha"] = zeros(nrho)
     instate["instate"]["j_tot"] = j_tot
     instate["instate"]["pmhd"] = pmhd
+
+    for k in range(n_ion):
+        instate["check"]["ni_{}".format(k)] = density_ion[k]
+    for k in range(n_imp):
+        instate["check"]["nz_{}".format(k)] = density_imp[k]
 
     #--- zeros
     for key in [
