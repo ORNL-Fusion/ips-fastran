@@ -20,7 +20,7 @@ class loglinear():
     def get_(self,ps):
         rval = self.data['const']
         for key in self.keys:
-            rval *= ps[key.lower()]**self.data[key.lower()]
+            rval *= ps[key.lower()][0]**self.data[key.lower()]
         return rval
 
     def latex(self):
