@@ -12,7 +12,7 @@ from fastran.equilibrium.efit_eqdsk import readg
 from fastran.instate import instate_model
 from fastran.instate import instate_io
 from fastran.driver import cesol_io
-from fastran.stability.pedestal_io import update_instate_pedestal
+#from fastran.stability.pedestal_io import update_instate_pedestal
 from fastran.util.fastranutil import namelist_default
 from ipsframework import Component
 
@@ -82,9 +82,9 @@ class fastran_init (Component):
         instate.write(f_instate)
 
         #-- expand instate
-        if f_inpedestal is not "":
-            print('INPEDESTAL = ', f_inpedestal)
-            update_instate_pedestal(f_instate, f_inpedestal)
+        #if f_inpedestal is not "":
+        #    print('INPEDESTAL = ', f_inpedestal)
+        #    update_instate_pedestal(f_instate, f_inpedestal)
 
         if instate_method == 'model':
             instate_model.instate_model(f_instate)
