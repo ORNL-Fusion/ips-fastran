@@ -38,19 +38,18 @@ class hcd_model(Component):
         #--- stage input files
         services.stage_input_files(self.INPUT_FILES)
 
-        #--- read inhcd
-        inhcd = Namelist("inhcd")
-        var_list = [ var.upper() for var in inhcd["inhcd"].keys() ]
-        for key in var_list:
-            try:
-                inhcd["inhcd"][key][0] = float(getattr(self, key))
-                print(key, 'updated')
-            except AttributeError:
-                pass
+        inhcd = Namelist("inhcd", case="upper")
+        for key in inhcd.keys():
+            for var in inhcd[key].keys():
+                for k in range(len(inhcd[key][var])):
+                    if hasattr(self, "%s_%s_%d"%(key, var, k)):
+                        inhcd[key][var][k] = float(getattr(self, "%s_%s_%d"%(key, var, k)))
+                        print(key, var, k,'updated')
         inhcd.write("inhcd")
 
         add = int(getattr(self, "ADD", "0"))
         print('add = ',add)
+        print('ps_backend = ',ps_backend)
 
         if ps_backend == 'PS':
             self.update_state(cur_state_file, cur_eqdsk_file, inhcd, add)
@@ -86,9 +85,9 @@ class hcd_model(Component):
         xmid = inhcd["inhcd"]["xmid"]
         xwid = inhcd["inhcd"]["xwid"]
 
-        j0_seed = inhcd["inhcd"]["j0_seed"][0]
-        x0_seed = inhcd["inhcd"]["x0_seed"][0]
-        drho_seed = inhcd["inhcd"]["drho_seed"][0]
+        j0_seed = inhcd["inhcd"]["j0_seed"]
+        x0_seed = inhcd["inhcd"]["x0_seed"]
+        drho_seed = inhcd["inhcd"]["drho_seed"]
 
         print("Pe =", Pe)
         print("Pi =", Pi)
@@ -128,11 +127,14 @@ class hcd_model(Component):
         ps.load_vol_profile(rho,pi_sum, "rho_icrf", "picrf_totals", k=1, add=add)
 
         #--- current
-        if j0_seed > 0.0:
-            jec_seed = j0_seed*exp(-(rho-x0_seed)**2/(2*drho_seed**2))
-        else:
-            jec_seed = zeros(nrho)
-        ps.load_j_parallel(rho,jec_seed*1.0e6,"rho_icrf","curich",r0,b0,add=add)
+        j_sum = zeros(nrho)
+        for k in range(nsrc):
+            if j0_seed[k] > 0.0:
+               j_seed = j0_seed[k]*exp(-(rho-x0_seed[k])**2/(2*drho_seed[k]**2))
+            else:
+               j_seed = zeros(nrho)
+            j_sum += j_seed
+        ps.load_j_parallel(rho,j_sum*1.0e6,"rho_icrf","curich",r0,b0,add=add)
 
         #--- write to ps
         ps.store(cur_state_file)
@@ -144,9 +146,9 @@ class hcd_model(Component):
         xmid = inhcd["inhcd"]["xmid"]
         xwid = inhcd["inhcd"]["xwid"]
 
-        j0_seed = inhcd["inhcd"]["j0_seed"][0]
-        x0_seed = inhcd["inhcd"]["x0_seed"][0]
-        drho_seed = inhcd["inhcd"]["drho_seed"][0]
+        j0_seed = inhcd["inhcd"]["j0_seed"]
+        x0_seed = inhcd["inhcd"]["x0_seed"]
+        drho_seed = inhcd["inhcd"]["drho_seed"]
 
         print("Pe =", Pe)
         print("Pi =", Pi)
@@ -184,13 +186,19 @@ class hcd_model(Component):
         if add:
             instate["instate"]["pe_ic"] = array(instate["instate"]["pe_ic"]) + pe_sum
             instate["instate"]["pi_ic"] = array(instate["instate"]["pi_ic"]) + pi_sum
+        else:
+            instate["instate"]["pe_ic"] = pe_sum
+            instate["instate"]["pi_ic"] = pi_sum
 
         #--- current
-        if j0_seed > 0.0:
-            jec_seed = j0_seed*exp(-(rho-x0_seed)**2/(2*drho_seed**2))
-        else:
-            jec_seed = zeros(nrho)
-        instate["instate"]["j_ic"] = jec_seed
+        j_sum = zeros(nrho)
+        for k in range(nsrc):
+            if j0_seed[k] > 0.0:
+               j_seed = j0_seed[k]*exp(-(rho-x0_seed[k])**2/(2*drho_seed[k]**2))
+            else:
+               j_seed = zeros(nrho)
+            j_sum += j_seed
+        instate["instate"]["j_ic"] = j_sum
 
         #--- write to instate
         instate.write(cur_instate_file)
