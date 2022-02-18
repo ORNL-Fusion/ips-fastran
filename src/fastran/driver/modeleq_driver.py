@@ -7,6 +7,8 @@ import glob
 import shutil
 import time as timer
 from Namelist import Namelist
+
+from fastran.instate import instate_io 
 from ipsframework import Component
 
 class modeleq_driver(Component):
@@ -24,6 +26,12 @@ class modeleq_driver(Component):
         #-- stage input and plasma state files
         services.stage_input_files(self.INPUT_FILES)
         services.stage_state()
+
+        cur_state_file = services.get_config_param('CURRENT_STATE')
+        cur_instate_file = services.get_config_param('CURRENT_INSTATE')
+
+        ps_backend = getattr(self, "PS_BACKEND", "INSTATE")
+        use_ps = int(getattr(self, "USE_PS", 1))
 
         #-- get list of ports
         ports = services.get_config_param('PORTS')
@@ -67,9 +75,14 @@ class modeleq_driver(Component):
             for port_name in port_names:
                 if port_name in ['INIT','DRIVER'] + post_names: continue
                 self.component_call(services, port_name, port_dict[port_name], 'step', time_id)
+                #if use_ps:
+                #    services.stage_state()
+                #    instate_io.instate_to_ps(cur_instate_file, cur_state_file)
+                #    services.update_state()
 
             services.stage_state()
             services.stage_output_files(time_id, self.OUTPUT_FILES)
+     
 
         #-- port in post process
         for port_name in post_names:
@@ -117,6 +130,7 @@ class modeleq_driver(Component):
             services.call(comp, mode, time)
         except Exception:
             services.exception(comp_mode_string + ' failed')
+            raise Exception(comp_mode_string + ' failed')
         else:
             print((comp_mode_string + ' finished'))
         t1 = timer.time()
