@@ -74,6 +74,23 @@ class profile_pedestal():
     def call_tanhg(self, xval):
         return self.tanhg(self.c, xval)
 
+class profile_parab():
+    def __init__(self, yaxis, ysep, alpha, beta):
+        self.yaxis = yaxis
+        self.ysep = ysep
+        self.alpha = alpha
+        self.beta = beta
+        pass
+
+    def __call__(self, xval):
+        return (self.yaxis-self.ysep)*(1.0-xval**self.alpha)**self.beta + self.ysep
+
+    def __getitem__(self, xvec):
+        return 0.0
+
+    def info(self):
+        pass
+
 class profile_spline():
     def __init__(self, x, y, yp):
         self.n = len(x)
