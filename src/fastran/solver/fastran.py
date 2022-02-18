@@ -6,13 +6,15 @@
 
 import os
 import shutil
+import numpy as np
+
 from ipsframework import Component
+
 from Namelist import Namelist
 from fastran.solver import fastran_io_ps
 from fastran.solver import fastran_io_instate
 from fastran.instate import instate_io
 from fastran.solver import zdata
-import numpy as np
 
 class fastran(Component):
     def __init__(self, services, config):
@@ -92,7 +94,7 @@ class fastran(Component):
 
         ncpu = int(self.NPROC)
         nky  = int(self.NPROC_KY)
-        n1d  = ncpu/nky
+        n1d  = ncpu//nky
 
         print("ncpu = ", ncpu)
         print("n1d  = ", n1d)
