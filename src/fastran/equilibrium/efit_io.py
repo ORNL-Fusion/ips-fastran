@@ -19,7 +19,6 @@ def fixbdry_kfile(shot, time, inefit, inmetric, relax=0, topology='', error=1.0e
 
     #-------------------------------------------------------------------
     # from inefit
-
     ip = inefit["inefit"]["ip"][0] # [A]
     r0 = inefit["inefit"]["r0"][0] # [m]
     b0_sign = inefit["inefit"]["b0"][0] # [T]
@@ -31,7 +30,6 @@ def fixbdry_kfile(shot, time, inefit, inmetric, relax=0, topology='', error=1.0e
 
     #-------------------------------------------------------------------
     # from inmetric
-
     for key in inmetric.keys():
         inmetric[key] = array(inmetric[key])
 
@@ -57,7 +55,6 @@ def fixbdry_kfile(shot, time, inefit, inmetric, relax=0, topology='', error=1.0e
 
     #-------------------------------------------------------------------
     # spline profiles
-
     ipol_spl = zinterp(rho, ipol)
     ipol_der = ipol_spl(rho, der=1)
 
@@ -96,23 +93,23 @@ def fixbdry_kfile(shot, time, inefit, inmetric, relax=0, topology='', error=1.0e
     pprim_psi = tmp(psi, der=1)
     pprim_psi = pprim_psi/dpsi
 
+    ipol_psi = ipol_spl(rho_eval, der=0) #------
+
     #-------------------------------------------------------------------
     # Ip scale
-
     ip_temp = 0.0
     for i in range(nrho-1):
         dV = (vol[i+1]-vol[i])
         rho_m  = 0.5*(rho[i+1]+rho[i])
         ip_temp += dV*jtor_spl(rho_m)
     ip_temp /= 2.0*pi*r0
-    print ('Ip = %5.3f %5.3f %5.3f'%(ip*1.0e-6, ip_temp*1.0e-6, ip/ip_temp))
+    print ('ip, ip cal, ip/(ip cal) = %5.3f %5.3f %5.3f'%(ip*1.0e-6, ip_temp*1.0e-6, ip/ip_temp))
 
     for i in range(len(jtor_psi)):
         jtor_psi[i] = ip/ip_temp*jtor_psi[i]
 
     #-------------------------------------------------------------------
     # calculate p' and ff'
-
     x0 = [0.1,0.15,0.2]
     extrapolation(psi, pprim_psi, x0, y0=None)
 
@@ -144,6 +141,7 @@ def fixbdry_kfile(shot, time, inefit, inmetric, relax=0, topology='', error=1.0e
 
     if relax:
        kfile_old = Namelist("k%06d.%05d"%(shot, time))
+       infreegs_old = Namelist("infreegs")
 
     kfile = Namelist()
 
@@ -210,13 +208,28 @@ def fixbdry_kfile(shot, time, inefit, inmetric, relax=0, topology='', error=1.0e
     kfile['profile_ext']['npsi_ext'] = [npsi]
     kfile['profile_ext']['psin_ext'] = psi
     if relax:
-        kfile['profile_ext']['pprime_ext'] =0.5*( -pprim_psi + kfile_old['profile_ext']['pprime_ext'])
-        kfile['profile_ext']['ffprim_ext'] =0.5*(-ffprim_psi + kfile_old['profile_ext']['ffprim_ext'])
+        kfile['profile_ext']['pprime_ext'] = 0.5*(-pprim_psi + kfile_old['profile_ext']['pprime_ext'])
+        kfile['profile_ext']['ffprim_ext'] = 0.5*(-ffprim_psi + kfile_old['profile_ext']['ffprim_ext'])
     else:
         kfile['profile_ext']['pprime_ext'] = -pprim_psi
-        kfile['profile_ext']['ffprim_ext'] =-ffprim_psi
+        kfile['profile_ext']['ffprim_ext'] = -ffprim_psi
 
     kfile.write("k%06d.%05d"%(shot, time))
+
+    infreegs = Namelist()
+    infreegs['profile_ext']['npsi_ext'] = [npsi]
+    infreegs['profile_ext']['psin_ext'] = psi
+    if relax:
+        infreegs['profile_ext']['pprime_ext'] = 0.5*(-pprim_psi + infreegs_old['profile_ext']['pprime_ext'])
+        infreegs['profile_ext']['ffprim_ext'] = 0.5*(-ffprim_psi + infreegs_old['profile_ext']['ffprim_ext'])
+        infreegs['profile_ext']['p_ext'] = 0.5*(press_psi + infreegs_old['profile_ext']['p_ext'])
+        infreegs['profile_ext']['f_ext'] = 0.5*(ipol_psi*r0*b0 + infreegs_old['profile_ext']['f_ext'])
+    else:
+        infreegs['profile_ext']['pprime_ext'] = -pprim_psi
+        infreegs['profile_ext']['ffprim_ext'] = -ffprim_psi
+        infreegs['profile_ext']['p_ext'] = press_psi
+        infreegs['profile_ext']['f_ext'] = ipol_psi*r0*b0
+    infreegs.write("infreegs")
 
     #-------------------------------------------------------------------
     # convergence check
@@ -229,12 +242,12 @@ def fixbdry_kfile(shot, time, inefit, inmetric, relax=0, topology='', error=1.0e
     diff_f_sum = 0.0
     if relax:
        for k in range(nrho):
-           diff_p += abs(kfile['profile_ext']['pprime_ext'][k]-kfile_old['profile_ext']['pprime_ext'][k] )
+           diff_p += abs(kfile['profile_ext']['pprime_ext'][k] - kfile_old['profile_ext']['pprime_ext'][k] )
            diff_p_sum += abs(kfile['profile_ext']['pprime_ext'][k])
            diff_f += abs(kfile['profile_ext']['ffprim_ext'][k] - kfile_old['profile_ext']['ffprim_ext'][k] )
            diff_f_sum += abs(kfile['profile_ext']['ffprim_ext'][k])
-       print ('diff=',diff_p/diff_p_sum)
-       print ('diff=',diff_f/diff_f_sum)
+       print ('diff_p =', diff_p/diff_p_sum)
+       print ('diff_f =', diff_f/diff_f_sum)
        if diff_p/diff_p_sum < max_error and diff_f/diff_f_sum < max_error: iconv = 1
     return iconv
 
@@ -408,6 +421,11 @@ def io_input_from_instate(f_instate, f_inefit="inefit", mode='kinetic'):
     if mode == 'kinetic':
        print('mode = kinetic')
        pmhd = 1.602e3*(ne*te +(ni+nz)*ti)+2.0/3.0*1.0e6*(wbeam+walp)
+    elif mode == 'pmhd':
+       print('mode = pmhd')
+       pmhd = instate['pmhd']
+       if pmhd is None:
+          pmhd = instate['p_eq'] 
     else:
        print('mode = total')
        #pmhd = instate['pmhd']
@@ -432,6 +450,7 @@ def io_input_from_instate(f_instate, f_inefit="inefit", mode='kinetic'):
 def io_input_from_state(f_ps, f_inbc, f_inefit="inefit", mode="kinetic", ismooth=0, betan_target=-1.):
     # read inbc
     inbc = Namelist(f_inbc)["inbc"]
+    if not inbc: inbc = Namelist(f_inbc)["instate"]
 
     # read plasma state
     r0 = inbc["r0"][0]
@@ -464,10 +483,10 @@ def io_input_from_state(f_ps, f_inbc, f_inefit="inefit", mode="kinetic", ismooth
     walpha = density_alpha*walpha
 
     if mode == 'kinetic':
-       print('mode = kinetic')
-       pmhd = 1.602e3*(ne*te+ni*ti)+2.0/3.0*1.602e3*(wbeam+walpha)# *1.1 #=========
+       # print('mode = kinetic')
+       pmhd = 1.602e3*(ne*te+ni*ti)+2.0/3.0*1.602e3*(wbeam+walpha)
     else:
-       print('mode = total')
+       # print('mode = total')
        pmhd = ps["P_eq"][:]
 
     jpar = ps.dump_j_parallel(rho, "rho_eq", "curt", r0, b0, tot=True)
@@ -486,7 +505,7 @@ def io_input_from_state(f_ps, f_inbc, f_inefit="inefit", mode="kinetic", ismooth
     betan *= 2.0*mu0/b0**2
     betan /= fabs(ip/(a0*b0))
     betan *= 1.0e2
-    print ('BETAN=',betan)
+    print ('betan =',betan)
 
     if betan_target > 0 and betan > betan_target:
         print("betan scale", betan_target/betan)
@@ -501,6 +520,8 @@ def io_input_from_state(f_ps, f_inbc, f_inefit="inefit", mode="kinetic", ismooth
     rlim = inbc["rlim"][:]
     zlim = inbc["zlim"][:]
     nlim = len(rlim)
+    print('nlim =', nlim)
+    print('rlim =', rlim)
 
     # namelist for efit
 
