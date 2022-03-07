@@ -11,6 +11,7 @@ import freegs.machine
 from freegs.shaped_coil import ShapedCoil
 import json
 from fastran.util.zinterp import zinterp
+import netCDF4
 
 def read_coil_data(f_coil_data):
     with open(f_coil_data, "r") as f:
@@ -116,10 +117,10 @@ def call_freegs(f_instate, f_inefit, init=False, boundary='all'):
            return fpol(psin)
 
         profiles = freegs.jtor.ProfilesPprimeFfprime(pprime_func, 
-                                                              ffprime_func, 
-                                                              r0*b0, 
-                                                              p_func=p_func, 
-                                                              f_func=f_func)
+                                                     ffprime_func,
+                                                     r0*b0,
+                                                     p_func=p_func,
+                                                     f_func=f_func)
          
 #   constrain = freegs.control.constrain(xpoints=xpoints, isoflux=isoflux)
     constrain = freegs.control.constrain(isoflux=isoflux)
@@ -138,3 +139,8 @@ def call_freegs(f_instate, f_inefit, init=False, boundary='all'):
     with open("lsn.geqdsk", "w") as f:
         freegs.geqdsk.write(eq, f, R0=r0)
 
+    with netCDF4.Dataset('c.nc', 'w') as coils_file_ref:
+        coils_file_ref.createDimension('num_coil_currents', len(tokamak.coils))
+        coils = coils_file_ref.createVariable('coil_currents', 'f8', ('num_coil_currents'))
+        for i in range(len(tokamak.coils)):
+            coils[i] = tokamak.coils[i].current

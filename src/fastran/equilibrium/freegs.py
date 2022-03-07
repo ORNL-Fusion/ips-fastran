@@ -167,6 +167,7 @@ class freegs(Component):
 
             #--- update local geqdsk state
             shutil.copyfile("lsn.geqdsk", "g%06d.%05d"%(ishot, itime))
+            shutil.copyfile("c.nc", "c%06d.%05d"%(ishot, itime))
 
         #--- load geqdsk to plasma state file
         if ps_backend == 'PS':
@@ -185,7 +186,7 @@ class freegs(Component):
         if self.OUTPUT_FILES:
             self.services.stage_output_files(timeid, self.OUTPUT_FILES)
         else:
-            output_files = ' '.join(["{0}{1:06d}.{2:05d}".format(header, ishot, itime) for header in ["g", "a", "k", "m"]])
+            output_files = ' '.join(["{0}{1:06d}.{2:05d}".format(header, ishot, itime) for header in ["g", "a", "k", "m", "c"]])
             output_files += " inefit"
             print("stage_output_files: ", output_files)
             elf.ervices.stage_output_files(timeid,  output_files)
