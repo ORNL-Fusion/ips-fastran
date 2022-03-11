@@ -6,9 +6,9 @@
 import numpy as np
 from Namelist import Namelist
 import freegs
-import freegs.geqdsk
-import freegs.machine
-from freegs.shaped_coil import ShapedCoil
+#import freegs.geqdsk
+#import freegs.machine
+#from freegs.shaped_coil import ShapedCoil
 import json
 from fastran.util.zinterp import zinterp
 import netCDF4
@@ -72,6 +72,7 @@ def call_freegs(f_instate, f_inefit, init=False, boundary='all'):
         isoflux += p
 
     tokamak = freegs.machine.DIIID_Tokamak(rwall=rwall, zwall=zwall)
+
 #   f_coil_data = 'd3d_coils'
 #   coils_shape = read_coil_data(f_coil_data)
 #   tokamak = freegs.machine.Machine(coils_shape, freegs.machine.Wall(rwall, zwall))
@@ -80,10 +81,10 @@ def call_freegs(f_instate, f_inefit, init=False, boundary='all'):
     ny = 129
 
     eq = freegs.Equilibrium(tokamak=tokamak,
-                    Rmin=0.84, Rmax=2.54, # Radial domain
-                    Zmin=-1.6, Zmax=1.6, # Height range
-                    nx=nx, ny=ny, # Number of grid points
-                    boundary=freegs.boundary.freeBoundaryHagenow) # Boundary condition
+                            Rmin=0.84, Rmax=2.54, # Radial domain
+                            Zmin=-1.6, Zmax=1.6, # Height range
+                            nx=nx, ny=ny, # Number of grid points
+                            boundary=freegs.boundary.freeBoundaryHagenow) # Boundary condition
 
     if init:
         profiles = freegs.jtor.ConstrainPaxisIp(press[0], # Plasma pressure on axis [Pascals]
@@ -125,9 +126,12 @@ def call_freegs(f_instate, f_inefit, init=False, boundary='all'):
 #   constrain = freegs.control.constrain(xpoints=xpoints, isoflux=isoflux)
     constrain = freegs.control.constrain(isoflux=isoflux)
 
-    freegs.solve(eq, # The equilibrium to adjust
-                 profiles, # The toroidal current profile function
-                 constrain) # Constraint function to set coil currents
+    freegs.picard.solve(eq, # The equilibrium to adjust
+                        profiles, # The toroidal current profile function
+                        constrain=constrain,
+                        maxits=1000000,
+                        rtol=1E-10,
+                        atol=1E-10) # Constraint function to set coil currents
     
     # eq now contains the solution
     
@@ -143,4 +147,4 @@ def call_freegs(f_instate, f_inefit, init=False, boundary='all'):
         coils_file_ref.createDimension('num_coil_currents', len(tokamak.coils))
         coils = coils_file_ref.createVariable('coil_currents', 'f8', ('num_coil_currents'))
         for i in range(len(tokamak.coils)):
-            coils[i] = tokamak.coils[i].current
+            coils[i] = tokamak.coils[i][1].current

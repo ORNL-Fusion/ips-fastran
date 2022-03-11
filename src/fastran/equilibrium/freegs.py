@@ -71,6 +71,8 @@ class freegs(Component):
         cur_instate_file = self.services.get_config_param('CURRENT_INSTATE')
         use_instate = int(getattr(self, "USE_INSTATE", "0"))
 
+        cur_coil_file = self.services.get_config_param('CURRENT_COIL')
+
         #--- generate inefit
         f_inefit = "inefit"
         mode = getattr(self, "PRESSURE", "kinetic")
@@ -164,6 +166,7 @@ class freegs(Component):
             print('elapsed time = %6.3f %6.3f'%(t1-t0, t2-t1))
 
             shutil.copyfile("lsn.geqdsk", cur_eqdsk_file)
+            shutil.copyfile("c.nc", cur_coil_file)
 
             #--- update local geqdsk state
             shutil.copyfile("lsn.geqdsk", "g%06d.%05d"%(ishot, itime))
@@ -198,12 +201,14 @@ class freegs(Component):
         cur_state_file = self.services.get_config_param('CURRENT_STATE')
         cur_eqdsk_file = self.services.get_config_param('CURRENT_EQDSK')
         cur_instate_file = self.services.get_config_param('CURRENT_INSTATE')
+        cur_coil_file = self.services.get_config_param('CURRENT_COIL')
 
         efit_io.io_input_from_instate(f_instate=cur_instate_file, f_inefit="inefit", mode='pmhd')
 
         call_freegs(cur_instate_file, "inefit", init=True)
 
         shutil.copyfile("lsn.geqdsk", cur_eqdsk_file)
+        shutil.copyfile("c.nc", cur_coil_file)
 
         ps = plasmastate('ips',1)
         ps.read(cur_state_file)

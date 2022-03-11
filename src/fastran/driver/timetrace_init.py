@@ -49,6 +49,7 @@ class timetrace_init (Component):
         cur_state_file = self.services.get_config_param('CURRENT_STATE')
         cur_eqdsk_file = self.services.get_config_param('CURRENT_EQDSK')
         cur_instate_file = self.services.get_config_param('CURRENT_INSTATE')
+        cur_coil_file = self.services.get_config_param('CURRENT_COIL')
 
         #-- instate / dakota binding
         f_instate = getattr(self, 'INSTATE', '')
@@ -139,6 +140,10 @@ class timetrace_init (Component):
 
         #-- touch plasma state files
         for fname in [cur_eqdsk_file]:
+            open(fname, "w").close()
+
+        #-- touch plasma state files
+        for fname in [cur_coil_file]:
             open(fname, "w").close()
 
         #-- update plasma state
