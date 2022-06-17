@@ -1,7 +1,7 @@
 #!/bin/bash -l
 
-#SBATCH --image=docker:registry.services.nersc.gov/rwp53/ips-massive-serial:latest
-#SBATCH --volume="/global/cscratch1/sd/rwp/tmpfiles:/tmp:perNodeCache=size=1G"
+#SBATCH --image=docker:registry.services.nersc.gov/rwp53/ips-massive-serial:dev
+#SBATCH --volume="/global/cscratch1/sd/rwp/tmpfiles:/tmp:perNodeCache=size=20G"
 
 #SBATCH -p debug
 #SBATCH --nodes=2
@@ -12,7 +12,8 @@
 #SBATCH -e ips.err
 #SBATCH -o ips.out
 
-module use /global/common/software/atom/cori/cesol_dev/modulefiles/cori
-module load fastran
+export BIN_DIR=/global/common/software/atom/cori/binaries
+module load python
+conda activate massiveparallel
 
-python $IPS_ROOT/bin/ips.py --config=ips_massive_serial_global_shifter.config --platform=$IPSCONFIG_DIR/cori_haswell.conf --log=ips.log
+ips.py --config=ips_massive_serial_global_shifter.config --platform=cori_haswell.conf --log=ips.log
