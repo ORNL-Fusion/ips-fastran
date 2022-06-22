@@ -1,5 +1,5 @@
 # Luce shape
-from omfit.classes.fluxSurface import boundaryShape
+from omfit_classes.fluxSurface import boundaryShape
 
 # simple analytic
 def set_shape(R0, a0, kappa, delta, nt, dlim = 0.05):
