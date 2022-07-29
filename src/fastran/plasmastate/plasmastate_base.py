@@ -14,7 +14,7 @@ class plasmastate_base():
 
     def analytic_volume(self, b0, r0, a0, kappa0, delta0):
         nrho_eq = 101 #self["nrho_eq"]
-        print('analytic volume:')
+        print('usng analytic volume')
 
         for i in range(nrho_eq):
             rho = self["rho_eq"][i]
@@ -78,6 +78,7 @@ class plasmastate_base():
         zone_spl = interp(self["rho_eq"], self["vol"])
 
         rho_ps = self[xkey]
+
         if k<0:
            prof_ps = self[ykey]
         else:

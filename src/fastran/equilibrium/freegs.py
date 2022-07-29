@@ -188,7 +188,7 @@ class freegs(Component):
             output_files = ' '.join(["{0}{1:06d}.{2:05d}".format(header, ishot, itime) for header in ["g", "a", "k", "m"]])
             output_files += " inefit"
             print("stage_output_files: ", output_files)
-            elf.ervices.stage_output_files(timeid,  output_files)
+            self.services.stage_output_files(timeid,  output_files)
 
     def finalize(self, timeid):
         print ('>>> freegs.finalize() called')
