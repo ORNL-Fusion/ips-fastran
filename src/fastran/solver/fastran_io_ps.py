@@ -14,7 +14,7 @@ from fastran.solver import zfdat
 from fastran.equilibrium.efit_eqdsk import readg
 from fastran.plasmastate.plasmastate import plasmastate
 
-def write_input(f_state,f_eqdsk,rdir='.'):
+def write_input(f_state, f_eqdsk, rdir='.', recycle=0.):
     #-------------------------------------------------------------------
     # read geqdsk and plasma state file
     geq = readg(f_eqdsk)
@@ -87,6 +87,18 @@ def write_input(f_state,f_eqdsk,rdir='.'):
     torque_in= zeros(nrho)
 
     se_nb = 1.e-19*(ps.dump_vol_profile(rho, "rho_nbi", "sbedep") + ps.dump_vol_profile(rho, "rho_nbi", "sbehalo"))
+
+    se_tot = ps.integrate("sbedep")
+    print ("se_tot =", se_tot)
+
+    if recycle > 0:
+        se_recycle = 1.e-19*ps.dump_vol_profile(rho, "rho_gas", "sprof0e", k=0)
+        se_recycle_tot = ps.integrate("sprof0e", k=0)
+        print("se_recycle_tot =", se_recycle_tot)
+        se_recycle *= recycle*se_tot
+    else:
+        se_recycle = zeros(nrho)
+        print ("se_recycle_tot = 0")
 
     p_rad= zeros(nrho)
     p_ohm= zeros(nrho)
@@ -186,7 +198,7 @@ def write_input(f_state,f_eqdsk,rdir='.'):
     zfdat.write_f("qcx"     , pi_cx,'', f)
     zfdat.write_f("storqueb", torque_nb,'', f)
     zfdat.write_f("storque" , torque_in,'', f)
-    zfdat.write_f("sion"    , se_nb,'', f)
+    zfdat.write_f("sion"    , se_nb + se_recycle,'', f)
     zfdat.write_f("chie"    , chie,'', f)
     zfdat.write_f("chii"    , chii,'', f)
     f.close()

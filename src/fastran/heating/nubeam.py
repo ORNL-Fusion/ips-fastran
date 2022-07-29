@@ -189,7 +189,7 @@ class nubeam(Component):
             del os.environ['FRANTIC_INIT']
         except:
             pass
-        os.environ['FRANTIC_ACTION'] = 'NONE' #'none' #'execute'
+        os.environ['FRANTIC_ACTION'] = getattr(self, "FRANTIC_ACTION", "NONE")
 
         #--- run nstep-navg
 

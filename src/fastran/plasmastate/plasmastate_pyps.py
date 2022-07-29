@@ -55,7 +55,7 @@ class plasmastate(PlasmaState, plasmastate_base):
         self["nz"] = 0
 
         self["nrho_gas"] = nrho
-        self["nrho_nbi"] = nrho_nbi #nrho
+        self["nrho_nbi"] = nrho_nbi 
         self["nrho_ecrf"] = nrho
         self["nrho_icrf"] = nrho
         self["nrho_lhrf"] = nrho
@@ -76,7 +76,12 @@ class plasmastate(PlasmaState, plasmastate_base):
 
         self["num_rzlim"] = nlim
 
+        self["ngsc0"] = 1
+
         self.alloc()
+
+        self["gs_name"] = ["D0_recycle"]
+        self["gas_atom"] = ["D"]
 
         self["icrf_src_name"] = ['IC%02d'%k for k in range(nicrf_src)]
         self["lhrf_src_name"] = ['LH%02d'%k for k in range(nlhrf_src)]

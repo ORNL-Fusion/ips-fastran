@@ -78,7 +78,9 @@ class fastran(Component):
         if self.PS_BACKEND=="instate":
            fastran_io_instate.write_input(cur_instate_file)
         else:
-           fastran_io_ps.write_input(cur_state_file, cur_eqdsk_file)
+           recycle = float(getattr(self, "RECYCLE", "0"))
+           print("recycle =", recycle)
+           fastran_io_ps.write_input(cur_state_file, cur_eqdsk_file, recycle = recycle)
 
         if timeid > ifreeze and timeid < irefreeze:
             inmetric = zdata.zdata()

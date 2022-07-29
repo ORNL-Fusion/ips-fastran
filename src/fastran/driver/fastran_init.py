@@ -6,6 +6,7 @@
 
 import shutil
 import numpy as np
+import netCDF4
 from Namelist import Namelist
 from fastran.plasmastate.plasmastate import plasmastate
 from fastran.equilibrium.efit_eqdsk import readg
@@ -161,6 +162,17 @@ class fastran_init (Component):
 
         #-- write plasma state file
         ps.store(cur_state_file)
+
+        #-- recycling neutral
+        neutral_energy = namelist_default(instate, "instate", "neutral_energy", [15.0])[0]
+        neutral_recycling = namelist_default(instate, "instate", "neutral_recycling", [1.0e20])[0]
+
+        ps = netCDF4.Dataset(cur_state_file, "r+", format='NETCDF4')
+        ps.variables["sc0_to_sgas"][:] = [1]
+        ps.variables["is_recycling"][:] = [1]
+        ps.variables["sc0"][:] = [neutral_recycling]
+        ps.variables["e0_av"][:] = [neutral_energy*1.0e-3]
+        ps.close()
 
         #-- boundary condition state file
         instate = Namelist(f_instate)["inbc"]
