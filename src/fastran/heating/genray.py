@@ -73,6 +73,9 @@ class genray(Component):
         jmulti = float(getattr(self, "JMULTI", 1.0))
         print('GENRAY JMULTI:', jmulti)
 
+        rho_smooth = float(getattr(self, "RHO_SMOOTH", -1.0))
+        print('GENRAY RHO_SMOOTH:', rho_smooth)
+
         genray_io.write_inputfiles(cur_state_file, cur_eqdsk_file, f_ingenray, MKS)
 
         add = int(getattr(self, "ADD", "0"))
@@ -97,7 +100,7 @@ class genray(Component):
            raise Exception('Error executing: xgenray')
 
         #--- get genray output
-        genray_io.update_state(cur_state_file, cur_eqdsk_file, imode=imode, jmulti=jmulti, add=add)
+        genray_io.update_state(cur_state_file, cur_eqdsk_file, imode=imode, jmulti=jmulti, add=add, rho_smooth=rho_smooth)
 
         #--- update plasma state files
         services.update_state()
