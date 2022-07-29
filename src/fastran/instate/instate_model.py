@@ -202,7 +202,7 @@ def instate_model(f_instate):
         zoffset = 0.
 
         rb, zb, zref = boundaryShape(a0, eps, kapu, kapl, delu, dell, zetaou, zetaiu, zetail, zetaol, zoffset,
-                          upnull=True, lonull=True, np=np, doPlot=False)
+                          upnull=True, lonull=True, npts=np, doPlot=False)
 
         rb = append(rb, rb[0])
         zb = append(zb, zb[0])
@@ -261,6 +261,7 @@ def instate_model(f_instate):
 
     use_inped = instate["instate"]["use_inped"][0]
     if  use_inped == 1:
+        print("use inped")
         nesep = ne_ped * instate["inped"]["nesep"][0]
         tesep_inped = instate["inped"]["tesep"][0]
         if tesep_inped > 0:
@@ -305,6 +306,10 @@ def instate_model(f_instate):
         ne_sep = nesep
         te_ped = teped
         ti_ped = teped
+
+    print(">>>>> check te_ped = ", te_ped)
+    print(">>>>> check te_xmid = ", te_xmid)
+    print(">>>>> check te_xwid = ", te_xwid)
 
     #--- construnct profile
     rho = arange(nrho)/(nrho-1.0)
