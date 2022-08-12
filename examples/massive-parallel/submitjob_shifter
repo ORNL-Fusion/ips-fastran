@@ -4,7 +4,7 @@
 #SBATCH --volume="/global/cscratch1/sd/rwp/tmpfiles:/tmp:perNodeCache=size=1G"
 
 #SBATCH -p debug
-#SBATCH --nodes=2
+#SBATCH --nodes=1
 #SBATCH -t 00:10:00
 #SBATCH -C haswell
 
