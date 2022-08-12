@@ -105,7 +105,8 @@ class ips_massive_serial(Component):
             sim["SIM_ROOT"] = rundir
             sim["OUT_REDIRECT"] = "True"
             sim["OUT_REDIRECT_FNAME"] = os.path.join(tmp_xfs_rank if tmp_xfs else cwd, "run%05d.out"%k)
-            sim["USE_PORTAL"] = "False"
+            sim["USE_PORTAL"] = "True"
+            sim['PARENT_PORTAL_RUNID'] = self.services.get_config_param("PORTAL_RUNID")
             driver = sim['PORTS']['DRIVER']['IMPLEMENTATION']
             sim[driver]["SUMMARY"] = tmp_xfs_dir_summary if tmp_xfs else dir_summary
             sim.write(open(os.path.join(tmp_xfs_rank, "run%05d.config"%k), "wb") if tmp_xfs else open("run%05d.config"%k, "wb"))
