@@ -15,12 +15,12 @@ from distributed.diagnostics.plugin import WorkerPlugin
 def file_daemon(worker_id, evt, source_dir, target_dir):
 
     cmd = f"""cd {source_dir}
-tar -caf {target_dir}/{worker_id}_archive_$(date +"%Y-%m-%dT%H.%M.%S").tar.gz SUMMARY run?????/*.log run?????/*.out
+tar -caf {target_dir}/{worker_id}_archive_$(date +"%Y-%m-%dT%H.%M.%S").tar.gz SUMMARY run?????
 # Remove all *.tar.gz except most recent 2
 ls -t {target_dir}/{worker_id}_archive_*.tar.gz | tail +3 | xargs rm -f
 """
 
-    while not evt.wait(60):  # interval which to archive data
+    while not evt.wait(600):  # interval which to archive data
         os.system(cmd)
 
     os.system(cmd)
