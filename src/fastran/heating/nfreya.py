@@ -39,6 +39,7 @@ class nfreya(Component):
             cur_bc_file = services.get_config_param('CURRENT_BC')
         elif ps_backend == 'INSTATE':
             cur_instate_file = services.get_config_param('CURRENT_INSTATE')
+            cur_bc_file = cur_instate_file
 
         cur_eqdsk_file = services.get_config_param('CURRENT_EQDSK')
 
@@ -80,10 +81,9 @@ class nfreya(Component):
         print(dir_data)
 
         if ps_backend == 'PS':
-            nfreya_io.write_inputfiles(cur_state_file, cur_eqdsk_file, f_innfreya,dir_data)
+            nfreya_io.write_inputfiles(cur_state_file, cur_eqdsk_file, f_innfreya, dir_data)
         elif ps_backend == 'INSTATE':
-            print('here')
-            nfreya_io.write_inputfiles_instate(cur_instate_file, cur_eqdsk_file, f_innfreya,dir_data)
+            nfreya_io.write_inputfiles_instate(cur_instate_file, cur_eqdsk_file, f_innfreya, dir_data)
 
         #--- run nfreya
         print('run nfreya')

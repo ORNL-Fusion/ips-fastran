@@ -186,7 +186,7 @@ def write_inputfiles(f_state, f_eqdsk, f_infreya, dir_data=''):
 
     innfreya = Namelist(f_infreya)
     for key in innfreya["innfreya"].keys():
-        if key.lower() in ["rmajor","rminor","rin","rout","inenez","zfrac"]:
+        if key.lower() in ["rmajor", "rminor", "rin", "rout", "inenez", "zfrac"]:
             inone["namelis1"][key] = innfreya["innfreya"][key]
         else:
             inone["namelis2"][key] = innfreya["innfreya"][key]
@@ -250,16 +250,10 @@ def write_inputfiles_instate(f_instate, f_eqdsk, f_infreya, dir_data=''):
 
     innfreya = Namelist(f_infreya)
     for key in innfreya["innfreya"].keys():
-        inone["namelis2"][key] = innfreya["innfreya"][key]
-
-    # inone["namelis1"]["inenez"] = [1]
-    # inone["namelis1"]["nprim"] = [2]
-    # inone["namelis1"]["namep"] = ['d', 't']
-    # inone["namelis1"]["zfrac"] = [0.5]
-    # inone["namelis1"]["nimp"] = [1]
-    # inone["namelis1"]["namei"] = ['c']
-    # inone["namelis1"]["nneu"] = [2]
-    # inone["namelis1"]["namen"] = ['d', 't']
+        if key.lower() in ["rmajor", "rminor", "rin", "rout", "inenez", "zfrac"]:
+            inone["namelis1"][key] = innfreya["innfreya"][key]
+        else:
+            inone["namelis2"][key] = innfreya["innfreya"][key]
 
     inone["namelis1"]["inenez"] = [1]
     inone["namelis1"]["nprim"] = [1]
@@ -267,8 +261,8 @@ def write_inputfiles_instate(f_instate, f_eqdsk, f_infreya, dir_data=''):
     inone["namelis1"]["zfrac"] = [1.0]
     inone["namelis1"]["nimp"] = [1]
     inone["namelis1"]["namei"] = ['c']
-    inone["namelis1"]["nneu"] = [1] #[2]
-    inone["namelis1"]["namen"] = ['d'] #['d', 'c']
+    inone["namelis1"]["nneu"] = [1] 
+    inone["namelis1"]["namen"] = ['d'] 
 
     inone["namelis1"]["nj"] = [nrho]
     inone["namelis1"]["njene"] = [nrho]
@@ -286,32 +280,21 @@ def write_inputfiles_instate(f_instate, f_eqdsk, f_infreya, dir_data=''):
     inone["namelis1"]["rangrot"] = rho
     inone["namelis1"]["angrotin"] = omega
 
-    # inone["namelis1"]["njenp"] = 2*[nrho]
-    # inone["namelis1"]["renpin(1,1)"] = rho
-    # inone["namelis1"]["renpin(1,2)"] = rho
-    # inone["namelis1"]["enp(1,1)"] = np[0]*1.0e-6
-    # inone["namelis1"]["enp(1,2)"] = np[1]*1.0e-6
-    # inone["namelis1"]["njeni"] = 2*[nrho]
-    # inone["namelis1"]["reniin(1,1)"] = rho
-    # inone["namelis1"]["reniin(1,2)"] = rho
-    # inone["namelis1"]["eni(1,1)"] = nc*1.0e-6
-    # inone["namelis1"]["eni(1,2)"] = nhe4*1.0e-6
-
     inone["namelis3"]["EQDSKIN"] = [f_eqdsk]
 
-    inone["namelis2"]["extqerf_id"] = ['rf_e']
-    inone["namelis2"]["extqerf_watts"] = [0]
-    inone["namelis2"]["extqerf"] = [1.0]
-    inone["namelis2"]["extqerf_nj"] = [nrho]
-    inone["namelis2"]["extqerf_rho"] = rho
-    inone["namelis2"]["extqerf_qe"] = instate["instate"]["pe_ic"]
+    # inone["namelis2"]["extqerf_id"] = ['rf_e']
+    # inone["namelis2"]["extqerf_watts"] = [0]
+    # inone["namelis2"]["extqerf"] = [1.0]
+    # inone["namelis2"]["extqerf_nj"] = [nrho]
+    # inone["namelis2"]["extqerf_rho"] = rho
+    # inone["namelis2"]["extqerf_qe"] = instate["instate"]["pe_ic"]
 
-    inone["namelis2"]["extqirf_id"] = ['rf_i']
-    inone["namelis2"]["extqirf_watts"] = [0]
-    inone["namelis2"]["extqirf"] = [1.0]
-    inone["namelis2"]["extqirf_nj"] = [nrho]
-    inone["namelis2"]["extqirf_rho"] = rho
-    inone["namelis2"]["extqirf_qi"] = instate["instate"]["pi_ic"]
+    # inone["namelis2"]["extqirf_id"] = ['rf_i']
+    # inone["namelis2"]["extqirf_watts"] = [0]
+    # inone["namelis2"]["extqirf"] = [1.0]
+    # inone["namelis2"]["extqirf_nj"] = [nrho]
+    # inone["namelis2"]["extqirf_rho"] = rho
+    # inone["namelis2"]["extqirf_qi"] = instate["instate"]["pi_ic"]
 
     # inone["namelis2"]["extcurrf_id"] = ['rf_j']
     # inone["namelis2"]["extcurrf_amps"] = [0]
@@ -455,5 +438,8 @@ def update_instate(f_instate,f_eqdsk,scales={}):
 
     instate['instate']['pdd'] = [pdd]
     instate['instate']['neutron'] = [neutron]
+
+    instate['instate']['pe_nb'] = pnbe
+    instate['instate']['pi_nb'] = pnbi
 
     instate.write(f_instate)
