@@ -1,0 +1,12 @@
+name: ips-fastran
+channels:
+  - conda-forge
+  - defaults
+
+dependencies:
+  - python=3.7
+  - scipy
+  - netcdf4
+  - matplotlib
+  - dask=2.30
+  - ipsframework=0.6.1
