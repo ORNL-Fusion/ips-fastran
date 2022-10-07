@@ -8,14 +8,16 @@ import shutil
 import numpy as np
 import netCDF4
 from Namelist import Namelist
+from ipsframework import Component
 from fastran.plasmastate.plasmastate import plasmastate
 from fastran.equilibrium.efit_eqdsk import readg
 from fastran.instate import instate_model
 from fastran.instate import instate_io
 from fastran.driver import cesol_io
-#from fastran.stability.pedestal_io import update_instate_pedestal
 from fastran.util.fastranutil import namelist_default
-from ipsframework import Component
+from fastran.util import dakota_io
+from fastran.state.instate import Instate
+
 
 class fastran_init (Component):
     def __init__(self, services, config):
@@ -26,33 +28,32 @@ class fastran_init (Component):
         print('fastran_init.init() called')
 
     def step(self, timeStamp):
-        #-- entry
         print('fastran_init.step() started')
-        services = self.services
 
-        #-- run identifiers
-        tokamak_id = services.get_config_param('TOKAMAK_ID')
-        shot_number = services.get_config_param('SHOT_NUMBER')
+        # -- run identifiers
+        tokamak_id = self.services.get_config_param('TOKAMAK_ID')
+        shot_number = self.services.get_config_param('SHOT_NUMBER')
 
         print('tokamak_id =', tokamak_id)
         print('shot_number =', shot_number)
 
-        #-- stage input files
+        # -- stage input files
         input_dir_id = getattr(self, "INPUT_DIR_ID", "")
         if input_dir_id:
-            services.component_ref.config['INPUT_DIR'] = services.component_ref.config['INPUT_DIR']+"_%d"%int(float(input_dir_id))
-        print('INPUT_DIR =', services.component_ref.config['INPUT_DIR'])
+            self.services.component_ref.config['INPUT_DIR'] = self.services.component_ref.config['INPUT_DIR'] + \
+                "_%d" % int(float(input_dir_id))
+        print('INPUT_DIR =', self.services.component_ref.config['INPUT_DIR'])
 
-        services.stage_input_files(self.INPUT_FILES)
+        self.services.stage_input_files(self.INPUT_FILES)
 
-        #-- plasma state file names
-        cur_state_file = services.get_config_param('CURRENT_STATE')
-        cur_eqdsk_file = services.get_config_param('CURRENT_EQDSK')
-        cur_bc_file = services.get_config_param('CURRENT_BC')
-        cur_instate_file = services.get_config_param('CURRENT_INSTATE')
+        # -- plasma state file names
+        cur_state_file = self.services.get_config_param('CURRENT_STATE')
+        cur_eqdsk_file = self.services.get_config_param('CURRENT_EQDSK')
+        cur_bc_file = self.services.get_config_param('CURRENT_BC')
+        cur_instate_file = self.services.get_config_param('CURRENT_INSTATE')
 
-        #-- set default
-        init_method = getattr(self, 'INIT_METHOD', 'instate') # not used
+        # -- set default
+        init_method = getattr(self, 'INIT_METHOD', 'instate')  # not used
         instate_method = getattr(self, 'INSTATE_METHOD', '')
         f_instate = getattr(self, 'INSTATE', '')
         f_inps = getattr(self, 'INPS', '')
@@ -60,112 +61,96 @@ class fastran_init (Component):
         f_eped = getattr(self, 'EPED', '')
         f_inpedestal = getattr(self, 'INPEDESTAL', '')
 
-        #-- instate / dakota binding
-        instate = Namelist(f_instate)
+        # -- instate / dakota binding
+        instate = Instate(f_instate)
 
-        var_list = [ var.upper() for var in instate["instate"].keys() ]
-        for key in var_list:
-            if hasattr(self, key):
-                instate["instate"][key][0] = float(getattr(self, key))
-                print(key, 'updated')
-
-            if hasattr(self, "SCALE_"+key):
-                scale = float(getattr(self, "SCALE_"+key))
-                instate["instate"][key] = scale*np.array(instate["instate"][key])
-                print(key,'scaled',scale)
-
-        var_list = [ var.upper() for var in instate["flux"].keys() ]
-        for key in var_list:
-            if hasattr(self, "FLUX_"+key):
-                instate["flux"][key][0] = float(getattr(self, "FLUX_"+key))
-                print(key, 'updated')
-
-        instate.write(f_instate)
-
-        #-- expand instate
-        #if f_inpedestal is not "":
-        #    print('INPEDESTAL = ', f_inpedestal)
-        #    update_instate_pedestal(f_instate, f_inpedestal)
+        print("start dakota update")
+        dakota_io.update_namelist(self, instate.data, section="instate")
+        dakota_io.update_namelist(self, instate.data)
 
         if instate_method == 'model':
-            instate_model.instate_model(f_instate)
+            print("instate_model started")
 
-        #-- alloc plasma state file
+            instate.set_shape()
+            instate.model_profile()
+            print(instate.data)
+            instate.particle_balance()
+            instate.zeros()
+
+        # -- alloc plasma state file
         ps = plasmastate('ips', 1)
 
-        instate = Namelist(f_instate)
-        nicrf_src =  namelist_default(instate, "instate", "nicrf_src", [1])
-        nlhrf_src =  namelist_default(instate, "instate", "nlhrf_src", [1])
+        nicrf_src = namelist_default(instate.data, "instate", "nicrf_src", [1])
+        nlhrf_src = namelist_default(instate.data, "instate", "nlhrf_src", [1])
 
         print('init from instate:', f_instate)
-
         ps.init(
             cur_state_file,
-            global_label = ['ips'],
-            runid = ['ips'],
-            shot_number = [int(shot_number)],
-            nspec_th = [instate["instate"]["n_ion"][0] + instate["instate"]["n_imp"][0]] ,
-            nspec_beam = [instate["instate"]["n_beam"][0]],
-            nspec_fusion = [instate["instate"]["n_fusion"][0]],
-            nspec_rfmin = [instate["instate"]["n_min"][0]],
-            nspec_gas = [instate["instate"]["n_ion"][0]],
-            z_ion = instate["instate"]["z_ion"] + instate["instate"]["z_imp"],
-            a_ion = instate["instate"]["a_ion"] + instate["instate"]["a_imp"],
-            z_beam = instate["instate"]["z_beam"],
-            a_beam = instate["instate"]["a_beam"],
-            z_fusion = instate["instate"]["z_fusion"],
-            a_fusion = instate["instate"]["a_fusion"],
-            z_rfmin = instate["instate"]["z_min"],
-            a_rfmin = instate["instate"]["a_min"],
-            z_gas = instate["instate"]["z_ion"],
-            a_gas = instate["instate"]["a_ion"],
-            nicrf_src = nicrf_src,
-            nlhrf_src = nlhrf_src,
-            nrho = [101],
-            time = [0.0],
-            nlim = instate["instate"]["nlim"]
+            global_label=['ips'],
+            runid=['ips'],
+            shot_number=[int(shot_number)],
+            nspec_th=[instate["n_ion"][0] + instate["n_imp"][0]],
+            nspec_beam=[instate["n_beam"][0]],
+            nspec_fusion=[instate["n_fusion"][0]],
+            nspec_rfmin=[instate["n_min"][0]],
+            nspec_gas=[instate["n_ion"][0]],
+            z_ion=np.append(instate["z_ion"], instate["z_imp"]),
+            a_ion=np.append(instate["a_ion"], instate["a_imp"]),
+            z_beam=instate["z_beam"],
+            a_beam=instate["a_beam"],
+            z_fusion=instate["z_fusion"],
+            a_fusion=instate["a_fusion"],
+            z_rfmin=instate["z_min"],
+            a_rfmin=instate["a_min"],
+            z_gas=instate["z_ion"],
+            a_gas=instate["a_ion"],
+            nicrf_src=nicrf_src,
+            nlhrf_src=nlhrf_src,
+            nrho=[101],
+            time=[0.0],
+            nlim=instate["nlim"]
         )
 
-        #-- input equlibrium
+        # -- input equlibrium
         if f_ingeqdsk:
             ps.load_geqdsk(f_ingeqdsk, keep_cur_profile=False, bdy_crat=0.01)
             shutil.copyfile(f_ingeqdsk, cur_eqdsk_file)
 
             geq = readg(f_ingeqdsk)
-            r0  = geq["rzero" ]
-            b0  = abs(geq["bcentr"])
-            ip  = geq['cpasma']
+            r0 = geq["rzero"]
+            b0 = abs(geq["bcentr"])
+            ip = geq['cpasma']
 
-            ps.load_j_parallel(instate["instate"]["rho"], instate["instate"]["j_tot"], "rho_eq", "curt", r0, b0, tot=True)
+            ps.load_j_parallel(instate["rho"], instate["j_tot"], "rho_eq", "curt", r0, b0, tot=True)
         else:
-            r0 = instate["instate"]["r0"][0]
-            b0 = instate["instate"]["b0"][0]
+            r0 = instate["r0"][0]
+            b0 = instate["b0"][0]
 
-            rb = np.array(instate["instate"]["rbdry"])
-            zb = np.array(instate["instate"]["zbdry"])
+            rb = np.array(instate["rbdry"])
+            zb = np.array(instate["zbdry"])
 
-            R = 0.5*( np.max(rb) + np.min(rb) )
-            Z = 0.5*( np.max(zb) + np.min(zb) )
-            a = 0.5*( np.max(rb) - np.min(rb) )
-            kappa = 0.5*( ( np.max(zb) - np.min(zb) )/ a )
-            delta_u = ( R - rb[np.argmax(zb)] )/a
-            delta_l = ( R - rb[np.argmin(zb)] )/a
-            delta = 0.5*( delta_u + delta_l )
+            R = 0.5*(np.max(rb) + np.min(rb))
+            Z = 0.5*(np.max(zb) + np.min(zb))
+            a = 0.5*(np.max(rb) - np.min(rb))
+            kappa = 0.5*((np.max(zb) - np.min(zb)) / a)
+            delta_u = (R - rb[np.argmax(zb)])/a
+            delta_l = (R - rb[np.argmin(zb)])/a
+            delta = 0.5*(delta_u + delta_l)
 
             ps.analytic_volume(b0, r0, a, kappa, delta)
 
-            open(cur_eqdsk_file,"w").close()
+            open(cur_eqdsk_file, "w").close()
+            print('end')
 
-        #-- load instate to plasma state
-        print('instate to ps:', f_instate)
-        instate_io.instate_to_ps(f_instate, ps)
+        # -- load instate to plasma state
+        instate.to_ps(ps)
 
-        #-- write plasma state file
+        # -- write plasma state file
         ps.store(cur_state_file)
 
-        #-- recycling neutral
-        neutral_energy = namelist_default(instate, "instate", "neutral_energy", [15.0])[0]
-        neutral_recycling = namelist_default(instate, "instate", "neutral_recycling", [1.0e20])[0]
+        # -- recycling neutral
+        neutral_energy = namelist_default(instate.data, "instate", "neutral_energy", [15.0])[0]
+        neutral_recycling = namelist_default(instate.data, "instate", "neutral_recycling", [1.0e20])[0]
 
         ps = netCDF4.Dataset(cur_state_file, "r+", format='NETCDF4')
         ps.variables["sc0_to_sgas"][:] = [1]
@@ -174,9 +159,12 @@ class fastran_init (Component):
         ps.variables["e0_av"][:] = [neutral_energy*1.0e-3]
         ps.close()
 
-        #-- boundary condition state file
-        instate = Namelist(f_instate)["inbc"]
-        if not instate: instate = Namelist(f_instate)["instate"]
+        # -- write instate file
+        instate.write(f_instate)
+
+        # -- boundary condition state file
+        #instate = Namelist(f_instate)["inbc"]
+        #if not instate: instate = Namelist(f_instate)["instate"]
 
         inbc = Namelist()
         inbc["inbc"]["r0"] = instate["r0"]
@@ -190,18 +178,19 @@ class fastran_init (Component):
         inbc["inbc"]["zlim"] = instate["zlim"]
         inbc.write(cur_bc_file)
 
-        #-- instate, fastran nc file
-        if f_instate: shutil.copyfile(f_instate, cur_instate_file)
+        # -- instate, fastran nc file
+        if f_instate:
+            shutil.copyfile(f_instate, cur_instate_file)
 
         #-- eped
         if f_eped:
             cesol_io.eped_to_plasmastate(cur_state_file, f_eped, cur_instate_file)
 
-        #-- update plasma state
-        services.update_state()
+        # -- update plasma state
+        self.services.update_state()
 
-        #-- archive output files
-        services.stage_output_files(timeStamp, self.OUTPUT_FILES)
+        # -- archive output files
+        self.services.stage_output_files(timeStamp, self.OUTPUT_FILES)
 
     def finalize(self, timeStamp=0.0):
         print('fastran_init.finalize() called')
