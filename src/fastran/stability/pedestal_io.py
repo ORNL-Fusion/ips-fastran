@@ -14,6 +14,7 @@ from fastran.util import formula
 from fastran.util.fastranutil import namelist_default
 from fastran.plasmastate.plasmastate import plasmastate
 
+
 def write_input(fn_instate, fn_plasma_state, ps_backend):
     instate = Namelist(fn_instate)
 
@@ -23,12 +24,12 @@ def write_input(fn_instate, fn_plasma_state, ps_backend):
     if model_shape in [0]:
         rb = instate["instate"]["rbdry"] 
         zb = instate["instate"]["zbdry"] 
-        r = 0.5*( max(rb) + min(rb) )
-        z = 0.5*( max(zb) + min(zb) )
-        a = 0.5*( max(rb) - min(rb) )
-        kappa = 0.5*( ( max(zb) - min(zb) )/ a )
-        delta_u = ( r - rb[argmax(zb)] )/a
-        delta_l = ( z - rb[argmin(zb)] )/a
+        r = 0.5*( np.max(rb) + np.min(rb) )
+        z = 0.5*( np.max(zb) + np.min(zb) )
+        a = 0.5*( np.max(rb) - np.min(rb) )
+        kappa = 0.5*( ( np.max(zb) - np.min(zb) )/ a )
+        delta_u = ( r - rb[np.argmax(zb)] )/a
+        delta_l = ( z - rb[np.argmin(zb)] )/a
         delta = 0.5*( delta_u + delta_l )
     elif model_shape in [1, 2]:
         r = namelist_default(instate, "instate", "r0", [-1.])[0] 
@@ -40,8 +41,9 @@ def write_input(fn_instate, fn_plasma_state, ps_backend):
     neped = instate["instate"]["ne_ped"][0]
     nesep = instate["instate"]["ne_sep"][0]
 
-    xmid = instate["instate"]["xmid"][0]
     xwid = instate["instate"]["xwid"][0]
+#   xmid = instate["instate"]["xmid"][0]
+    xmid = 1. - 0.5*xwid
     rho_ped = xmid - 0.5*xwid
 
     #betan = instate["instate"]["betan"][0]
@@ -132,17 +134,12 @@ def update_state(fn_inped, fn_instate, fn_plasma_state, ps_backend="INSTATE"):
     print('rho_ped = {}'.format(rho_ped))
     print('rho_top = {}'.format(rho_top))
 
+    #-- input profiles from the previous iteration/timestep
     instate = Namelist(fn_instate)
 
-    rho_ped_in, rho_top_in = {}, {}
-    for key in ["te", "ti", "ne"]:
-        wped_in = instate["instate"][key+"_xwid"][0]
-        xmid_in = instate["instate"][key+"_xmid"][0]
-        rho_ped_in[key] = 1. - wped_in
-        rho_top_in[key] = 1. - 1.5*wped_in
-
-    print("rho_ped_in = {}".format(rho_ped_in))
-    print("rho_top_in = {}".format(rho_top_in))
+    wped_in = instate["instate"]["xwid"][0]
+    rho_ped_in = 1. - wped_in
+    rho_top_in = 1. - 1.5*wped_in 
 
     y_in = {}
     if ps_backend == "INSTATE":
@@ -159,14 +156,14 @@ def update_state(fn_inped, fn_instate, fn_plasma_state, ps_backend="INSTATE"):
         y_in["te"] = ps.cell2node_bdry(ps["Ts"][0,:])
         y_in["ti"] = ps.cell2node_bdry(ps["Ti"][:])
 
-    prof_in = {}
+    profile_input = {}
     for key in ["te", "ti", "ne"]:
-        prof_in[key] = zinterp(rho, y_in[key]) 
+        profile_input[key] = zinterp(rho, y_in[key]) 
     
     ysep_in, ytop_in, yaxis_in = {}, {}, {}
     for key in ["te", "ti", "ne"]:
         ysep_in[key] = instate["instate"][key+"_sep"][0]
-        ytop_in[key] = prof_in[key](rho_top_in[key])
+        ytop_in[key] = profile_input[key](rho_top_in)
         yaxis_in[key] = y_in[key][0]
 
     te_pedestal = profile_pedestal(nrho, 1.0-0.5*wped, wped, te_ped, ysep_in["te"], yaxis_in["te"], alpha=1.5, beta=1.5)
@@ -182,28 +179,31 @@ def update_state(fn_inped, fn_instate, fn_plasma_state, ps_backend="INSTATE"):
     ne = np.zeros(nrho)
     for k in range(nrho):
         if rho[k] < rho_top:
-            te[k] = prof_in["te"](rho[k] * rho_top_in["te"]/rho_top) + te_top - ytop_in["te"]
-            ti[k] = prof_in["ti"](rho[k] * rho_top_in["ti"]/rho_top) + ti_top - ytop_in["ti"]
-            ne[k] = prof_in["ne"](rho[k] * rho_top_in["ne"]/rho_top) + ne_top - ytop_in["ne"]
+            te[k] = profile_input["te"](rho[k] * rho_top_in/rho_top) + te_top - ytop_in["te"]
+            ti[k] = profile_input["ti"](rho[k] * rho_top_in/rho_top) + ti_top - ytop_in["ti"]
+            ne[k] = profile_input["ne"](rho[k] * rho_top_in/rho_top) + ne_top - ytop_in["ne"]
         else:
             te[k] = te_pedestal(rho[k])
             ti[k] = ti_pedestal(rho[k])
             ne[k] = ne_pedestal(rho[k])
 
+    instate["instate"]["xwid"] = [wped]
+    instate["instate"]["xmid"] = [1. - 0.5*wped]
+
     instate["instate"]["te"] = te
     instate["instate"]["te_ped"] = [te_ped]
     instate["instate"]["te_xwid"] = [wped] 
-    instate["instate"]["te_xmid"] = [1.0 - wped] 
+    instate["instate"]["te_xmid"] = [1. - 0.5*wped] 
 
     instate["instate"]["ti"] = ti
     instate["instate"]["ti_ped"] = [ti_ped]
     instate["instate"]["ti_xwid"] = [wped] 
-    instate["instate"]["ti_xmid"] = [1.0 - wped] 
+    instate["instate"]["ti_xmid"] = [1. - 0.5*wped] 
 
     instate["instate"]["ne"] = ne
     instate["instate"]["ne_ped"] = [ne_ped]
     instate["instate"]["ne_xwid"] = [wped] 
-    instate["instate"]["ne_xmid"] = [1.0 - wped] 
+    instate["instate"]["ne_xmid"] = [1. - 0.5*wped] 
 
     if ps_backend == "INSTATE":
         instate["instate"]["ne"] = ne
@@ -212,7 +212,7 @@ def update_state(fn_inped, fn_instate, fn_plasma_state, ps_backend="INSTATE"):
     elif ps_backend == "PS":
         ps["ns"][0] = 1.0e19*ps.node2cell(ne)
         ps["Ts"][0,:] = ps.node2cell(te)
-        nspec_th = len(ps["Ts"])-1
+        nspec_th = len(ps["Ts"]) - 1
         for k in range(nspec_th):
             ps["Ts"][k+1,:] = ps.node2cell(ti)
         ps["Ti"][:] = ps.node2cell(ti)
