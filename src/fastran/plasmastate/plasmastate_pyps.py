@@ -14,6 +14,10 @@ from fastran.plasmastate.plasmastate_base import plasmastate_base
 
 class plasmastate(PlasmaState, plasmastate_base):
     def init(self, f_ps, **keyargs):
+        for key in keyargs:
+            if key not in ["global_label", "runid", "time"]:
+                keyargs[key] = [ int(nvalue) for nvalue in keyargs[key] ] 
+
         nrho = keyargs['nrho'][0]
         nth  = 101
         nlim = keyargs['nlim'][0]
@@ -42,10 +46,10 @@ class plasmastate(PlasmaState, plasmastate_base):
         nicrf_src = keyargs['nicrf_src'][0]
         nlhrf_src = keyargs['nlhrf_src'][0]
 
-        self["nspec_th"] = nspec_th
-        self["nspec_beam"] = nspec_beam
-        self["nspec_fusion"] = nspec_fusion
-        self["nspec_rfmin"] = nspec_rfmin
+        self["nspec_th"] = int(nspec_th)
+        self["nspec_beam"] = int(nspec_beam)
+        self["nspec_fusion"] = int(nspec_fusion)
+        self["nspec_rfmin"] = int(nspec_rfmin)
 
         self["nrho"] =  nrho
         self["nrho_eq"] = nrho
@@ -62,19 +66,19 @@ class plasmastate(PlasmaState, plasmastate_base):
         self["nrho_fus"] = nrho
         self["nrho_anom"] = nrho
 
-        self["nicrf_src"] = nicrf_src
-        self["nlhrf_src"] = nlhrf_src
+        self["nicrf_src"] = int(nicrf_src)
+        self["nlhrf_src"] = int(nlhrf_src)
 
         #-------
-        self["global_label"] = keyargs['global_label'][0]
+        self["global_label"] = keyargs["global_label"][0]
         self["tokamak_id"] = ''
-        self["runid"] = keyargs['runid'][0]
-        self["shot_number"] = keyargs['shot_number'][0]
+        self["runid"] = keyargs["runid"][0]
+        self["shot_number"] = keyargs["shot_number"][0]
 
         self["t0"] = keyargs['time'][0]
         self["t1"] = keyargs['time'][0]
 
-        self["num_rzlim"] = nlim
+        self["num_rzlim"] = int(nlim)
 
         self["ngsc0"] = 1
 
