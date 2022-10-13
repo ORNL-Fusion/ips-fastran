@@ -7,7 +7,7 @@ import os
 import shutil
 import numpy as np
 import time
-from ipsframework.configobj import ConfigObj
+from configobj import ConfigObj
 
 from ipsframework import Component
 from ipsframework import ipsutil
