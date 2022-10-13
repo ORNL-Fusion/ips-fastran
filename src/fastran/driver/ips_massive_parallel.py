@@ -6,7 +6,7 @@
 import os
 import subprocess
 from threading import Thread, Event
-from ipsframework.configobj import ConfigObj
+from configobj import ConfigObj
 
 from ipsframework import Component
 from distributed.diagnostics.plugin import WorkerPlugin

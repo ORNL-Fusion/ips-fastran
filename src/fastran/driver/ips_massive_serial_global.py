@@ -8,7 +8,7 @@ import shutil
 import numpy as np
 import time
 import subprocess
-from ipsframework.configobj import ConfigObj
+from configobj import ConfigObj
 from ipsframework import Component
 
 class ips_massive_serial_global(Component):
