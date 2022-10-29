@@ -7,117 +7,109 @@ import glob
 import shutil
 import time as timer
 from Namelist import Namelist
-
-from fastran.instate import instate_io 
 from ipsframework import Component
+
 
 class modeleq_driver(Component):
     def __init__(self, services, config):
         Component.__init__(self, services, config)
-        print ('Created %s' % (self.__class__))
+        print('Created %s' % (self.__class__))
 
-    def init(self, timestamp=0):
-        print ('* DIRVER INIT')
+    def init(self, timeid=0):
+        print('* MODELEQ DIRVER INIT')
 
-    def step(self, timestamp=0):
-        #-- entry
-        services = self.services
+    def step(self, timeid=0):
+        # -- stage input and plasma state files
+        self.services.stage_input_files(self.INPUT_FILES)
+        self.services.stage_state()
 
-        #-- stage input and plasma state files
-        services.stage_input_files(self.INPUT_FILES)
-        services.stage_state()
+        cur_state_file = self.services.get_config_param('CURRENT_STATE')
+        cur_instate_file = self.services.get_config_param('CURRENT_INSTATE')
 
-        cur_state_file = services.get_config_param('CURRENT_STATE')
-        cur_instate_file = services.get_config_param('CURRENT_INSTATE')
-
-        ps_backend = getattr(self, "PS_BACKEND", "INSTATE")
-        use_ps = int(getattr(self, "USE_PS", 1))
-
-        #-- get list of ports
-        ports = services.get_config_param('PORTS')
+        # -- get list of ports
+        ports = self.services.get_config_param('PORTS')
         port_names = ports['NAMES'].split()
-        print ('PORTS =', port_names)
+        print('PORTS =', port_names)
         port_dict = {}
 
         post_names = ports['POSTS'].split()
         print(('POSTS =', post_names))
 
-        #-- instantiate components in port_names list, except DRIVER itself
+        # -- instantiate components in port_names list, except DRIVER itself
         for port_name in port_names:
-            if port_name in ["DRIVER"]: continue
-            port_dict[port_name] = services.get_port(port_name)
+            if port_name in ["DRIVER"]:
+                continue
+            port_dict[port_name] = self.services.get_port(port_name)
 
-        #-- initialize components in PORTS list for startup
+        # -- initialize components in PORTS list for startup
         init_mode = 'init'
         for port_name in port_names:
-            if port_name in ['INIT', 'DRIVER']: continue
-            self.component_call(services, port_name, port_dict[port_name], init_mode, 0)
+            if port_name in ['INIT', 'DRIVER']:
+                continue
+            self.component_call(self.services, port_name, port_dict[port_name], init_mode, 0)
 
-        #-- get plasma state files into driver work directory
-        services.stage_state()
+        # -- get plasma state files into driver work directory
+        self.services.stage_state()
 
-        #-- post init processing: stage output
-        services.stage_output_files(0, self.OUTPUT_FILES)
+        # -- post init processing: stage output
+        self.services.stage_output_files(0, self.OUTPUT_FILES)
 
-        #-- iteration loop
-        nstep = int(services.sim_conf["ITERATION_LOOP"]["NSTEP"])
-        print(("number of interation :",nstep))
+        # -- iteration loop
+        nstep = int(self.services.sim_conf["ITERATION_LOOP"]["NSTEP"])
+        print(("number of interation :", nstep))
 
         for k in range(nstep):
             print(('\n'+72*"="))
-            print(('= model driver: iteration number = %d\n'%k))
+            print(('= model driver: iteration number = %d\n' % k))
 
             time_id = k
 
-            services.update_time_stamp(time_id)
+            self.services.update_time_stamp(time_id)
 
             # call step for each component
             for port_name in port_names:
-                if port_name in ['INIT','DRIVER'] + post_names: continue
-                self.component_call(services, port_name, port_dict[port_name], 'step', time_id)
-                #if use_ps:
-                #    services.stage_state()
-                #    instate_io.instate_to_ps(cur_instate_file, cur_state_file)
-                #    services.update_state()
+                if port_name in ['INIT', 'DRIVER'] + post_names:
+                    continue
+                self.component_call(self.services, port_name, port_dict[port_name], 'step', time_id)
 
-            services.stage_state()
-            services.stage_output_files(time_id, self.OUTPUT_FILES)
-     
+            self.services.stage_state()
+            self.services.stage_output_files(time_id, self.OUTPUT_FILES)
 
-        #-- port in post process
+        # -- port in post process
         for port_name in post_names:
-            self.component_call(services, port_name, port_dict[port_name], 'step', time_id)
+            self.component_call(self.services, port_name, port_dict[port_name], 'step', time_id)
 
-        services.stage_state()
-        services.stage_output_files(time_id, self.OUTPUT_FILES)
+        self.services.stage_state()
+        self.services.stage_output_files(time_id, self.OUTPUT_FILES)
 
-        services.update_state()
+        self.services.update_state()
 
-        #-- call finalize on each component
-        print ('')
+        # -- call finalize on each component
+        print('')
         print((72*"="))
-        print ('= modeleq driver: finalize')
-        print ('')
+        print('= modeleq driver: finalize')
+        print('')
         for port_name in port_names:
-            if port_name in ['INIT','DRIVER']: continue
-            self.component_call(services, port_name, port_dict[port_name], 'finalize', time_id)
+            if port_name in ['INIT', 'DRIVER']:
+                continue
+            self.component_call(self.services, port_name, port_dict[port_name], 'finalize', time_id)
 
-    def finalize(self, timestamp = 0):
-        print ('* DRIVER FINALIZE')
+    def finalize(self, timeid=0):
+        print('* MODELEQ DRIVER FINALIZE')
 
-        services = self.services
-        sym_root = services.get_config_param('SIM_ROOT')
-        outfile = os.path.join(sym_root,'RESULT')
-        print (outfile)
-        f = open(outfile,"w")
+        sym_root = self.services.get_config_param('SIM_ROOT')
+        outfile = os.path.join(sym_root, 'RESULT')
+        print(outfile)
+        f = open(outfile, "w")
        #f.write("%d scan_id\n"%0)
-        f.write("%d\n"%0)
+        f.write("%d\n" % 0)
         f.close()
 
         dir_summary = getattr(self, "SUMMARY", "")
         if dir_summary != "":
-            if not os.path.exists(dir_summary): os.makedirs(dir_summary)
-            dir_state = services.get_config_param('STATE_WORK_DIR')
+            if not os.path.exists(dir_summary):
+                os.makedirs(dir_summary)
+            dir_state = self.services.get_config_param('STATE_WORK_DIR')
             for filename in glob.glob(os.path.join(dir_state, "*.*")):
                 print(filename)
                 shutil.copy(filename, dir_summary)
@@ -125,7 +117,7 @@ class modeleq_driver(Component):
     def component_call(self, services, port_name, comp, mode, time):
         comp_mode_string = port_name + ' ' + mode
         t0 = timer.time()
-        print (comp_mode_string)
+        print(comp_mode_string)
         try:
             services.call(comp, mode, time)
         except Exception:
@@ -134,4 +126,4 @@ class modeleq_driver(Component):
         else:
             print((comp_mode_string + ' finished'))
         t1 = timer.time()
-        print(("WALL TIMER: %s %6.3f"%(port_name, t1-t0)))
+        print(("WALL TIMER: %s %6.3f" % (port_name, t1-t0)))

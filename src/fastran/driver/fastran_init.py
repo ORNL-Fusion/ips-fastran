@@ -12,7 +12,6 @@ from ipsframework import Component
 from fastran.plasmastate.plasmastate import plasmastate
 from fastran.equilibrium.efit_eqdsk import readg
 from fastran.instate import instate_model
-from fastran.instate import instate_io
 from fastran.driver import cesol_io
 from fastran.util.fastranutil import namelist_default
 from fastran.util import dakota_io

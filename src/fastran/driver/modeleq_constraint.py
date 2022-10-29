@@ -2,10 +2,10 @@
 model equilibrium, profile adjust
 """
 
+from ipsframework import Component
 from fastran.driver.modeleq_constraint_io import update_state, constraint_pedestal_width
 from fastran.plasmastate.plasmastate import plasmastate
-from fastran.instate import instate_io
-from ipsframework import Component
+from fastran.state.instate import Instate
 
 
 class modeleq_constraint(Component):
@@ -34,9 +34,11 @@ class modeleq_constraint(Component):
             constraint_pedestal_width(cur_instate_file)
 
         if ps_update == 'enabled':
+            instate = Instate(cur_instate_file)
+
             ps = plasmastate('ips', 1)
             ps.read(cur_state_file)
-            instate_io.instate_to_ps(cur_instate_file, ps)
+            instate.to_ps(ps)
             ps.store(cur_state_file)
 
         self.services.update_state()

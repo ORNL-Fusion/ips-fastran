@@ -11,9 +11,9 @@ from ipsframework import Component
 from Namelist import Namelist
 from fastran.solver import fastran_io_ps
 from fastran.solver import fastran_io_instate
-from fastran.instate import instate_io
 from fastran.solver import zdata
-
+from fastran.plasmastate.plasmastate import plasmastate
+from fastran.state.instate import Instate
 
 class fastran(Component):
     def __init__(self, services, config):
@@ -120,7 +120,11 @@ class fastran(Component):
 
         if update_instate == 'enabled' and ps_backend == 'pyps':
             print("updating instate")
-            instate_io.ps_to_instate(cur_state_file, cur_eqdsk_file, cur_instate_file)
+            instate = Instate(cur_instate_file)
+            ps = plasmastate('ips', 1)
+            ps.read(cur_state_file)
+            instate.from_ps(ps)
+            instate.write(cur_instate_file) 
 
         self.services.update_state()
 

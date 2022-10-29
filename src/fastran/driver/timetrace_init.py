@@ -9,8 +9,6 @@ import numpy as np
 from Namelist import Namelist
 from fastran.plasmastate.plasmastate import plasmastate
 from fastran.equilibrium.efit_eqdsk import readg
-from fastran.instate import instate_model
-from fastran.instate import instate_io
 from fastran.driver import cesol_io
 #from fastran.stability.pedestal_io import update_instate_pedestal
 from fastran.util.fastranutil import namelist_default
