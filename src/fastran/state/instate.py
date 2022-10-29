@@ -413,9 +413,128 @@ class Instate():
         #-- torque
         ps.load_vol_profile(self["rho"], self["torque_nb"], "rho_nbi", "tqbe")
     
-    def from_ps(self):
-        pass
-    
+    def from_ps(self, ps):
+        r0  = self["r0"][0]
+        b0  = abs(self["b0"])
+        ip  = self["ip"][0]*1.e6
+ 
+        nrho = len(ps["rho"])
+        rho = ps["rho"][:]
+        ne = ps["ns"][0,:]*1.0e-19
+        te = ps["Ts"][0,:]
+        ti = ps["Ti"][:]
+        zeff = ps["Zeff"][:]
+        omega = ps["omegat"][:]
+        ne = ps.cell2node_bdry(ne)
+        te = ps.cell2node_bdry(te)
+        ti = ps.cell2node_bdry(ti)
+        zeff = ps.cell2node_bdry(zeff)
+        omega = ps.cell2node_bdry(omega)
+        q = np.zeros(nrho)
+        fp = np.zeros(nrho)
+ 
+        j_tot = 1.e-6*ps.dump_j_parallel(rho, "rho_eq", "curt", r0, b0, tot=True)
+        j_nb = 1.e-6*ps.dump_j_parallel(rho, "rho_nbi", "curbeam", r0, b0)
+        j_ec = 1.e-6*ps.dump_j_parallel(rho, "rho_ecrf", "curech", r0, b0)
+        j_ic = 1.e-6*ps.dump_j_parallel(rho, "rho_icrf", "curich", r0, b0)
+        j_lh = 1.e-6*ps.dump_j_parallel(rho, "rho_lhrf", "curlh", r0, b0)
+        j_bs = np.zeros(nrho)
+        j_oh = np.zeros(nrho)
+ 
+        density_beam = ps.dump_profile(rho, "rho_nbi", "nbeami", k=0)*1.e-19
+        wbeam = ps.dump_profile(rho, "rho_nbi", "eperp_beami", k=0) \
+              + ps.dump_profile(rho, "rho_nbi", "epll_beami", k=0)
+        wbeam = density_beam*wbeam*1.602e-3 #MJ/m**3
+ 
+        pe_nb  = ps.dump_vol_profile(rho, "rho_nbi", "pbe")*1.e-6
+        pi_nb  = (ps.dump_vol_profile(rho, "rho_nbi", "pbi") + ps.dump_vol_profile(rho, "rho_nbi", "pbth"))*1.e-6
+        pth_nb = ps.dump_vol_profile(rho, "rho_nbi", "pbth")*1.e-6
+ 
+        density_alpha = ps.dump_profile(rho, "rho_fus", "nfusi", k=0)*1.e-19
+        walpha = ps.dump_profile(rho, "rho_fus", "eperp_fusi", k=0) \
+             + ps.dump_profile(rho, "rho_fus", "epll_fusi", k=0)
+        walpha = density_alpha*walpha*1.602e-3 #MJ/m**3
+ 
+        pe_fus = ps.dump_vol_profile(rho, "rho_fus", "pfuse")*1.e-6
+        pi_fus = ps.dump_vol_profile(rho, "rho_fus", "pfusi")*1.e-6
+        pth_fus = ps.dump_vol_profile(rho, "rho_fus", "pfusth")*1.e-6
+ 
+        pe_ec = 1.e-6*ps.dump_vol_profile(rho, "rho_ecrf", "peech")
+        pe_ic = 1.e-6*ps.dump_vol_profile(rho, "rho_icrf", "picrf_totals", k=0)
+        pe_lh = 1.e-6*ps.dump_vol_profile(rho, "rho_lhrf", "pelh")
+ 
+        pi_ec = np.zeros(nrho)
+        pi_ic = 1.0e-6*ps.dump_vol_profile(rho, "rho_icrf", "picrf_totals", k=1)
+        pi_lh = 1.e-6*ps.dump_vol_profile(rho, "rho_lhrf", "pilh")
+ 
+        tqbe = ps.dump_vol_profile(rho, "rho_nbi", "tqbe")
+        tqbi = ps.dump_vol_profile(rho, "rho_nbi", "tqbi")
+        tqbjxb = ps.dump_vol_profile(rho, "rho_nbi", "tqbjxb")
+        tqbth = ps.dump_vol_profile(rho, "rho_nbi", "tqbth")
+ 
+        torque_nb = tqbe+tqbi+tqbjxb+tqbth
+        torque_in = np.zeros(nrho)
+ 
+        se_nb = 1.e-19*(ps.dump_vol_profile(rho, "rho_nbi", "sbedep") + ps.dump_vol_profile(rho, "rho_nbi", "sbehalo"))
+ 
+        p_ei = np.zeros(nrho)
+        p_rad = np.zeros(nrho)
+        p_ohm = np.zeros(nrho)
+        pe_ionization = np.zeros(nrho)
+        pi_ionization = np.zeros(nrho)
+        pi_cx = np.zeros(nrho)
+        si_nb = np.zeros(nrho)
+        chie = np.zeros(nrho)
+        chii = np.zeros(nrho)
+ 
+        se_ionization = np.zeros(nrho)
+        si_ionization = np.zeros(nrho)
+ 
+        self["nrho"] = [nrho]
+        self["rho"] = rho
+        self["ne"] = ne
+        self["te"] = te
+        self["ti"] = ti
+        self["zeff"] = zeff
+        self["omega"] = omega
+        self["j_tot"] = j_tot
+        self["j_oh"] = j_oh
+        self["j_bs"] = j_bs
+        self["j_nb"] = j_nb
+        self["j_ec"] = j_ec
+        self["j_ic"] = j_ic
+        self["j_lh"] = j_lh
+        self["pe_nb"] = pe_nb
+        self["pe_ec"] = pe_ec
+        self["pe_ic"] = pe_ic
+        self["pe_lh"] = pe_lh
+        self["pe_fus"] = pe_fus
+        self["pe_ionization"] = pe_ionization
+        self["p_rad"] = p_rad
+        self["pi_nb"] = pi_nb
+        self["pi_ec"] = pi_ec
+        self["pi_ic"] = pi_ic
+        self["pi_lh"] = pi_lh
+        self["pi_fus"] = pi_fus
+        self["pi_ionization"]  = pi_ionization
+        self["pi_cx"] = pi_cx
+        self["p_ohm"] = p_ohm
+        self["p_ei"] = p_ei
+        self["torque_nb"] = torque_nb
+        self["torque_in"] = torque_in
+        self["se_nb"] = se_nb
+        self["se_ionization"] = se_ionization
+        self["si_nb"] = si_nb
+        self["si_ionization"] = si_ionization
+        self["q"] = q
+    #   self["psipol"] = psipol
+        self["density_beam"] = density_beam
+        self["wbeam"] = wbeam
+        self["density_alpha"] = density_alpha
+        self["walpha"] = walpha
+        self["chie"] = chie
+        self["chii"] = chii
+
 if __name__=="__main__":
     instate = Instate("instate0")
 
