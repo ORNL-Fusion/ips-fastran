@@ -107,7 +107,11 @@ class ips_massive_parallel(Component):
             sim["OUT_REDIRECT"] = "True"
             sim["OUT_REDIRECT_FNAME"] = os.path.join(rundir, "run%05d.out"%k)
             sim["USE_PORTAL"] = "True"
-            sim['PARENT_PORTAL_RUNID'] = self.services.get_config_param("PORTAL_RUNID")
+            try:
+                sim['PARENT_PORTAL_RUNID'] = self.services.get_config_param("PORTAL_RUNID")
+                sim["USE_PORTAL"] = "True"
+            except Exception:
+                sim["USE_PORTAL"] = "False"
             driver = sim['PORTS']['DRIVER']['IMPLEMENTATION']
             sim[driver]["SUMMARY"] = tmp_xfs_dir_summary if tmp_xfs else dir_summary
 
