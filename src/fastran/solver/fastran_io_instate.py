@@ -195,6 +195,11 @@ def update_state(f_instate, f_fastran, relax=1.):
     instate["j_oh"] = j_oh
     instate["j_bs"] = j_bs
 
+    instate["pe_fus"] = fastran.variables["pe_fus"][-1, :]
+    instate["pi_fus"] = fastran.variables["pi_fus"][-1, :]
+
+    instate["density_he"] = fastran.variables["nhe"][-1, :]
+
     instate.write(f_instate)
 
 

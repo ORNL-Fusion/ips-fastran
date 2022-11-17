@@ -213,6 +213,10 @@ class Instate():
 
             for k in range(n_imp):
                 density_imp[k] = self["ne"]*f_imp[k]
+                if self["z_imp"][k] == 2 and self["a_imp"][k] == 4 and "density_he" in self:
+                    print("He profile found")
+                    density_imp[k] = self["density_he"]
+
             nith = self["ne"] - self["density_beam"] - 2.*self["density_alpha"]
             for k in range(n_imp):
                 nith = nith - z_imp[k]*density_imp[k]
