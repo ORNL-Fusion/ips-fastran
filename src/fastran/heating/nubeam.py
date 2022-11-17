@@ -12,7 +12,7 @@ from Namelist import Namelist
 from fastran.plasmastate.plasmastate import plasmastate
 from ipsframework import Component
 from fastran.util import dakota_io
-
+from fastran.state.instate import Instate
 
 class nubeam(Component):
     def __init__(self, services, config):
@@ -131,6 +131,7 @@ class nubeam(Component):
         self.services.stage_state()
 
         # -- get plasma state file name
+        cur_instate_file = self.services.get_config_param('CURRENT_INSTATE')
         cur_state_file = self.services.get_config_param('CURRENT_STATE')
         cur_eqdsk_file = self.services.get_config_param('CURRENT_EQDSK')
 
@@ -161,13 +162,6 @@ class nubeam(Component):
         difb_in = innubeam["nbi_model"]["difb_in"][0]
         difb_out = innubeam["nbi_model"]["difb_out"][0]
 
-        # try:
-        #     difb_0 = float(getattr(self, "DB"))
-        #     print('DB updated')
-        # except AttributeError:
-        #     pass
-        # print('DB: ', difb_0)
-
         ps = plasmastate('ips', 1)
         ps.read(cur_state_file)
 
@@ -175,6 +169,16 @@ class nubeam(Component):
         ps["difb_nbi"][:] = difb_a + (difb_0 - difb_a)*(1. - rho_anom**difb_in)**difb_out
 
         ps.update_particle_balance()  # <--------
+
+        if getattr(self, "TIMEBC", "") == "INSTATE":
+           print("innubeam updated from instate")
+           instate = Instate(cur_instate_file)
+           nbeam = innubeam['NBI_CONFIG']['NBEAM'][0]
+           for k in range(nbeam):
+              pnbi_k = instate['PNBI_%d'%k][0]
+              print(k, pnbi_k)
+              innubeam['NBI_CONFIG']['PINJA'][k] = pnbi_k
+              ps.load_innubeam()
 
         ps.store(cur_state_file)
 
