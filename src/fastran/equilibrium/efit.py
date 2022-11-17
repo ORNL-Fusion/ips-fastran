@@ -19,6 +19,7 @@ from fastran.solver.inmetric_io import ps_to_inmetric
 from fastran.equilibrium.efit_eqdsk import readg, writeg, scaleg
 from fastran.util.input_default import input_default
 
+
 class efit(Component):
     def __init__(self, services, config):
         Component.__init__(self, services, config)
@@ -30,10 +31,9 @@ class efit(Component):
         return ishot, itime
 
     def _write_xefit(self, ishot, itime):
-        scale_gs = int(getattr(self, "SCALE_GS", "0"))
         efit_bin = os.path.join(self.BIN_PATH, self.BIN)
         kfile = "k%06d.%05d" % (ishot, itime)
-        if scale_gs:
+        if self.user_inputs["scale"] == "enabled":
             kfile = kfile + "_s"
         args = "2\n 1\n " + kfile
         command = 'echo \"%s\"' % args + ' | ' + efit_bin
