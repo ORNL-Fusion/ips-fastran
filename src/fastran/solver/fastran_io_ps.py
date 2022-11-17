@@ -26,7 +26,7 @@ def write_input(f_state, f_eqdsk, rdir='.', recycle=0.):
     ps.read(f_state)
     spec = ps.get_species()
 
-    print("sepc", spec)
+    # print("sepc", spec)
 
     # -------------------------------------------------------------------
     # profiles
