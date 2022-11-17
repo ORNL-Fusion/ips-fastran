@@ -67,14 +67,14 @@ class fastran_init (Component):
         dakota_io.update_namelist(self, instate.data, section="instate")
         dakota_io.update_namelist(self, instate.data)
 
+        # -- expand the instate profiles
         if instate_method == 'model':
             print("instate_model started")
-
             instate.set_shape()
             instate.model_profile()
-            print(instate.data)
-            instate.particle_balance()
-            instate.zeros()
+
+        instate.particle_balance()
+        instate.zeros()
 
         # -- alloc plasma state file
         ps = plasmastate('ips', 1)
