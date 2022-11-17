@@ -34,12 +34,65 @@ def update_state(kiter, f_instate, nmax_iter=100, const=None):
     print('betan_beam =', betan_beam)
 
     # -------------------------------------------------------------------
-    # scale : beam pressure
-    betan_target = instate["betan"][0]
-    betan_beam_target = instate.default("betan_beam", [0.])[0]
-    betan_th_target = betan_target - betan_beam_target
+    # betan or h98 constraint
+    x = instate.data["inmetric"]["rminor"]
+    nebar = 0.
+    for i in range(nrho - 1):
+        nebar += 0.5*(instate["ne"][i + 1] + instate["ne"][i]) * (x[i+1] - x[i])
+    nebar /= x[-1]
+    print('nebar = ', nebar)
 
-    if betan_beam_target > 0.0:
+    kappa = instate["kappa"][0]
+    m = np.sum( [ instate["a_ion"][k] * instate["f_ion"][k] for k in range(instate["n_ion"][0]) ] )
+    print("m = ", m)
+
+    vol_integrate = lambda vol, y: np.sum([(vol[i + 1] - vol[i]) * 0.5*(y[i + 1] + y[i]) for i in range(len(y) - 1)])
+
+    pe_ec  = vol_integrate(vol, instate["pe_ec"]) #np.sum([(vol[i + 1] - vol[i])*instate["pe_ec"][i] for i in range(nrho - 1)])
+    pe_ic  = vol_integrate(vol, instate["pe_ic"]) #np.sum([(vol[i + 1] - vol[i])*instate["pe_ic"][i] for i in range(nrho - 1)])
+    pi_ic  = vol_integrate(vol, instate["pi_ic"]) #np.sum([(vol[i + 1] - vol[i])*instate["pi_ic"][i] for i in range(nrho - 1)])
+    pe_nb  = vol_integrate(vol, instate["pe_nb"]) #np.sum([(vol[i + 1] - vol[i])*instate["pe_nb"][i] for i in range(nrho - 1)])
+    pi_nb  = vol_integrate(vol, instate["pi_nb"]) #np.sum([(vol[i + 1] - vol[i])*instate["pi_nb"][i] for i in range(nrho - 1)])
+    pe_fus = vol_integrate(vol, instate["pe_fus"]) #np.sum([(vol[i + 1] - vol[i])*instate["pe_fus"][i] for i in range(nrho - 1)])
+    pi_fus = vol_integrate(vol, instate["pi_fus"]) #np.sum([(vol[i + 1] - vol[i])*instate["pi_fus"][i] for i in range(nrho - 1)])
+
+    pinj = pe_ec + pe_ic + pi_ic + pe_nb + pi_nb + pe_fus + pi_fus
+
+    print('pe_ec, pe_ic, pi_ic, pe_nb, pi_nb =', pe_ec, pe_ic, pi_ic, pe_nb, pi_nb)
+    print('pe_fus, pi_fus =', pe_fus, pi_fus)
+    print('pinj =', pinj)
+
+    tau98 = 0.0562 \
+          * ip**0.93 \
+          * b0**0.15 \
+          * pinj**-0.69 \
+          * nebar**0.41 \
+          * m**0.19 \
+          * r0**1.97 \
+          * (r0/a0)**-0.58 \
+          * kappa**0.78
+
+    print('tau98 =', tau98)
+
+    h98_target = instate.default("h98_target", [-1.])[0]
+    print('h98_target =', h98_target)
+    if h98_target > 0:
+        wth_target = tau98 * h98_target * pinj 
+        mu0 = 4.*np.pi*1.e-7
+        betan_th_target = 4./3.*mu0*a0/(ip*b0) * wth_target*1.0e6 / vol[-1] * 100.
+        print('betan_th_target = ', betan_th_target) 
+        betan_beam_target = instate.default("betan_beam_target", [0.])[0]
+        betan_target = betan_th_target + betan_beam_target
+        instate["betan_target"] = [betan_target]
+    else:
+        betan_target = instate["betan_target"][0]
+        betan_beam_target = instate.default("betan_beam_target", [0.])[0]
+        betan_th_target = betan_target - betan_beam_target
+
+    # -------------------------------------------------------------------
+    # scale : beam pressure
+
+    if betan_beam_target > 0.:
         density_beam = (instate["nbeam_axis"][0] - instate["nbeam_sep"][0]) \
             * (1. - instate["rho"]**instate["nbeam_alpha"][0])**instate["nbeam_beta"][0] \
             + instate["nbeam_sep"][0]
