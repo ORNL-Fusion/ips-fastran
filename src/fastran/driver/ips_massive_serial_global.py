@@ -8,7 +8,7 @@ import shutil
 import numpy as np
 import time
 import subprocess
-from ipsframework.configobj import ConfigObj
+from configobj import ConfigObj
 from ipsframework import Component
 
 class ips_massive_serial_global(Component):
@@ -56,7 +56,12 @@ class ips_massive_serial_global(Component):
             sim["SIM_ROOT"] = rundir
             sim["OUT_REDIRECT"] = "True"
             sim["OUT_REDIRECT_FNAME"] = os.path.join(cwd, "run%05d.out"%k)
-            sim["USE_PORTAL"] = "False"
+            sim["USE_PORTAL"] = "True"
+            try:
+                sim['PARENT_PORTAL_RUNID'] = self.services.get_config_param("PORTAL_RUNID")
+                sim["USE_PORTAL"] = "True"
+            except Exception:
+                sim["USE_PORTAL"] = "False"
 
             driver = sim['PORTS']['DRIVER']['IMPLEMENTATION']
             sim[driver]["SUMMARY"] = dir_summary

@@ -1,4 +1,4 @@
-FROM ubuntu:18.04
+FROM ubuntu:20.04
 
 ARG DEBIAN_FRONTEND=noninteractive
 
@@ -7,24 +7,43 @@ RUN \
     apt-get install --yes    \
         build-essential      \
         gfortran             \
-        python3-dev          \
         wget                 \
-        cmake                \
-        doxygen              \
         git                  \
-        mpich                \
-        python3-mpi4py       \
-        python3-numpy        \
-        python3-scipy        \
-        python3-matplotlib   \
-        python3-netcdf4      \
         libnetcdff-dev       \
-        libopenblas-dev   && \
+        libopenblas-dev      \
+        &&                   \
     apt-get clean all
 
-RUN update-alternatives --install /usr/bin/python python /usr/bin/python3 10
+ARG mpich=3.3
+ARG mpich_prefix=mpich-$mpich
+
+RUN \
+    wget https://www.mpich.org/static/downloads/$mpich/$mpich_prefix.tar.gz && \
+    tar xvzf $mpich_prefix.tar.gz                                           && \
+    cd $mpich_prefix                                                        && \
+    ./configure                                                             && \
+    make -j 4                                                               && \
+    make install                                                            && \
+    make clean                                                              && \
+    cd ..                                                                   && \
+    rm -rf $mpich_prefix
+
+RUN /sbin/ldconfig
+
+RUN wget \
+    https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
+RUN bash Miniconda3-latest-Linux-x86_64.sh -b -p /opt/conda
+
+ENV PATH="/opt/conda/bin:${PATH}"
+ARG PATH="/opt/conda/bin:${PATH}"
+
+RUN conda install python=3.8 numpy scipy matplotlib netcdf4 dask
+
+RUN python3 -m pip install mpi4py
 
 RUN mkdir /code
+
+RUN python -m pip install ipsframework
 
 COPY greentable.tar.gz /code
 RUN cd /code && tar xf greentable.tar.gz && rm greentable.tar.gz && chmod 755 greentable && chmod 644 greentable/*
@@ -32,57 +51,40 @@ RUN cd /code && tar xf greentable.tar.gz && rm greentable.tar.gz && chmod 755 gr
 ARG GITHUB_USER
 ARG GITHUB_TOKEN
 
-RUN cd /code && \
-    git clone --single-branch --branch v0.1.0 --depth 1 https://github.com/HPC-SimTools/IPS-framework.git ips-framework && \
-    git clone --single-branch --branch massive-serial --depth 1 https://${GITHUB_USER}:${GITHUB_TOKEN}@github.com/ORNL-Fusion/ips-fastran.git
+RUN cd /code && git clone --single-branch --branch update-massive-serial --depth 1 https://${GITHUB_USER}:${GITHUB_TOKEN}@github.com/ORNL-Fusion/ips-fastran.git
+RUN cd /code/ips-fastran/src && python -m pip install .
+RUN cd /code/ips-fastran/lib/namelist && python -m pip install .
+RUN rm -r /code/ips-fastran
 
-ENV IPS_DIR /code
+RUN mkdir -p /opt/conda/lib/python3.8/site-packages/omfit_classes/ && touch /opt/conda/lib/python3.8/site-packages/omfit_classes/__init__.py
+COPY fluxSurface.py /opt/conda/lib/python3.8/site-packages/omfit_classes/
+RUN chmod 644 /opt/conda/lib/python3.8/site-packages/omfit_classes/fluxSurface.py
+RUN python -c "from omfit_classes.fluxSurface import boundaryShape"
 
-# byte-compile everything we might need, exclude a few files that can't compile
-RUN cd /code && py3compile ips-framework/framework/src           \
-                           ips-framework/framework/utils/HTML.py \
-                           ips-fastran/lib/python/Namelist.py    \
-                           ips-fastran/src                       \
-                           -X ".*/elite_io.py"                   \
-                           -X ".*/modeleq_constraint_pscale.py"  \
-                           -X ".*/pest3.py"
-
-ENV IPS_PATH $IPS_DIR/ips-framework
-ENV IPS_ROOT $IPS_PATH
-ENV PATH $IPS_PATH/framework/src:/code/bin:$PATH
-ENV PYTHONPATH $IPS_PATH/framework/src:$IPS_PATH/framework/utils:$PYTHONPATH
-
-ENV FASTRAN_ROOT="${IPS_DIR}/ips-fastran"
-ENV PYTHONPATH="$FASTRAN_ROOT/lib:$PYTHONPATH"
-ENV PYTHONPATH="$FASTRAN_ROOT/lib/python:$PYTHONPATH"
-ENV PYTHONPATH="$FASTRAN_ROOT/src:$PYTHONPATH"
-
-RUN mkdir -p $FASTRAN_ROOT/lib/omfit/classes/ && touch $FASTRAN_ROOT/lib/omfit/classes/__init__.py
-COPY fluxSurface.py $FASTRAN_ROOT/lib/omfit/classes/
-RUN chmod 644 $FASTRAN_ROOT/lib/omfit/classes/fluxSurface.py
-RUN python3 -c "from omfit.classes.fluxSurface import boundaryShape"
-
-COPY pyps.tar.gz /code
-RUN cd /code && tar xf pyps.tar.gz && chmod 755 pyps_new && chmod 644 pyps_new/*.py
-ENV PYTHONPATH="${IPS_DIR}/pyps_new:$PYTHONPATH"
-RUN cd /code/pyps_new/pyps_test3 && python3 test1.py && python3 test2.py && python3 test3.py
+COPY pyps_38.tar.gz /code
+RUN cd /code && tar xf pyps_38.tar.gz && chmod 755 pyps && chmod 644 pyps/*.py && rm pyps_38.tar.gz
+ENV PYTHONPATH="/code/pyps:$PYTHONPATH"
+RUN cd /code/pyps/test && python3 test1.py && python3 test2.py && python3 test3.py
 
 ENV PS_BACKEND=pyps
 
 RUN mkdir /code/bin
 
+ENV BIN_DIR=/code/bin
+ENV PATH /code/bin:$PATH
+
 COPY efitd90_static /code/bin
 RUN chmod 755 /code/bin/efitd90_static
-ENV EFIT_BIN_DIR="${IPS_DIR}/bin"
+ENV EFIT_BIN_DIR=/code/bin
 ENV EFIT_BIN_NAME=efitd90_static
 
-ENV EFIT_TABLE_DIR="${IPS_DIR}/greentable/"
-ENV EFIT_INPUT_DIR="${IPS_DIR}/greentable/"
+ENV EFIT_TABLE_DIR=/code/greentable/
+ENV EFIT_INPUT_DIR=/code/greentable/
 
 COPY xfastran_ver0.93_ser /code/bin
 RUN chmod 755 /code/bin/xfastran_ver0.93_ser
 RUN cd /code/bin && ln -s xfastran_ver0.93_ser xfastran
-ENV FASTRAN_BIN_DIR="${IPS_DIR}/bin"
+ENV FASTRAN_BIN_DIR=/code/bin
 ENV FASTRAN_BIN_NAME=xfastran
 ENV FASTRAN_SERIAL_BIN_NAME=xfastran_ver0.93_ser
 
