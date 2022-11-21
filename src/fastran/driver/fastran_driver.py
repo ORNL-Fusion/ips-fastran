@@ -9,6 +9,7 @@ import glob
 import shutil
 from ipsframework import Component
 
+
 class fastran_driver(Component):
     def __init__(self, services, config):
         Component.__init__(self, services, config)
@@ -19,16 +20,12 @@ class fastran_driver(Component):
         print('FASTRAN DIRVER INIT')
 
     def step(self, timeid=0):
-        #--- entry
-        services = self.services
+        # -- stage input and plasma state files
+        self.services.stage_input_files(self.INPUT_FILES)
+        self.services.stage_state()
 
-        #-- stage input and plasma state files
-        services.stage_input_files(self.INPUT_FILES)
-        services.stage_state()
-
-        #-- get list of ports
-        ports = services.get_config_param('PORTS')
-        #port_names = ports['NAMES'].split()
+        # -- get list of ports
+        ports = self.services.get_config_param('PORTS')
         port_names = []
         for port_name in ports['NAMES'].split():
             if port_name not in port_names: port_names.append(port_name)
@@ -45,17 +42,17 @@ class fastran_driver(Component):
         else:
             POSTPROCESS = []
 
-        #-- instantiate components in port_names list, except DRIVER itself
+        # -- instantiate components in port_names list, except DRIVER itself
         port_dict = {}
         for port_name in port_names:
             if port_name in ["DRIVER"]: continue
-            port = services.get_port(port_name)
+            port = self.services.get_port(port_name)
             if(port == None):
                 raise Exception('Error accessing %s component'%port_name)
             port_dict[port_name] = port
 
-        #-- simulation mode
-        sim_mode = services.get_config_param('SIMULATION_MODE')
+        # -- simulation mode
+        sim_mode = self.services.get_config_param('SIMULATION_MODE')
         print('SIMULATION_MODE =', sim_mode)
 
         #-- initial iteration id
@@ -66,10 +63,9 @@ class fastran_driver(Component):
             kstep_prefix = "iteration_%d_"%timeid
 
         t0 = kstep_prefix + "0"
+        print('*** t0=', t0, kstep_prefix)
 
-        print('*** t0=',t0, kstep_prefix)
-
-        #-- initialize components in PORTS list for startup or restart
+        # -- initialize components in PORTS list for startup or restart
         init_mode = 'init'
         if sim_mode == 'RESTART' : init_mode = 'restart'
 
@@ -77,24 +73,23 @@ class fastran_driver(Component):
             for port_name in port_names:
                 if port_name in ['INIT', 'DRIVER']: continue
                 print(port_name, 'init ********')
-                services.call(port_dict[port_name], init_mode, t0)
-                #self.component_call(services, port_name, port_dict[port_name], init_mode, t0)
+                self.services.call(port_dict[port_name], init_mode, t0)
 
-        #-- get plasma state files into driver work directory
-        services.stage_state()
+        # -- get plasma state files into driver work directory
+        self.services.stage_state()
 
-        #-- post init processing: stage output
-        services.stage_output_files(t0, self.OUTPUT_FILES)
+        # -- post init processing: stage output
+        self.services.stage_output_files(t0, self.OUTPUT_FILES, save_plasma_state=False)
 
-        #-- steady-state solution procedures, timeloop refers to nonlinear iteration
-        nstep = int(services.sim_conf["ITERATION_LOOP"]["NSTEP"])
+        # -- steady-state solution procedures, timeloop refers to nonlinear iteration
+        nstep = int(self.services.sim_conf["ITERATION_LOOP"]["NSTEP"])
         print("number of interation :", nstep)
 
-        #-- pre process
+        # -- pre process
         for port_name in PREPROCESS:
-            self.component_call(services, port_name, port_dict[port_name], 'step', timeid)
+            self.component_call(port_name, port_dict[port_name], 'step', timeid)
 
-        #-- main iteration
+        # -- main iteration
         for kstep in range(timeid, timeid+nstep):
             # t = kstep_prefix+"%d"%kstep
             t = kstep
@@ -103,21 +98,21 @@ class fastran_driver(Component):
             print(72*"=")
             print('= fastran driver: iteration number = ', kstep)
             print('')
-            services.update_time_stamp(t)
+            self.services.update_time_stamp(t)
 
             for port_name in port_names:
                 if port_name in ["INIT", "DRIVER"]: continue
                 if port_name in PREPROCESS: continue
                 if port_name in POSTPROCESS: continue
 
-                self.component_call(services, port_name, port_dict[port_name], 'step', t)
+                self.component_call(port_name, port_dict[port_name], 'step', t)
 
-            services.stage_state()
-            services.stage_output_files(t, self.OUTPUT_FILES)
+            self.services.stage_state()
+            self.services.stage_output_files(t, self.OUTPUT_FILES, save_plasma_state=False)
 
-        #-- post process
+        # -- post process
         if POSTPROCESS:
-            nstep_post = int(services.sim_conf["ITERATION_LOOP"]["NSTEP_POST"])
+            nstep_post = int(self.services.sim_conf["ITERATION_LOOP"]["NSTEP_POST"])
             for kstep in range(nstep, nstep+nstep_post):
                 # t = kstep_prefix+"%d"%kstep
                 t = kstep
@@ -125,12 +120,12 @@ class fastran_driver(Component):
                 print(72*"=")
                 print('= POST PROCESS: iteration number = ', t)
                 print('')
-                services.update_time_stamp(t)
+                self.services.update_time_stamp(t)
 
                 for port_name in POSTPROCESS:
-                    self.component_call(services, port_name, port_dict[port_name], 'step', t)
+                    self.component_call(port_name, port_dict[port_name], 'step', t)
 
-        #-- call finalize on each component
+        # -- call finalize on each component
         if self.SUB_WORKFLOW  == '':
             print('')
             print(72*"=")
@@ -138,9 +133,9 @@ class fastran_driver(Component):
             print('')
             for port_name in port_names:
                 if port_name in ['INIT', 'DRIVER']: continue
-                self.component_call(services, port_name, port_dict[port_name], 'finalize', t)
+                self.component_call(port_name, port_dict[port_name], 'finalize', t)
 
-    def finalize(self, timeid = 0):
+    def finalize(self, timeid=0):
         print(80*'*')
         print('FASTRAN DIRVER FINALIZE')
         sym_root = self.services.get_config_param('SIM_ROOT')
@@ -158,13 +153,13 @@ class fastran_driver(Component):
                 print(filename)
                 shutil.copy(filename, dir_summary)
 
-    def component_call(self, services, port_name, comp, mode, time):
+    def component_call(self, port_name, comp, mode, time):
         comp_mode_string = port_name + ' ' + mode
         print (comp_mode_string)
         try:
-            services.call(comp, mode, time)
+            self.services.call(comp, mode, time)
         except Exception:
-            services.exception(comp_mode_string + ' failed')
-            raise
+            self.services.exception(comp_mode_string + ' failed')
+            raise Exception("component call")
         else:
             print(comp_mode_string + ' finished')

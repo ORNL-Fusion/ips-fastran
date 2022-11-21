@@ -102,7 +102,7 @@ class genray(Component):
         self.services.update_state()
 
         # -- archive output files
-        self.services.stage_output_files(timeid, self.OUTPUT_FILES)
+        self.services.stage_output_files(timeid, self.OUTPUT_FILES, save_plasma_state=False)
 
     def finalize(self, timeid=0):
         print('genray.finalize() called')

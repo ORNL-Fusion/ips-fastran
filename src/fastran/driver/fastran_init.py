@@ -23,10 +23,10 @@ class fastran_init (Component):
         Component.__init__(self, services, config)
         print('Created %s' % (self.__class__))
 
-    def init(self, timestamp=0.0):
+    def init(self, timeid=0):
         print('fastran_init.init() called')
 
-    def step(self, timeStamp):
+    def step(self, timeid=0):
         print('fastran_init.step() started')
 
         # -- run identifiers
@@ -189,7 +189,7 @@ class fastran_init (Component):
         self.services.update_state()
 
         # -- archive output files
-        self.services.stage_output_files(timeStamp, self.OUTPUT_FILES)
+        self.services.stage_output_files(timeid, self.OUTPUT_FILES, save_plasma_state=False)
 
-    def finalize(self, timeStamp=0.0):
+    def finalize(self, timeid):
         print('fastran_init.finalize() called')

@@ -15,6 +15,7 @@ from fastran.solver import zdata
 from fastran.plasmastate.plasmastate import plasmastate
 from fastran.state.instate import Instate
 
+
 class fastran(Component):
     def __init__(self, services, config):
         Component.__init__(self, services, config)
@@ -102,20 +103,20 @@ class fastran(Component):
 
         if ps_backend == "instate":
             fastran_io_instate.update_state(
-                f_instate=cur_instate_file, 
-                f_fastran='fastran.nc', 
+                f_instate=cur_instate_file,
+                f_fastran='fastran.nc',
                 relax=relax)
         else:
             fastran_io_ps.update_state(
-                f_state=cur_state_file, 
-                f_eqdsk=cur_eqdsk_file, 
+                f_state=cur_state_file,
+                f_eqdsk=cur_eqdsk_file,
                 f_instate=cur_instate_file,
-                f_fastran='fastran.nc', 
-                time=timeid, 
-                relax=relax, 
-                relax_J=relax_J, 
-                adjust_ip=adjust_ip, 
-                fni_target=fni, 
+                f_fastran='fastran.nc',
+                time=timeid,
+                relax=relax,
+                relax_J=relax_J,
+                adjust_ip=adjust_ip,
+                fni_target=fni,
                 relax_ip=relax_ip)
 
         if update_instate == 'enabled' and ps_backend == 'pyps':
@@ -124,12 +125,12 @@ class fastran(Component):
             ps = plasmastate('ips', 1)
             ps.read(cur_state_file)
             instate.from_ps(ps)
-            instate.write(cur_instate_file) 
+            instate.write(cur_instate_file)
 
         self.services.update_state()
 
         # -- archive output files
-        self.services.stage_output_files(timeid, self.OUTPUT_FILES)
+        self.services.stage_output_files(timeid, self.OUTPUT_FILES, save_plasma_state=False)
 
         self.icalled = self.icalled + 1
 
@@ -146,7 +147,6 @@ class fastran(Component):
 
 
 def adjust_ip(f_state, f_bc, f_fastran):
-
     fastran = netCDF4.Dataset(f_fastran, 'r', format='NETCDF4')
 
     ip = fastran.variables["ip"][-1]

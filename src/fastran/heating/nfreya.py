@@ -21,7 +21,7 @@ class nfreya(Component):
         print('nfreya.init() called')
 
     def step(self, timeid=0):
-        print('nfreya.step() called')
+        print('nfreya.step() started')
 
         # -- excutable
         nfreya_bin = os.path.join(self.BIN_PATH, self.BIN)
@@ -115,7 +115,7 @@ class nfreya(Component):
             self.services.update_state()
 
         # -- archive output files
-        self.services.stage_output_files(timeid, self.OUTPUT_FILES)
+        self.services.stage_output_files(timeid, self.OUTPUT_FILES, save_plasma_state=False)
 
         # -- clean up
         clean_after = int(getattr(self, "CLEAN_AFTER", "1"))

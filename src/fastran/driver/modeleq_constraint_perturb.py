@@ -7,6 +7,7 @@ from Namelist import Namelist
 from fastran.util.zinterp import zinterp
 from ipsframework import Component
 
+
 class modeleq_constraint_perturb(Component):
     def __init__(self, services, config):
         Component.__init__(self, services, config)
@@ -18,10 +19,8 @@ class modeleq_constraint_perturb(Component):
     def step(self, timeid=0):
         print('modeleq_constraint_perturb.step() started')
 
-        #--- entry
-        services = self.services
-        services.stage_state()
-        cur_instate_file = services.get_config_param('CURRENT_INSTATE')
+        self.services.stage_state()
+        cur_instate_file = self.services.get_config_param('CURRENT_INSTATE')
 
         width = float(self.WIDTH)
         jpert = float(self.JPERT)
@@ -29,11 +28,11 @@ class modeleq_constraint_perturb(Component):
 
         perturb(cur_instate_file, width, jpert, ppert)
 
-        services.update_state()
-        services.stage_output_files(timeid, self.OUTPUT_FILES)
+        self.services.update_state()
+        self.services.stage_output_files(timeid, self.OUTPUT_FILES, save_plasma_state=False)
 
-def perturb(f_instate, w=0.3, jpert=0.0, ppert=0.0):
 
+def perturb(f_instate, w=0.3, jpert=0., ppert=0.):
     instate = Namelist(f_instate)
     rho = instate["inmetric"]["rho"]
     qmhd = instate["inmetric"]["qmhd"]

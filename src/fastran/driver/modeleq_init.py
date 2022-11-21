@@ -6,16 +6,17 @@ from Namelist import Namelist
 from fastran.instate.instate_model import instate_model
 from ipsframework import Component
 
+
 class modeleq_init(Component):
     def __init__(self, services, config):
         Component.__init__(self, services, config)
         print(('Created %s' % (self.__class__)))
 
-    def init(self, timestamp=0.0):
+    def init(self, timeid=0):
         print ('modeleq_init.init() called')
 
-    def step(self, timeStamp):
-        print ('modeleq_init.step() called')
+    def step(self, timeid=0):
+        print ('modeleq_init.step() started')
         services = self.services
 
         #-- stage input files
@@ -51,7 +52,7 @@ class modeleq_init(Component):
         services.update_state()
 
         #-- archive output files
-        services.stage_output_files(timeStamp, self.OUTPUT_FILES)
+        services.stage_output_files(timeid, self.OUTPUT_FILES, save_plasma_state=False)
 
-    def finalize(self, timeStamp=0):
+    def finalize(self, timeid=0):
         print ('modeleq_init.finalize() called')

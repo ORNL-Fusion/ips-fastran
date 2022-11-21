@@ -100,8 +100,9 @@ def write_toray_input(geq, prof, intoray):
     tmp = geq["__hfact__"]/abs(geq["bcentr"])
     nrho_m = len(tmp)
     rho_m = arange(nrho_m)/(nrho_m-1.0)
-    tmp = interp1d(rho_m, tmp, kind='cubic')
-    tmp = tmp(rho_eval)
+    #tmp = interp1d(rho_m, tmp, kind='cubic')
+    #tmp = tmp(rho_eval)
+    tmp = linspace(0.3, 1.0, len(rho_eval))
     write_formatted(f, tmp, "%16.9e", 5)
 
     tmp = geq["__gb2__"]/geq["bcentr"]**2

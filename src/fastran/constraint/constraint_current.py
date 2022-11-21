@@ -7,6 +7,7 @@ from fastran.plasmastate.plasmastate import plasmastate
 from fastran.constraint import constraint_current_io
 from ipsframework import Component
 
+
 class constraint_current(Component):
     def __init__(self, services, config):
         Component.__init__(self, services, config)
@@ -18,26 +19,23 @@ class constraint_current(Component):
     def step(self, timeid=0):
         print('constraint_current.step() started')
 
-        #--- entry
-        services = self.services
+        # -- stage plasma state files
+        self.services.stage_state()
 
-        #--- stage plasma state files
-        services.stage_state()
+        # -- get plasma state file name
+        cur_state_file = self.services.get_config_param('CURRENT_STATE')
+        cur_eqdsk_file = self.services.get_config_param('CURRENT_EQDSK')
 
-        #--- get plasma state file name
-        cur_state_file = services.get_config_param('CURRENT_STATE')
-        cur_eqdsk_file = services.get_config_param('CURRENT_EQDSK')
+        # -- stage input files
+        self.services.stage_input_files(self.INPUT_FILES)
 
-        #--- stage input files
-        services.stage_input_files(self.INPUT_FILES)
-
-        #--- freeze
+        # -- freeze
         start_time = int(getattr(self, "START_TIME", "-1"))
         end_time = int(getattr(self, "END_TIME", "1000"))
         if timeid < start_time: return
         if timeid > end_time: return
 
-        #--- apply constraint to local plasma state
+        # -- apply constraint to local plasma state
         rho_jbdry = float(getattr(self, "RHO_JBDRY", "0.85"))
 
         if self.METHOD == 'broadJ':
@@ -69,11 +67,11 @@ class constraint_current(Component):
 
             constraint_current_io.parabolicJ(cur_state_file, cur_eqdsk_file, rho_jbdry=rho_jbdry, alpha=alpha, q0=q0)
 
-        #--- update plasma state files
-        services.update_state()
+        # -- update plasma state files
+        self.services.update_state()
 
-        #--- archive output files
-        services.stage_output_files(timeid, self.OUTPUT_FILES)
+        # -- archive output files
+        self.services.stage_output_files(timeid, self.OUTPUT_FILES, save_plasma_state=False)
 
     def finalize(self, timeid=0):
         print('constraint_current.finalize() called')

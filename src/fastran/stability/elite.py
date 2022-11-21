@@ -10,6 +10,7 @@ from ipsframework import Component
 from Namelist import Namelist
 from fastran.stability.pdata import pdata
 
+
 class elite(Component):
     def __init__(self, services, config):
         Component.__init__(self, services, config)
@@ -19,23 +20,21 @@ class elite(Component):
         print('elite.init() entered')
 
     def step(self, timeid=0):
-        print('enter elite.step()')
+        print('elite.step() started')
 
-        #--- code entry
-        services = self.services
+        # -- code entry
+        ishot = int(self.services.get_config_param('SHOT_NUMBER'))
+        itime = int(self.services.get_config_param('TIME_ID'))
 
-        ishot = int(services.get_config_param('SHOT_NUMBER'))
-        itime = int(services.get_config_param('TIME_ID'))
+        # -- stage plasma state files
+        self.services.stage_state()
 
-        #--- stage plasma state files
-        services.stage_state()
+        # -- get plasma state file names
+        cur_instate_file = self.services.get_config_param('CURRENT_INSTATE')
+        cur_eqdsk_file = self.services.get_config_param('CURRENT_EQDSK')
+        cur_bc_file = self.services.get_config_param('CURRENT_BC')
 
-        #--- get plasma state file names
-        cur_instate_file = services.get_config_param('CURRENT_INSTATE')
-        cur_eqdsk_file = services.get_config_param('CURRENT_EQDSK')
-        cur_bc_file = services.get_config_param('CURRENT_BC')
-
-        #--- input
+        # -- input
         fn_inelite = getattr(self,'INELITE')
 
         print(fn_inelite)
@@ -49,7 +48,7 @@ class elite(Component):
         p.load_instate(cur_instate_file)
         p.write('peqdsk')
 
-        #--- run codes
+        # -- run codes
         bin_eq = os.path.join(self.BIN_PATH, self.BIN_EQ)
         bin_vac = os.path.join(self.BIN_PATH, self.BIN_VAC)
         bin_elite = os.path.join(self.BIN_PATH, self.BIN_ELITE)
@@ -61,25 +60,25 @@ class elite(Component):
 
             inelite.write(runid+".in")
 
-            cwd = services.get_working_dir()
+            cwd = self.services.get_working_dir()
 
-            task_id = services.launch_task(1, cwd, bin_eq+' '+runid, logfile = 'xeq%d.log'%nmode)
-            retcode = services.wait_task(task_id)
+            task_id = self.services.launch_task(1, cwd, bin_eq+' '+runid, logfile = 'xeq%d.log'%nmode)
+            retcode = self.services.wait_task(task_id)
             if (retcode != 0): raise Exception('Error executing EQ')
 
-            task_id = services.launch_task(1, cwd, bin_vac+' '+runid, logfile = 'xvac%d.log'%nmode)
-            retcode = services.wait_task(task_id)
+            task_id = self.services.launch_task(1, cwd, bin_vac+' '+runid, logfile = 'xvac%d.log'%nmode)
+            retcode = self.services.wait_task(task_id)
             if (retcode != 0): raise Exception('Error executing VAC')
 
-            task_id = services.launch_task(1, cwd, bin_elite+' '+runid, logfile = 'xelite%d.log'%nmode)
-            retcode = services.wait_task(task_id)
+            task_id = self.services.launch_task(1, cwd, bin_elite+' '+runid, logfile = 'xelite%d.log'%nmode)
+            retcode = self.services.wait_task(task_id)
             if (retcode != 0): raise Exception('Error executing ELITE')
 
-        #--- update plasma state files
-        services.update_state()
+        # -- update plasma state files
+        self.services.update_state()
 
-        #--- archive output files
-        services.stage_output_files(timeid, self.OUTPUT_FILES)
+        # -- archive output files
+        self.services.stage_output_files(timeid, self.OUTPUT_FILES, save_plasma_state=False)
 
     def finalize(self, timeid=0):
         print('elite.finalize() called')

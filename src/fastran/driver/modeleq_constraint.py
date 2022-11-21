@@ -13,11 +13,11 @@ class modeleq_constraint(Component):
         Component.__init__(self, services, config)
         print('Created %s' % (self.__class__))
 
-    def init(self, timestamp=0):
+    def init(self, timeid=0):
         print('modeleq_constraint.init() called')
 
-    def step(self, timestamp=0):
-        print('modeleq_constraint.step() called')
+    def step(self, timeid=0):
+        print('modeleq_constraint.step() started')
 
         self.services.stage_state()
 
@@ -26,11 +26,11 @@ class modeleq_constraint(Component):
         if ps_update == 'enabled':
             cur_state_file = self.services.get_config_param('CURRENT_STATE')
 
-        update_state(timestamp, cur_instate_file, nmax_iter=100, const=None)
+        update_state(timeid, cur_instate_file, nmax_iter=100, const=None)
 
         k_pedestal_constraint = int(getattr(self, "PEDESTAL", "-1"))
 
-        if k_pedestal_constraint >= 0 and timestamp >= k_pedestal_constraint:
+        if k_pedestal_constraint >= 0 and timeid >= k_pedestal_constraint:
             constraint_pedestal_width(cur_instate_file)
 
         if ps_update == 'enabled':
@@ -42,4 +42,4 @@ class modeleq_constraint(Component):
             ps.store(cur_state_file)
 
         self.services.update_state()
-        self.services.stage_output_files(timestamp, self.OUTPUT_FILES)
+        self.services.stage_output_files(timeid, self.OUTPUT_FILES, save_plasma_state=False)

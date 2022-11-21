@@ -120,7 +120,7 @@ class efit(Component):
 
         if ps_backend == 'PS' and use_instate == 0:
             efit_io.io_input_from_state(
-                f_ps=cur_state_file, f_instate=cur_instate_file, f_inefit=f_inefit, 
+                f_ps=cur_state_file, f_instate=cur_instate_file, f_inefit=f_inefit,
                 model_pressure=model_pressure, betan_target=betan_target)
             nrho = 257
         elif ps_backend == 'INSTATE' or use_instate == 1:
@@ -143,7 +143,7 @@ class efit(Component):
             Rs = 1.
             Bs = 1.
 
-        # -- user inputs 
+        # -- user inputs
         topology = input_default(self, key="TOPOLOGY", default="")
         error = float(input_default(self, key="ERROR", default="1.0e-4"))
         max_error_efit = float(input_default(self, key="MAX_EFIT_ERROR", default="0.1"))
@@ -276,12 +276,12 @@ class efit(Component):
 
         # -- archive output files
         if self.OUTPUT_FILES:
-            self.services.stage_output_files(timeid, self.OUTPUT_FILES)
+            self.services.stage_output_files(timeid, self.OUTPUT_FILES, save_plasma_state=False)
         else:
             output_files = ' '.join(["{0}{1:06d}.{2:05d}".format(header, ishot, itime) for header in ["g", "a", "k", "m"]])
             output_files += " inefit"
             print("stage_output_files: ", output_files)
-            self.services.stage_output_files(timeid,  output_files)
+            self.services.stage_output_files(timeid,  output_files, save_plasma_state=False)
 
     def finalize(self, timeid):
         print('>>> efit.finalize() started')

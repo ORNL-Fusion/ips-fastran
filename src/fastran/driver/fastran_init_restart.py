@@ -9,6 +9,7 @@ from Namelist import Namelist
 from fastran.equilibrium.efit_eqdsk import readg
 from ipsframework import Component
 
+
 class fastran_init_restart (Component):
     def __init__(self, services, config):
         Component.__init__(self, services, config)
@@ -17,33 +18,30 @@ class fastran_init_restart (Component):
     def init(self, timeid=0):
         print ('fastran_init_restart.init() called')
 
-    def step(self, timeid):
-        #-- entry
+    def step(self, timeid=0):
         print ('fastran_init_restart.step() start')
-        services = self.services
 
-        #-- run identifiers
-
-        tokamak_id = services.get_config_param('TOKAMAK_ID')
-        shot_number = services.get_config_param('SHOT_NUMBER')
+        # -- run identifiers
+        tokamak_id = self.services.get_config_param('TOKAMAK_ID')
+        shot_number = self.services.get_config_param('SHOT_NUMBER')
 
         print('tokamak_id =', tokamak_id)
         print('shot_number =', shot_number)
 
-        #-- stage input files
-        services.stage_input_files(self.INPUT_FILES)
+        # -- stage input files
+        self.services.stage_input_files(self.INPUT_FILES)
 
-        #-- plasma state file names
-        cur_state_file = services.get_config_param('CURRENT_STATE')
-        cur_eqdsk_file = services.get_config_param('CURRENT_EQDSK')
-        cur_bc_file = services.get_config_param('CURRENT_BC')
-        cur_instate_file = services.get_config_param('CURRENT_INSTATE')
+        # -- plasma state file names
+        cur_state_file = self.services.get_config_param('CURRENT_STATE')
+        cur_eqdsk_file = self.services.get_config_param('CURRENT_EQDSK')
+        cur_bc_file = self.services.get_config_param('CURRENT_BC')
+        cur_instate_file = self.services.get_config_param('CURRENT_INSTATE')
         try:
-            cur_fastran_file = services.get_config_param('CURRENT_FASTRAN')
+            cur_fastran_file = self.services.get_config_param('CURRENT_FASTRAN')
         except:
             cur_fastran_file = ''
 
-        #-- set default
+        # -- set default
         f_inps = getattr(self, 'INPS', '')
         f_ingeqdsk = getattr(self, 'INGEQDSK', '')
         f_instate = getattr(self, 'INSTATE', '')
@@ -53,7 +51,7 @@ class fastran_init_restart (Component):
         if f_instate: shutil.copyfile(f_instate, cur_instate_file)
         if cur_fastran_file: open(cur_fastran_file, "w").close()
 
-        #-- boundary condition state file
+        # -- boundary condition state file
         geq = readg(f_ingeqdsk)
         r0  = geq["rzero" ]
         b0  = abs(geq["bcentr"])
@@ -71,14 +69,14 @@ class fastran_init_restart (Component):
         inbc["inbc"]["zlim"] = geq["zlim"]
         inbc.write(cur_bc_file)
 
-        #-- update plasma state
-        services.update_state()
+        # -- update plasma state
+        self.services.update_state()
 
-        #-- archive output files
-        services.stage_output_files(timeid, self.OUTPUT_FILES)
+        # -- archive output files
+        self.services.stage_output_files(timeid, self.OUTPUT_FILES, save_plasma_state=False)
 
-        #-- exit
-        print ('fastran_init_restart.step() done')
+        # -- exit
+        print('fastran_init_restart.step() done')
 
     def finalize(self, timeid=0):
         print('fastran_init_restart.finalize() called')

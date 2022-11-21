@@ -12,6 +12,7 @@ from Namelist import Namelist
 from fastran.plasmastate.plasmastate import plasmastate
 from ipsframework import Component
 
+
 class pest3(Component):
     def __init__(self, services, config):
         Component.__init__(self, services, config)
@@ -23,44 +24,42 @@ class pest3(Component):
     def step(self, timeid=0):
         print('pest3.step() started')
 
-        #-- entry
-        services = self.services
+        # -- entry
+        shot_number = self.services.get_config_param('SHOT_NUMBER')
+        time_id = self.services.get_config_param('TIME_ID')
 
-        shot_number = services.get_config_param('SHOT_NUMBER')
-        time_id = services.get_config_param('TIME_ID')
-
-        #-- excutable
+        # -- excutable
         corsica_bin = 'echo 0 | '+os.path.join(self.BIN_PATH_CALTRANS, self.BIN_CALTRANS)
         print('corsica_bin = ', corsica_bin)
 
         pest3_bin = os.path.join(self.BIN_PATH, self.BIN)
         print('pest3_bin = ', pest3_bin)
 
-        #-- stage plasma state files
-        services.stage_state()
+        # -- stage plasma state files
+        self.services.stage_state()
 
-        #-- get plasma state file names
-        cur_instate_file = services.get_config_param('CURRENT_INSTATE')
-        cur_eqdsk_file = services.get_config_param('CURRENT_EQDSK')
+        # -- get plasma state file names
+        cur_instate_file = self.services.get_config_param('CURRENT_INSTATE')
+        cur_eqdsk_file = self.services.get_config_param('CURRENT_EQDSK')
 
-        #-- stage input files
-        services.stage_input_files(self.INPUT_FILES)
+        # -- stage input files
+        self.services.stage_input_files(self.INPUT_FILES)
 
-        #-- prepare run
+        # -- prepare run
         shutil.copyfile(cur_eqdsk_file, 'eqdsk')
         f_inbas = getattr(self,'INBAS')
 
-        #-- run teq
+        # -- run teq
         print('run corsica')
         try:
             open("xcorsica", "w").write(corsica_bin+" "+f_inbas)
-            cwd = services.get_working_dir()
-            task_id = services.launch_task(1, cwd, 'sh xcorsica', logfile = 'xcorsica.log')
-            retcode = services.wait_task(task_id)
+            cwd = self.services.get_working_dir()
+            task_id = self.services.launch_task(1, cwd, 'sh xcorsica', logfile = 'xcorsica.log')
+            retcode = self.services.wait_task(task_id)
         except Exception:
             raise Exception('...in launch_task, xcorsica')
 
-        #-- get output
+        # -- get output
         teqdsk = "i%06d.%05d_test"%(int(shot_number), int(time_id))
         print('TEQDSK = ', teqdsk)
         shutil.copy(teqdsk, "ieqdsk")
@@ -70,9 +69,9 @@ class pest3(Component):
             cmd+= '-s0 -D0.25 -W\"0 0.26 0.5 0.8 0.9 1.0\" -p\"2.0 2.0\" -M2 -b0.40 -K\"1\" -X '
             open("xpest3", "w").write(cmd)
             logfile = 'pest%06d.%05d'%(int(shot_number), int(time_id))
-            cwd = services.get_working_dir()
-            task_id = services.launch_task(1, cwd, 'sh xpest3', logfile = logfile)
-            retcode = services.wait_task(task_id)
+            cwd = self.services.get_working_dir()
+            task_id = self.services.launch_task(1, cwd, 'sh xpest3', logfile = logfile)
+            retcode = self.services.wait_task(task_id)
         except Exception:
             raise Exception('...in launch_task, pest3')
 
@@ -88,10 +87,10 @@ class pest3(Component):
         instate.write(cur_instate_file)
 
         #-- update plasma state files
-        services.update_state()
+        self.services.update_state()
 
         #-- archive output files
-        services.stage_output_files(timeid, self.OUTPUT_FILES)
+        self.services.stage_output_files(timeid, self.OUTPUT_FILES, save_plasma_state=False)
 
     def finalize(self, timeid=0):
         print('pest3.finalize() called')

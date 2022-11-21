@@ -12,6 +12,7 @@ import numpy as np
 import netCDF4
 from Namelist import Namelist
 
+
 class constraint_timetrace(Component):
     def __init__(self, services, config):
         Component.__init__(self, services, config)
@@ -24,7 +25,7 @@ class constraint_timetrace(Component):
         self.services.stage_input_files(self.INPUT_FILES)
 
     def step(self, timeid=0):
-        print('>>> constraint_timetrace.step() started')
+        print('constraint_timetrace.step() started')
 
         #--- stage input files
         self.services.stage_input_files(self.INPUT_FILES)
@@ -47,17 +48,17 @@ class constraint_timetrace(Component):
 
         f_timetrace = self.TIMETRACE
         timetrace = Timetrace(f_timetrace, start_time=tmin, end_time=tmax)
- 
+
         ip = timetrace.get("ip", timeid)
         b0 = timetrace.get("bt", timeid)
         r0 = timetrace.get("r0", timeid)
         print('ip = {}, bt={}, r0={}'.format(ip*1.e-6, b0, r0))
- 
+
         ps = plasmastate('ips', 1)
         ps.read(cur_state_file)
- 
+
         instate = Instate(cur_instate_file)
- 
+
         instate["ip"] = [ip*1.e-6]
         instate["b0"] = [b0]
         instate["r0"] = [r0]
@@ -77,7 +78,7 @@ class constraint_timetrace(Component):
 
         t0 = timetrace.get_time(timeid)
         t1 = timetrace.get_time(timeid+1)
-        print ("t0, t1 =", t0, t1)  
+        print ("t0, t1 =", t0, t1)
 
         instate["t0"] = [t0]
         instate["t1"] = [t1]
@@ -86,9 +87,9 @@ class constraint_timetrace(Component):
         ps["t1"] = t1*1.e-3
 
         include = getattr(self, "INCLUDE", "").split()
-        if "NB" in include: 
+        if "NB" in include:
             pinj = timetrace.slice("pinj", timeid)
-            print("pinj =", pinj)  
+            print("pinj =", pinj)
             instate["power_nbi"] = pinj
             ps["power_nbi"] = pinj
 
@@ -101,8 +102,7 @@ class constraint_timetrace(Component):
         self.services.update_state()
 
         #--- archive output files
-        self.services.stage_output_files(timeid, self.OUTPUT_FILES)
+        self.services.stage_output_files(timeid, self.OUTPUT_FILES, save_plasma_state=False)
 
     def finalize(self, timeid=0):
         print('constraint_timetrace.finalize() called')
-

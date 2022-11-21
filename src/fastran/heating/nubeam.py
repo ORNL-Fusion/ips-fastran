@@ -14,6 +14,7 @@ from ipsframework import Component
 from fastran.util import dakota_io
 from fastran.state.instate import Instate
 
+
 class nubeam(Component):
     def __init__(self, services, config):
         Component.__init__(self, services, config)
@@ -256,7 +257,7 @@ class nubeam(Component):
         self.services.update_state()
 
         # -- archive output files
-        self.services.stage_output_files(timeid, self.OUTPUT_FILES)
+        self.services.stage_output_files(timeid, self.OUTPUT_FILES, save_plasma_state=False)
 
     def finalize(self, timeid=0):
         print('nubeam.finalize() called')

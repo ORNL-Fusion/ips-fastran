@@ -39,7 +39,7 @@ class constraint_timebc(Component):
         return interp1d(self.data[key]['t'], self.data[key]['y'], axis=0, fill_value=(self.data[key]['y'][0], self.data[key]['y'][-1],), bounds_error=False)(time)
 
     def step(self, timeid=0):
-        print('>>> constraint_timebc.step() started')
+        print('constraint_timebc.step() started')
 
         # -- stage input files
         self.services.stage_input_files(self.INPUT_FILES)
@@ -72,8 +72,7 @@ class constraint_timebc(Component):
         self.services.update_state()
 
         # -- archive output files
-        self.services.stage_output_files(timeid, self.OUTPUT_FILES)
+        self.services.stage_output_files(timeid, self.OUTPUT_FILES, save_plasma_state=False)
 
     def finalize(self, timeid=0):
         print('constraint_timebc.finalize() called')
-

@@ -52,7 +52,7 @@ class modeleq_driver(Component):
         self.services.stage_state()
 
         # -- post init processing: stage output
-        self.services.stage_output_files(0, self.OUTPUT_FILES)
+        self.services.stage_output_files(0, self.OUTPUT_FILES, save_plasma_state=False)
 
         # -- iteration loop
         nstep = int(self.services.sim_conf["ITERATION_LOOP"]["NSTEP"])
@@ -73,14 +73,14 @@ class modeleq_driver(Component):
                 self.component_call(self.services, port_name, port_dict[port_name], 'step', time_id)
 
             self.services.stage_state()
-            self.services.stage_output_files(time_id, self.OUTPUT_FILES)
+            self.services.stage_output_files(time_id, self.OUTPUT_FILES, save_plasma_state=False)
 
         # -- port in post process
         for port_name in post_names:
             self.component_call(self.services, port_name, port_dict[port_name], 'step', time_id)
 
         self.services.stage_state()
-        self.services.stage_output_files(time_id, self.OUTPUT_FILES)
+        self.services.stage_output_files(time_id, self.OUTPUT_FILES, save_plasma_state=False)
 
         self.services.update_state()
 
