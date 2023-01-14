@@ -157,7 +157,7 @@ def update_state(kiter, f_instate, nmax_iter=100, const=None):
         instate["ti_axis"] = [ti[0]]
 
     else:
-        pth = 1.602e3*(instate["ne"]*insate["te"] + (instate["ni"] + instate["nz"])*instate["ti"])
+        pth = 1.602e3*(instate["ne"]*instate["te"] + (instate["ni"] + instate["nz"])*instate["ti"])
         tscale = 1.0
 
     print('Temperature scale: %5.3f %5.3f %5.3f %5.3f' % (te[0], ti[0], betan_th_target/betan_th, tscale))
