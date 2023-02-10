@@ -13,7 +13,7 @@ from ipsframework import Component
 from distributed.diagnostics.plugin import WorkerPlugin
 
 
-def file_daemon(worker_id, evt, source_dir, target_dir, archive_files):
+def file_daemon(worker_id, evt, source_dir, target_dir, archive_files, archive_interval=600):
     files = archive_files if archive_files else "run?????/run?????.???  run?????/simulation_log/*.eventlog"
     files = "SUMMARY " + files
     print(">>> archive_files:", files)
@@ -31,21 +31,22 @@ ls -t {target_dir}/{worker_id}_archive_*.tar.gz | tail +3 | xargs rm -f
 #ls -t {target_dir}/{worker_id}_archive_*.tar.gz | tail +3 | xargs rm -f
 #"""
 
-    while not evt.wait(600):  # interval which to archive data
+    while not evt.wait(archive_interval):  # interval which to archive data
         os.system(cmd)
 
     os.system(cmd)
 
 
 class ArchievingPlugin(WorkerPlugin):
-    def __init__(self, tmp_dir, target_dir, archive_files):
+    def __init__(self, tmp_dir, target_dir, archive_files, archive_interval=600):
         self.tmp_dir = tmp_dir
         self.target_dir = target_dir
         self.archive_files = archive_files
+        self.archive_interval = archive_interval
 
     def setup(self, worker):
         self.evt = Event()
-        self.thread = Thread(target=file_daemon, args=(worker.id, self.evt, self.tmp_dir, self.target_dir, self.archive_files))
+        self.thread = Thread(target=file_daemon, args=(worker.id, self.evt, self.tmp_dir, self.target_dir, self.archive_files, self.archive_interval))
         self.thread.start()
 
     def teardown(self, worker):
@@ -149,7 +150,8 @@ class ips_massive_parallel(Component):
                 logfile=logfile)
 
         archive_files = getattr(self, "ARCHIVE_FILES", "")
-        worker_plugin = ArchievingPlugin(self.TMPXFS, dir_summary, archive_files)
+        archive_interval = getattr(self, "ARCHIVE_INTERVAL", 600)
+        worker_plugin = ArchievingPlugin(self.TMPXFS, dir_summary, archive_files, archive_interval)
 
         #--- run
         ret_val = services.submit_tasks('pool', use_dask=True, dask_nodes=dask_nodes,
