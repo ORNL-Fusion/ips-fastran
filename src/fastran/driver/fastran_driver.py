@@ -8,7 +8,7 @@ import os
 import glob
 import shutil
 from ipsframework import Component
-
+from fastran.util.fastranutil import config_default
 
 class fastran_driver(Component):
     def __init__(self, services, config):
@@ -62,7 +62,7 @@ class fastran_driver(Component):
         else:
             kstep_prefix = "iteration_%d_"%timeid
 
-        t0 = kstep_prefix + "0"
+        t0 = kstep_prefix + '0'
         print('*** t0=', t0, kstep_prefix)
 
         # -- initialize components in PORTS list for startup or restart
@@ -82,15 +82,33 @@ class fastran_driver(Component):
         self.services.stage_output_files(t0, self.OUTPUT_FILES, save_plasma_state=False)
 
         # -- steady-state solution procedures, timeloop refers to nonlinear iteration
-        nstep = int(self.services.sim_conf["ITERATION_LOOP"]["NSTEP"])
-        print("number of interation :", nstep)
 
         # -- pre process
-        for port_name in PREPROCESS:
-            self.component_call(port_name, port_dict[port_name], 'step', timeid)
+        if PREPROCESS:
+            # nstep_pre = int(self.services.sim_conf["ITERATION_LOOP"]["NSTEP_PRE"])
+            nstep_pre = int(config_default(self.services.sim_conf, 'ITERATION_LOOP', 'NSTEP_PREPROCESS', 1))
+            print('nstep_pre:', nstep_pre)
+            # for kstep in range(timeid, timeid + nstep_pre):
+            for kstep in range(nstep_pre):
+                # t = kstep_prefix+"%d"%kstep
+                # t = kstep
+                t = "preprocess_%d"%kstep
+
+                print('')
+                print(72*"=")
+                print('= fastran driver: preprocess iteration number = ', kstep)
+                print('')
+                self.services.update_time_stamp(t)
+
+                for port_name in PREPROCESS:
+                    self.component_call(port_name, port_dict[port_name], 'step', t)
 
         # -- main iteration
-        for kstep in range(timeid, timeid+nstep):
+        # nstep = int(self.services.sim_conf["ITERATION_LOOP"]["NSTEP"])
+        nstep = int(config_default(self.services.sim_conf, 'ITERATION_LOOP', 'NSTEP', 1))
+        print("number of interation :", nstep)
+        # for kstep in range(timeid + nstep_pre, timeid + nstep_pre + nstep):
+        for kstep in range(nstep):
             # t = kstep_prefix+"%d"%kstep
             t = kstep
 
@@ -112,10 +130,13 @@ class fastran_driver(Component):
 
         # -- post process
         if POSTPROCESS:
-            nstep_post = int(self.services.sim_conf["ITERATION_LOOP"]["NSTEP_POST"])
-            for kstep in range(nstep, nstep+nstep_post):
+            # nstep_post = int(self.services.sim_conf["ITERATION_LOOP"]["NSTEP_POST"])
+            nstep_post = int(config_default(self.services.sim_conf, 'ITERATION_LOOP', 'NSTEP_POSTPROCESS', 1))
+            # for kstep in range(timeid + nstep_pre + nstep, timeid + nstep_pre + nstep + nstep_post):
+            for kstep in range(nstep_post):
                 # t = kstep_prefix+"%d"%kstep
-                t = kstep
+                # t = kstep
+                t = "postprocess_%d"%kstep
                 print('')
                 print(72*"=")
                 print('= POST PROCESS: iteration number = ', t)
