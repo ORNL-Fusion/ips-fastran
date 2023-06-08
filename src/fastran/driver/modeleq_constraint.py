@@ -22,19 +22,22 @@ class modeleq_constraint(Component):
         self.services.stage_state()
 
         cur_instate_file = self.services.get_config_param('CURRENT_INSTATE')
-        ps_update = getattr(self, 'PS_UPDATE', 'disabled')
-        if ps_update == 'enabled':
-            cur_state_file = self.services.get_config_param('CURRENT_STATE')
-
         update_state(timeid, cur_instate_file, nmax_iter=100, const=None)
 
         k_pedestal_constraint = int(getattr(self, "PEDESTAL", "-1"))
-
         if k_pedestal_constraint >= 0 and timeid >= k_pedestal_constraint:
             constraint_pedestal_width(cur_instate_file)
 
+        ps_update = getattr(self, 'PS_UPDATE', 'disabled')
         if ps_update == 'enabled':
+            cur_state_file = self.services.get_config_param('CURRENT_STATE')
+            cur_eqdsk_file = self.services.get_config_param('CURRENT_EQDSK')
             instate = Instate(cur_instate_file)
+
+            ps = plasmastate('ips', 1)
+            ps.read(cur_state_file)
+            ps.load_geqdsk(cur_eqdsk_file)
+            ps.store(cur_state_file)
 
             ps = plasmastate('ips', 1)
             ps.read(cur_state_file)
