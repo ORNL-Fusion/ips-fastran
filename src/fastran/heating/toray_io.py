@@ -97,9 +97,9 @@ def write_toray_input(geq, prof, intoray):
     rho_eval[ 0]=0.0
     rho_eval[-1]=1.0
 
-    tmp = geq["__hfact__"]/abs(geq["bcentr"])
-    nrho_m = len(tmp)
-    rho_m = arange(nrho_m)/(nrho_m-1.0)
+    #tmp = geq["__hfact__"]/abs(geq["bcentr"])
+    #nrho_m = len(tmp)
+    #rho_m = arange(nrho_m)/(nrho_m-1.0)
     #tmp = interp1d(rho_m, tmp, kind='cubic')
     #tmp = tmp(rho_eval)
     tmp = linspace(0.3, 1.0, len(rho_eval))
@@ -407,37 +407,40 @@ def update_state(geq, ps, intoray):
         except:
            width = 0.0
            print('no width inuput, set 0')
+
         try:
            width2 = intoray["adjust"]["width2"][k]
         except:
            width2 = 0.0
            print('no width2 inuput, set 0')
-        print('width: ',width,width2)
+        print('width: ',width, width2)
 
         if width > 0.0:
             print('adjust width')
 
-            jec_max = 0.0
+            qec_max = 0.0
             for j in range(len(rho)):
-                if jec[j] > jec_max:
-                   jec_max = jec[j]
+                if qec[j] > qec_max:
+                   qec_max = qec[j]
                    j_find = j
-            print('rho_peak, jec_peak :',rho[j_find], jec_max)
+            print('rho_peak, qec_peak :',rho[j_find], qec_max)
 
             if width2 > 0.0:
                 print('call asym')
-                fit = adjust_jec_asym(
-                    0.5*width, 0.5*width2, rho[j_find], jec_max, Iec, nrho, ps, r0, b0)
-                jec = fit
+                if abs(jec[j_find]) > 1.0e-3:
+                    fit = adjust_jec_asym(
+                        0.5*width, 0.5*width2, rho[j_find], jec[j_find], Iec, nrho, ps, r0, b0)
+                    jec = fit
 
                 fit = adjust_qec_asym(
                     0.5*width, 0.5*width2, rho[j_find], qec[j_find], Pec, nrho, ps)
                 qec = fit
 
             else:
-                fit = adjust_jec(
-                    0.5*width, rho[j_find], jec_max, Iec, nrho, ps, r0, b0)
-                jec = fit
+                if abs(jec[j_find]) > 1.0e-3:
+                    fit = adjust_jec(
+                        0.5*width, rho[j_find], jec[j_find], Iec, nrho, ps, r0, b0)
+                    jec = fit
 
                 fit = adjust_qec(
                     0.5*width, rho[j_find], qec[j_find], Pec, nrho,ps)
