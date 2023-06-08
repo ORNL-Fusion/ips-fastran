@@ -8,13 +8,14 @@ import shutil
 import time as timer
 import numpy as np
 from Namelist import Namelist
+
+from ipsframework import Component
 from fastran.equilibrium import efit_io
 from fastran.plasmastate.plasmastate import plasmastate
 from fastran.solver.inmetric_io import ps_to_inmetric
 from fastran.equilibrium.efit_eqdsk import readg
-from ipsframework import Component
-
 from fastran.equilibrium.freegs_io import call_freegs
+from fastran.util.fastranutil import freeze
 
 class freegs(Component):
     def __init__(self, services, config):
@@ -24,17 +25,21 @@ class freegs(Component):
     def _get_shot_time(self):
         ishot = int(self.services.get_config_param('SHOT_NUMBER'))
         itime = int(float(self.TIME_ID)) if hasattr(self, "TIME_ID") else int(self.services.get_config_param('TIME_ID'))
-        return ishot, itime 
+        return ishot, itime
 
     def init(self, timeid=0):
         print('>>> freegs.init() started')
 
-        #--- get shot and time
+        # -- get shot and time
         ishot, itime = self._get_shot_time()
-        if itime < 0: itime = timeid
+        if itime < 0:
+            itime = timeid
         print('freegs time = {}'.format(itime))
 
-        #--- initial equilibrium
+        # -- stage input files
+        self.services.stage_input_files(self.INPUT_FILES)
+
+        # -- initial equilibrium
         init_run = int(getattr(self, "INIT_RUN", 0))
         print('init_run = ', init_run)
         if init_run:
@@ -46,17 +51,13 @@ class freegs(Component):
     def step(self, timeid=0):
         print('>>> freegs.step() started')
 
+        # -- freeze/resume
+        if freeze(self, timeid, 'freegs'): return None
+
         #--- get shot and time
         ishot, itime = self._get_shot_time()
         if itime < 0: itime = timeid
         print('freegs time = {}'.format(itime))
-
-        #--- freeze
-        ifreeze = int(getattr(self, "FREEZE", 10000))
-        iresume = int(getattr(self, "RESUME", -10000))
-        if timeid > ifreeze and timeid < iresume:
-            print("FREEZE: timeid = {}, ifreeze = {}, iresume = {}"%(timeid, ifreeze, iresume))
-            return
 
         #--- stage plasma state files
         self.services.stage_state()
@@ -66,8 +67,6 @@ class freegs(Component):
         cur_eqdsk_file = self.services.get_config_param('CURRENT_EQDSK')
         if ps_backend == 'PS':
             cur_state_file = self.services.get_config_param('CURRENT_STATE')
-            cur_bc_file = self.services.get_config_param('CURRENT_BC')
-        #elif ps_backend == 'INSTATE':
         cur_instate_file = self.services.get_config_param('CURRENT_INSTATE')
         use_instate = int(getattr(self, "USE_INSTATE", "0"))
 
@@ -82,10 +81,10 @@ class freegs(Component):
 
         betan_target = float(getattr(self, "BETAN_TARGET", "-1.0"))
         if ps_backend == 'PS' and use_instate == 0:
-            efit_io.io_input_from_state(f_ps=cur_state_file, f_inbc=cur_bc_file, f_inefit=f_inefit, mode=mode, betan_target=betan_target)
+            efit_io.io_input_from_state(f_ps=cur_state_file, f_instate=cur_instate_file, f_inefit=f_inefit, model_pressure=mode, betan_target=betan_target)
             nrho = 257
         elif ps_backend == 'INSTATE' or use_instate == 1:
-            efit_io.io_input_from_instate(f_instate=cur_instate_file, f_inefit=f_inefit, mode=mode)
+            efit_io.io_input_from_instate(f_instate=cur_instate_file, f_inefit=f_inefit, model_pressure=mode)
             instate = Namelist(cur_instate_file,"r")
             nrho = instate["instate"]["nrho"][0]
 
@@ -131,9 +130,9 @@ class freegs(Component):
             r0 = inefit["inefit"]["r0"][0]
             b0 = inefit["inefit"]["b0"][0]
             ip = inefit["inefit"]["ip"][0]
-            print ('r0 = ',r0)
-            print ('b0 = ',b0)
-            print ('ip = ',ip)
+            print ('r0 = ', r0)
+            print ('b0 = ', b0)
+            print ('ip = ', ip)
 
             try:
                 ps.init_from_geqdsk(cur_eqdsk_file, nrho=nrho, nth=101)
@@ -198,14 +197,11 @@ class freegs(Component):
         cur_eqdsk_file = self.services.get_config_param('CURRENT_EQDSK')
         cur_instate_file = self.services.get_config_param('CURRENT_INSTATE')
 
-        efit_io.io_input_from_instate(f_instate=cur_instate_file, f_inefit="inefit", mode='pmhd')
-
+        efit_io.io_input_from_instate(f_instate=cur_instate_file, f_inefit="inefit", model_pressure='kinetic')
         call_freegs(cur_instate_file, "inefit", init=True)
-
         shutil.copyfile("lsn.geqdsk", cur_eqdsk_file)
 
         ps = plasmastate('ips',1)
         ps.read(cur_state_file)
         ps.load_geqdsk(cur_eqdsk_file)
         ps.store(cur_state_file)
-

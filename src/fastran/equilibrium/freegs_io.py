@@ -1,6 +1,6 @@
 """
  -----------------------------------------------------------------------
- freegs io 
+ freegs io
  -----------------------------------------------------------------------
 """
 import numpy as np
@@ -12,34 +12,39 @@ from freegs.shaped_coil import ShapedCoil
 import json
 from fastran.util.zinterp import zinterp
 
-def read_coil_data(f_coil_data):
+
+def read_coil_data(f_coil_data, scale=1.0):
     with open(f_coil_data, "r") as f:
-         coils_input = json.load(f)
+         coil_data = json.load(f)
     coils = []
-    for key in coils_input:
-        coils.append([key, ShapedCoil(coils_input[key])])
-        print(coils_input[key])
+    for key in coil_data:
+        print(key, coil_data[key])
+        shape = []
+        for p in coil_data[key]:
+            shape.append( [p[0]*scale, p[1]*scale] )
+        coils.append([key, ShapedCoil(shape)])
     return coils
 
-def call_freegs(f_instate, f_inefit, init=False, boundary='all'):
+
+def call_freegs(f_instate, f_inefit, init=False, boundary='all', f_coil_data = 'coils_d3d.json', r0_scale=1.7):
     instate = Namelist(f_instate)
 
     inefit = Namelist(f_inefit)
-    r0 = inefit["inefit"]["r0"][0]
-    b0 = inefit["inefit"]["b0"][0]
-    ip = inefit["inefit"]["ip"][0]
+    r0 = inefit['inefit']['r0'][0]
+    b0 = inefit['inefit']['b0'][0]
+    ip = inefit['inefit']['ip'][0]
     print('r0, b0, ip = ', r0, b0, ip)
-    rbdry = inefit["inefit"]["rbdry"]
-    zbdry = inefit["inefit"]["zbdry"]
-    rwall = inefit["inefit"]["rlim"]
-    zwall = inefit["inefit"]["zlim"]
-    press = inefit["inefit"]["press"]
+    rbdry = inefit['inefit']['rbdry']
+    zbdry = inefit['inefit']['zbdry']
+    rwall = inefit['inefit']['rlim']
+    zwall = inefit['inefit']['zlim']
+    press = inefit['inefit']['press']
 
     k_x1 = np.argmin(zbdry)
     k_x2 = np.argmax(zbdry)
     k_in = np.argmin(rbdry)
     k_out = np.argmax(rbdry)
-    
+
     Rx_1, Zx_1 = rbdry[k_x1], zbdry[k_x1]
     Rx_1p, Zx_1p = rbdry[k_x1+1], zbdry[k_x1+1]
     Rx_1m, Zx_1m = rbdry[k_x1-1], zbdry[k_x1-1]
@@ -50,10 +55,12 @@ def call_freegs(f_instate, f_inefit, init=False, boundary='all'):
 
     R_in, Z_in = rbdry[k_in], zbdry[k_in]
     R_out, Z_out = rbdry[k_out], zbdry[k_out]
+    a0 = 0.5*(R_out - R_in)
 
     print('Rx_1 =', Rx_1, Rx_1p, Rx_1m)
     print('Rx_2 =', Rx_2, Rx_2p, Rx_2m)
     print('R_in, R_out =', R_in, R_out)
+    print('a0 =', a0)
 
     if boundary == 'all':
         r_isoflux = rbdry
@@ -63,73 +70,75 @@ def call_freegs(f_instate, f_inefit, init=False, boundary='all'):
         z_isoflux = [Z_in, Zx_1m, Zx_1, Zx_1p, Z_out, Zx_2m, Zx_2, Zx_2p, Z_in]
 
     xpoints = [(Rx_1, Zx_1), (Rx_2, Zx_2)]
-    
+
     n_isoflux = len(r_isoflux)
     isoflux = []
     for k in range(n_isoflux-1):
         p = [(r_isoflux[k], z_isoflux[k], r_isoflux[k+1], z_isoflux[k+1],)]
         isoflux += p
 
-    tokamak = freegs.machine.DIIID_Tokamak(rwall=rwall, zwall=zwall)
-#   f_coil_data = 'd3d_coils'
-#   coils_shape = read_coil_data(f_coil_data)
-#   tokamak = freegs.machine.Machine(coils_shape, freegs.machine.Wall(rwall, zwall))
+    scale = r0/r0_scale
+    coils_shape = read_coil_data(f_coil_data, scale)
+    tokamak = freegs.machine.Machine(coils_shape, freegs.machine.Wall(rwall, zwall))
 
     nx = 129
     ny = 129
 
-    eq = freegs.Equilibrium(tokamak=tokamak,
-                    Rmin=0.84, Rmax=2.54, # Radial domain
-                    Zmin=-1.6, Zmax=1.6, # Height range
-                    nx=nx, ny=ny, # Number of grid points
-                    boundary=freegs.boundary.freeBoundaryHagenow) # Boundary condition
+    eq = freegs.Equilibrium(
+        tokamak=tokamak,
+        Rmin=r0-1.5*a0, Rmax=r0+1.5*a0, # Radial domain
+        Zmin=-3*a0, Zmax=3*a0, # Height range
+        nx=nx, ny=ny, # Number of grid points
+        boundary=freegs.boundary.freeBoundaryHagenow) # Boundary condition
 
     if init:
-        profiles = freegs.jtor.ConstrainPaxisIp(press[0], # Plasma pressure on axis [Pascals]
-                                                         ip, # Plasma current [Amps]
-                                                         r0*b0) # Vacuum f=R*Bt
-    else: 
-        infreegs = Namelist("infreegs")
+        profiles = freegs.jtor.ConstrainPaxisIp(
+            press[0], # Plasma pressure on axis [Pascals]
+            ip, # Plasma current [Amps]
+            r0*b0) # Vacuum f=R*Bt
+    else:
+        infreegs = Namelist('infreegs')
         pprime_ext = infreegs['profile_ext']['pprime_ext']
         ffprime_ext = infreegs['profile_ext']['ffprim_ext']
         p_ext = infreegs['profile_ext']['p_ext']
         f_ext = infreegs['profile_ext']['f_ext']
-        
+
         npsi = infreegs['profile_ext']['npsi_ext'][0]
         psin = infreegs['profile_ext']['psin_ext']
-        
+
         pprime = zinterp(psin, pprime_ext)
         ffprime = zinterp(psin, ffprime_ext)
         pressure =  zinterp(psin, p_ext)
         fpol =  zinterp(psin, f_ext)
-        
+
         def pprime_func(psin):
             return pprime(psin)
-        
+
         def ffprime_func(psin):
            return ffprime(psin)
-        
+
         def p_func(psin):
            return pressure(psin)
-        
+
         def f_func(psin):
            return fpol(psin)
 
-        profiles = freegs.jtor.ProfilesPprimeFfprime(pprime_func, 
-                                                              ffprime_func, 
-                                                              r0*b0, 
-                                                              p_func=p_func, 
-                                                              f_func=f_func)
-         
+        profiles = freegs.jtor.ProfilesPprimeFfprime(
+            pprime_func,
+            ffprime_func,
+            r0*b0,
+            p_func=p_func,
+            f_func=f_func)
+
 #   constrain = freegs.control.constrain(xpoints=xpoints, isoflux=isoflux)
     constrain = freegs.control.constrain(isoflux=isoflux)
 
-    freegs.solve(eq, # The equilibrium to adjust
-                 profiles, # The toroidal current profile function
-                 constrain) # Constraint function to set coil currents
-    
+    freegs.solve(
+        eq, # The equilibrium to adjust
+        profiles, # The toroidal current profile function
+        constrain) # Constraint function to set coil currents
+
     # eq now contains the solution
-    
     print("Done!")
     print("Plasma current: %e Amps" % (eq.plasmaCurrent()))
     print("Plasma pressure on axis: %e Pascals" % (eq.pressure(0.0)))
@@ -137,4 +146,3 @@ def call_freegs(f_instate, f_inefit, init=False, boundary='all'):
 
     with open("lsn.geqdsk", "w") as f:
         freegs.geqdsk.write(eq, f, R0=r0)
-
