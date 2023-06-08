@@ -1,8 +1,10 @@
 import numpy as np
 from Namelist import Namelist
 from fastran.util.modelprofile import profile_pedestal, profile_parab
-from fastran.util import shape_io 
+from fastran.util import shape_io
 from fastran.util.formula import mu0
+
+import os
 
 instate_variables = [
     "ne",
@@ -10,47 +12,51 @@ instate_variables = [
     "ti",
     "omega",
     "zeff",
-    "j_oh", 
-    "j_bs", 
-    "j_nb", 
-    "j_ec", 
-    "j_ic", 
-    "pe_nb", 
-    "pe_ec", 
-    "pe_ic", 
-    "pe_fus", 
-    "pe_ionization", 
-    "p_rad", 
-    "pi_nb", 
-    "pi_ec", 
-    "pi_ic", 
+    "j_oh",
+    "j_bs",
+    "j_nb",
+    "j_ec",
+    "j_ic",
+    "j_lh",
+    "pe_nb",
+    "pe_ec",
+    "pe_ic",
+    "pe_lh",
+    "pe_fus",
+    "pe_ionization",
+    "p_rad",
+    "pi_nb",
+    "pi_ec",
+    "pi_ic",
+    "pi_lh",
     "pi_fus",
-    "pi_ionization", 
-    "pi_cx", 
-    "p_ohm", 
-    "p_ei", 
-    "torque_nb", 
-    "torque_in", 
-    "se_nb", 
-    "se_ionization", 
-    "si_nb", 
-    "si_ionization", 
-    "q", 
-    "psipol", 
-    "density_beam", 
-    "wbeam", 
+    "pi_ionization",
+    "pi_cx",
+    "p_ohm",
+    "p_ei",
+    "torque_nb",
+    "torque_in",
+    "se_nb",
+    "se_ionization",
+    "si_nb",
+    "si_ionization",
+    "q",
+    "psipol",
+    "density_beam",
+    "wbeam",
     "tbeam",
-    "density_alpha", 
-    "walpha", 
+    "density_alpha",
+    "walpha",
     "talpha",
-    "chie", 
-    "chii", 
+    "chie",
+    "chii",
     "p_eq",
-    "j_tot", 
+    "j_tot",
 ]
 
 class Instate():
     def __init__(self, fname):
+        os.system("sync -f " + fname)
         self.data = Namelist(fname)
 
         #-- check error
@@ -77,7 +83,7 @@ class Instate():
         self.data["instate"][key] = value
 
     def __contains__(self, key):
-        return True if key.upper() in self.keys() else False 
+        return True if key.upper() in self.keys() else False
 
     def keys(self):
         return self.data["instate"].keys()
@@ -91,7 +97,7 @@ class Instate():
 
     def write_netcdf(self, fname):
         self.data.write(fname)
-            
+
     def set_shape(self):
         if self.model_shape  == 0:
             print("Shape from instate data array")
@@ -152,7 +158,7 @@ class Instate():
         self["zlim"] = zlim
 
     def from_timetrace(self, itime, extract=["ip", "bt", "rbdry", "zbdry", "ne", "te", "ti", "omega", "zeff"]):
-        #-- extract profile timetrace data 
+        #-- extract profile timetrace data
         pass
 
     def zeros(self):
@@ -223,7 +229,7 @@ class Instate():
             for k in range(n_ion):
                 density_ion[k] = nith*f_ion[k]
 
-            zeff = nith + z_beam**2*self["density_beam"] + 2.**2*self["density_alpha"] 
+            zeff = nith + z_beam**2*self["density_beam"] + 2.**2*self["density_alpha"]
             for k in range(n_imp):
                 zeff = zeff + z_imp[k]**2*density_imp[k]
             self["zeff"] = zeff/self["ne"]
@@ -266,21 +272,21 @@ class Instate():
         self["rho"] = rho
         for key in ["ne", "te", "ti"]:
             self[key] = profile_pedestal(
-                nrho, 
-                self["{}_xmid".format(key)][0], 
+                nrho,
+                self["{}_xmid".format(key)][0],
                 self["{}_xwid".format(key)][0],
-                self["{}_ped".format(key)][0], 
+                self["{}_ped".format(key)][0],
                 self["{}_sep".format(key)][0],
-                self["{}_axis".format(key)][0], 
-                self["{}_alpha".format(key)][0], 
-                self["{}_beta".format(key)][0], 
+                self["{}_axis".format(key)][0],
+                self["{}_alpha".format(key)][0],
+                self["{}_beta".format(key)][0],
                 ifit=self["{}_fit".format(key)][0])(rho)
 
         for key in ["omega", "zeff", "density_beam", "tbeam", "density_alpha", "jpar"]:
             self[key] = profile_parab(
-                self["{}_axis".format(key)][0], 
+                self["{}_axis".format(key)][0],
                 self["{}_sep".format(key)][0],
-                self["{}_alpha".format(key)][0], 
+                self["{}_alpha".format(key)][0],
                 self["{}_beta".format(key)][0])(rho)
 
         self["j_tot"] = self["jpar"][:]
@@ -338,10 +344,10 @@ class Instate():
 
     def to_ps(self, ps, **keyarg):
         """
-        required input profiles in instate["instate"] 
-            ne, te, ti, omega, zeff 
+        required input profiles in instate["instate"]
+            ne, te, ti, omega, zeff
             tbeam, density_beam (model_beam = 0) or wbeam (model_beam = 1)
-      
+
         """
         nrho = self["nrho"][0]
         r0 = self["r0"][0]
@@ -360,7 +366,7 @@ class Instate():
         for k in range(self["n_imp"][0]):
             ps["ns"][k + self["n_ion"][0] + 1,:] = 1.e19*ps.node2cell(self["density_imp_{}".format(k)])
         ps["ni"][:] = 1.e19*ps.node2cell(self["density_th"])
-    
+
         #-- beam
         if self.model_beam == 0:
             ps["nbeami"][0][:] = 1.e19*ps.node2cell(self["density_beam"])
@@ -370,24 +376,24 @@ class Instate():
             tbeam = self["wbeam"]/1.602e-3/(delf["density_beam"]+1.e-6)
             ps["eperp_beami"][0][:] = ps.node2cell(self["zbeam"][0]*self["tbeam"]/3.0)
             ps["epll_beami"][0][:] = ps.node2cell(self["tbeam"]/3.0)
-       
+
         #-- temperature
         ps["Ts"][0,:] = ps.node2cell(self["te"])
-    
+
         for k in range(self["n_ion"][0]):
             ps["Ts"][k + 1, :] = ps.node2cell(self["ti"])
         for k in range(self["n_imp"][0]):
             ps["Ts"][k + self["n_ion"][0] + 1, :] = ps.node2cell(self["ti"])
-    
+
         ps["Ti"][:] = ps.node2cell(self["ti"])
-    
+
         #-- zeff
         ps["Zeff"][:] = ps.node2cell(self["zeff"])
         ps["Zeff_th"][:] = ps.node2cell(self["zeff"])
-    
+
         #-- rotation
         ps["omegat"][:] = ps.node2cell(self["omega"])
-    
+
         #-- current
         self["j_tot"][0] = self["j_tot"][1]
         ps.load_j_parallel(self["rho"], 1.e6*self["j_tot"], "rho_eq", "curt", r0, b0, tot=True)
@@ -397,31 +403,32 @@ class Instate():
         ps.load_j_parallel(self["rho"], 1.e6*self["j_ic"], "rho_icrf", "curich", r0, b0)
         ps.load_j_parallel(self["rho"], 1.e6*self["j_bs"], "rho", "curr_bootstrap", r0, b0)
         ps.load_j_parallel(self["rho"], 1.e6*self["j_oh"], "rho", "curr_ohmic", r0 ,b0)
-    
+
         #-- MHD pressure
         ps["P_eq"][:] = self["p_eq"]
-    
+
         #-- heating
         pe_fus = 1.e6*self["pe_fus"]
         pi_fus = 1.e6*self["pi_fus"]
-    
+
         ps.load_vol_profile(self["rho"], 1.e6*self["pe_nb"], "rho_nbi", "pbe")
         ps.load_vol_profile(self["rho"], 1.e6*self["pi_nb"], "rho_nbi", "pbi")
         ps.load_vol_profile(self["rho"], 1.e6*self["pe_ec"], "rho_ecrf", "peech")
         ps.load_vol_profile(self["rho"], 1.e6*self["pe_ic"], "rho_icrf", "picrf_totals", k=0)
-        ps.load_vol_profile(self["rho"], 1.e6*self["pi_ic"], "rho_icrf", "picth")
-    
+        ps.load_vol_profile(self["rho"], 1.e6*self["pi_ic"], "rho_icrf", "picrf_totals", k=1)
+        # ps.load_vol_profile(self["rho"], 1.e6*self["pi_ic"], "rho_icrf", "picth")
+
         #-- particle source
         ps.load_vol_profile(self["rho"], 1.e19*self["se_nb"], "rho_nbi", "sbedep")
-    
+
         #-- torque
         ps.load_vol_profile(self["rho"], self["torque_nb"], "rho_nbi", "tqbe")
-    
+
     def from_ps(self, ps):
         r0  = self["r0"][0]
         b0  = abs(self["b0"])
         ip  = self["ip"][0]*1.e6
- 
+
         nrho = len(ps["rho"])
         rho = ps["rho"][:]
         ne = ps["ns"][0,:]*1.0e-19
@@ -436,7 +443,7 @@ class Instate():
         omega = ps.cell2node_bdry(omega)
         q = np.zeros(nrho)
         fp = np.zeros(nrho)
- 
+
         j_tot = 1.e-6*ps.dump_j_parallel(rho, "rho_eq", "curt", r0, b0, tot=True)
         j_nb = 1.e-6*ps.dump_j_parallel(rho, "rho_nbi", "curbeam", r0, b0)
         j_ec = 1.e-6*ps.dump_j_parallel(rho, "rho_ecrf", "curech", r0, b0)
@@ -444,43 +451,43 @@ class Instate():
         j_lh = 1.e-6*ps.dump_j_parallel(rho, "rho_lhrf", "curlh", r0, b0)
         j_bs = np.zeros(nrho)
         j_oh = np.zeros(nrho)
- 
+
         density_beam = ps.dump_profile(rho, "rho_nbi", "nbeami", k=0)*1.e-19
         wbeam = ps.dump_profile(rho, "rho_nbi", "eperp_beami", k=0) \
               + ps.dump_profile(rho, "rho_nbi", "epll_beami", k=0)
         wbeam = density_beam*wbeam*1.602e-3 #MJ/m**3
- 
+
         pe_nb  = ps.dump_vol_profile(rho, "rho_nbi", "pbe")*1.e-6
         pi_nb  = (ps.dump_vol_profile(rho, "rho_nbi", "pbi") + ps.dump_vol_profile(rho, "rho_nbi", "pbth"))*1.e-6
         pth_nb = ps.dump_vol_profile(rho, "rho_nbi", "pbth")*1.e-6
- 
+
         density_alpha = ps.dump_profile(rho, "rho_fus", "nfusi", k=0)*1.e-19
         walpha = ps.dump_profile(rho, "rho_fus", "eperp_fusi", k=0) \
              + ps.dump_profile(rho, "rho_fus", "epll_fusi", k=0)
         walpha = density_alpha*walpha*1.602e-3 #MJ/m**3
- 
+
         pe_fus = ps.dump_vol_profile(rho, "rho_fus", "pfuse")*1.e-6
         pi_fus = ps.dump_vol_profile(rho, "rho_fus", "pfusi")*1.e-6
         pth_fus = ps.dump_vol_profile(rho, "rho_fus", "pfusth")*1.e-6
- 
+
         pe_ec = 1.e-6*ps.dump_vol_profile(rho, "rho_ecrf", "peech")
         pe_ic = 1.e-6*ps.dump_vol_profile(rho, "rho_icrf", "picrf_totals", k=0)
         pe_lh = 1.e-6*ps.dump_vol_profile(rho, "rho_lhrf", "pelh")
- 
+
         pi_ec = np.zeros(nrho)
         pi_ic = 1.0e-6*ps.dump_vol_profile(rho, "rho_icrf", "picrf_totals", k=1)
         pi_lh = 1.e-6*ps.dump_vol_profile(rho, "rho_lhrf", "pilh")
- 
+
         tqbe = ps.dump_vol_profile(rho, "rho_nbi", "tqbe")
         tqbi = ps.dump_vol_profile(rho, "rho_nbi", "tqbi")
         tqbjxb = ps.dump_vol_profile(rho, "rho_nbi", "tqbjxb")
         tqbth = ps.dump_vol_profile(rho, "rho_nbi", "tqbth")
- 
+
         torque_nb = tqbe+tqbi+tqbjxb+tqbth
         torque_in = np.zeros(nrho)
- 
+
         se_nb = 1.e-19*(ps.dump_vol_profile(rho, "rho_nbi", "sbedep") + ps.dump_vol_profile(rho, "rho_nbi", "sbehalo"))
- 
+
         p_ei = np.zeros(nrho)
         p_rad = np.zeros(nrho)
         p_ohm = np.zeros(nrho)
@@ -490,10 +497,10 @@ class Instate():
         si_nb = np.zeros(nrho)
         chie = np.zeros(nrho)
         chii = np.zeros(nrho)
- 
+
         se_ionization = np.zeros(nrho)
         si_ionization = np.zeros(nrho)
- 
+
         self["nrho"] = [nrho]
         self["rho"] = rho
         self["ne"] = ne
