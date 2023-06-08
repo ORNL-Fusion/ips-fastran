@@ -78,7 +78,7 @@ class ips_massive_serial(Component):
             tmp_xfs_rank = os.path.join(tmp_xfs, str(rank)) # make unique folder per rank to work in the tmp xfs directory
             # copy files needed by ips_massive_serial.py
             ipsutil.copyFiles(".", getattr(self, "INPUT_FILES"), tmp_xfs_rank)
-            # copy files needed for fastran_modeleq
+            # copy files needed for ips-fastran
             ipsutil.copyFiles(os.path.join(pwd, "input"), "*", os.path.join(tmp_xfs_rank, "input"))
             ipsutil.copyFiles(".", "local.conf", tmp_xfs_rank)
             tmp_xfs_dir_summary = os.path.realpath(os.path.join(tmp_xfs_rank, "SUMMARY"))
@@ -111,7 +111,8 @@ class ips_massive_serial(Component):
             except Exception:
                 sim["USE_PORTAL"] = "False"
             driver = sim['PORTS']['DRIVER']['IMPLEMENTATION']
-            sim[driver]["SUMMARY"] = tmp_xfs_dir_summary if tmp_xfs else dir_summary
+            # sim[driver]["SUMMARY"] = tmp_xfs_dir_summary if tmp_xfs else dir_summary
+            sim[driver]["SUMMARY"] = dir_summary 
             sim.write(open(os.path.join(tmp_xfs_rank, "run%05d.config"%k), "wb") if tmp_xfs else open("run%05d.config"%k, "wb"))
 
             ips_bin = os.path.join(self.BIN_PATH, self.BIN)
