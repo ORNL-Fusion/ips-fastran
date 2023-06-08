@@ -1,15 +1,15 @@
 """
  -----------------------------------------------------------------------
- nfreya component
+ nfreya neutral beam H/CD component
  -----------------------------------------------------------------------
 """
 
 import os
 import subprocess
-from numpy import *
 from Namelist import Namelist
 from ipsframework import Component
 from fastran.heating import nfreya_io
+from fastran.util.fastranutil import freeze
 
 
 class nfreya(Component):
@@ -22,6 +22,9 @@ class nfreya(Component):
 
     def step(self, timeid=0):
         print('nfreya.step() started')
+
+        # -- freeze/resume
+        if freeze(self, timeid, 'nfreya'): return None
 
         # -- excutable
         nfreya_bin = os.path.join(self.BIN_PATH, self.BIN)
@@ -45,33 +48,34 @@ class nfreya(Component):
         self.services.stage_input_files(self.INPUT_FILES)
 
         # -- dakota
-        innfreya = Namelist("innfreya", case="lower")
-        var_list = [var.upper() for var in innfreya["innfreya"].keys()]
+        innfreya = Namelist('innfreya', case='lower')
+        var_list = [var.upper() for var in innfreya['innfreya'].keys()]
         for key in var_list:
-            for k in range(len(innfreya["innfreya"][key])):
+            for k in range(len(innfreya['innfreya'][key])):
                 try:
-                    innfreya["innfreya"][key][k] = float(getattr(self, key+"_%d" % k))
+                    innfreya['innfreya'][key][k] = float(getattr(self, key+'_%d' % k))
                     print(key, k, 'updated')
                 except AttributeError:
                     pass
-        innfreya.write("innfreya")
+        innfreya.write('innfreya')
 
         FEEDBACK = int(getattr(self, 'FEEDBACK', '10000'))
         inbc = Namelist(cur_bc_file)
-        innfreya = Namelist("innfreya", case="lower")
-        if timeid >= FEEDBACK:
-            pnb = inbc["feedback"]["pnb"][-1]
-            innfreya["innfreya"]["bptor"] = [pnb]
-            print("feedback:")
-            print(inbc["feedback"]["pnb"])
+        innfreya = Namelist('innfreya', case='lower')
+        _timeid = int(str(timeid).split('_')[-1])
+        if _timeid >= FEEDBACK:
+            pnb = inbc['feedback']['pnb'][-1]
+            innfreya['innfreya']['bptor'] = [pnb]
+            print('feedback:')
+            print(inbc['feedback']['pnb'])
             print(pnb)
         else:
-            inbc["feedback"]["pnb"] = [innfreya["innfreya"]["bptor"][0]]
+            inbc['feedback']['pnb'] = [innfreya['innfreya']['bptor'][0]]
         inbc.write(cur_bc_file)
-        innfreya.write("innfreya")
+        innfreya.write('innfreya')
 
         # -- generate input
-        f_innfreya = "innfreya"
+        f_innfreya = 'innfreya'
         try:
             dir_data = self.DIR_DATA
         except:
@@ -100,8 +104,8 @@ class nfreya(Component):
 
         # -- get output
         scales = {}
-        scales['current'] = float(getattr(self, "SCALE_CURRENT", "1."))
-        scales['particle'] = float(getattr(self, "SCALE_PARTICLE", "1."))
+        scales['current'] = float(getattr(self, 'SCALE_CURRENT', '1.'))
+        scales['particle'] = float(getattr(self, 'SCALE_PARTICLE', '1.'))
 
         if ps_backend == 'PS':
             nfreya_io.update_state(cur_state_file, cur_eqdsk_file, scales)
@@ -118,9 +122,9 @@ class nfreya(Component):
         self.services.stage_output_files(timeid, self.OUTPUT_FILES, save_plasma_state=False)
 
         # -- clean up
-        clean_after = int(getattr(self, "CLEAN_AFTER", "1"))
+        clean_after = int(getattr(self, 'CLEAN_AFTER', '1'))
         if clean_after:
-            delete_files = ["bpltfil", "eqpltfil", "namelists", "qikone", "isllog", "runlog", "test_trnspt_mhd.txt"]
+            delete_files = ['bpltfil', 'eqpltfil', 'namelists', 'qikone', 'isllog', 'runlog', 'test_trnspt_mhd.txt']
             for f in delete_files:
                 if os.path.exists(f):
                     os.remove(f)

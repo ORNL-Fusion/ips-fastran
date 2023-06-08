@@ -6,7 +6,7 @@
 from fastran.plasmastate.plasmastate import plasmastate
 from fastran.constraint import constraint_current_io
 from ipsframework import Component
-
+from fastran.util.fastranutil import freeze
 
 class constraint_current(Component):
     def __init__(self, services, config):
@@ -19,6 +19,9 @@ class constraint_current(Component):
     def step(self, timeid=0):
         print('constraint_current.step() started')
 
+        # -- freeze/resume
+        if freeze(self, timeid, 'constraint_current'): return None
+
         # -- stage plasma state files
         self.services.stage_state()
 
@@ -28,12 +31,6 @@ class constraint_current(Component):
 
         # -- stage input files
         self.services.stage_input_files(self.INPUT_FILES)
-
-        # -- freeze
-        start_time = int(getattr(self, "START_TIME", "-1"))
-        end_time = int(getattr(self, "END_TIME", "1000"))
-        if timeid < start_time: return
-        if timeid > end_time: return
 
         # -- apply constraint to local plasma state
         rho_jbdry = float(getattr(self, "RHO_JBDRY", "0.85"))

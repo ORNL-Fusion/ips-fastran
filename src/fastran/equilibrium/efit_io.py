@@ -527,24 +527,3 @@ def io_input_init(f_instate):
     inefit["inefit"]["rbdry"] = instate["rbdry"]
     inefit["inefit"]["zbdry"] = instate["zbdry"]
     inefit.write("inefit")
-
-
-def io_input_init_keyargs(**keyargs):
-    nrho = keyargs['nrho']
-    rho = np.arange(nrho)/(nrho - 1.)
-
-    inefit = Namelist()
-    inefit["inefit"]["ip"] = [keyargs["ip"]*1.e6]
-    inefit["inefit"]["r0"] = [keyargs["r0"]]
-    inefit["inefit"]["b0"] = [keyargs["b0"]]
-    inefit["inefit"]["nrho"] = [nrho]
-    inefit["inefit"]["rho"] = rho
-    inefit["inefit"]["press"] = np.zeros(nrho)
-    inefit["inefit"]["jpar"] = np.zeros(nrho)
-    inefit["inefit"]["nlim"] = [keyargs["nlim"]]
-    inefit["inefit"]["rlim"] = [keyargs["rlim"]]
-    inefit["inefit"]["zlim"] = [keyargs["zlim"]]
-    inefit["inefit"]["nbdry"] = [keyargs["nbdry"]]
-    inefit["inefit"]["rbdry"] = [keyargs["rbdry"]]
-    inefit["inefit"]["zbdry"] = [keyargs["zbdry"]]
-    inefit.write("inefit")

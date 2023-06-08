@@ -11,6 +11,7 @@ from Namelist import Namelist
 from ipsframework import Component
 from fastran.heating import genray_io
 from fastran.util import dakota_io
+from fastran.util.fastranutil import freeze
 
 
 class genray(Component):
@@ -29,12 +30,7 @@ class genray(Component):
         print('genray.step() started')
 
         # -- freeze/resume
-        ifreeze = int(getattr(self, "FREEZE", -1))
-        iresume = int(getattr(self, "RESUME", -1))
-        if ifreeze >= 0 and timeid >= ifreeze:
-            if iresume < 0 or timeid < iresume:
-                print("genray skipped, FREEZE = %d, RESUME = %d, TIMEID = %d" % (ifreeze, iresume, timeid))
-                return None
+        if freeze(self, timeid, 'genray'): return None
 
         # -- excutable
         genray_bin = os.path.join(self.BIN_PATH, self.BIN)
