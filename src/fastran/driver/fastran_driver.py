@@ -106,7 +106,7 @@ class fastran_driver(Component):
         # -- main iteration
         # nstep = int(self.services.sim_conf["ITERATION_LOOP"]["NSTEP"])
         nstep = int(config_default(self.services.sim_conf, 'ITERATION_LOOP', 'NSTEP', 1))
-        print("number of interation :", nstep)
+        print("number of iteration :", nstep)
         # for kstep in range(timeid + nstep_pre, timeid + nstep_pre + nstep):
         for kstep in range(nstep):
             # t = kstep_prefix+"%d"%kstep
@@ -134,6 +134,7 @@ class fastran_driver(Component):
             nstep_post = int(config_default(self.services.sim_conf, 'ITERATION_LOOP', 'NSTEP_POSTPROCESS', 1))
             # for kstep in range(timeid + nstep_pre + nstep, timeid + nstep_pre + nstep + nstep_post):
             for kstep in range(nstep_post):
+            #for kstep in range(nstep, nstep + nstep_post):
                 # t = kstep_prefix+"%d"%kstep
                 # t = kstep
                 t = "postprocess_%d"%kstep
