@@ -91,6 +91,8 @@ class ips_massive_parallel(Component):
 
         task_nproc = int(getattr(self, "TASK_NPROC", "1"))
 
+        clean_after = int(getattr(self, "CLEAN_AFTER", "0"))
+
         try:
             pwd = services.get_config_param("PWD")
         except:
@@ -128,6 +130,7 @@ class ips_massive_parallel(Component):
             sim["OUT_REDIRECT_FNAME"] = os.path.join(rundir, "run%05d.out"%k)
             sim["LOG_FILE"] = os.path.join(rundir, "run%05d.log"%k)
             sim["USE_PORTAL"] = "True"
+            sim["CLEAN_AFTER"] = clean_after
             try:
                 sim['PARENT_PORTAL_RUNID'] = self.services.get_config_param("PORTAL_RUNID")
                 sim["USE_PORTAL"] = "True"
@@ -159,6 +162,7 @@ class ips_massive_parallel(Component):
 
         print('ret_val = ', ret_val)
         exit_status = services.get_finished_tasks('pool')
+        services.remove_task_pool('pool')
         print(exit_status)
 
         #--- update plasma state files
@@ -195,6 +199,9 @@ def taskRunner(runname, sim, tmp_xfs, timeout=1e9):
     ips_bin += f" --config={runname}.config"
     ips_bin += f" --log=ips_{runname}.log"
     ips_bin += " --platform=local.conf"
+
+    if sim["CLEAN_AFTER"]:
+        ips_bin += "\nrm -rf " + rundir
 
     ips_bin_path = os.path.join(rundir, "ips_bin.sh")
     with open(ips_bin_path, "w") as f:
