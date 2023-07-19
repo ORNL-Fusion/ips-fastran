@@ -38,10 +38,11 @@ ls -t {target_dir}/{worker_id}_archive_*.tar.gz | tail +3 | xargs rm -f
 
 
 class ArchievingPlugin(WorkerPlugin):
-    def __init__(self, tmp_dir, target_dir, archive_files):
+    def __init__(self, tmp_dir, target_dir, archive_files, clean_after):
         self.tmp_dir = tmp_dir
         self.target_dir = target_dir
         self.archive_files = archive_files
+        self.clean_after = clean_after
 
     def setup(self, worker):
         self.evt = Event()
@@ -51,7 +52,8 @@ class ArchievingPlugin(WorkerPlugin):
     def teardown(self, worker):
         self.evt.set()  # tells the thread to exit
         self.thread.join()
-
+        if self.clean_after:
+            shutil.rmtree(self.tmp_dir)
 
 class ips_massive_parallel(Component):
     def step(self, timeid=0):
@@ -130,7 +132,6 @@ class ips_massive_parallel(Component):
             sim["OUT_REDIRECT_FNAME"] = os.path.join(rundir, "run%05d.out"%k)
             sim["LOG_FILE"] = os.path.join(rundir, "run%05d.log"%k)
             sim["USE_PORTAL"] = "True"
-            sim["CLEAN_AFTER"] = clean_after
             try:
                 sim['PARENT_PORTAL_RUNID'] = self.services.get_config_param("PORTAL_RUNID")
                 sim["USE_PORTAL"] = "True"
@@ -152,7 +153,7 @@ class ips_massive_parallel(Component):
                 logfile=logfile)
 
         archive_files = getattr(self, "ARCHIVE_FILES", "")
-        worker_plugin = ArchievingPlugin(self.TMPXFS, dir_summary, archive_files)
+        worker_plugin = ArchievingPlugin(self.TMPXFS, dir_summary, archive_files, clean_after)
 
         #--- run
         ret_val = services.submit_tasks('pool', use_dask=True, dask_nodes=dask_nodes,
@@ -199,9 +200,6 @@ def taskRunner(runname, sim, tmp_xfs, timeout=1e9):
     ips_bin += f" --config={runname}.config"
     ips_bin += f" --log=ips_{runname}.log"
     ips_bin += " --platform=local.conf"
-
-    if sim["CLEAN_AFTER"]:
-        ips_bin += "\nrm -rf " + rundir
 
     ips_bin_path = os.path.join(rundir, "ips_bin.sh")
     with open(ips_bin_path, "w") as f:
