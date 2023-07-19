@@ -159,7 +159,14 @@ class ips_massive_parallel(Component):
 
         print('ret_val = ', ret_val)
         exit_status = services.get_finished_tasks('pool')
+        services.remove_task_pool('pool')
         print(exit_status)
+
+        clean_after = int(getattr(self, 'CLEAN_AFTER', '0'))
+        if clean_after:
+            for k in range(nsim):
+                rundir = os.path.realpath(os.path.join(tmp_xfs, "run%05d"%k)) if tmp_xfs else os.path.realpath("run%05d"%k)
+                shutil.rmtree(rundir)
 
         #--- update plasma state files
         services.update_state()
