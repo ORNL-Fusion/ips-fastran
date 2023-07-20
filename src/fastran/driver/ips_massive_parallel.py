@@ -90,7 +90,6 @@ class ips_massive_parallel(Component):
 
         task_nproc = int(getattr(self, "TASK_NPROC", "1"))
 
-        clean_after = int(getattr(self, "CLEAN_AFTER", "0"))
         clean_after = int(getattr(self, 'CLEAN_AFTER', '0'))
         if clean_after:
             with open('cmd.sh', 'w') as f:
