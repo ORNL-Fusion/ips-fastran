@@ -164,9 +164,16 @@ class ips_massive_parallel(Component):
 
         clean_after = int(getattr(self, 'CLEAN_AFTER', '0'))
         if clean_after:
-            for k in range(nsim):
-                rundir = os.path.realpath(os.path.join(tmp_xfs, "run%05d"%k)) if tmp_xfs else os.path.realpath("run%05d"%k)
-                shutil.rmtree(rundir)
+            with open('cmd.sh', 'w') as f:
+                 f.write(f'rm -rf {tmp_xfs}/run?????\n')
+
+            cwd = self.services.get_working_dir()
+            cmd =  f'shifter sh cmd.sh'
+            task_id = self.services.launch_task(self.DASK_NODES, cwd, cmd, task_ppn=1, logfile='clean.log')
+            retcode = self.services.wait_task(task_id)
+            if (retcode != 0):
+                e = 'Error executing command:  clean '
+                raise Exception(e)
 
         #--- update plasma state files
         services.update_state()
@@ -188,13 +195,13 @@ def taskRunner(runname, sim, tmp_xfs, timeout=1e9):
 
     task_nproc = int(sim["TASK_NPROC"])
 
-    input_dir = sim["INPUT_DIR_SIM_TEMP"] 
+    input_dir = sim["INPUT_DIR_SIM_TEMP"]
     print(input_dir )
     shutil.copytree(input_dir, os.path.join(rundir, "input"))
     #sim["INPUT_DIR_SIM"] =  os.path.join(rundir, "input")
 
     sim.write(open(os.path.join(rundir, f"{runname}.config"), "wb"))
-     
+
 #   ips_bin = "which ips.py\n"
     ips_bin = "echo $PYTHONPATH\n"
     ips_bin += "which ips.py\n"
@@ -225,10 +232,10 @@ def wrt_localconf(fname="local.conf", task_nproc=1):
        cmd = "mpiexec"
     s = \
 """HOST = local
-MPIRUN = %s  
+MPIRUN = %s
 NODE_DETECTION = manual
-PROCS_PER_NODE = %d 
-CORES_PER_NODE = %d 
+PROCS_PER_NODE = %d
+CORES_PER_NODE = %d
 SOCKETS_PER_NODE = 1
 NODE_ALLOCATION_MODE = SHARED
 USE_ACCURATE_NODES = ON
