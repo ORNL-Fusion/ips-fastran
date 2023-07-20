@@ -38,11 +38,10 @@ ls -t {target_dir}/{worker_id}_archive_*.tar.gz | tail +3 | xargs rm -f
 
 
 class ArchievingPlugin(WorkerPlugin):
-    def __init__(self, tmp_dir, target_dir, archive_files, clean_after):
+    def __init__(self, tmp_dir, target_dir, archive_files):
         self.tmp_dir = tmp_dir
         self.target_dir = target_dir
         self.archive_files = archive_files
-        self.clean_after = clean_after
 
     def setup(self, worker):
         self.evt = Event()
@@ -52,8 +51,6 @@ class ArchievingPlugin(WorkerPlugin):
     def teardown(self, worker):
         self.evt.set()  # tells the thread to exit
         self.thread.join()
-        if self.clean_after:
-            shutil.rmtree(self.tmp_dir)
 
 class ips_massive_parallel(Component):
     def step(self, timeid=0):
@@ -94,6 +91,18 @@ class ips_massive_parallel(Component):
         task_nproc = int(getattr(self, "TASK_NPROC", "1"))
 
         clean_after = int(getattr(self, "CLEAN_AFTER", "0"))
+        clean_after = int(getattr(self, 'CLEAN_AFTER', '0'))
+        if clean_after:
+            with open('cmd.sh', 'w') as f:
+                 f.write(f'rm -rf {tmp_xfs}/run?????\n')
+
+            cwd = self.services.get_working_dir()
+            cmd =  f'shifter sh cmd.sh'
+            task_id = self.services.launch_task(self.DASK_NODES, cwd, cmd, task_ppn=1, logfile='clean.log')
+            retcode = self.services.wait_task(task_id)
+            if (retcode != 0):
+                e = 'Error executing command:  clean '
+                raise Exception(e)
 
         try:
             pwd = services.get_config_param("PWD")
@@ -153,7 +162,7 @@ class ips_massive_parallel(Component):
                 logfile=logfile)
 
         archive_files = getattr(self, "ARCHIVE_FILES", "")
-        worker_plugin = ArchievingPlugin(self.TMPXFS, dir_summary, archive_files, clean_after)
+        worker_plugin = ArchievingPlugin(self.TMPXFS, dir_summary, archive_files)
 
         #--- run
         ret_val = services.submit_tasks('pool', use_dask=True, dask_nodes=dask_nodes,
