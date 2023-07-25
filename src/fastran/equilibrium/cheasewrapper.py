@@ -3,7 +3,6 @@
 
 import os
 import sys
-import cheasefiles
 import numpy as npy
 
 from glob       import glob
@@ -11,6 +10,7 @@ from subprocess import Popen, PIPE
 from matplotlib import pyplot as plt
 from matplotlib.backends.backend_pdf import PdfPages
 
+from fastran.equilibrium import cheasefiles
 
 if   sys.version_info.major == 3:
      PYTHON3 = True; PYTHON2 = False
@@ -36,14 +36,15 @@ def create_namelist(setParam={}):
     if   'RELAX'     not in setParam: setParam['RELAX']     = 0.0
     if   'NBSEXPQ'   not in setParam: setParam['NBSEXPQ']   = 1111
     if   'NEQDSK'    not in setParam: setParam['NEQDSK']    = 0
-    if   'NS'        not in setParam: setParam['NS']        = 256
-    if   'NT'        not in setParam: setParam['NT']        = 256
-    if   'NISO'      not in setParam: setParam['NISO']      = 256
-    if   'NPSI'      not in setParam: setParam['NPSI']      = 1024
-    if   'NCHI'      not in setParam: setParam['NCHI']      = 1024
-    if   'NRBOX'     not in setParam: setParam['NRBOX']     = 60
-    if   'NZBOX'     not in setParam: setParam['NZBOX']     = 60
+    if   'NS'        not in setParam: setParam['NS']        = 64
+    if   'NT'        not in setParam: setParam['NT']        = 64
+    if   'NISO'      not in setParam: setParam['NISO']      = 128
+    if   'NPSI'      not in setParam: setParam['NPSI']      = 256
+    if   'NCHI'      not in setParam: setParam['NCHI']      = 256
+    if   'NRBOX'     not in setParam: setParam['NRBOX']     = 128
+    if   'NZBOX'     not in setParam: setParam['NZBOX']     = 128
     if   'NCSCAL'    not in setParam: setParam['NCSCAL']    = 4
+    if   'NRSCAL'    not in setParam: setParam['NRSCAL']    = 0
     if   'NOPT'      not in setParam: setParam['NOPT']      = 0
     if   'NSURF'     not in setParam: setParam['NSURF']     = 6
     if   'NFUNC'     not in setParam: setParam['NFUNC']     = 4
@@ -55,9 +56,9 @@ def create_namelist(setParam={}):
     if   'NPPFUN'    not in setParam: setParam['NPPFUN']    = 8
     if   'NVERBOSE'  not in setParam: setParam['NVERBOSE']  = 4
     if   'NDIAGOP'   not in setParam: setParam['NDIAGOP']   = 1
-    if   'NIDEAL'    not in setParam: setParam['NIDEAL']    = 9
-    if   'NDIFPS'    not in setParam: setParam['NDIFPS']    = 0
-    if   'NDIFT'     not in setParam: setParam['NDIFT']     = 1
+    if   'NIDEAL'    not in setParam: setParam['NIDEAL']    = 6
+   #if   'NDIFPS'    not in setParam: setParam['NDIFPS']    = 0
+   #if   'NDIFT'     not in setParam: setParam['NDIFT']     = 1
     if   'NMESHC'    not in setParam: setParam['NMESHC']    = 1
     if   'NPOIDC'    not in setParam: setParam['NPOIDC']    = 2
     if   'SOLPDC'    not in setParam: setParam['SOLPDC']    = 0.7
@@ -65,25 +66,26 @@ def create_namelist(setParam={}):
     if   'CWIDTH'    not in setParam: setParam['CWIDTH']    = '0.1,0.05,0.01,0.025'
     if   'NMESHPOL'  not in setParam: setParam['NMESHPOL']  = 1
     if   'SOLPDPOL'  not in setParam: setParam['SOLPDPOL']  = 0.1
-    if   'NTURN'     not in setParam: setParam['NTURN']     = 20
-    if   'NBLC0'     not in setParam: setParam['NBLC0']     = 16
-    if   'NPPR'      not in setParam: setParam['NPPR']      = 24
+#   if   'NTURN'     not in setParam: setParam['NTURN']     = 20
+#   if   'NBLC0'     not in setParam: setParam['NBLC0']     = 16
+   #if   'NPPR'      not in setParam: setParam['NPPR']      = 30
     if   'NINMAP'    not in setParam: setParam['NINMAP']    = 40
     if   'NINSCA'    not in setParam: setParam['NINSCA']    = 40
     if   'NSYM'      not in setParam: setParam['NSYM']      = 0
     if   'NEGP'      not in setParam: setParam['NEGP']      = 0
     if   'NER'       not in setParam: setParam['NER']       = 2
     if   'EPSLON'    not in setParam: setParam['EPSLON']    = 1.0E-10
-    if   'ETAEI'     not in setParam: setParam['ETAEI']     = 3.0
-    if   'RPEOP'     not in setParam: setParam['RPEOP']     = 0.5
-    if   'RZION'     not in setParam: setParam['RZION']     = 1.0
-    if   'GAMMA'     not in setParam: setParam['GAMMA']     = 1.6666666667
-    if   'AT3(1)'    not in setParam: setParam['AT3(1)']    = -0.69
+   #if   'ETAEI'     not in setParam: setParam['ETAEI']     = 3.0
+   #if   'RPEOP'     not in setParam: setParam['RPEOP']     = 0.5
+   #if   'RZION'     not in setParam: setParam['RZION']     = 1.0
+   #if   'GAMMA'     not in setParam: setParam['GAMMA']     = 1.6666666667
+   #if   'AT3(1)'    not in setParam: setParam['AT3(1)']    = -0.69
     if   'TENSPROF'  not in setParam: setParam['TENSPROF']  = 0.0
     if   'TENSBND'   not in setParam: setParam['TENSBND']   = 0.0
     if   'cocos_in'  not in setParam: setParam['cocos_in']  = 2
     if   'cocos_out' not in setParam: setParam['cocos_out'] = 12
 
+    if   'CURRT'     in setParam: wfh.write(' CURRT=%3.3f, '      % (float(setParam['CURRT'])))
     if   'RELAX'     in setParam: wfh.write(' RELAX=%2.2f, '      % (float(setParam['RELAX'])))
     if   'NBSEXPQ'   in setParam: wfh.write(' NBSEXPQ=%04d, '     % (int(setParam['NBSEXPQ'])))
     if   'NEQDSK'    in setParam: wfh.write(' NEQDSK=%1d,     \n' % (int(setParam['NEQDSK'])))
@@ -94,10 +96,15 @@ def create_namelist(setParam={}):
     if   'NISO'      in setParam: wfh.write(' NISO=%4d,       \n' % (int(setParam['NISO'])))
     if   'NRBOX'     in setParam: wfh.write(' NRBOX=%4d, '        % (int(setParam['NRBOX'])))
     if   'NZBOX'     in setParam: wfh.write(' NZBOX=%4d,      \n' % (int(setParam['NZBOX'])))
-    if   'NCSCAL'    in setParam: wfh.write(' NCSCAL=%1d, '       % (float(setParam['NCSCAL'])))
-    if   'NOPT'      in setParam: wfh.write(' NOPT=%1d,       \n' % (int(setParam['NOPT'])))
+    if   'NCSCAL'    in setParam: wfh.write(' NCSCAL=%1d, '       % (int(setParam['NCSCAL'])))
+    if   'NRSCAL'    in setParam: wfh.write(' NRSCAL=%1d, '       % (int(setParam['NRSCAL'])))
+    if   'NOPT'      in setParam: wfh.write(' NOPT=%1d, '         % (int(setParam['NOPT'])))
+    if   'CFBAL'     in setParam: wfh.write(' CFBAL=%3.3f, '      % (int(setParam['CFBAL'])))
+    if   'PREDGE'    in setParam: wfh.write(' PREDGE=%1d, '       % (int(setParam['PREDGE'])))
+    if   'CPRESS'    in setParam: wfh.write(' CPRESS=%3.3f,   \n' % (float(setParam['CPRESS'])))
     if   'NSURF'     in setParam: wfh.write(' NSURF=%1d, '        % (int(setParam['NSURF'])))
-    if   'NFUNC'     in setParam: wfh.write(' NFUNC=%1d,      \n' % (int(setParam['NFUNC'])))
+    if   'NTMF0'     in setParam: wfh.write(' NTMF0=%1d, '        % (int(setParam['NTMF0'])))
+    if   'NFUNC'     in setParam: wfh.write(' NFUNC=%1d, '        % (int(setParam['NFUNC'])))
     if   'NPPFUN'    in setParam: wfh.write(' NPPFUN=%1d,     \n' % (int(setParam['NPPFUN'])))
     if   'NFUNRHO'   in setParam: wfh.write(' NFUNRHO=%1d, '      % (int(setParam['NFUNRHO'])))
     if   'NRHOMESH'  in setParam: wfh.write(' NRHOMESH=%1d,   \n' % (int(setParam['NRHOMESH'])))
@@ -107,13 +114,21 @@ def create_namelist(setParam={}):
     if   'QSPEC'     in setParam: wfh.write(' QSPEC=%3.3f, '      % (float(setParam['QSPEC'])))
     if   'CSSPEC'    in setParam: wfh.write(' CSSPEC=%3.3f,   \n' % (float(setParam['CSSPEC'])))
     if   'TRIANG'    in setParam: wfh.write(' TRIANG=%3.3f,   \n' % (float(setParam['TRIANG'])))
-    if   'R0'        in setParam: wfh.write(' R0=%10.8f, '        % (float(setParam['R0'])))
-    if   'RZ0'       in setParam: wfh.write(' RZ0=%10.8f,     \n' % (float(setParam['RZ0'])))
-    if   'RBOXLEN'   in setParam: wfh.write(' RBOXLEN=%3.3f, '    % (float(setParam['RBOXLEN'])))
-    if   'ZBOXLEN'   in setParam: wfh.write(' ZBOXLEN=%3.3f, '    % (float(setParam['ZBOXLEN'])))
-    if   'RBOXLFT'   in setParam: wfh.write(' RBOXLFT=%3.3f,  \n' % (float(setParam['RBOXLFT'])))
+    if   'RC'        in setParam: wfh.write(' RC=%10.8f,      \n' % (float(setParam['RC'])))
+    if   'ZC'        in setParam: wfh.write(' ZC=%10.8f,      \n' % (float(setParam['ZC'])))
+    if   'R0'        in setParam: wfh.write(' R0=%10.7e, '        % (float(setParam['R0'])))
+    if   'RZ0'       in setParam: wfh.write(' RZ0=%10.7e,     \n' % (float(setParam['RZ0'])))
+    if   'RMAG'      in setParam: wfh.write(' RMAG=%10.7e, '      % (float(setParam['RMAG'])))
+    if   'RZMAG'     in setParam: wfh.write(' RZMAG=%10.7e,   \n' % (float(setParam['RZMAG'])))
+    if   'RBOXLEN'   in setParam: wfh.write(' RBOXLEN=%10.8f, '   % (float(setParam['RBOXLEN'])))
+    if   'ZBOXLEN'   in setParam: wfh.write(' ZBOXLEN=%10.8f, '   % (float(setParam['ZBOXLEN'])))
+    if   'ZBOXMID'   in setParam: wfh.write(' ZBOXMID=%10.8f, '   % (float(setParam['ZBOXMID'])))
+    if   'RBOXLFT'   in setParam: wfh.write(' RBOXLFT=%10.8f, \n' % (float(setParam['RBOXLFT'])))
     if   'R0EXP'     in setParam: wfh.write(' R0EXP=%3.3f, '      % (float(setParam['R0EXP'])))
     if   'B0EXP'     in setParam: wfh.write(' B0EXP=%3.3f,    \n' % (float(setParam['B0EXP'])))
+    if   'ASPCT'     in setParam: wfh.write(' ASPCT=%3.3f, '      % (float(setParam['ASPCT'])))
+    if   'TRIANG'    in setParam: wfh.write(' TRIANG=%3.3f, '     % (float(setParam['TRIANG'])))
+    if   'ELONG'     in setParam: wfh.write(' ELONG=%3.3f,    \n' % (float(setParam['ELONG'])))
     if   'NDIAGOP'   in setParam: wfh.write(' NDIAGOP=%1d, '      % (int(setParam['NDIAGOP'])))
     if   'NIDEAL'    in setParam: wfh.write(' NIDEAL=%1d,     \n' % (int(setParam['NIDEAL'])))
     if   'NDIFPS'    in setParam: wfh.write(' NDIFPS=%1d, '       % (int(setParam['NDIFPS'])))
@@ -126,6 +141,8 @@ def create_namelist(setParam={}):
     if   'NMESHPOL'  in setParam: wfh.write(' NMESHPOL=%4d, '     % (int(setParam['NMESHPOL'])))
     if   'SOLPDPOL'  in setParam: wfh.write(' SOLPDPOL=%2.2f, \n' % (float(setParam['SOLPDPOL'])))
     if   'NTURN'     in setParam: wfh.write(' NTURN=%2d, '        % (int(setParam['NTURN'])))
+    if   'NBLOPT'    in setParam: wfh.write(' NBLOPT=%1d, '       % (int(setParam['NBLOPT'])))
+    if   'NBAL'      in setParam: wfh.write(' NBAL=%2d, '         % (int(setParam['NBAL'])))
     if   'NBLC0'     in setParam: wfh.write(' NBLC0=%2d, '        % (int(setParam['NBLC0'])))
     if   'NPPR'      in setParam: wfh.write(' NPPR=%2d,       \n' % (int(setParam['NPPR'])))
     if   'NINMAP'    in setParam: wfh.write(' NINMAP=%2d, '       % (int(setParam['NINMAP'])))
@@ -139,8 +156,8 @@ def create_namelist(setParam={}):
     if   'RZION'     in setParam: wfh.write(' RZION=%2.1f, '      % (float(setParam['RZION'])))
     if   'GAMMA'     in setParam: wfh.write(' GAMMA=%12.11f,  \n' % (float(setParam['GAMMA'])))
     if   'AT3(1)'    in setParam: wfh.write(' AT3(1)=%2.2f,   \n' % (float(setParam['AT3(1)'])))
-    if   'TENSPROF'  in setParam: wfh.write(' TENSPROF=%2.2f, \n' % (float(setParam['TENSPROF'])))
-    if   'TENSBND'   in setParam: wfh.write(' TENSBND=%2.2f,  \n' % (float(setParam['TENSBND'])))
+    if   'TENSPROF'  in setParam: wfh.write(' TENSPROF=%5.3f, \n' % (float(setParam['TENSPROF'])))
+    if   'TENSBND'   in setParam: wfh.write(' TENSBND=%5.3f,  \n' % (float(setParam['TENSBND'])))
     if   'cocos_in'  in setParam: wfh.write(' cocos_in=%2d,   \n' % (int(setParam['cocos_in'])))
     if   'cocos_out' in setParam: wfh.write(' cocos_out=%2d   \n' % (int(setParam['cocos_out'])))
 
@@ -1145,7 +1162,20 @@ def init_chease_inputs(srcVals={},namelistVals={},importedVals={}):
             elif 'q' in expeqdata:
                  namelistParam['QSPEC'] = expeqdata['q'][0]
             namelistParam['CSSPEC'] = 0.0
-    namelistParam['NCSCAL'] = 4
+    elif current_src in [7,'imported']:
+         if 'QSPEC' in namelistVals and 'CSSPEC' in namelistVals:
+            namelistParam['QSPEC']  = namelistVals['QSPEC']
+            namelistParam['CSSPEC'] = namelistVals['CSSPEC']
+         else:
+            if   'q'   in importedVals:
+                 namelistParam['QSPEC'] = importedVals['q'][0]
+                 namelistParam['CSSPEC'] = 0.0
+            elif 'q0'  in importedVals:
+                 namelistParam['QSPEC'] = importedVals['q0']
+                 namelistParam['CSSPEC'] = 0.0
+            elif 'q95' in importedVals:
+                 namelistParam['QSPEC'] = importedVals['q95']
+                 namelistParam['CSSPEC'] = npy.sqrt(0.95)
 
     namelist = create_namelist(setParam=namelistParam)
        
@@ -1157,16 +1187,17 @@ def update_chease_outputs(**kwargs):
     else:
        it = max(0,len(glob('./chease_*.dat'))-1)
     if os.path.isfile('./chease_namelist'):        os.system('cp ./chease_namelist ./chease_namelist_iter%03d' % it)
-    if os.path.isfile('./ogyropsi.h5'):            os.system('mv ./ogyropsi.h5 chease_iter%03d.h5'             % it)
-    if os.path.isfile('./EQDSK'):                  os.system('mv ./EQDSK EQDSK_iter%03d.IN'                    % it)
-    if os.path.isfile('./EXPEQ'):                  os.system('mv ./EXPEQ EXPEQ_iter%03d.IN'                    % it)
-    if os.path.isfile('./EXPTNZ'):                 os.system('mv ./EXPTNZ EXPTNZ_iter%03d.IN'                  % it)
-    if os.path.isfile('./EXPEQ.OUT'):              os.system('mv ./EXPEQ.OUT EXPEQ_iter%03d.OUT'               % it)
-    if os.path.isfile('./EXPTNZ.OUT'):             os.system('mv ./EXPTNZ.OUT EXPTNZ_iter%03d.OUT'             % it)
-    if os.path.isfile('./EXPEQ_EXPEQ.IN'):         os.system('mv ./EXPEQ_EXPEQ.IN EXPEQ_EXPEQ_iter%03d.IN'     % it)
-    if os.path.isfile('./EQDSK_EXPEQ.IN'):         os.system('mv ./EQDSK_EXPEQ.IN EQDSK_EXPEQ_iter%03d.IN'     % it)
-    if os.path.isfile('./ogyropsi.dat'):           os.system('mv ./ogyropsi.dat chease_iter%03d.dat'           % it)
-    if os.path.isfile('./EQDSK_COCOS_02_POS.OUT'): os.system('mv ./EQDSK_COCOS_02_POS.OUT EQDSK_iter%03d'      % it)
+    if os.path.isfile('./ogyropsi.h5'):            os.system('cp ./ogyropsi.h5 chease_iter%03d.h5'             % it)
+    if os.path.isfile('./EQDSK'):                  os.system('cp ./EQDSK EQDSK_iter%03d.IN'                    % it)
+    if os.path.isfile('./EXPEQ'):                  os.system('cp ./EXPEQ EXPEQ_iter%03d.IN'                    % it)
+    if os.path.isfile('./EXPTNZ'):                 os.system('cp ./EXPTNZ EXPTNZ_iter%03d.IN'                  % it)
+    if os.path.isfile('./EXPEQ.OUT'):              os.system('cp ./EXPEQ.OUT EXPEQ_iter%03d.OUT'               % it)
+    if os.path.isfile('./EXPTNZ.OUT'):             os.system('cp ./EXPTNZ.OUT EXPTNZ_iter%03d.OUT'             % it)
+    if os.path.isfile('./EXPEQ.OUT.TOR'):          os.system('cp ./EXPEQ.OUT.TOR EXPEQ.TOR_iter%03d.OUT'               % it)
+    if os.path.isfile('./EXPEQ_EXPEQ.IN'):         os.system('cp ./EXPEQ_EXPEQ.IN EXPEQ_EXPEQ_iter%03d.IN'     % it)
+    if os.path.isfile('./EQDSK_EXPEQ.IN'):         os.system('cp ./EQDSK_EXPEQ.IN EQDSK_EXPEQ_iter%03d.IN'     % it)
+    if os.path.isfile('./ogyropsi.dat'):           os.system('cp ./ogyropsi.dat chease_iter%03d.dat'           % it)
+    if os.path.isfile('./EQDSK_COCOS_02_POS.OUT'): os.system('cp ./EQDSK_COCOS_02_POS.OUT EQDSK_iter%03d'      % it)
    #   os.system('mv ./EQDSK_COCOS_02_POS.OUT EQDSK_COCOS_02_iter%03d.OUT' % it)
    #if os.path.isfile('./EQDSK_COCOS_12.OUT'):
    #   os.system('mv ./EQDSK_COCOS_12.OUT EQDSK_COCOS_12_iter%03d.OUT'     % it)

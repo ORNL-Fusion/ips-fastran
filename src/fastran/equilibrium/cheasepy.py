@@ -5,18 +5,30 @@
 """
 
 import os
+import re
 import sys
+import glob
+import time
 import shutil
-import efit_io
-import efit_eqdsk
-import cheasefiles
-import cheasewrapper
+import subprocess
 
-from numpy        import sqrt
+from time         import time
+from numpy        import mean,pi,sqrt,array,linspace,argmin,argmax
 from Namelist     import Namelist
-from plasmastate  import plasmastate
-from component import Component
-#from ipsframework import Component
+from datetime     import datetime
+from ipsframework import Component
+
+from scipy.interpolate   import interp1d
+from fastran.equilibrium import efit_io
+from fastran.equilibrium import efit_eqdsk
+from fastran.equilibrium import cheasefiles
+from fastran.equilibrium import cheasetools
+from fastran.equilibrium import cheasewrapper
+
+from fastran.instate                 import instate_io
+from fastran.solver.inmetric_io      import ps_to_inmetric
+from fastran.equilibrium.efit_eqdsk  import readg, writeg, scaleg
+from fastran.plasmastate.plasmastate import plasmastate
 
 class cheasepy(Component):
 
@@ -28,25 +40,21 @@ class cheasepy(Component):
         print('cheasepy.init() started')
         services = self.services
 
-        #--- initial force free equilibrium
-        init_run = int(getattr(self, "INIT_RUN", 0))
-        print('init_run = ', init_run)
-
-        if init_run:
-            print ('INIT CHEASEPY, force free')
-            services.stage_state()
-            cheasefiles.initial_equilibrium()
-            services.update_state()
-
         #--- get shot and time
         self.TOKAMAK = services.get_config_param('TOKAMAK_ID')
-        self.SHOT_ID = services.get_config_param('SHOT_NUMBER')
-        self.TIME_ID = self.TIME_ID if hasattr(self, "TIME_ID") else services.get_config_param('TIME_ID')
+        self.SHOT_ID = int(services.get_config_param('SHOT_NUMBER'))
+        self.TIME_ID = int(self.TIME_ID if hasattr(self, "TIME_ID") else services.get_config_param('TIME_ID'))
 
-        #--- use_instate
-        self.useinstate       = int(getattr(self, "USE_INSTATE", "0"))
-        if self.useinstate in [1,"YES"]: self.useinstate = 1
-        else:                            self.useinstate = 0
+        #--- get plasma state file names
+        self.plasma_state_dir = services.get_config_param('STATE_WORK_DIR')
+
+        self.boundfname       = services.get_config_param('CURRENT_BC')
+        self.eqdskfname       = services.get_config_param('CURRENT_EQDSK')
+        self.statefname       = services.get_config_param('CURRENT_STATE')
+        self.instatefname     = services.get_config_param('CURRENT_INSTATE')
+
+        #--- get path to inputs
+        self.inputfpath = getattr(self,'INPUT_DIR',  '')
 
         print('cheasepy.init() done')
 
@@ -59,82 +67,60 @@ class cheasepy(Component):
         chease_bin = os.path.join(self.BIN_PATH, self.BIN)
         print("CHEASE Binary: %s" % chease_bin)
 
+        #--- generate inefit
+        mode = getattr(self, "PRESSURE", "kinetic")
+
+        setParam = {}
+        setParam['mode'] = mode
+
+        #--- get working directory
+        self.cwd = services.get_working_dir()
+
         #--- stage plasma state files
         services.stage_state()
 
         #--- stage input files
         services.stage_input_files(self.INPUT_FILES)
 
-        #--- get working directory
-        self.cwd = services.get_working_dir()
+        ps_backend  =     getattr(self, 'PS_BACKEND',  'PS')
+        init_run    = int(getattr(self, 'INIT_RUN',    "0"))
+        eq_recycle  = int(getattr(self, 'EQ_RECYCLE',  "0"))
 
-        #--- get plasma state file names
-        self.plasma_state_dir = services.get_config_param('PLASMA_STATE_WORK_DIR')
-        if not self.useinstate:
-           #self.eqdskfname       = services.get_config_param('CURRENT_EQDSK')
-            self.statefname       = services.get_config_param('CURRENT_STATE')
-           #self.fastranfname     = services.get_config_param('CURRENT_FASTRAN')
-            self.boundaryfname    = services.get_config_param('CURRENT_BC')
-           #self.path_to_eqdsk    = os.path.join(self.plasma_state_dir,self.eqdskfname)
-            self.path_to_state    = os.path.join(self.plasma_state_dir,self.statefname)
-           #self.path_to_fastran  = os.path.join(self.plasma_state_dir,self.fastranfname)
-            self.path_to_boundary = os.path.join(self.plasma_state_dir,self.boundaryfname)
-        else:
-            self.instatefname     = services.get_config_param('CURRENT_INSTATE')
-            self.path_to_instate  = os.path.join(self.plasma_state_dir,self.instatefname)
-           #self.eqdskfname       = "g%s.%s" % (self.SHOT_ID,self.TIME_ID)
+        setParam['init_run'] = init_run
 
-        #--- create inefit file
-       #efit_io.io_input_from_state(self.statefname,self.boundaryfname)
-       #inefit  = Namelist("inefit")
-       #rho     = inefit["inefit"]["rho"]     # []
-       #press   = inefit["inefit"]["press"]   #[Pa]
-       #jpar    = inefit["inefit"]["jpar"]    #[A/m^2]
-
-        #--- read inputs
-        self.inputfpath = getattr(self,'INPUT_DIR',  '')
+        #--- read input files
         self.inputfname = getattr(self,'INPUT_FILES','inchease').split()
-
-        if 'inchease' in self.inputfname:
+        if   'inchease0' in self.inputfname:
+              self.incheasefname = 'inchease0'
+        elif 'inchease' in self.inputfname:
             self.incheasefname = 'inchease'
-            self.path_to_inchease = os.path.join(self.inputfpath,self.incheasefname)
-            if os.path.isfile(self.path_to_inchease):
-               inchease = Namelist(self.path_to_inchease, case="lower")
-            else:
-               inchease = {}
         else:
             print("IOError: inchease file is missing. EXIT!"); sys.exit()
 
-        if self.useinstate and 'instate' in self.inputfname:
-            self.instatefname    = self.inputfname[self.inputfname.index('instate')]
-            self.path_to_instate = os.path.join(self.inputfpath,self.instatefname)
-        elif self.useinstate:
-            print("IOError: instate file is missing. EXIT!"); sys.exit()
-
-        #--- create input plasma profiles
-        if not self.useinstate:
-            statedata = cheasefiles.get_plasmastate(statefpath=self.path_to_instate,bcfpath=self.path_to_boundary)
-           #self.iterdbfname = cheasefiles.update_iterdb_from_fastran(self.path_to_fastran,self.TOKAMAK,self.SHOT_ID,self.TIME_ID)
-        elif   self.useinstate:
-            statedata = cheasefiles.get_plasmastate(statefpath=self.path_to_instate)
-           #statedata = cheasefiles.get_plasmastate(statefpath=self.path_to_instate,setParam={'mode':'non-kinetic'})
+        self.path_to_inchease = os.path.join(self.inputfpath,self.incheasefname)
+        if os.path.isfile(self.path_to_inchease):
+           inchease = Namelist(self.path_to_inchease, case="lower")
+        else:
+           inchease = {}
 
         namelistVals = {}
         if 'namelist' in inchease.keys():
             for ikey in inchease['namelist'].keys():
-                namelistVals[ikey.upper()] = inchease['namelist'][ikey][0]
+                if ikey in ['cocos_in','cocos_out']:
+                    namelistVals[ikey] = inchease['namelist'][ikey][0]
+                else:
+                    namelistVals[ikey.upper()] = inchease['namelist'][ikey][0]
 
-        #--- set default for namelist values
-        self.NRBOX = int(float(getattr(self, "NRBOX", "129")))
-        self.NZBOX = int(float(getattr(self, "NZBOX", "129")))
-        self.RELAX = int(float(getattr(self, "RELAX", "0.0")))
+        if   'NRBOX'    not in namelistVals: namelistVals['NRBOX']    = 129
+        if   'NZBOX'    not in namelistVals: namelistVals['NZBOX']    = 129
+        if   'RELAX'    not in namelistVals: namelistVals['RELAX']    = 0.0
+        if   'NFUNRHO'  not in namelistVals: namelistVals["NFUNRHO"]  = 1
+        if   'NRHOMESH' not in namelistVals: namelistVals["NRHOMESH"] = 1
 
-        if   'NRBOX' not in namelistVals:         namelistVals['NRBOX'] = self.NRBOX
-        elif namelistVals['NRBOX'] != self.NRBOX: namelistVals['NRBOX'] = self.NRBOX
-        if   'NZBOX' not in namelistVals:         namelistVals['NZBOX'] = self.NZBOX
-        elif namelistVals['NZBOX'] != self.NZBOX: namelistVals['NZBOX'] = self.NZBOX
-        if   'RELAX' not in namelistVals:         namelistVals['RELAX'] = self.RELAX
-        elif namelistVals['RELAX'] != self.RELAX: namelistVals['RELAX'] = self.RELAX
+        importedVals = {}
+       #if 'imported'  in inchease.keys():
+       #    for ikey in inchease['imported'].keys():
+       #        importedVals[ikey] = inchease['imported'][ikey][0]
 
         srcVals = {}
         if 'sources'  in inchease.keys():
@@ -142,85 +128,160 @@ class cheasepy(Component):
                 srcVals[ikey] = inchease['sources'][ikey][0]
 
         #--- set default for source values
-        self.rhomesh_src   = getattr(self,'rhomesh_src',    'eqdsk')
-        self.current_src   = getattr(self,'current_src',    'eqdsk')
-        self.pressure_src  = getattr(self,'pressure_src',   'eqdsk')
-        self.boundary_src  = getattr(self,'boundary_src',   'eqdsk')
-        self.boundary_type = getattr(self,'boundary_type',   'asis')
-        self.eprofiles_src = getattr(self,'eprofiles_src', 'iterdb')
-        self.iprofiles_src = getattr(self,'iprofiles_src', 'iterdb')
+        if 'rhomesh_src'   not in srcVals: srcVals['rhomesh_src']   = 'imported'
+        if 'current_src'   not in srcVals: srcVals['current_src']   = 'imported'
+        if 'pressure_src'  not in srcVals: srcVals['pressure_src']  = 'imported'
+        if 'boundary_src'  not in srcVals: srcVals['boundary_src']  = 'imported'
+        if 'eprofiles_src' not in srcVals: srcVals['eprofiles_src'] = 'imported'
+        if 'iprofiles_src' not in srcVals: srcVals['iprofiles_src'] = 'imported'
+        if 'boundary_type' not in srcVals: srcVals['boundary_type'] = 'asis'
+       #if init_run:
+       #    if 'boundary_type' not in srcVals: srcVals['boundary_type'] = 'interp'
+       #else:
+       #    if 'boundary_type' not in srcVals: srcVals['boundary_type'] = 'asis'
 
-        if 'rhomesh_src'   not in srcVals: srcVals['rhomesh_src']   = self.rhomesh_src
-        if 'current_src'   not in srcVals: srcVals['current_src']   = self.current_src
-        if 'pressure_src'  not in srcVals: srcVals['pressure_src']  = self.pressure_src
-        if 'boundary_src'  not in srcVals: srcVals['boundary_src']  = self.boundary_src
-        if 'boundary_type' not in srcVals: srcVals['boundary_type'] = self.boundary_type
-        if 'eprofiles_src' not in srcVals: srcVals['eprofiles_src'] = self.eprofiles_src
-        if 'iprofiles_src' not in srcVals: srcVals['iprofiles_src'] = self.iprofiles_src
+        if 'instate' in self.inputfname:
+            self.instatefname = 'instate'
+            self.path_to_instate = os.path.join(self.inputfpath,self.instatefname)
 
-       #if not self.useinstate:
-       #   srcVals['gfname']        = self.eqdskfname
-       #   srcVals['inputpath']     = self.cwd
-       #   srcVals['iterdbfname']   = self.iterdbfname
+        #--- create input plasma profiles
+        if   ps_backend == "PS":
+            if init_run:
+             statedata = cheasefiles.get_plasmastate(statefpath=self.statefname,bcfpath=self.boundfname,setParam=setParam)
+            else:
+             statedata = cheasefiles.get_plasmastate(statefpath=self.statefname,eqfpath=self.eqdskfname,setParam=setParam)
+        elif ps_backend == "INSTATE":
+             statedata = cheasefiles.get_plasmastate(instatefpath=self.instatefname,bcfpath=self.boundfname,setParam=setParam)
 
-        importedVals = {}
-        if 'imported'  in inchease.keys():
-            for ikey in inchease['imported'].keys():
-                importedVals[ikey] = inchease['imported'][ikey][0]
+        mu0 = 4.0e-7*pi
 
-        if 'rhotor' in importedVals:
-            namelistVals["NFUNRHO"]   = 1
-            namelistVals["NRHOMESH"]  = 1
+        importedVals['ITEXP']     = statedata['ip']
+        importedVals['R0EXP']     = statedata['RCTR']
+        importedVals['B0EXP']     = statedata['BCTR']
+        importedVals['rbound']    = statedata['rbound']
+        importedVals['zbound']    = statedata['zbound']
+
+        namelistVals['NIDEAL']    = 6
+        namelistVals['R0EXP']     = statedata['RCTR']
+        namelistVals['B0EXP']     = statedata['BCTR']
+        namelistVals['CURRT']     = statedata['ip']*mu0/statedata['RCTR']/statedata['BCTR'] 
+        namelistVals['PSIBNDEXP'] = 0.0
+
+        importedVals['Te']        = statedata['Te']
+        importedVals['ne']        = statedata['ne']
+        importedVals['Ti']        = statedata['Ti']
+        importedVals['ni']        = statedata['ni']
+        importedVals['nz']        = statedata['nz']
+        importedVals['Zeff']      = statedata['zeff']
+        importedVals['rhotor']    = statedata['rho']
+
+        if init_run == 1:
+            importedVals['ZMAX']     = (max(statedata['zbound']) + min(statedata['zbound'])) / 2.0
+           #importedVals['ZMAX']     = 0.0 # (max(statedata['zbound']) + min(statedata['zbound'])) / 2.0
+
+           #namelistVals['RC']       = 1.0
+           #namelistVals['R0']       = 1.0
+           #namelistVals['RZ0']      = 0.0
+            namelistVals['ZBOXMID']  = 0.0
+            namelistVals['ZBOXLEN']  = statedata['ZLEN']
+            namelistVals['RBOXLFT']  = statedata['RLFT']
+            namelistVals['RBOXLEN']  = statedata['RLEN']
+
+            namelistVals['NCSCAL']   = 1
+            namelistVals['PREDGE']   = statedata['pressure'][-1]
+
+            importedVals['Jprl']     = statedata['jpar']
+            importedVals['pressure'] = statedata['pressure']
+
         else:
-            namelistVals["NFUNRHO"]   = 0
-            namelistVals["NRHOMESH"]  = 0
+          # eqdskdata = cheasefiles.read_eqdsk(fpath=os.path.join(self.plasma_state_dir,self.eqdskfname))
+          # importedVals['ZMAX']     = eqdskdata['ZMAX'] # 0.0 # (max(statedata['zbound']) + min(statedata['zbound'])) / 2.0
+          # namelistVals['ZBOXMID']  = eqdskdata['ZMID']    # 0.0
+          # namelistVals['ZBOXLEN']  = eqdskdata['ZLEN']
+          # namelistVals['RBOXLFT']  = eqdskdata['RLFT']
+          # namelistVals['RBOXLEN']  = eqdskdata['RLEN']
 
-        importedVals['Te']       = statedata['Te']
-        importedVals['ne']       = statedata['ne']
-        importedVals['Ti']       = statedata['Ti']
-        importedVals['ni']       = statedata['ni']
-        importedVals['nz']       = statedata['nz']
-        importedVals['Zeff']     = statedata['zeff']
-        importedVals['Jprl']     = statedata['jpar']
-        importedVals['ZMAX']     = statedata['zlim'][0]
-        importedVals['ITEXP']    = statedata['ip']
-        importedVals['R0EXP']    = statedata['RCTR']
-        importedVals['B0EXP']    = statedata['BCTR']
-        if 'rhotor' in importedVals:
-           importedVals['rhotor']= statedata['rhotor']
-        else:
-           importedVals['rhopsi']= statedata['rhopsi']
-        importedVals['rbound']   = statedata['rbound']
-        importedVals['zbound']   = statedata['zbound']
-        if 'ffprime' in statedata:
-            importedVals['ffprime']  = statedata['ffprime']
-        importedVals['pressure'] = statedata['pressure']
+          # namelistVals['NCSCAL']   = 4
+          # namelistVals['PREDGE']   = cheasetools.interp(eqdskdata['rhopsi'],eqdskdata['pressure'],statedata['rho'])[-1]
 
-        cheasewrapper.init_chease_inputs(srcVals,namelistVals,importedVals)
+          # importedVals['Jprl']     = cheasetools.interp(eqdskdata['rhopsi'],eqdskdata['jtot'],statedata['rho'])
+          # importedVals['pressure'] = cheasetools.interp(eqdskdata['rhopsi'],eqdskdata['pressure'],statedata['rho'])
 
-        #--- run chease
-        task_id = services.launch_task(1, self.cwd, chease_bin, logfile = 'xchease.log')
-        retcode = services.wait_task(task_id)
+            importedVals['ZMAX']     = 0.0 # (max(statedata['zbound']) + min(statedata['zbound'])) / 2.0
+           #namelistVals['RC']       = 1.0
+           #namelistVals['R0']       = 1.0
+           #namelistVals['RZ0']      = 0.0
+            namelistVals['ZBOXMID']  = statedata['ZMID']    # 0.0
+            namelistVals['ZBOXLEN']  = statedata['ZLEN']
+            namelistVals['RBOXLFT']  = statedata['RLFT']
+            namelistVals['RBOXLEN']  = statedata['RLEN']
 
-        if (retcode != 0):
-            raise Exception('Error executing chease')
+            namelistVals['NCSCAL']   = 4
+            namelistVals['PREDGE']   = statedata['pressure'][-1]
+
+            importedVals['Jprl']     = statedata['jpar']
+            importedVals['pressure'] = statedata['pressure']
+
+        icntr  = 0
+        niters = 25
+        err_tol = 1.0e-6
+        pre_err = 0.0
+
+        t1 = time()
+        print("CHEASE Start Time: ",datetime.fromtimestamp(t1))
+        while True:
+            cheasewrapper.init_chease_inputs(srcVals,namelistVals,importedVals)
+            #--- run chease
+            task_id = services.launch_task(1, self.cwd, chease_bin, logfile = 'xchease.log')
+            retcode = services.wait_task(task_id)
+            if (retcode != 0): raise Exception('Error executing chease')
+            istatus = cheasewrapper.update_chease_outputs(suffix=icntr)
+
+            if not init_run: break
+
+            eqdskdata = cheasefiles.read_eqdsk(fpath=glob.glob('EQDSK_COCOS_??_POS.OUT')[0])
+            ip_err = (importedVals['ITEXP'] - eqdskdata['CURNT'])/importedVals['ITEXP']
+
+            if icntr >= niters:                    break
+            elif abs(ip_err) <= err_tol:           break
+            elif abs(pre_err - ip_err) <= 1.0e-6 : break
+            else:
+                pre_err = ip_err
+                icntr += 1
+
+                expeqdata = cheasefiles.read_expeq(fpath='EXPEQ.OUT.TOR')
+                q         = cheasetools.interp(eqdskdata['rhopsi'],eqdskdata['q'],statedata['rho'])
+                Jprl      = expeqdata['Jprl']*importedVals['B0EXP']/importedVals['R0EXP']/mu0
+                pressure  = expeqdata['pressure']*importedVals['B0EXP']**2/mu0
+
+                importedVals['ZMAX']     = expeqdata['zgeom'] * eqdskdata['RCTR']
+                importedVals['Jprl']     = Jprl
+                importedVals['pressure'] = pressure
+
+                namelistVals['NCSCAL']   = 1 
+                namelistVals['QSPEC']    = (1.0 - ip_err) * q[0]
+                namelistVals['CSSPEC']   =  0.0
+
+                if eq_recycle:
+                    namelistVals['NOPT']     = -2 # 1
+                    shutil.copyfile("NOUT","NIN")
+
+        t2 = time()
+        print("CHEASE End Time: ",datetime.fromtimestamp(t2))
+        print("CHEASE Running Wall-Time = %3.3f" % (t2-t1))
 
         #--- update local geqdsk state
-        shutil.copyfile('EQDSK_COCOS_02_POS.OUT', self.eqdskfname)
+        cheaseqfname = glob.glob('EQDSK_COCOS_??_POS.OUT')[0]
+        shutil.copyfile(cheaseqfname, self.eqdskfname)
         
-        #--- update local profile files
-       #if not self.useinstate:
-       #    self.path_to_iterdb = os.path.join(self.plasma_state_dir, "p%s.%s" % (self.SHOT_ID,self.TIME_ID))
-       #    shutil.copyfile(self.iterdbfname, self.path_to_iterdb)
-
         #--- load geqdsk to plasma state file
-        do_update_state = int(getattr(self, "UPDATE_STATE", "0"))
+        do_update_state = int(getattr(self, "UPDATE_STATE", "1"))
 
         if do_update_state:
-            print('CHEASE: LOAD GEQDSK')
             ps = plasmastate('ips',1)
             ps.read(self.statefname)
             ps.load_geqdsk(self.eqdskfname)
+           #ps.load_geqdsk(self.eqdskfname, keep_cur_profile=True, bdy_crat=1.e-6, kcur_option=1, rho_curbrk=0.9, EQ_Code_Info='chease')
             ps.store(self.statefname)
 
         #--- update plasma state files
@@ -235,17 +296,4 @@ class cheasepy(Component):
     def finalize(self, timeid=0):
         print('cheasepy.finalize() called')
 
-   #def __call__(self,Component,**kwargs):
-   #    services = self.services
-   #    try:
-   #        services.call('CHEASEQ', 'init', 0)
-   #    except Exception:
-   #        raise
-   #   #self.init()
-   #   #self.step()
-   #   #self.finalize()
-   #    return 1
-
-#if __name__=='__main__':
-#    cheasepy(Component,config)
 

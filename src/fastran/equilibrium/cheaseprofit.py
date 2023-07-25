@@ -5,12 +5,12 @@ import os
 import sys
 import math
 import warnings
-import cheasefiles
 
 import numpy as npy
 import matplotlib.pyplot as plt
 
 from scipy.optimize import curve_fit
+from fastran.equilibrium import cheasefiles
 
 
 if   sys.version_info.major == 3:
@@ -40,6 +40,9 @@ def fit_profile(rhotor,in_profile,method='stefanikova',setParam={},fitParam={},f
 
 
     if   method.lower()=='stefanikova':
+         lw_bound = [-npy.inf for i in range(8)]
+         up_bound = [ npy.inf for i in range(8)]
+    elif method.lower() == 'fastran':
          lw_bound = [-npy.inf for i in range(8)]
          up_bound = [ npy.inf for i in range(8)]
     elif method.lower()=='groebner':
@@ -106,7 +109,6 @@ def fit_profile(rhotor,in_profile,method='stefanikova',setParam={},fitParam={},f
        fit_plot = setParam['plot']
     else:
        fit_plot = True
-    print(fit_plot)
 
     if norm:
        fmin    = npy.min(in_profile)
@@ -180,6 +182,38 @@ def fit_profile(rhotor,in_profile,method='stefanikova',setParam={},fitParam={},f
             plt.savefig(fname="gfitting.png",dpi=100)
             plt.close()
 
+    elif method.lower()=='fastran':
+         try:
+            popt,pcov = curve_fit(fastran_fit,rhotor,profile,bounds=fit_bounds)
+         except RuntimeError:
+            result = [npy.nan for i in range(8)]
+            popt,pcov = (result,npy.nan)
+
+         fit_parameters               = {}
+         if 'set_alpha'      in globals(): fit_parameters['alpha']      = set_alpha
+         else:                             fit_parameters['alpha']      = popt[0]
+         if 'set_ped_height' in globals(): fit_parameters['ped_height'] = (fmax-fmin)*set_ped_height+fmin
+         else:                             fit_parameters['ped_height'] = (fmax-fmin)*popt[1]+fmin
+         if 'set_ped_sol'    in globals(): fit_parameters['ped_sol']    = (fmax-fmin)*set_ped_sol+fmin
+         else:                             fit_parameters['ped_sol']    = (fmax-fmin)*popt[2]+fmin
+         if 'set_ped_width'  in globals(): fit_parameters['ped_width']  = set_ped_width
+         else:                             fit_parameters['ped_width']  = popt[3]
+         if 'set_ped_mid'    in globals(): fit_parameters['ped_mid']    = set_ped_mid
+         else:                             fit_parameters['ped_mid']    = popt[4]
+         if 'set_cor_exp'    in globals(): fit_parameters['cor_exp']    = set_cor_exp
+         else:                             fit_parameters['cor_exp']    = popt[5]
+         if 'set_cor_width'  in globals(): fit_parameters['cor_width']  = set_cor_width
+         else:                             fit_parameters['cor_width']  = popt[6]
+         if 'set_cor_height' in globals(): fit_parameters['cor_height'] = (fmax-fmin)*set_cor_height+fmin
+         else:                             fit_parameters['cor_height'] = (fmax-fmin)*popt[7]+fmin
+
+         if fit_plot:
+            plt.plot(rhotor,stefanikova_fit(rhotor,*popt),'r',label='CRVFIT')
+            plt.plot(rhotor,profile,'b--',label='EXP')
+            plt.legend()
+            plt.show()
+            plt.close()
+
     if 'set_alpha'      in globals(): del set_alpha
     if 'set_ped_sol'    in globals(): del set_ped_sol
     if 'set_ped_mid'    in globals(): del set_ped_mid
@@ -242,6 +276,67 @@ def groebner_fit(rho,alpha,ped_height,ped_sol,ped_width,ped_mid):
 
     return fprof_ped
 
+def fastran_fit(rho,alpha,ped_mid,ped_width,ped_height,ped_sol,cor_exp,cor_height,cor_width=0):
+    def tanhg(c, x, param=None):
+        """
+          Taken from Osborne pyped routine
+          c[0] = SYMMETRY POINT
+          c[1] = FULL WIDTH
+          c[2] = HEIGHT
+          c[3] = OFFSET
+        """
+        z = 2.*(c[0]-x)/c[1]
+        pz1  = 1.+ c[4]*z + c[5]*z*z + c[6]*z*z*z
+        pz2  = 1.+ c[7]*z
+        mth = 0.5*( ( pz1 + pz2 )*npy.tanh(z) + pz1 - pz2  )
+        y = 0.5*( (c[2]-c[3])*mth + c[2]+c[3] )
+        return y
+
+    def fit_func(c, x, y, func, param=None):
+        rval = func(c,x)-y
+        return rval
+
+    profileFlag=False; refprofFlag=False
+   #if  'profile' in locals() or 'profile' in globals():
+   #    f = profile[:]
+   #    profileFlag=True
+   #else:
+   #    print("No profile in the locals() or globals()?")
+   #    sys.exit()
+
+    if 'set_alpha'      in globals(): alpha      = set_alpha
+    if 'set_ped_sol'    in globals(): ped_sol    = set_ped_sol
+    if 'set_ped_mid'    in globals(): ped_mid    = set_ped_mid
+    if 'set_ped_width'  in globals(): ped_width  = set_ped_width
+    if 'set_ped_height' in globals(): ped_height = set_ped_height
+    if 'set_cor_exp'    in globals(): cor_exp    = set_cor_exp
+    if 'set_cor_width'  in globals(): cor_width  = set_cor_width
+    if 'set_cor_height' in globals(): cor_height = set_cor_height
+
+    ped_lim = ped_mid-ped_width/2.0
+    ped_top = ped_mid-ped_width
+
+    a0 = (ped_height - ped_sol)/(npy.tanh(2.0*(1.0 - ped_mid)/ped_width) - npy.tanh(2.0*(ped_mid - 0.5*ped_width - ped_mid)/ped_width))
+    a1 =  cor_height - ped_sol - a0*(npy.tanh(2.0*(1.0 - ped_mid)/ped_width) - npy.tanh(2.0*(0.0 - ped_mid)/ped_width))
+    if cor_width > 0.0:
+        yy = ped_sol + a0*(npy.tanh(2.0*(1.0 - ped_mid)/ped_width) - npy.tanh(2.0*(ped_top - ped_mid)/ped_width))
+        a1 = (cor_width - yy)/(1.0 - (ped_top/ped_lim)**alpha)**cor_exp
+    y_edge = ped_sol + a0*(npy.tanh(2.0*(1.0 - ped_mid)/ped_width)-npy.tanh(2.0*(rho - ped_mid)/ped_width))
+
+    y_core = npy.zeros(len(rho))
+    if cor_height > 0.0 or cor_width > 0.0:
+        for k,xval in enumerate(rho):
+            if xval < ped_lim: y_core[k] = a1*(1.0 - (xval/ped_lim)**alpha)**cor_exp
+            else:              y_core[k] = 0.0
+
+   #y = y_edge + y_core
+    fprof_ped = y_edge + y_core
+
+   #c0 = [ped_mid, ped_width, ped_height, ped_sol, 0.0, 0.0, 0.0] + 10*[0.0]
+   #c, success = scipy.optimize.leastsq(fit_func, c0, args=(rho, y, tanhg))
+   #fprof_ped = tanhg(c,rho)
+
+    return fprof_ped
 
 def find_pedestal(profilefpath,profileftype,setParam={},**kwargs):
     pedParam = {}
