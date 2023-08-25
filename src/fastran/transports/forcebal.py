@@ -89,9 +89,9 @@ class forcebal(Component):
 
         # -- updating the inforcebal file
         inforcebal = Namelist("inforcebal", case="upper")
-        inforcebal['nr_r']    = [nr_r]
-        inforcebal['time']    = [self.TIME_ID]
-        inforcebal['id_shot'] = [self.SHOT_ID]
+        inforcebal['INFORCEBAL']['NR_R'][0]    = int(nr_r)
+        inforcebal['INFORCEBAL']['TIME'][0]    = float(int(self.TIME_ID))/1000.0
+        inforcebal['INFORCEBAL']['ID_SHOT'][0] = int(self.SHOT_ID)
         inforcebal.write("inforcebal")
 
         #--- run forcebal
