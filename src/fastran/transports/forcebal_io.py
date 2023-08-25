@@ -1875,7 +1875,15 @@ def write_input_files(statefname='',statedata={},shot_id=100001,time_id=10001):
     npy.savetxt(fname,records, fmt='%7.7E', delimiter='\t')
 
     fname = "vt%06d.%05d" % (shot_id,time_id)
-    records = npy.column_stack((statedata['rho'],statedata['omega']))
+    if 'omega' in statedata:
+       records = npy.column_stack((statedata['rho'],statedata['omega']))
+    elif 'omegat' in statedata:
+       records = npy.column_stack((statedata['rho'],statedata['omegat']))
+    elif 'Vrot' in statedata:
+       records = npy.column_stack((statedata['rho'],statedata['Vrot']))
+    else:
+       raise ValueError("FATAL IN FORCEBAL: TOROIDAL VELOCITY IS NOT FOUND IN STATEDATA")
+
     npy.savetxt(fname,records, fmt='%7.7E', delimiter='\t')
 
     return 1

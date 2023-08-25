@@ -4,6 +4,7 @@
  -----------------------------------------------------------------------
 """
 
+import os
 import numpy as npy
 from Namelist import Namelist
 from ipsframework import Component
@@ -24,6 +25,7 @@ class forcebal(Component):
 
     def init(self, timeid=0):
         print('forcebal.init() called')
+        services = self.services
 
         #--- get shot and time
         self.TOKAMAK = services.get_config_param('TOKAMAK_ID')
@@ -44,24 +46,29 @@ class forcebal(Component):
 
     def step(self, timeid=0):
         print('forcebal.init() started')
+        #--- code entry
+        services = self.services
 
-        # -- stage plasma state files
-        self.services.stage_state()
+        #--- get working directory
+        self.cwd = services.get_working_dir()
+
+        #--- stage plasma state files
+        services.stage_state()
+
+        #--- stage input files
+        services.stage_input_files(self.INPUT_FILES)
 
         #--- GENE EXCUTABLE
         forcebal_bin = os.path.join(self.BIN_PATH, self.BIN)
         print("FORCEBAL Binary: %s" % forcebal_bin)
 
-        # -- get plasma state file names
-        cur_state_file = self.services.get_config_param('CURRENT_STATE')
-        cur_eqdsk_file = self.services.get_config_param('CURRENT_EQDSK')
+       ## -- get plasma state file names
+       #cur_state_file = self.services.get_config_param('CURRENT_STATE')
+       #cur_eqdsk_file = self.services.get_config_param('CURRENT_EQDSK')
 
         ps_backend = getattr(self, 'PS_BACKEND', 'PS')
-        if ps_backend == 'INSTATE':
-            cur_instate_file = self.services.get_config_param('CURRENT_INSTATE')
-
-        # -- stage input files
-        self.services.stage_input_files(self.INPUT_FILES)
+       #if ps_backend == 'INSTATE':
+       #    cur_instate_file = self.services.get_config_param('CURRENT_INSTATE')
 
        #print("start dakota update")
        #dakota_io.update_namelist(self, inforcebal)
@@ -72,18 +79,15 @@ class forcebal(Component):
         setParam = {}
         setParam['mode'] = mode
         if   ps_backend == "PS":
-            if init_run:
-             statedata = cheasefiles.get_plasmastate(statefpath=self.statefname,bcfpath=self.boundfname,setParam=setParam)
-            else:
              statedata = cheasefiles.get_plasmastate(statefpath=self.statefname,eqfpath=self.eqdskfname,setParam=setParam)
         elif ps_backend == "INSTATE":
              statedata = cheasefiles.get_plasmastate(instatefpath=self.instatefname,bcfpath=self.boundfname,setParam=setParam)
              statedata['Te'] /= 1.602
              statedata['Ti'] /= 1.602
-        write_from_instate_file(statedata=statedata,shot_id=self.SHOT_ID,time_id=self.TIME_ID)
         nr_r = npy.size(statedata['Te'])
+        forcebal_io.write_input_files(statedata=statedata,shot_id=self.SHOT_ID,time_id=self.TIME_ID)
 
-        # -- idakota binding
+        # -- updating the inforcebal file
         inforcebal = Namelist("inforcebal", case="upper")
         inforcebal['nr_r']    = [nr_r]
         inforcebal['time']    = [self.TIME_ID]
