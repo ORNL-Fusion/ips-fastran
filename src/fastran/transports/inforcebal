@@ -1,0 +1,22 @@
+ $inforcebal
+  l_banana      = .TRUE.
+  l_pfirsch     = .TRUE.
+  l_classical   = .TRUE.
+  l_potato      = .FALSE.
+  l_squeeze     = .FALSE.
+  l_reduce_out  = .FALSE.
+  k_edotb       = 0
+  k_order       = 2
+  cid_device    = 'diiid'
+  cid_mhdeq     = 'efit'
+  cid_run       = 'a02'
+  cid_diag      = 'C'
+  cid_scsion(1) = 'D'
+  id_shot       = 101381
+  nr_r          = 101
+  time          = 2.630
+  amu_b(1)      = 2.0
+  z_b(1)        = 1.0
+  e0_b          = 80.0
+  pmw_b         = 0.0       0.0       0.0
+ $end
