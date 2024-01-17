@@ -22,7 +22,7 @@ class nubeam(Component):
         print('Created %s' % (self.__class__))
 
     def init(self, timeid=0):
-        print('nubeam.init() called')
+        print('>> nubeam.init() started')
 
         # -- get plasma state file name
         cur_state_file = self.services.get_config_param('CURRENT_STATE')
@@ -54,13 +54,21 @@ class nubeam(Component):
 
         innubeam.write('innubeam')
 
-        # -- load nubeam geometry
-        print('load innubeam')
-
+        # -- load to plasma state
         ps = plasmastate('ips', 1)
         ps.read(cur_state_file)
 
+        print('load innubeam')
         ps.load_innubeam()
+
+        print('load difb')
+        difb_0 = innubeam['nbi_model']['difb_0'][0]
+        difb_a = innubeam['nbi_model']['difb_a'][0]
+        difb_in = innubeam['nbi_model']['difb_in'][0]
+        difb_out = innubeam['nbi_model']['difb_out'][0]
+
+        rho_anom = ps['rho_anom'][:]
+        ps['difb_nbi'][:] = difb_a + (difb_0 - difb_a) * (1. - rho_anom**difb_in)**difb_out
 
         ps.update_particle_balance()
         ps.store(cur_state_file)
@@ -81,8 +89,6 @@ class nubeam(Component):
         nubeam_files['NUBEAM_FILES']['PLASMA_STATE_UPDATE'] = ['state_changes.cdf']
         nubeam_files['NUBEAM_FILES']['STEP_NAMELIST'] = ['nubeam_step_input.dat']
         nubeam_files.write('nubeam_step_files.dat')
-
-        innubeam = Namelist('innubeam')
 
         nubeam_init_input = Namelist()
         nubeam_init_input['NBI_INIT'] = innubeam['NBI_INIT']
@@ -121,7 +127,7 @@ class nubeam(Component):
             raise Exception('Error executing command:  mpi_nubeam_comp_exec: init ')
 
     def step(self, timeid=0):
-        print('nubeam.step() started')
+        print('>> nubeam.step() started')
 
         # -- freeze/resume
         if freeze(self, timeid, 'nubeam'): return None
@@ -133,9 +139,6 @@ class nubeam(Component):
         cur_instate_file = self.services.get_config_param('CURRENT_INSTATE')
         cur_state_file = self.services.get_config_param('CURRENT_STATE')
         cur_eqdsk_file = self.services.get_config_param('CURRENT_EQDSK')
-
-        # -- stage input files
-        # self.services.stage_input_files(self.INPUT_FILES)
 
         # -- get work directory
         workdir = self.services.get_working_dir()
@@ -156,36 +159,16 @@ class nubeam(Component):
         print('nstep = ', nstep)
         print('navg  = ', navg)
 
-        difb_0 = innubeam["nbi_model"]["difb_0"][0]
-        difb_a = innubeam["nbi_model"]["difb_a"][0]
-        difb_in = innubeam["nbi_model"]["difb_in"][0]
-        difb_out = innubeam["nbi_model"]["difb_out"][0]
-
+        # -- enforce particle balance
         ps = plasmastate('ips', 1)
         ps.read(cur_state_file)
-
-        rho_anom = ps["rho_anom"][:]
-        ps["difb_nbi"][:] = difb_a + (difb_0 - difb_a)*(1. - rho_anom**difb_in)**difb_out
-
-        ps.update_particle_balance()  # <--------
-
-        if getattr(self, 'TIMEBC', '') == 'INSTATE':
-           print('innubeam updated from instate')
-           instate = Instate(cur_instate_file)
-           nbeam = innubeam['NBI_CONFIG']['NBEAM'][0]
-           for k in range(nbeam):
-              pnbi_k = instate['PNBI_%d'%k][0]
-              print(k, pnbi_k)
-              innubeam['NBI_CONFIG']['PINJA'][k] = pnbi_k
-              ps.load_innubeam()
-
+        ps.update_particle_balance()
         ps.store(cur_state_file)
-
-        self.services.update_state()
+        self.services.update_state() # <------- needed since the merge_current_state will be applied to STATE_WORK_DIR/CURRENT_STATE
 
         nubeam_bin = os.path.join(self.BIN_PATH, self.BIN)
         os.environ['NUBEAM_ACTION'] = 'STEP'
-        os.environ['NUBEAM_REPEAT_COUNT'] = '%dx%f' % (nstep-navg, dt_nubeam)
+        os.environ['NUBEAM_REPEAT_COUNT'] = '%dx%f' % (nstep - navg, dt_nubeam)
         os.environ['STEPFLAG'] = 'TRUE'
         os.environ['NUBEAM_POSTPROC'] = 'summary_test'  # 'FBM_WRITE'
         try:
@@ -239,20 +222,31 @@ class nubeam(Component):
 
             shutil.copyfile('state_changes_0.cdf', 'state_changes.cdf')
 
+
         # -- update plasma state
-        ps = plasmastate('ips', 1)
-        ps.read(cur_state_file)
-        vol = ps["vol"][:]
         self.services.merge_current_state('state_changes.cdf', logfile='log.update_state')
 
-        # --
-        self.services.stage_state()
         ps = plasmastate('ips', 1)
         ps.read(cur_state_file)
-        ps["vol"][:] = vol
         ps.update_particle_balance()
         ps.store(cur_state_file)
+
         self.services.update_state()
+
+        # -- update plasma state
+        # ps = plasmastate('ips', 1)
+        # ps.read(cur_state_file)
+        # vol = ps['vol'][:]
+        # self.services.merge_current_state('state_changes.cdf', logfile='log.update_state')
+ 
+        # # --
+        # self.services.stage_state()
+        # ps = plasmastate('ips', 1)
+        # ps.read(cur_state_file)
+        # ps['vol'][:] = vol
+        # ps.update_particle_balance()
+        # ps.store(cur_state_file)
+        # self.services.update_state()
 
         # -- archive output files
         self.services.stage_output_files(timeid, self.OUTPUT_FILES, save_plasma_state=False)
