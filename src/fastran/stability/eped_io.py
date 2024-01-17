@@ -5,7 +5,7 @@ import netCDF4
 from Namelist import Namelist
 from fastran.util.zinterp import zinterp
 
-from fastran.util.modelprofile import profile_pedestal
+from fastran.util.model_profile import profile_pedestal
 from fastran.util.zprofile import zprofile
 from fastran.util.formula import get_ni
 
