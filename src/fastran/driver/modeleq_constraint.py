@@ -22,7 +22,7 @@ class modeleq_constraint(Component):
         self.services.stage_state()
 
         cur_instate_file = self.services.get_config_param('CURRENT_INSTATE')
-        update_state(timeid, cur_instate_file, nmax_iter=100, const=None)
+        update_state(cur_instate_file, nmax_iter=100)
 
         k_pedestal_constraint = int(getattr(self, "PEDESTAL", "-1"))
         if k_pedestal_constraint >= 0 and timeid >= k_pedestal_constraint:
