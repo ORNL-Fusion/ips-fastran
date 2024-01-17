@@ -58,11 +58,36 @@ class constraint_current(Component):
         elif self.METHOD == 'parabolicJ':
             q0 = float(self.Q0)
             alpha = float(self.ALPHA)
+            jboot = float(getattr(self, 'JBOOT', '1.0'))
 
             print('q0 = ', q0)
             print('alpha = ', alpha)
 
-            constraint_current_io.parabolicJ(cur_state_file, cur_eqdsk_file, rho_jbdry=rho_jbdry, alpha=alpha, q0=q0)
+            constraint_current_io.parabolicJ(cur_state_file, cur_eqdsk_file, rho_jbdry=rho_jbdry, alpha=alpha, q0=q0, jboot=jboot)
+
+        elif self.METHOD == 'hat':
+            q0 = float(self.Q0)
+            jboot = float(getattr(self, 'JBOOT', '1.0'))
+
+            wid_jhat = float(getattr(self, 'WID_JHAT', '0.2'))
+            rho_jhat_min = float(getattr(self, 'RHO_JHAT_MIN', '0.1'))
+            rho_jhat_max = float(getattr(self, 'RHO_JHAT_MAX', '0.6'))
+
+            print('****', wid_jhat)
+            print('****', rho_jhat_min)
+            print('****', rho_jhat_max)
+
+            constraint_current_io.hatJ(
+                cur_state_file,
+                cur_eqdsk_file,
+                rho_jbdry=rho_jbdry,
+                q0=q0,
+                wid_jhat=wid_jhat,
+                rho_jhat_min=rho_jhat_min,
+                rho_jhat_max=rho_jhat_max,
+                niter_max=100,
+                jboot=jboot
+            )
 
         # -- update plasma state files
         self.services.update_state()
