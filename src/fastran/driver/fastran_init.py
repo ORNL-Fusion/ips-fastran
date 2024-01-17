@@ -25,6 +25,11 @@ class fastran_init (Component):
 
     def init(self, timeid=0):
         print('fastran_init.init() called')
+        state_files = self.services.get_config_param('STATE_FILES')
+        print(state_files)
+        for fname in state_files.split():
+            print(f'create null {fname}')
+            open(fname, 'w').close()
 
     def step(self, timeid=0):
         print('fastran_init.step() started')
@@ -37,10 +42,10 @@ class fastran_init (Component):
         print('shot_number =', shot_number)
 
         # -- stage input files
-        input_dir_id = getattr(self, "INPUT_DIR_ID", "")
+        input_dir_id = getattr(self, 'INPUT_DIR_ID', '')
         if input_dir_id:
             self.services.component_ref.config['INPUT_DIR'] = self.services.component_ref.config['INPUT_DIR'] + \
-                "_%d" % int(float(input_dir_id))
+                '_%d' % int(float(input_dir_id))
         print('INPUT_DIR =', self.services.component_ref.config['INPUT_DIR'])
 
         self.services.stage_input_files(self.INPUT_FILES)
@@ -48,7 +53,7 @@ class fastran_init (Component):
         # -- plasma state file names
         cur_state_file = self.services.get_config_param('CURRENT_STATE')
         cur_eqdsk_file = self.services.get_config_param('CURRENT_EQDSK')
-        cur_bc_file = self.services.get_config_param('CURRENT_BC')
+        # cur_bc_file = self.services.get_config_param('CURRENT_BC')
         cur_instate_file = self.services.get_config_param('CURRENT_INSTATE')
 
         # -- set default
@@ -69,12 +74,28 @@ class fastran_init (Component):
 
         # -- expand the instate profiles
         if instate_method == 'model':
-            print("instate_model started")
+            print("instate_method: model")
             instate.set_shape()
             instate.model_profile()
+        elif instate_method == 'trace':
+            print("instate_method: trace")
+            tmin = float(self.services.sim_conf['ITERATION_LOOP']['TMIN'])
+            tmax = float(self.services.sim_conf['ITERATION_LOOP']['TMAX'])
+            dt = float(self.services.sim_conf['ITERATION_LOOP']['DT'])
+            f_timetrace = getattr(self, 'TIMETRACE', 'timetrace.nc')
+            interpolation_method = getattr(self, 'INTERPOLATION_METHOD', 'linear')
+            timenow = tmin
+            instate.set_grid()
+            instate.zeros()
+            instate.from_timetrace(f_timetrace, timenow, interpolation_method=interpolation_method, init=True)
+            #instate.particle_balance()
+        else:
+            instate.zeros()
+            instate.write('instate_test')
 
         instate.particle_balance()
         instate.zeros()
+        instate.scale()
 
         # -- alloc plasma state file
         ps = plasmastate('ips', 1)
@@ -142,7 +163,8 @@ class fastran_init (Component):
             print('end')
 
         # -- load instate to plasma state
-        instate.to_ps(ps)
+        # instate.model_beam = 1
+        instate.to_ps(ps, init=True)
 
         # -- write plasma state file
         ps.store(cur_state_file)
