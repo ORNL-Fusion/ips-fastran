@@ -180,9 +180,59 @@ class Instate():
         self['rlim'] = rlim
         self['zlim'] = zlim
 
-    def from_timetrace(self, itime, extract=["ip", "bt", "rbdry", "zbdry", "ne", "te", "ti", "omega", "zeff"]):
-        #-- extract profile timetrace data
-        pass
+    def from_timetrace(
+            self,
+            f_timetrace,
+            timenow,
+            interpolation_method='linear',
+            init=False
+        ):
+        """
+        extract profile timetrace data
+        """
+        timetrace = Timetrace(f_timetrace, kind=interpolation_method)
+
+        ip = timetrace.get('ip', timenow) * 1.e-6
+        b0 = timetrace.get('bt', timenow)
+        r0 = timetrace.get('r0', timenow)
+        b0 = np.abs(b0)
+        print(f'ip = {ip}, bt={b0}, r0={r0}')
+
+        self['ip'] = [ip]
+        self['b0'] = [b0]
+        self['r0'] = [r0]
+
+        print(f'time slice at t = {timenow}')
+        print('instate from timetrace: update profile')
+
+        for key in ['ne', 'te', 'ti', 'omega', 'nz', 'p_eq', 'j_tot']:
+            if self.default(f'trace_{key}', [1])[0]:
+                print(f'instate from time trace: {key}')
+                self[key] = timetrace.slice(key, timenow, self['rho'])
+        if self.default(f'trace_nz', [1])[0]:
+            print('instate from time trace: nz')
+            self['zeff'] = 30. * np.array(self['nz']) / np.array(self['ne']) + 1.
+
+        nbdry = timetrace.nearest('nbdry', timenow)
+        self['nbdry'] = [nbdry]
+        self['rbdry'] = timetrace.nearest('rbdry', timenow)[:nbdry]
+        self['zbdry'] = timetrace.nearest('zbdry', timenow)[:nbdry]
+
+        for key in ['ne', 'te', 'ti', 'omega', 'nz', 'p_eq', 'j_tot']:
+            if self.default(f'trace_{key}', [1])[0] or init:
+                print(f'instate from time trace: {key}')
+                self[key] = timetrace.slice(key, timenow, self['rho'])
+
+        for key in ['p_rad', 'pe_nb', 'pi_nb', 'wbeam', 'density_beam', 'p_ohm']:
+            if self.default(f'trace_{key}', [0])[0]:
+                print(f'instate from time trace: {key}')
+                self[key] = timetrace.slice(key, timenow, self['rho'])
+
+        if self.default(f'trace_nb', [1])[0]:
+            for key in ['pnbi']:
+                    print(f'instate from time trace: {key}')
+                    self[key] = timetrace.slice_list(key, timenow)
+
 
     def particle_balance(self):
         nrho = self['nrho'][0]
