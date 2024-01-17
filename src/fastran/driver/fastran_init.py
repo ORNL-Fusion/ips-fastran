@@ -183,22 +183,6 @@ class fastran_init (Component):
         # -- write instate file
         instate.write(f_instate)
 
-        # -- boundary condition state file
-        #instate = Namelist(f_instate)["inbc"]
-        #if not instate: instate = Namelist(f_instate)["instate"]
-
-        inbc = Namelist()
-        inbc["inbc"]["r0"] = instate["r0"]
-        inbc["inbc"]["b0"] = instate["b0"]
-        inbc["inbc"]["ip"] = instate["ip"]
-        inbc["inbc"]["nbdry"] = instate["nbdry"]
-        inbc["inbc"]["rbdry"] = instate["rbdry"]
-        inbc["inbc"]["zbdry"] = instate["zbdry"]
-        inbc["inbc"]["nlim"] = instate["nlim"]
-        inbc["inbc"]["rlim"] = instate["rlim"]
-        inbc["inbc"]["zlim"] = instate["zlim"]
-        inbc.write(cur_bc_file)
-
         # -- instate, fastran nc file
         if f_instate:
             shutil.copyfile(f_instate, cur_instate_file)
