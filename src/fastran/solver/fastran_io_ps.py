@@ -100,8 +100,11 @@ def write_input(f_state, f_eqdsk, rdir='.', recycle=0.):
 
     se_pellet = ps.dump_vol_profile(rho, 'rho', 'sn_trans', k=0)*1.e-19
 
-    p_rad = np.zeros(nrho)
-    p_ohm = np.zeros(nrho)
+    # p_rad = np.zeros(nrho)
+    # p_ohm = np.zeros(nrho)
+    p_rad = ps.dump_vol_profile(rho, 'rho_rad', 'prad')*1.e-6
+    p_ohm = ps.dump_vol_profile(rho, 'rho', 'pohme')*1.e-6
+
     pe_ionization = np.zeros(nrho)
     pi_ionization = np.zeros(nrho)
     pi_cx = np.zeros(nrho)
