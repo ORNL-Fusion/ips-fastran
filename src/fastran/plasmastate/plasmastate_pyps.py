@@ -16,7 +16,7 @@ class plasmastate(PlasmaState, plasmastate_base):
     def init(self, f_ps, **keyargs):
         for key in keyargs:
             if key not in ["global_label", "runid", "time"]:
-                keyargs[key] = [ int(nvalue) for nvalue in keyargs[key] ] 
+                keyargs[key] = [ int(nvalue) for nvalue in keyargs[key] ]
 
         nrho = keyargs['nrho'][0]
         nth  = 101
@@ -59,12 +59,13 @@ class plasmastate(PlasmaState, plasmastate_base):
         self["nz"] = 0
 
         self["nrho_gas"] = nrho
-        self["nrho_nbi"] = nrho_nbi 
+        self["nrho_nbi"] = nrho_nbi
         self["nrho_ecrf"] = nrho
         self["nrho_icrf"] = nrho
         self["nrho_lhrf"] = nrho
         self["nrho_fus"] = nrho
         self["nrho_anom"] = nrho
+        self["nrho_rad"] = nrho
 
         self["nicrf_src"] = int(nicrf_src)
         self["nlhrf_src"] = int(nlhrf_src)
@@ -121,6 +122,7 @@ class plasmastate(PlasmaState, plasmastate_base):
         self["rho_lhrf"] = rho
         self["rho_fus"] = rho
         self["rho_anom"] = rho
+        self["rho_rad"] = rho
 
     def load_innubeam(self, fn="innubeam"):
         innubeam = Namelist(fn)

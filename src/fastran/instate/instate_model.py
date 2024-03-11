@@ -7,7 +7,7 @@ from numpy import *
 from Namelist import Namelist
 from fastran.util.fastranutil import namelist_default
 from fastran.util.zinterp import zinterp
-from fastran.util.modelprofile import profile_pedestal
+from fastran.util.model_profile import profile_pedestal
 from fastran.util.formula import get_ni, mu0
 from fastran.util.shape_io import boundaryShape, set_shape
 

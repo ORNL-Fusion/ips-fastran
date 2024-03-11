@@ -2,6 +2,7 @@
 # efit eqdsk
 #-----------------------------------------------------------------------------#
 from numpy import *
+from scipy.interpolate import RectBivariateSpline
 
 def line2vec(line, nlen=16):
     ncol = len(line)//nlen
@@ -308,3 +309,17 @@ def scaleg(geq, R0=1., B0=1.):
     geq["zlim"  ]  = geq["zlim"]*R0
 
     print(geq["ssimag"], geq["ssibry"], geq["psirz" ].min())
+
+def spline_geqdsk(fn_geqdsk):
+    #-- read geqdsk
+    g = readg(fn_geqdsk)
+
+    nx = g["nw"]
+    ny = g["nh"]
+    x = linspace(g["rgrid"], g["rgrid"] + g["xdim"], nx)
+    y = linspace(g["zmid"] - 0.5*g["ydim"], g["zmid"] + 0.5*g["ydim"], ny)
+    psi = g["psirz"].transpose()  # EFIT psi = poloidal magnetic flux per radian
+
+    psi_spl = RectBivariateSpline(x, y, psi)
+
+    return psi_spl

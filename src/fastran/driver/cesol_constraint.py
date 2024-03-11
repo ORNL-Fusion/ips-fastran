@@ -9,7 +9,7 @@ from ipsframework import Component
 import numpy as np
 from Namelist import Namelist
 from fastran.plasmastate.plasmastate import plasmastate
-from fastran.util.modelprofile import profile_pedestal
+from fastran.util.model_profile import profile_pedestal
 from fastran.util.zinterp import zinterp
 from fastran.formula import get_ni
 

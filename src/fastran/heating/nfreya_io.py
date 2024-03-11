@@ -98,6 +98,7 @@ def set_default():
     return inone
 
 def write_inputfiles(f_state, f_eqdsk, f_infreya, dir_data=''):
+    print('nfreya: generate input from ps')
     ps = plasmastate('ips', 1)
     ps.read(f_state)
 
@@ -261,8 +262,8 @@ def write_inputfiles_instate(f_instate, f_eqdsk, f_infreya, dir_data=''):
     inone["namelis1"]["zfrac"] = [1.0]
     inone["namelis1"]["nimp"] = [1]
     inone["namelis1"]["namei"] = ['c']
-    inone["namelis1"]["nneu"] = [1] 
-    inone["namelis1"]["namen"] = ['d'] 
+    inone["namelis1"]["nneu"] = [1]
+    inone["namelis1"]["namen"] = ['d']
 
     inone["namelis1"]["nj"] = [nrho]
     inone["namelis1"]["njene"] = [nrho]

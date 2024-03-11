@@ -48,10 +48,10 @@ class efit(Component):
         self.user_inputs = {}
         self.user_inputs['scale'] = input_default(
             self, key='SCALE', default='disabled', alias=['SCALE_GS'], maps={'0':'disabled', '1':'enabled'})
-        self.user_inputs['R0_scale'] = float(input_default(
-            self, key='R0_SCALE', default='1.7', alias=['R0_scale'], maps={})) # default to D3D EFIT
-        self.user_inputs['B0_scale'] = float(input_default(
-            self, key='B0_SCALE', default='2.0', alias=['B0_scale'], maps={})) # default to D3D EFIT
+        self.user_inputs['r0_scale'] = float(input_default(
+            self, key='R0_SCALE', default='1.7', alias=['r0_scale'], maps={})) # default to D3D EFIT
+        self.user_inputs['b0_scale'] = float(input_default(
+            self, key='B0_SCALE', default='2.0', alias=['b0_scale'], maps={})) # default to D3D EFIT
 
         # -- get shot and time
         ishot, itime = self._get_shot_time()
@@ -99,18 +99,21 @@ class efit(Component):
 
         # -- generate inefit
         f_inefit = 'inefit'
+        f_inefit_prev = 'inefit0'
 
         model_pressure = input_default(
             self, key='PRESSURE', default='kinetic', alias=[], maps={})
 
-        profile_relax = input_default(
-            self, key='PROFILE_RELAX', default='disabled', alias=[], maps={'0':'disabled', '1':'enabled'})
+        relax_profile = input_default(
+            self, key='RELAX_PROFILE', default='0', alias=[], maps={}, type='float')
 
-        betan_target = float( input_default(
-            self, key='BETAN_TARGET', default='-1.0', alias=[], maps={}) )
+        relax_metric = input_default(
+            self, key='RELAX_METRIC', default='0.5', alias=[], maps={}, type='float')
 
-        if profile_relax == 'enabled' and timeid >= 0:
-            print('PROFILE RELAX CALLED')
+        betan_target = input_default(
+            self, key='BETAN_TARGET', default='-1.0', alias=[], maps={}, type='float')
+
+        if relax_profile > 0 and timeid >= 0:
             shutil.copyfile(f_inefit, f_inefit+'0')
 
         if ps_backend == 'PS' and use_instate == 0:
@@ -122,18 +125,18 @@ class efit(Component):
             efit_io.io_input_from_instate(f_instate=cur_instate_file, f_inefit=f_inefit, model_pressure=model_pressure)
             nrho = instate['instate']['nrho'][0]
 
-        if profile_relax == 'enabled' and timeid > 0:
-            print('PROFILE RELAX CALLED')
-            inefit0 = Namelist(f_inefit+'0')
+        if relax_profile > 0 and timeid > 0:
+            print(f'relax_profile = {relax_profile}')
+            inefit0 = Namelist(f_inefit_prev)
             inefit = Namelist(f_inefit)
             for key in ['press', 'jpar']:
-                inefit['inefit'][key] = 0.5*(array(inefit0['inefit'][key]) + array(inefit['inefit'][key]))
+                inefit['inefit'][key] = 0.5 * (array(inefit0['inefit'][key]) + array(inefit['inefit'][key]))
             inefit.write(f_inefit)
 
         # -- scaled GS
         if self.user_inputs['scale'] == 'enabled':
-            Rs = instate['instate']['r0'][0]/self.user_inputs['R0_scale']
-            Bs = instate['instate']['b0'][0]/self.user_inputs['B0_scale']
+            Rs = instate['instate']['r0'][0] / self.user_inputs['r0_scale']
+            Bs = instate['instate']['b0'][0] / self.user_inputs['b0_scale']
         else:
             Rs = 1.
             Bs = 1.
@@ -192,12 +195,9 @@ class efit(Component):
                 if k > 0:
                     inmetric_prev = inmetric
                 inmetric = ps_to_inmetric(ps, r0, b0, ip)
-                inmetric_keys = [
-                    'volp', 'ipol', 'g11', 'g22', 'g33', 'gradrho', 'area', 'rminor', 'rmajor',
-                    'shift', 'kappa', 'delta', 'pmhd', 'qmhd',
-                    'er', 'nc1', 'hfac1', 'hfac2', 'psi', "vol", "gr2i", "bp2"]
-                if k > 0:
-                    print('inmtric under-relax')
+                if k > 0 and relax_metric > 0:
+                    print(f'inmtric under-relax: {relax_metric}')
+                    inmetric_keys = ['psi', 'rhob', 'ipol', 'vol', 'gr2i']
                     for key in inmetric_keys:
                         inmetric['inmetric'][key] = 0.5*(array(inmetric_prev['inmetric'][key]) + array(inmetric['inmetric'][key]))
 
@@ -316,9 +316,9 @@ class efit(Component):
         efit_io.fixbdry_kfile_init(ishot, itime, f_inefit='inefit')
 
         if self.user_inputs['scale'] == 'enabled':
-            print('scaled ', self.user_inputs['R0_scale'], self.user_inputs['B0_scale'])
-            Rs = instate['r0'][0]/self.user_inputs['R0_scale']
-            Bs = instate['b0'][0]/self.user_inputs['B0_scale']
+            print('scaled ', self.user_inputs['r0_scale'], self.user_inputs['b0_scale'])
+            Rs = instate['r0'][0]/self.user_inputs['r0_scale']
+            Bs = instate['b0'][0]/self.user_inputs['b0_scale']
             efit_io.scale_kfile(ishot, itime, Rs=Rs, Bs=Bs)
 
         f = open('log.efit', 'w')
@@ -332,7 +332,9 @@ class efit(Component):
         if cur_eqdsk_file != 'g%06d.%05d' % (ishot, itime):
             shutil.copyfile('g%06d.%05d' % (ishot, itime), cur_eqdsk_file)
 
-        if ps_backend == 'PS':
+        ps_update = getattr(self, 'PS_UPDATE', 'disabled')
+        print('ps_update', ps_update)
+        if ps_backend == 'PS' or ps_update == 'enabled':
             ps = plasmastate('ips', 1)
             ps.read(cur_state_file)
             ps.load_geqdsk(cur_eqdsk_file)

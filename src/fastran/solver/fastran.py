@@ -40,6 +40,12 @@ class fastran(Component):
         cur_eqdsk_file = self.services.get_config_param('CURRENT_EQDSK')
         cur_instate_file = self.services.get_config_param('CURRENT_INSTATE')
 
+        update_next = getattr(self, 'UPDATE_NEXT', 'disabled')
+        print(f'update_next = {update_next}')
+        if update_next == 'enabled':
+            next_state_file = self.services.get_config_param('NEXT_STATE')
+            next_instate_file = self.services.get_config_param('NEXT_INSTATE')
+
         ps_backend = getattr(self, 'PS_BACKEND', 'pyps').lower()
         update_instate = getattr(self, 'UPDATE_INSTATE', 'enabled').lower()
 
@@ -51,23 +57,28 @@ class fastran(Component):
             shutil.copyfile(self.INFASTRAN, 'infastran')
 
         infastran = Namelist('infastran')
-        for key in ['SOLVE_NE', 'SOLVE_TE', 'SOLVE_TI', 'SOLVE_V', 'RELAX_J']:
-            iupdate = int(getattr(self, 'UPDATE_%s' % key, -1))
-            if self.icalled >= iupdate and iupdate >= 0:
-                if infastran['infastran'][key][0] == 1:
-                    infastran['infastran'][key][0] = 0
-                else:
-                    infastran['infastran'][key][0] = 1
-                print('UPDATE_%s at %d : %d' % (key, self.icalled, infastran['infastran'][key][0]))
+        update_infastran = getattr(self, 'UPDATE_INFASTRAN', '')
+        if update_infastran:
+            print('UPDATE_INFASTRAN', update_infastran)
+            try:
+                key, timeid_update, switch_update = update_infastran.split(':')
+            except:
+                raise Exception('Invalid UPDATE_INFASTRAN format', update_infastran)
+            if int(timeid_update) <= int(str(timeid).split('_')[-1]):
+                print(f'INFASTARN {key} updated', int(switch_update))
+                infastran['infastran'][key] = [int(switch_update)]
         infastran.write('infastran')
 
         # -- generate fastran input
+        recycle = float(getattr(self, 'RECYCLE', "0"))
+        print('recycle =', recycle)
+
         if ps_backend == 'instate':
             fastran_io_instate.write_input(cur_instate_file)
         else:
-            recycle = float(getattr(self, 'RECYCLE', "0"))
-            print('recycle =', recycle)
-            fastran_io_ps.write_input(cur_state_file, cur_eqdsk_file, recycle=recycle)
+            fastran_io_ps.write_input(cur_state_file, cur_eqdsk_file, f_inprof='inprof', recycle=recycle)
+            if update_next == 'enabled':
+                fastran_io_ps.write_input(next_state_file, cur_eqdsk_file, f_inprof='inprof1', recycle=recycle)
 
         # -- run fastran
         fastran_bin = os.path.join(self.BIN_PATH, self.BIN)
@@ -116,7 +127,7 @@ class fastran(Component):
                 fni_target=fni,
                 relax_ip=relax_ip)
 
-        if update_instate == 'enabled' and ps_backend == 'pyps':
+        if ps_backend == 'pyps' and update_instate == 'enabled':
             print('updating instate')
             instate = Instate(cur_instate_file)
             ps = plasmastate('ips', 1)
