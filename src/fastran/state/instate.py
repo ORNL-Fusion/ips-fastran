@@ -185,7 +185,8 @@ class Instate():
             f_timetrace,
             timenow,
             interpolation_method='linear',
-            init=False
+            init=False,
+            force=[]
         ):
         """
         extract profile timetrace data
@@ -206,22 +207,23 @@ class Instate():
         print('instate from timetrace: update profile')
 
         for key in ['ne', 'te', 'ti', 'omega', 'nz', 'p_eq', 'j_tot']:
-            if self.default(f'trace_{key}', [1])[0]:
+            if self.default(f'trace_{key}', [1])[0] or key in force or init:
                 print(f'instate from time trace: {key}')
                 self[key] = timetrace.slice(key, timenow, self['rho'])
-        if self.default(f'trace_nz', [1])[0]:
+        if self.default(f'trace_nz', [1])[0] or init:
             print('instate from time trace: nz')
             self['zeff'] = 30. * np.array(self['nz']) / np.array(self['ne']) + 1.
+            # self['zeff'][-5:] = self['zeff'][-5] # < ========================================= 
 
         nbdry = timetrace.nearest('nbdry', timenow)
         self['nbdry'] = [nbdry]
         self['rbdry'] = timetrace.nearest('rbdry', timenow)[:nbdry]
         self['zbdry'] = timetrace.nearest('zbdry', timenow)[:nbdry]
 
-        for key in ['ne', 'te', 'ti', 'omega', 'nz', 'p_eq', 'j_tot']:
-            if self.default(f'trace_{key}', [1])[0] or init:
-                print(f'instate from time trace: {key}')
-                self[key] = timetrace.slice(key, timenow, self['rho'])
+        # for key in ['ne', 'te', 'ti', 'omega', 'nz', 'p_eq', 'j_tot']:
+        #    if self.default(f'trace_{key}', [1])[0] or init:
+        #        print(f'instate from time trace: {key}')
+        #        self[key] = timetrace.slice(key, timenow, self['rho'])
 
         for key in ['p_rad', 'pe_nb', 'pi_nb', 'wbeam', 'density_beam', 'p_ohm']:
             if self.default(f'trace_{key}', [0])[0]:
@@ -233,6 +235,10 @@ class Instate():
                     print(f'instate from time trace: {key}')
                     self[key] = timetrace.slice_list(key, timenow)
 
+        if self.default(f'trace_ec', [1])[0]:
+            for key in ['pech']:
+                    print(f'instate from time trace: {key}')
+                    self[key] = timetrace.slice_list(key, timenow)
 
     def particle_balance(self):
         nrho = self['nrho'][0]
@@ -422,6 +428,61 @@ class Instate():
             for i in range(nrho):
                 self['wbeam'][i] = 1.5 * 1.602e3 * self['density_beam'][i] * self['tbeami'][i] * 1.e-6
 
+#    def to_ps_profile(self, ps, init=False):
+#        # ne[0] = ne[1]
+#        # te[0] = te[1]
+#        # ti[0] = ti[1]
+#        # omega[0] = omega[1]
+#        # zeff[0] = zeff[1]
+#
+#        #-- density
+#        if self.default('trace_ne', [1])[0]:
+#            ps['ns'][0,:] = 1.e19*ps.node2cell(self['ne'])
+#            for k in range(self['n_ion'][0]):
+#                ps['ns'][k + 1, :] = 1.e19*ps.node2cell(self['density_ion_{}'.format(k)])
+#            for k in range(self['n_imp'][0]):
+#                ps['ns'][k + self['n_ion'][0] + 1,:] = 1.e19*ps.node2cell(self['density_imp_{}'.format(k)])
+#            ps['ni'][:] = 1.e19*ps.node2cell(self['density_th'])
+#
+#        #-- temperature
+#        if self.default('trace_te', [1])[0]:
+#            ps['Ts'][0,:] = ps.node2cell(self['te'])
+#
+#        if self.default('trace_ti', [1])[0]:
+#            for k in range(self['n_ion'][0]):
+#                ps['Ts'][k + 1, :] = ps.node2cell(self['ti'])
+#            for k in range(self['n_imp'][0]):
+#                ps['Ts'][k + self['n_ion'][0] + 1, :] = ps.node2cell(self['ti'])
+#            ps['Ti'][:] = ps.node2cell(self['ti'])
+#
+#        #-- zeff
+#        if self.default('trace_nz', [1])[0]:
+#            ps['Zeff'][:] = ps.node2cell(self['zeff'])
+#            ps['Zeff_th'][:] = ps.node2cell(self['zeff'])
+#
+#        #-- rotation
+#        if self.default('trace_omega', [1])[0]:
+#            ps['omegat'][:] = ps.node2cell(self['omega'])
+#
+#        #-- radiation
+#        if self.default('trace_p_rad', [1])[0]:
+#            ps.load_vol_profile(self['rho'], 1.e6 * self['p_rad'], 'rho_rad', 'prad')
+#
+#        #-- ohmic heating (to be removed) 
+#        if self.default('trace_p_ohm', [1])[0]:
+#            ps.load_vol_profile(self['rho'], 1.e6 * self['p_ohm'], 'rho', 'pohme')
+#
+#        #-- MHD equilibrium current
+#        if self.default('trace_j_tot', [1])[0] or init:
+#            r0 = self['r0'][0]
+#            b0 = self['b0'][0]
+#            self['j_tot'][0] = self['j_tot'][1]
+#            ps.load_j_parallel(self['rho'], 1.e6 * self['j_tot'], 'rho_eq', 'curt', r0, b0, tot=True)
+#
+#        #-- MHD equilibrium pressure
+#        if self.default('trace_p_eq', [1])[0] or init:
+#            ps['P_eq'][:] = self['p_eq']
+
     def to_ps_profile(self, ps, init=False):
         # ne[0] = ne[1]
         # te[0] = te[1]
@@ -430,7 +491,7 @@ class Instate():
         # zeff[0] = zeff[1]
 
         #-- density
-        if self.default('trace_ne', [1])[0]:
+        if self.default('update_ps_ne', [1])[0]:
             ps['ns'][0,:] = 1.e19*ps.node2cell(self['ne'])
             for k in range(self['n_ion'][0]):
                 ps['ns'][k + 1, :] = 1.e19*ps.node2cell(self['density_ion_{}'.format(k)])
@@ -439,10 +500,10 @@ class Instate():
             ps['ni'][:] = 1.e19*ps.node2cell(self['density_th'])
 
         #-- temperature
-        if self.default('trace_te', [1])[0]:
+        if self.default('update_ps_te', [1])[0]:
             ps['Ts'][0,:] = ps.node2cell(self['te'])
 
-        if self.default('trace_ti', [1])[0]:
+        if self.default('update_ps_ti', [1])[0]:
             for k in range(self['n_ion'][0]):
                 ps['Ts'][k + 1, :] = ps.node2cell(self['ti'])
             for k in range(self['n_imp'][0]):
@@ -450,32 +511,33 @@ class Instate():
             ps['Ti'][:] = ps.node2cell(self['ti'])
 
         #-- zeff
-        if self.default('trace_nz', [1])[0]:
+        if self.default('update_nz', [1])[0]:
             ps['Zeff'][:] = ps.node2cell(self['zeff'])
             ps['Zeff_th'][:] = ps.node2cell(self['zeff'])
 
         #-- rotation
-        if self.default('trace_omega', [1])[0]:
+        if self.default('update_omega', [1])[0]:
             ps['omegat'][:] = ps.node2cell(self['omega'])
 
         #-- radiation
-        if self.default('trace_p_rad', [1])[0]:
+        if self.default('update_p_rad', [1])[0]:
             ps.load_vol_profile(self['rho'], 1.e6 * self['p_rad'], 'rho_rad', 'prad')
 
         #-- ohmic heating (to be removed) 
-        if self.default('trace_p_ohm', [1])[0]:
+        if self.default('update_p_ohm', [1])[0]:
             ps.load_vol_profile(self['rho'], 1.e6 * self['p_ohm'], 'rho', 'pohme')
 
         #-- MHD equilibrium current
-        if self.default('trace_j_tot', [1])[0] or init:
+        if self.default('update_j_tot', [1])[0] or init:
             r0 = self['r0'][0]
             b0 = self['b0'][0]
             self['j_tot'][0] = self['j_tot'][1]
             ps.load_j_parallel(self['rho'], 1.e6 * self['j_tot'], 'rho_eq', 'curt', r0, b0, tot=True)
 
         #-- MHD equilibrium pressure
-        if self.default('trace_p_eq', [1])[0] or init:
+        if self.default('update_p_eq', [1])[0] or init:
             ps['P_eq'][:] = self['p_eq']
+
 
     def to_ps_nb(self, ps):
         nrho = self['nrho'][0]
@@ -512,8 +574,8 @@ class Instate():
     def to_ps_pnbi(self, ps):
         ps['power_nbi'][:] = self['pnbi']
 
-    def to_ps(self, ps, **keyarg):
-        self.to_ps_profile(ps, init=keyarg['init'])
+    def to_ps(self, ps, init=False):
+        self.to_ps_profile(ps, init)
         self.to_ps_nb(ps)
         self.to_ps_rf(ps)
 
