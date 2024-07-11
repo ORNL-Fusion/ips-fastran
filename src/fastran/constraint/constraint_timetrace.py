@@ -61,7 +61,7 @@ class constraint_timetrace(Component):
 
         t0 = timenow
         t1 = timenow + dt
-        print (f't0, t1 = {t0, t1}')
+        print(f't0, t1 = {t0, t1}')
 
         instate['t0'] = [t0]
         instate['t1'] = [t1]
@@ -74,19 +74,29 @@ class constraint_timetrace(Component):
             for key in exclude.split():
                 instate[f'trace_{key}'] = [0]
 
-        instate.from_timetrace(f_timetrace, timenow, interpolation_method='linear')
+        instate.from_timetrace(
+            f_timetrace,
+            timenow,
+            interpolation_method='linear')
         instate.particle_balance()
         instate.scale()
 
         instate.to_ps_profile(ps)
-        if int(getattr(self, 'TRACE_NB', '0')): instate.to_ps_pnbi(ps) 
-        # if int(getattr(self, 'TRACE_NB', '0')): instate.to_ps_nb(ps) 
+        if int(getattr(self, 'TRACE_NB', '0')):
+            instate.to_ps_pnbi(ps)
+        # if int(getattr(self, 'TRACE_NB', '0')): instate.to_ps_nb(ps)
         instate.write(cur_instate_file)
         ps.store(cur_state_file)
 
         # -- next state
         if update_next == 'enabled':
-            instate.from_timetrace(f_timetrace, timenow + dt, interpolation_method='linear')
+            instate.from_timetrace(
+                f_timetrace,
+                timenow + dt,
+                interpolation_method='linear',
+                force=[
+                    'te',
+                    'ti'])
             instate.particle_balance()
             instate.scale()
 
@@ -99,7 +109,8 @@ class constraint_timetrace(Component):
         self.services.update_state()
 
         # -- archive output files
-        self.services.stage_output_files(timeid, self.OUTPUT_FILES, save_plasma_state=False)
+        self.services.stage_output_files(
+            timeid, self.OUTPUT_FILES, save_plasma_state=False)
 
     def finalize(self, timeid=0):
         print('>>> constraint_timetrace.finalize() called')
