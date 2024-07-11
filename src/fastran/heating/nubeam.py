@@ -3,7 +3,6 @@
  nubeam component for steady-state solution
  -----------------------------------------------------------------------
 """
-
 import os
 import shutil
 import numpy as np
@@ -11,9 +10,11 @@ import netCDF4
 from Namelist import Namelist
 from fastran.plasmastate.plasmastate import plasmastate
 from ipsframework import Component
+from fastran.heating import nubeam_io
 from fastran.util import dakota_io
 from fastran.state.instate import Instate
 from fastran.util.fastranutil import freeze
+from fastran.util.input_default import input_default
 
 
 class nubeam(Component):
@@ -51,6 +52,16 @@ class nubeam(Component):
         print('start dakota update')
         dakota_io.update_namelist(self, innubeam, section='nbi_config')
         dakota_io.update_namelist(self, innubeam)
+
+        # -- from instate
+        if int(getattr(self, 'TRACE', '0')):
+            print('update NB:workdir power from instate')
+            cur_instate_file = self.services.get_config_param('CURRENT_INSTATE')
+            instate = Instate(cur_instate_file)
+            pnbi = instate['pech'] 
+            intoray['intoray']['rfpow'] = pech
+                
+        intoray.write("intoray")
 
         innubeam.write('innubeam')
 
@@ -230,6 +241,11 @@ class nubeam(Component):
         ps.read(cur_state_file)
         ps.update_particle_balance()
         ps.store(cur_state_file)
+
+        # -- dump to instate
+        update_instate = input_default(self, key='UPDATE_INSTATE', default='disabled', alias=[], maps={'0':'disabled', '1':'enabled'})
+        if update_instate:
+           nubeam_io.update_instate(cur_state_file, cur_instate_file) 
 
         self.services.update_state()
 
