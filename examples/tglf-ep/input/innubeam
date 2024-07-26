@@ -1,0 +1,92 @@
+Based on
+JM 11/08/2009
+ITER Off-axis beam benchmark case
+
+&NUBEAM_RUN
+
+  DT_NUBEAM = 0.050
+  NSTEP = 40
+  NAVG  = 10
+
+/
+
+&NBI_CONFIG
+
+  NBEAM      =  1
+
+  NLCO(1)    = .T.
+  ABEAMA(1)  = 2.0	
+  XZBEAMA(1) = 1.0
+  
+  EINJA(1)   = 0.75E+06
+  PINJA(1)   = 23.3e6
+  FFULLA(1)  = 1.0
+  FHALFA(1)  = 0.0
+   
+  NBSHAPA(1) = 1
+  BMWIDRA(1) = 28.0
+  BMWIDZA(1) = 60.0
+  
+  NBAPSHA(1) = 1 
+  RAPEDGA(1) = 29.2
+  XZPEDGA(1) = 61.2
+  xrapoffa(1) = 0.0
+  xzapoffa(1) = 0.0
+  
+  RTCENA(1) =  400.0
+  XLBTNA(1) =  3168.0
+  XYBSCA(1) =  0.0  
+  
+  XLBAPA(1) =  2275.0
+  XYBAPA(1) =  0.0
+  
+  DIVRA(1)  =  5.0e-3
+  DIVZA(1)  =  5.0e-3
+  FOCLZA(1) =  1.0e6
+  FOCLRA(1) =  1.0e6
+
+  nbapsh2(1) = 0
+  xlbapa2(1) = 0.0
+  rapedg2(1) = 0.0
+  xzpedg2(1) = 0.0
+  xrapoff2(1) = 0.0
+  xzapoff2(1) = 0.0
+/
+
+&NBI_MODEL
+
+  DIFB_0 = 0.0
+  DIFB_A = 0.0
+  DIFB_IN = 2.0
+  DIFB_OUT = 1.0
+  NKDIFB = 3
+/
+
+&NBI_INIT
+
+  WGHTA    = 20.0
+  NZONES   = 20
+  NZONE_FB = 10
+  NZNBMA   = 50
+  NZNBME   = 100
+  NPTCLS   = 3000
+  NPTCLF   = 1000
+  NDEP0    = 1000
+  NSIGEXC  = 1
+  NMCURB   = 4 
+  NSEED    = 410338673
+
+  NLTEST_OUTPUT = 0
+  NSDBGB = 2
+/
+
+&NBI_UPDATE
+
+  NLTEST_OUTPUT = 0
+  NBBCX_BB = 0
+	 
+! NPTCLS = 5000   ! #MC BEAM IONS
+! NPTCLF = 5000   ! #MC FUSION PRODUCT IONS
+! NDEP0  = 5000
+
+/
