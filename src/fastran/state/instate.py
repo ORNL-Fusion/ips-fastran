@@ -160,6 +160,9 @@ class Instate():
                                a0, eps, kapu, kapl, delu, dell,
                                zetaou, zetaiu, zetail, zetaol, zoffset,
                                upnull=True, lonull=True, npts=nbdry, doPlot=False)
+
+            if np.isnan(zb[0]): zb[0] = 0.0 # need to debug Luce shape routine
+            
             rb = np.append(rb, rb[0])
             zb = np.append(zb, zb[0])
 
