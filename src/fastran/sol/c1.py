@@ -55,11 +55,13 @@ class c1(Component):
         if int(getattr(self, 'SERIAL', '0')) == 1:
             print('c1, subprocess')
             logfile = open('c1.log', 'w')
-            retcode = subprocess.call([c1_bin], stdout=logfile, stderr=logfile, shell=True)
+            retcode = subprocess.call(
+                [c1_bin], stdout=logfile, stderr=logfile, shell=True)
             logfile.close()
         else:
             cwd = self.services.get_working_dir()
-            task_id = self.services.launch_task(1, cwd, c1_bin, logfile='c1.log')
+            task_id = self.services.launch_task(
+                1, cwd, c1_bin, logfile='c1.log')
             retcode = self.services.wait_task(task_id)
         if (retcode != 0):
             raise Exception('Error executing: c1')
@@ -71,12 +73,13 @@ class c1(Component):
         self.services.update_state()
 
         # -- archive output files
-        self.services.stage_output_files(timeid, self.OUTPUT_FILES, save_plasma_state=False)
+        self.services.stage_output_files(
+            timeid, self.OUTPUT_FILES, save_plasma_state=False)
 
     def finalize(self, timeid=0):
         print('c1.finalize() called')
 
-    def write_inputfile(self, cur_instate_file, f_inc1):
+    def write_inputfile(self, cur_instate_file, f_inc1, qe_min=0.01, qi_min=0.01):
         instate = Namelist(cur_instate_file)
         inc1 = Namelist(f_inc1)
 
@@ -102,19 +105,19 @@ class c1(Component):
 
         LX = 0.
         for i in range(i_start, i_end - 1):
-            dl = ( (rb[i + 1] - rb[i])**2 + (zb[i + 1] - zb[i])**2 )**0.5
+            dl = ((rb[i + 1] - rb[i])**2 + (zb[i + 1] - zb[i])**2)**0.5
             LX += dl
         print('LX =', LX)
-        print('L0 =', LX/0.75)
+        print('L0 =', LX / 0.75)
 
         print('area =', area)
         print('qe =', qe, qe / area)
-        print('qi =', qi, qe / area)
+        print('qi =', qi, qi / area)
 
-        inc1['inc1']['l0'] = [ LX / 0.75 ]
-        inc1['inc1']['lx'] = [ LX ]
-        inc1['inc1']['qe'] = [ 1.e6 * qe / area ]
-        inc1['inc1']['qi'] = [ 1.e6 * qe / area ]
+        inc1['inc1']['l0'] = [LX / 0.75]
+        inc1['inc1']['lx'] = [LX]
+        inc1['inc1']['qe'] = [1.e6 * max(qe, qe_min) / area]
+        inc1['inc1']['qi'] = [1.e6 * max(qi, qi_min) / area]
 
         inc1.write(f_inc1)
 
@@ -126,5 +129,5 @@ class c1(Component):
         instate['instate']['np_div'] = output['output']['nd']
         instate['instate']['te_div'] = output['output']['te']
         instate['instate']['ti_div'] = output['output']['ti']
-        instate['instate']['qe_div'] = [1.e-6*output['output']['qe_div'][0]]
+        instate['instate']['qe_div'] = [1.e-6 * output['output']['qe_div'][0]]
         instate.write(cur_instate_file)
