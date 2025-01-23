@@ -165,7 +165,7 @@ class ips_massive_parallel(Component):
 
         #--- run
         ret_val = services.submit_tasks('pool', use_dask=True, dask_nodes=dask_nodes,
-                                        use_shifter=True,
+                                        use_shifter=int(getattr(self, "USE_SHIFTER", "1")) > 0,
                                         dask_ppw=task_ppn,
                                         dask_worker_plugin=worker_plugin)
 
@@ -182,7 +182,7 @@ class ips_massive_parallel(Component):
 
 
 def taskRunner(runname, sim, tmp_xfs, timeout=1e9):
-    if os.system(f'findmnt -nt xfs -T {tmp_xfs}') != 0:
+    if tmp_xfs and os.system(f'findmnt -nt xfs -T {tmp_xfs}') != 0:
         raise Exception(f"TMPXFS is set but this is either not running in a shifter container "
                         f"or {tmp_xfs} is not mounted as a temporary xfs file")
 
