@@ -86,9 +86,85 @@ def write_inputfiles(f_state, f_eqdsk, nexp=201):
     # zeta = 0.5 * (ps['squareLO'][:] + squareUO[:]) 
 
     # write input.gacode
+    nions = len ps['ns']-1
 
     f = open('input.gacode', 'w')
-    # .....
+      f.write('# transitory statefile for TGLF-EP.'+'\n')
+      f.write('# nexp'+'\n')
+      f.write('{nrho}'+'\n')
+      f.write('# nion'+'\n')
+      f.write('{nions}'+'\n')
+      f.write('# name'+'\n')
+      f.write('D D C'+'\n')
+      f.write('# type'+'\n')
+      f.write('[therm] [fast] [therm]'+'\n')
+      f.write('# masse'+'\n')
+      f.write('5.4488739E-04'+'\n')
+      f.write('# mass'+'\n')
+      f.write('2.0000000E+00 2.0000000E+00 12.0000000E+00'+'\n')
+      f.write('# ze'+'\n')
+      f.write('# z'+'\n')
+      f.write('1.0000000E+00 1.0000000E+00 6.0000000E+00'+'\n')
+      f.write('# torfluxa | Wb/radian')
+      f.write('{rhob}'+'\n')
+      f.write('# rcentr | m',+'\n')
+      f.write('{r0}'+'\n')
+      f.write('# bcentr | T'+'\n')
+      f.write('{b0}'+'\n')
+      f.write('# current'+'\n')
+      f.write('{ip}'+'\n')
+      f.write('# rho | -'+'\n')
+      for ir in range(nrho):
+          f.write('{:>3} {:>14.7E}'+'\n'.format(ir,rho[ir]))
+      f.write('# rmin | m'+'\n')
+      for ir in range(nrho):
+          f.write('{:>3} {:>14.7E}'+'\n'.format(ir,rminor[ir]))
+      f.write('# polflux | Wb/radian'+'\n')
+      for ir in range(nrho):
+          f.write('{:>3} {:>14.7E}'+'\n'.format(ir,psi[ir]))
+      f.write('# q | -'+'\n')
+      for ir in range(nrho):
+          f.write('{:>3} {:>14.7E}'+'\n'.format(ir,qmhd[ir]))
+      f.write('# rmaj | m'+'\n')
+      for ir in range(nrho):
+          f.write('{:>3} {:>14.7E}'+'\n'.format(ir,rmajor[ir]))
+      f.write('# zmag | m'+'\n')
+      for ir in range(nrho):
+          f.write('{:>3} {:>14.7E}'+'\n'.format(ir,zaxis[ir]))
+      f.write('# kappa | -'+'\n')
+      for ir in range(nrho):
+          f.write('{:>3} {:>14.7E}'+'\n'.format(ir,kappa[ir]))
+      f.write('# delta | -'+'\n')
+      for ir in range(nrho):
+          f.write('{:>3} {:>14.7E}'+'\n'.format(ir,delta[ir]))
+      f.write('# zeta | -'+'\n')
+      for ir in range(nrho):
+          f.write('{:>3} {:>14.7E}'+'\n'.format(ir,zeta[ir]))
+      f.write('# ne | 10^19/m^3'+'\n')
+      for ir in range(nrho):
+          f.write('{:>3} {:>14.7E}'+'\n'.format(ir,ne[ir]))
+      f.write('# ni | 10^19/m^3'+'\n')
+      for ir in range(nrho):
+          f.write('{:>3}'.format(ir,ps[ir]))
+          for jions in range(nions):
+              f.write(' {:>14.7E}'.format(ps['ns'][jions+1,ir]))
+          f.write('\n')
+      f.write('# te | keV'+'\n')
+      for ir in range(nrho):
+          f.write('{:>3} {:>14.7E}'+'\n'.format(ir,te[ir]))
+      f.write('# ti | keV'+'\n')
+      for ir in range(nrho):
+          f.write('{:>3}'.format(ir,ps[ir])))                          
+          for jions in range(nions):
+              f.write(' {:>14.7E}'.format(ps['Ts'][jions+1,ir]))
+          f.write('\n')    
+      f.write('# ptot | Pa'+'\n')
+      for ir in range(nrho):
+          f.write('{:>3} {:>14.7E}'+'\n'.format(ir,pmhd[ir]))
+      f.write('# z_eff | -'+'\n')
+      for ir in range(nrho):
+          f.write('{:>3} {:>14.7E}'+'\n'.format(ir,zeff[ir]))
+
     f.close()
 
 def update_state():

@@ -1,4 +1,4 @@
-IPS_DIR = /global/common/software/atom/cori
+IPS_DIR = /global/u2/b/bassem/ips-fastran
 
 PREFIX = ${IPS_DIR}/cesol/ips_fastran
 
