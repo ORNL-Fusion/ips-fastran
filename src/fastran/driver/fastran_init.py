@@ -3,19 +3,19 @@
  fastran init component
  -----------------------------------------------------------------------
 """
-
+import os
 import shutil
 import numpy as np
 import netCDF4
 from Namelist import Namelist
 from ipsframework import Component
-from fastran.plasmastate.plasmastate import plasmastate
-from fastran.equilibrium.efit_eqdsk import readg
-from fastran.instate import instate_model
 from fastran.driver import cesol_io
-from fastran.util.fastranutil import namelist_default
-from fastran.util import dakota_io
+from fastran.equilibrium.efit_eqdsk import readg, writeg
+from fastran.plasmastate.plasmastate import plasmastate
 from fastran.state.instate import Instate
+from fastran.util.fastranutil import namelist_default
+from fastran.util import dakota_io, shape_io
+from fastran.util.input_default import input_default
 
 
 class fastran_init (Component):
@@ -26,7 +26,7 @@ class fastran_init (Component):
     def init(self, timeid=0):
         print('fastran_init.init() started')
         state_files = self.services.get_config_param('STATE_FILES')
-        print(state_files)
+        print('state_files:', state_files)
         for fname in state_files.split():
             print(f'create null {fname}')
             open(fname, 'w').close()
@@ -57,7 +57,7 @@ class fastran_init (Component):
 
         # -- set default
         init_method = getattr(self, 'INIT_METHOD', 'instate')  # not used
-        instate_method = getattr(self, 'INSTATE_METHOD', '')
+        instate_method = getattr(self, 'INSTATE_METHOD', 'profile')
         f_instate = getattr(self, 'INSTATE', '')
         f_inps = getattr(self, 'INPS', '')
         f_ingeqdsk = getattr(self, 'INGEQDSK', '')
@@ -65,6 +65,7 @@ class fastran_init (Component):
 
         # -- instate / dakota binding
         instate = Instate(f_instate)
+        instate.zeros()
 
         print('start dakota update')
         dakota_io.update_namelist(self, instate.data, section='instate')
@@ -94,11 +95,27 @@ class fastran_init (Component):
             # instate.particle_balance()
         else:
             print('instate_method: not specified')
-            instate.zeros()
 
         instate.particle_balance()
-        instate.zeros()
         instate.scale()
+
+        if f_ingeqdsk:
+            shutil.copyfile(f_ingeqdsk, cur_eqdsk_file)
+
+            geq = readg(cur_eqdsk_file)
+            nb = geq['nbdry']
+            rb = geq['rbdry']
+            zb = geq['zbdry']
+            nlim = geq['nlim']
+            rlim = geq['rlim']
+            zlim = geq['zlim']
+
+            instate['nbdry'] = [nb]
+            instate['rbdry'] = rb
+            instate['zbdry'] = zb
+            instate['nlim'] = [nlim]
+            instate['rlim'] = rlim
+            instate['zlim'] = zlim
 
         # -- alloc plasma state file
         ps = plasmastate('ips', 1)
@@ -108,7 +125,6 @@ class fastran_init (Component):
 
         print('init from instate:', f_instate)
         ps.init(
-            cur_state_file,
             global_label=['ips'],
             runid=['ips'],
             shot_number=[int(shot_number)],
@@ -130,12 +146,13 @@ class fastran_init (Component):
             nicrf_src=nicrf_src,
             nlhrf_src=nlhrf_src,
             nrho=[101],
-            time=[0.0],
+            time=[0.],
             nlim=instate['nlim']
         )
 
         # -- input equlibrium
         if f_ingeqdsk:
+            """
             ps.load_geqdsk(f_ingeqdsk, keep_cur_profile=False, bdy_crat=0.01)
             shutil.copyfile(f_ingeqdsk, cur_eqdsk_file)
 
@@ -152,6 +169,10 @@ class fastran_init (Component):
                 r0,
                 b0,
                 tot=True)
+            """
+            shutil.copyfile(f_ingeqdsk, cur_eqdsk_file)
+            ps.updateEquilibrium(f_ingeqdsk, bdy_crat=1.e-6, kcur_option=1, rho_curbrk=0.9)
+            ps.deriveMhdEq('everything')
         else:
             r0 = instate['r0'][0]
             b0 = instate['b0'][0]
