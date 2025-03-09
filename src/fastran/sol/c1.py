@@ -104,7 +104,7 @@ class c1(Component):
         print('OMP, X point:', i_start, i_end)
 
         LX = 0.
-        for i in range(i_start, i_end - 1):
+        for i in range(min(i_start, i_end), max(i_start, i_end) - 1):
             dl = ((rb[i + 1] - rb[i])**2 + (zb[i + 1] - zb[i])**2)**0.5
             LX += dl
         print('LX =', LX)
@@ -125,9 +125,12 @@ class c1(Component):
         output = Namelist('sol_summary.dat')
 
         instate = Namelist(cur_instate_file)
-        instate['instate']['np_up'] = output['output']['nu']
-        instate['instate']['np_div'] = output['output']['nd']
-        instate['instate']['te_div'] = output['output']['te']
-        instate['instate']['ti_div'] = output['output']['ti']
+        instate['instate']['ne_sep'] = output['output']['np_u']
+        instate['instate']['te_sep'] = output['output']['te_u']
+        instate['instate']['ti_sep'] = output['output']['ti_u']
+        instate['instate']['np_div'] = output['output']['np_div']
+        instate['instate']['te_div'] = output['output']['te_div']
+        instate['instate']['ti_div'] = output['output']['ti_div']
         instate['instate']['qe_div'] = [1.e-6 * output['output']['qe_div'][0]]
+        instate['instate']['qi_div'] = [1.e-6 * output['output']['qi_div'][0]]
         instate.write(cur_instate_file)
