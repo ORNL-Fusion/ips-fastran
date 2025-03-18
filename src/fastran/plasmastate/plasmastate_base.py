@@ -277,7 +277,7 @@ class plasmastate_base():
         z_imp = []
         a_imp = []
         k_imp = []
-        np = []
+        ni = []
         nz = []
         f_imp = []
         nhe4 = np.zeros(nrho)
@@ -292,7 +292,7 @@ class plasmastate_base():
                 print('ion', spec_list[k])
                 z_ion.append(z_spec[k])
                 a_ion.append(a_spec[k])
-                np.append(self.cell2node_bdry(self['ns'][k + 1, :]))
+                ni.append(self.cell2node_bdry(self['ns'][k + 1, :]))
                 k_ion.append(k + 1)
             elif spec_list[k] == 'He4':
                 print('He4 found')
@@ -305,25 +305,25 @@ class plasmastate_base():
                 nz.append(self.cell2node_bdry(self['ns'][k + 1, :]))
                 k_imp.append(k + 1)
 
-        np = np.arrary(np)
-        nz = np.arrary(nz)
-        z_ion = np.arrary(z_ion)
-        a_ion = np.arrary(a_ion)
-        z_imp = np.arrary(z_imp)
-        a_imp = np.arrary(a_imp)
+        ni = np.array(ni)
+        nz = np.array(nz)
+        z_ion = np.array(z_ion)
+        a_ion = np.array(a_ion)
+        z_imp = np.array(z_imp)
+        a_imp = np.array(a_imp)
 
         n_ion = len(z_ion)
         n_imp = len(z_imp)
 
-        amain = sum(np.arrary([a_ion[k] * np[k] for k in range(n_ion)]), axis=0)
-        zmain = sum(np.arrary([z_ion[k] * np[k] for k in range(n_ion)]), axis=0)
-        nitot = sum(np.arrary([np[k] for k in range(n_ion)]), axis=0)
+        amain = np.sum(np.array([a_ion[k] * ni[k] for k in range(n_ion)]), axis=0)
+        zmain = np.sum(np.array([z_ion[k] * ni[k] for k in range(n_ion)]), axis=0)
+        nitot = np.sum(np.array([ni[k] for k in range(n_ion)]), axis=0)
         amain /= nitot
         zmain /= nitot
 
         ne = self.cell2node_bdry(self['ns'][0, :])
-        f_imp = np.arrary([nz[k] / ne for k in range(n_imp)])
-        f_ion = np.arrary([np[k] / nitot for k in range(n_ion)])
+        f_imp = np.array([nz[k] / ne for k in range(n_imp)])
+        f_ion = np.array([ni[k] / nitot for k in range(n_ion)])
 
         return {
             'n_ion': n_ion,
@@ -332,7 +332,7 @@ class plasmastate_base():
             'n_imp': n_imp,
             'z_imp': z_imp,
             'a_imp': a_imp,
-            'np': np,
+            'np': ni,
             'nz': nz,
             'nhe4': nhe4,
             'amain': amain,
@@ -384,8 +384,8 @@ class plasmastate_base():
 
         density_th = np.zeros(nrho)
 
-        f_ion = ns_ion / sum(ns_ion, axis=0)
-        f_imp = ns_imp / sum(ns_imp, axis=0)
+        f_ion = ns_ion / np.sum(ns_ion, axis=0)
+        f_imp = ns_imp / np.sum(ns_imp, axis=0)
 
         for i in range(nrho - 1):
             a = 0
