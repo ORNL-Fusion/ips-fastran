@@ -42,6 +42,7 @@ instate_variables = [
     'se_ionization',
     'si_nb',
     'si_ionization',
+    'se_pellet',
     'q',
     'psipol',
     'psi',
@@ -533,7 +534,7 @@ class Instate():
         self.to_ps_nb(ps)
         self.to_ps_rf(ps)
 
-    def from_ps(self, ps):
+    def from_ps(self, ps, update_variables=instate_variables):
         r0 = self['r0'][0]
         b0 = abs(self['b0'])
         ip = self['ip'][0] * 1.e6

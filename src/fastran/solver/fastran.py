@@ -7,12 +7,12 @@
 import os
 import shutil
 import numpy as np
-from ipsframework import Component
 from Namelist import Namelist
+from ipsframework import Component
+from fastran.plasmastate.plasmastate import plasmastate
 from fastran.solver import fastran_io_ps
 from fastran.solver import fastran_io_instate
 from fastran.solver import zdata
-from fastran.plasmastate.plasmastate import plasmastate
 from fastran.state.instate import Instate
 from fastran.util.fastranutil import freeze
 
@@ -47,7 +47,8 @@ class fastran(Component):
             next_instate_file = self.services.get_config_param('NEXT_INSTATE')
 
         ps_backend = getattr(self, 'PS_BACKEND', 'pyps').lower()
-        update_instate = getattr(self, 'UPDATE_INSTATE', 'enabled').lower()
+        update_instate = True if getattr(self, 'UPDATE_INSTATE', 'enabled').lower() == 'enabled' else False
+        print('update_instate = ', update_instate)
 
         # -- stage input files
         self.services.stage_input_files(self.INPUT_FILES)
@@ -69,16 +70,12 @@ class fastran(Component):
                 infastran['infastran'][key] = [int(switch_update)]
         infastran.write('infastran')
 
-        # -- generate fastran input
-        recycle = float(getattr(self, 'RECYCLE', "0"))
-        print('recycle =', recycle)
-
         if ps_backend == 'instate':
             fastran_io_instate.write_input(cur_instate_file)
         else:
-            fastran_io_ps.write_input(cur_state_file, cur_eqdsk_file, f_inprof='inprof', recycle=recycle)
+            fastran_io_ps.write_input(cur_state_file, cur_instate_file, cur_eqdsk_file, f_inprof='inprof')
             if update_next == 'enabled':
-                fastran_io_ps.write_input(next_state_file, cur_eqdsk_file, f_inprof='inprof1', recycle=recycle)
+                fastran_io_ps.write_input(next_state_file, next_instate_file, cur_eqdsk_file, f_inprof='inprof1')
 
         # -- run fastran
         fastran_bin = os.path.join(self.BIN_PATH, self.BIN)
@@ -101,8 +98,8 @@ class fastran(Component):
 
         # -- update local plasma state
         relax = float(getattr(self, 'RELAX', 0.5))
-        relax_j = float(getattr(self, 'RELAX_J', 1.0))
-        fni = float(getattr(self, 'FNI', 1.0))
+        relax_j = float(getattr(self, 'RELAX_J', 1.))
+        fni = float(getattr(self, 'FNI', 1.))
         relax_ip = float(getattr(self, 'RELAX_IP', 0.3))
 
         if self.icalled >= int(getattr(self, 'ADJUST_IP', 10000)):
@@ -121,19 +118,12 @@ class fastran(Component):
                 f_eqdsk=cur_eqdsk_file,
                 f_instate=cur_instate_file,
                 f_fastran='fastran.nc',
+                update_instate=update_instate,
                 relax=relax,
                 relax_j=relax_j,
                 adjust_ip=adjust_ip,
                 fni_target=fni,
                 relax_ip=relax_ip)
-
-        if ps_backend == 'pyps' and update_instate == 'enabled':
-            print('updating instate')
-            instate = Instate(cur_instate_file)
-            ps = plasmastate('ips', 1)
-            ps.read(cur_state_file)
-            instate.from_ps(ps)
-            instate.write(cur_instate_file)
 
         self.services.update_state()
 

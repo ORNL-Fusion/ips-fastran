@@ -8,13 +8,14 @@ import os
 import numpy as np
 import netCDF4
 from Namelist import Namelist
-from fastran.util.zinterp import zinterp
-from fastran.solver import zfdat
 from fastran.equilibrium.efit_eqdsk import readg
 from fastran.plasmastate.plasmastate import plasmastate
+from fastran.solver import zfdat
+from fastran.state.instate import Instate
+from fastran.util.zinterp import zinterp
 
 
-def write_input(f_state, f_eqdsk, rdir='.', f_inprof='inprof', recycle=0.):
+def write_input(f_state, f_instate, f_eqdsk, rdir='.', f_inprof='inprof'):
     # -- read geqdsk and plasma state file
     geq = readg(f_eqdsk)
     r0 = geq['rzero']
@@ -25,10 +26,12 @@ def write_input(f_state, f_eqdsk, rdir='.', f_inprof='inprof', recycle=0.):
     ps.read(f_state)
     spec = ps.get_species()
 
+    instate = Instate(f_instate)
+
     # --  profiles
     nrho = len(ps['rho'])
     rho = ps['rho'][:]
-    ne = ps['ns'][0, :]*1.e-19
+    ne = ps['ns'][0, :] * 1.e-19
     te = ps['Ts'][0, :]
     ti = ps['Ti'][:]
     zeff = ps['Zeff'][:]
@@ -41,31 +44,31 @@ def write_input(f_state, f_eqdsk, rdir='.', f_inprof='inprof', recycle=0.):
     q = np.zeros(nrho)
     fp = np.zeros(nrho)
 
-    j_tot = ps.dump_j_parallel(rho, 'rho_eq', 'curt', r0, b0, tot=True)*1.e-6
-    j_nb = ps.dump_j_parallel(rho, 'rho_nbi', 'curbeam', r0, b0)*1.e-6
+    j_tot = ps.dump_j_parallel(rho, 'rho_eq', 'curt', r0, b0, tot=True) * 1.e-6
+    j_nb = ps.dump_j_parallel(rho, 'rho_nbi', 'curbeam', r0, b0) * 1.e-6
     j_rf = ps.dump_j_parallel(rho, 'rho_ecrf', 'curech', r0, b0) \
         + ps.dump_j_parallel(rho, 'rho_icrf', 'curich', r0, b0) \
         + ps.dump_j_parallel(rho, 'rho_lhrf', 'curlh', r0, b0)
     j_rf *= 1.e-6
     j_bs = np.zeros(nrho)
 
-    density_beam = ps.dump_profile(rho, 'rho_nbi', 'nbeami', k=0)*1.e-19
+    density_beam = ps.dump_profile(rho, 'rho_nbi', 'nbeami', k=0) * 1.e-19
     wbeam = ps.dump_profile(rho, 'rho_nbi', 'eperp_beami', k=0) \
         + ps.dump_profile(rho, 'rho_nbi', 'epll_beami', k=0)
-    wbeam = density_beam*wbeam*1.602e-3 # MJ/m**3
+    wbeam = density_beam * wbeam * 1.602e-3  # MJ/m**3
 
-    pe_nb = ps.dump_vol_profile(rho, 'rho_nbi', 'pbe')*1.e-6
-    pi_nb = (ps.dump_vol_profile(rho, 'rho_nbi', 'pbi') + ps.dump_vol_profile(rho, 'rho_nbi', 'pbth'))*1.e-6
-    pth_nb = ps.dump_vol_profile(rho, 'rho_nbi', 'pbth')*1.e-6
+    pe_nb = ps.dump_vol_profile(rho, 'rho_nbi', 'pbe') * 1.e-6
+    pi_nb = (ps.dump_vol_profile(rho, 'rho_nbi', 'pbi') + ps.dump_vol_profile(rho, 'rho_nbi', 'pbth')) * 1.e-6
+    pth_nb = ps.dump_vol_profile(rho, 'rho_nbi', 'pbth') * 1.e-6
 
-    density_alpha = ps.dump_profile(rho, 'rho_fus', 'nfusi', k=0)*1.e-19
+    density_alpha = ps.dump_profile(rho, 'rho_fus', 'nfusi', k=0) * 1.e-19
     walpha = ps.dump_profile(rho, 'rho_fus', 'eperp_fusi', k=0) \
         + ps.dump_profile(rho, 'rho_fus', 'epll_fusi', k=0)
-    walpha = density_alpha*walpha*1.602e-3
+    walpha = density_alpha * walpha * 1.602e-3
 
-    pe_fus = ps.dump_vol_profile(rho, 'rho_fus', 'pfuse')*1.e-6
-    pi_fus = ps.dump_vol_profile(rho, 'rho_fus', 'pfusi')*1.e-6
-    pth_fus = ps.dump_vol_profile(rho, 'rho_fus', 'pfusth')*1.e-6
+    pe_fus = ps.dump_vol_profile(rho, 'rho_fus', 'pfuse') * 1.e-6
+    pi_fus = ps.dump_vol_profile(rho, 'rho_fus', 'pfusi') * 1.e-6
+    pth_fus = ps.dump_vol_profile(rho, 'rho_fus', 'pfusth') * 1.e-6
 
     pe_rf = ps.dump_vol_profile(rho, 'rho_ecrf', 'peech') \
         + ps.dump_vol_profile(rho, 'rho_icrf', 'picrf_totals', k=0) \
@@ -84,26 +87,13 @@ def write_input(f_state, f_eqdsk, rdir='.', f_inprof='inprof', recycle=0.):
     torque_nb = tqbe + tqbi + tqbjxb + tqbth
     torque_in = np.zeros(nrho)
 
-    se_nb = (ps.dump_vol_profile(rho, 'rho_nbi', 'sbedep') + ps.dump_vol_profile(rho, 'rho_nbi', 'sbehalo'))*1.e-19
+    se_nb = (ps.dump_vol_profile(rho, 'rho_nbi', 'sbedep') + ps.dump_vol_profile(rho, 'rho_nbi', 'sbehalo')) * 1.e-19
 
-    se_tot = ps.integrate('sbedep')
-    print('se_tot =', se_tot)
+    se_ionization = instate['se_ionization']
+    se_pellet = ps.dump_vol_profile(rho, 'rho', 'sn_trans', k=0) * 1.e-19
 
-    if recycle > 0:
-        se_recycle = 1.e-19*ps.dump_vol_profile(rho, 'rho_gas', 'sprof0e', k=0)
-        se_recycle_tot = ps.integrate('sprof0e', k=0)
-        print('se_recycle_tot =', se_recycle_tot)
-        se_recycle *= recycle*se_tot
-    else:
-        se_recycle = np.zeros(nrho)
-        print('se_recycle_tot = 0')
-
-    se_pellet = ps.dump_vol_profile(rho, 'rho', 'sn_trans', k=0)*1.e-19
-
-    # p_rad = np.zeros(nrho)
-    # p_ohm = np.zeros(nrho)
-    p_rad = ps.dump_vol_profile(rho, 'rho_rad', 'prad')*1.e-6
-    p_ohm = ps.dump_vol_profile(rho, 'rho', 'pohme')*1.e-6
+    p_rad = ps.dump_vol_profile(rho, 'rho_rad', 'prad') * 1.e-6
+    p_ohm = ps.dump_vol_profile(rho, 'rho', 'pohme') * 1.e-6
 
     pe_ionization = np.zeros(nrho)
     pi_ionization = np.zeros(nrho)
@@ -124,23 +114,23 @@ def write_input(f_state, f_eqdsk, rdir='.', f_inprof='inprof', recycle=0.):
     f_imp_0 = [f_imp[k][0] for k in range(n_imp)]
 
     # -- metrics
-    psi = ps['psipol'][:]/ps['psipol'][-1]  # equi-drho grid
-    rho = np.sqrt(ps['phit'][:]/ps['phit'][-1])
-    rhob = (ps['phit'][-1]/np.pi/b0)**0.5
+    psi = ps['psipol'][:] / ps['psipol'][-1]  # equi-drho grid
+    rho = np.sqrt(ps['phit'][:] / ps['phit'][-1])
+    rhob = (ps['phit'][-1] / np.pi / b0)**0.5
 
     rhopsi = zinterp(psi, rho)
-    ipol = ps['g_eq'][:]/(r0*b0)
+    ipol = ps['g_eq'][:] / (r0 * b0)
     ipol = np.abs(ipol)
-    volp = 4.0*np.pi*np.pi*rho*rhob*r0/ipol/(r0*r0*ps['gr2i'][:])
+    volp = 4.0 * np.pi * np.pi * rho * rhob * r0 / ipol / (r0 * r0 * ps['gr2i'][:])
 
-    g11 = volp*ps['grho2'][:]*rhob**2
-    g22 = r0*volp/(4.0*np.pi*np.pi)*ps['grho2r2i'][:]*rhob**2
-    g33 = r0*r0*ps['gr2i'][:]
-    gradrho = ps['grho1'][:]*rhob
+    g11 = volp * ps['grho2'][:] * rhob**2
+    g22 = r0 * volp / (4.0 * np.pi * np.pi) * ps['grho2r2i'][:] * rhob**2
+    g33 = r0 * r0 * ps['gr2i'][:]
+    gradrho = ps['grho1'][:] * rhob
     area = ps['surf'][:]
     rmajor = ps['Rmajor_mean'][:]
     rminor = ps['rMinor_mean'][:]
-    shift = rmajor-r0
+    shift = rmajor - r0
     kappa = ps['elong'][:]
     delta = ps['triang'][:]
     pmhd = ps['P_eq'][:]
@@ -150,15 +140,15 @@ def write_input(f_state, f_eqdsk, rdir='.', f_inprof='inprof', recycle=0.):
     gb1 = ps['gb1'][:]
     gb2 = ps['gb2'][:]
     Bmax = ps['B_surfMax'][:]
-    hfac1 = gb1/Bmax
-    hfac2 = gb2/Bmax**2
+    hfac1 = gb1 / Bmax
+    hfac2 = gb2 / Bmax**2
 
     # -- write inprof
     f = open(os.path.join(rdir, f_inprof), 'w')
     f.write(' # generated by zfastran.py Ver+Oct2009\n')
     zfdat.write_f('inflag', [1.0], '', f)
     zfdat.write_f('time0', [0.0], 's', f)
-    zfdat.write_f('ip', [geq['cpasma']*1.0e-6], '', f)
+    zfdat.write_f('ip', [geq['cpasma'] * 1.0e-6], '', f)
     zfdat.write_f('bcentr', [geq["bcentr"]], '', f)
     zfdat.write_f('rmajor', [r0], '', f)
     zfdat.write_f('aminor', [rminor[-1]], '', f)
@@ -192,14 +182,14 @@ def write_input(f_state, f_eqdsk, rdir='.', f_inprof='inprof', recycle=0.):
     zfdat.write_f('qtfusi', pi_fus, '', f)
     zfdat.write_f('qrfe', pe_rf, '', f)
     zfdat.write_f('qrfi', pi_rf, '', f)
-    zfdat.write_f('qrad', p_rad, '', f)
+    zfdat.write_f('qrad', -p_rad, '', f)
     zfdat.write_f('qohm', p_ohm, '', f)
     zfdat.write_f('qione', pe_ionization, '', f)
     zfdat.write_f('qioni', pi_ionization, '', f)
     zfdat.write_f('qcx', pi_cx, '', f)
     zfdat.write_f('storqueb', torque_nb, '', f)
     zfdat.write_f('storque', torque_in, '', f)
-    zfdat.write_f('sion', se_nb + se_recycle + se_pellet, '', f)
+    zfdat.write_f('sion', se_nb + se_ionization + se_pellet, '', f)
     zfdat.write_f('chie', chie, '', f)
     zfdat.write_f('chii', chii, '', f)
     f.close()
@@ -236,7 +226,7 @@ def write_input(f_state, f_eqdsk, rdir='.', f_inprof='inprof', recycle=0.):
     f.close()
 
 
-def update_state(f_state, f_eqdsk, f_fastran, f_instate, relax=1., relax_j=1., adjust_ip=0, fni_target=1., relax_ip=0.3):
+def update_state(f_state, f_eqdsk, f_fastran, f_instate, update_instate=True, relax=1., relax_j=1., adjust_ip=0, fni_target=1., relax_ip=0.3):
     # -- read geqdsk and plasma state
     ps = plasmastate('ips', 1)
     ps.read(f_state)
@@ -260,88 +250,102 @@ def update_state(f_state, f_eqdsk, f_fastran, f_instate, relax=1., relax_j=1., a
     ti = fastran.variables['ti'][-1, :]
     omega = fastran.variables['omega'][-1, :]
 
-    j_tot = fastran.variables['j_tot'][-1, :]*1.e6
-    j_oh = fastran.variables['j_oh'][-1, :]*1.e6
-    j_bs = fastran.variables['j_bs'][-1, :]*1.e6
+    j_tot = fastran.variables['j_tot'][-1, :] * 1.e6
+    j_oh = fastran.variables['j_oh'][-1, :] * 1.e6
+    j_bs = fastran.variables['j_bs'][-1, :] * 1.e6
 
     zeff = fastran.variables['zeff'][-1, :]
     ni = fastran.variables['ni'][-1, :]
     nhe = fastran.variables['nhe'][-1, :]
     z_imp = fastran.variables['zimp'][:]
     n_imp = len(z_imp)
-    nz = n_imp*[0]
+    nz = n_imp * [0]
     for k in range(n_imp):
         nz[k] = fastran.variables['nz%d' % k][-1, :]
     nz = np.array(nz)
 
+    pe_fus = fastran.variables['pe_fus'][-1, :] * 1.e6
+    pi_fus = fastran.variables['pi_fus'][-1, :] * 1.e6
 
     # -- update plasma state
     # ps['ns'][0] = (1. - relax)*ps['ns'][0] + 1.e19*relax*ps.node2cell(ne)
-    ps['ns'][0] = 1.e19*ps.node2cell(ne)
+    ps['ns'][0] = 1.e19 * ps.node2cell(ne)
     for k in range(spec['n_ion']):
-        ps['ns'][spec['k_ion'][k], :] = 1.e19*ps.node2cell(ni*spec['f_ion'][k])
+        ps['ns'][spec['k_ion'][k], :] = 1.e19 * ps.node2cell(ni * spec['f_ion'][k])
     for k in range(spec['n_imp']):
-        ps['ns'][spec['k_imp'][k], :] = 1.e19*ps.node2cell(nz[k])
+        ps['ns'][spec['k_imp'][k], :] = 1.e19 * ps.node2cell(nz[k])
     if spec['k_he4'] > 0:
-        ps['ns'][spec['k_he4'], :] = 1.e19*ps.node2cell(nhe)
+        ps['ns'][spec['k_he4'], :] = 1.e19 * ps.node2cell(nhe)
     ps['Zeff'][:] = ps.node2cell(zeff)
     ps['Zeff_th'][:] = ps.node2cell(zeff)
 
-    ps['Ts'][0, :] = (1. - relax)*ps['Ts'][0, :] + relax*ps.node2cell(te)
+    ps['Ts'][0, :] = (1. - relax) * ps['Ts'][0, :] + relax * ps.node2cell(te)
     nspec_th = len(ps['Ts']) - 1
     print('nspec_th =', nspec_th)
     for k in range(nspec_th):
-        ps['Ts'][k + 1, :] = (1. - relax)*ps['Ts'][k + 1, :] + relax*ps.node2cell(ti)
-    ps['Ti'][:] = (1. - relax)*ps['Ti'][:] + relax*ps.node2cell(ti)
+        ps['Ts'][k + 1, :] = (1. - relax) * ps['Ts'][k + 1, :] + relax * ps.node2cell(ti)
+    ps['Ti'][:] = (1. - relax) * ps['Ti'][:] + relax * ps.node2cell(ti)
 
-    ps['omegat'][:] = (1. - relax)*ps['omegat'][:] + relax*ps.node2cell(omega)
+    ps['omegat'][:] = (1. - relax) * ps['omegat'][:] + relax * ps.node2cell(omega)
 
     ps.load_j_parallel(rho, j_tot, 'rho_eq', 'curt', r0, b0, tot=True)
     ps.load_j_parallel(rho, j_bs, 'rho', 'curr_bootstrap', r0, b0)
     ps.load_j_parallel(rho, j_oh, 'rho', 'curr_ohmic', r0, b0)
-
-    pe_fus = fastran.variables['pe_fus'][-1, :]*1.e6
-    pi_fus = fastran.variables['pi_fus'][-1, :]*1.e6
 
     ps.load_vol_profile(rho, pe_fus, 'rho_fus', 'pfuse')
     ps.load_vol_profile(rho, pi_fus, 'rho_fus', 'pfusi')
 
     ps.update_particle_balance()
 
-    #-- write plasma state
+    # -- write plasma state
     ps.store(f_state)
 
     # -- global parameters to instate
-    instate = Namelist(f_instate)
+    instate = Instate(f_instate)
+    if update_instate:
+        instate['ne'] = ne
+        instate['te'] = te
+        instate['ti'] = ti
+        instate['omega'] = omega
+        instate['j_tot'] = j_tot
+        instate['j_oh'] = j_oh
+        instate['j_bs'] = j_bs
+        instate['zeff'] = zeff
+        instate['density_he'] = nhe
+        for k in range(n_imp):
+            instate[f'_nz_{k}'] = nz[k] # temporary for check
+        instate['pe_fus'] = pe_fus
+        instate['pi_fus'] = pi_fus
+        instate['j_tot'] = j_tot
+        instate['j_bs'] = j_bs
+        instate['j_oh'] = j_oh
 
-    instate['instate']['pnbe'] = [fastran.variables['pnbe'][:][-1]]
-    instate['instate']['pnbi'] = [fastran.variables['pnbi'][:][-1]]
-    instate['instate']['prfe'] = [fastran.variables['prfe'][:][-1]]
-    instate['instate']['prfi'] = [fastran.variables['prfi'][:][-1]]
-    instate['instate']['pfuse'] = [fastran.variables['pfuse'][:][-1]]
-    instate['instate']['pfusi'] = [fastran.variables['pfusi'][:][-1]]
-    instate['instate']['pei'] = [fastran.variables['pei'][:][-1]]
-    instate['instate']['prad'] = [fastran.variables['prad'][:][-1]]
-    instate['instate']['area'] = [fastran.variables['area'][-1, :][-1]]
+        instate['pnbe'] = [fastran.variables['pnbe'][:][-1]]
+        instate['pnbi'] = [fastran.variables['pnbi'][:][-1]]
+        instate['prfe'] = [fastran.variables['prfe'][:][-1]]
+        instate['prfi'] = [fastran.variables['prfi'][:][-1]]
+        instate['pfuse'] = [fastran.variables['pfuse'][:][-1]]
+        instate['pfusi'] = [fastran.variables['pfusi'][:][-1]]
+        instate['pei'] = [fastran.variables['pei'][:][-1]]
+        instate['prad'] = [fastran.variables['prad'][:][-1]]
+        instate['area'] = [fastran.variables['area'][-1, :][-1]]
+
+        instate.particle_balance()
 
     if adjust_ip > 0:
         ibs = fastran.variables['ibs'][-1]
         inb = fastran.variables['inb'][-1]
         irf = fastran.variables['irf'][-1]
-        fni = (ibs + inb + irf)/(ip*1.e-6)
-        ip1 = (ibs + inb + irf)*fni_target
-
+        fni = (ibs + inb + irf) / (ip * 1.e-6)
+        ip1 = (ibs + inb + irf) * fni_target
+    
         ip0 = instate['instate']['ip'][0]
-        instate['instate']['ip'][0] = (1. - relax_ip)*ip0 + relax_ip*ip1
-
-        # j_tot = (1. - relax_ip)*j_tot + relax_ip*j_tot/fni
-
+        instate['instate']['ip'][0] = (1. - relax_ip) * ip0 + relax_ip * ip1
+    
         print('******* IP ADJUST (OLD, NEW):', ip0, ip1)
 
-    # j_tot_prev = ps.dump_j_parallel(rho, 'rho_eq', 'curt', r0, b0, tot=True)
-    # j_tot = relax_j*j_tot + (1. - relax_j)*j_tot_prev
-
     instate.write(f_instate)
+
 
 # -----------------------------------------------------------------------
 # test
