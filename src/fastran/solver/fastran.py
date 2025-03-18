@@ -130,6 +130,11 @@ class fastran(Component):
         # -- archive output files
         self.services.stage_output_files(timeid, self.OUTPUT_FILES, save_plasma_state=False)
 
+        if int(getattr(self, 'COLLECT_TGLF', 0)):
+            print('collect tglf output')
+            os.system('tar cvf tglf_dump.tar tglf_dump_???.dat')
+            os.system('rm -f tglf_dump_???.dat')
+
         self.icalled = self.icalled + 1
 
     def finalize(self, timeid=0):
