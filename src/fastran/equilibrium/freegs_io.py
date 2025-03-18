@@ -1,8 +1,8 @@
-"""
+'''
  -----------------------------------------------------------------------
  freegs io
  -----------------------------------------------------------------------
-"""
+'''
 import numpy as np
 from Namelist import Namelist
 import freegs
@@ -11,111 +11,92 @@ import freegs.machine
 from freegs.shaped_coil import ShapedCoil
 import json
 from fastran.util.zinterp import zinterp
+from fastran.state.instate import Instate
+from fastran.equilibrium.mhdeq_io import mhdeq_io
 
 
 def read_coil_data(f_coil_data, scale=1.0):
-    with open(f_coil_data, "r") as f:
-         coil_data = json.load(f)
+    with open(f_coil_data, 'r') as f:
+        coil_data = json.load(f)
     coils = []
     for key in coil_data:
         print(key, coil_data[key])
         shape = []
         for p in coil_data[key]:
-            shape.append( [p[0]*scale, p[1]*scale] )
+            shape.append([p[0] * scale, p[1] * scale])
         coils.append([key, ShapedCoil(shape)])
     return coils
 
 
-def call_freegs(f_instate, f_inefit, init=False, boundary='all', f_coil_data = 'coils_d3d.json', r0_scale=1.7):
-    instate = Namelist(f_instate)
+class freegs_io():
+    def __init__(self, topology='DN', model_pressure='total'):
+        self.topology = topology
+        self.mhdeq = mhdeq_io(model_pressure)
 
-    inefit = Namelist(f_inefit)
-    r0 = inefit['inefit']['r0'][0]
-    b0 = inefit['inefit']['b0'][0]
-    ip = inefit['inefit']['ip'][0]
-    print('r0, b0, ip = ', r0, b0, ip)
-    rbdry = inefit['inefit']['rbdry']
-    zbdry = inefit['inefit']['zbdry']
-    rwall = inefit['inefit']['rlim']
-    zwall = inefit['inefit']['zlim']
-    press = inefit['inefit']['press']
+    def from_instate(self, f_instate):
+        self.instate = Instate(f_instate)
 
-    k_x1 = np.argmin(zbdry)
-    k_x2 = np.argmax(zbdry)
-    k_in = np.argmin(rbdry)
-    k_out = np.argmax(rbdry)
+    def define_tokamak(self, f_coil_data, domain, nx=129, ny=129):
+        # read coils
+        coils_shape = read_coil_data(f_coil_data)
+        rwall = self.instate['rlim']
+        zwall = self.instate['zlim']
 
-    Rx_1, Zx_1 = rbdry[k_x1], zbdry[k_x1]
-    Rx_1p, Zx_1p = rbdry[k_x1+1], zbdry[k_x1+1]
-    Rx_1m, Zx_1m = rbdry[k_x1-1], zbdry[k_x1-1]
+        # define tokamak from coil and wall
+        self.tokamak = freegs.machine.Machine(
+                           coils_shape, 
+                           freegs.machine.Wall(rwall, zwall))
 
-    Rx_2, Zx_2 = rbdry[k_x2], zbdry[k_x2]
-    Rx_2p, Zx_2p = rbdry[k_x2+1], zbdry[k_x2+1]
-    Rx_2m, Zx_2m = rbdry[k_x2-1], zbdry[k_x2-1]
+        # define freegs equilibriumm
+        self.eq = freegs.Equilibrium(
+                      tokamak=self.tokamak,
+                      Rmin=domain['rmin'],
+                      Rmax=domain['rmax'],
+                      Zmin=domain['zmin'],
+                      Zmax=domain['zmax'],
+                      nx=nx,
+                      ny=ny,
+                      boundary=freegs.boundary.freeBoundaryHagenow)
 
-    R_in, Z_in = rbdry[k_in], zbdry[k_in]
-    R_out, Z_out = rbdry[k_out], zbdry[k_out]
-    a0 = 0.5*(R_out - R_in)
+    def set_profiles_simple(self):
+        self.mhdeq.from_instate(self.instate)
+        press = self.mhdeq.get_p() 
+        r0 = self.instate['r0'][0]
+        b0 = self.instate['b0'][0]
+        ip = self.instate['ip'][0]
+        self.profiles = freegs.jtor.ConstrainPaxisIp(
+                            self.eq, 
+                            press[0],  # Plasma pressure on axis [Pascals]
+                            ip * 1.e6 ,  # Plasma current [Amps]
+                            r0 * b0)  # Vacuum f=R*Bt
 
-    print('Rx_1 =', Rx_1, Rx_1p, Rx_1m)
-    print('Rx_2 =', Rx_2, Rx_2p, Rx_2m)
-    print('R_in, R_out =', R_in, R_out)
-    print('a0 =', a0)
+    def set_profiles(self, f_geqdsk, relax=0, relax_metric=0, relax_profile=0):
+        self.mhdeq.from_instate(self.instate)
+        self.mhdeq.load_geqdsk(f_geqdsk)
+        self.mhdeq.get_ffprime_pprime_relax(relax)
+        # press = mhdeq.get_p() 
+        # print(press) 
 
-    if boundary == 'all':
-        r_isoflux = rbdry
-        z_isoflux = zbdry
-    else:
-        r_isoflux = [R_in, Rx_1m, Rx_1, Rx_1p, R_out, Rx_2m, Rx_2, Rx_2p, R_in]
-        z_isoflux = [Z_in, Zx_1m, Zx_1, Zx_1p, Z_out, Zx_2m, Zx_2, Zx_2p, Z_in]
+        psin = self.mhdeq.psin 
+        pprim = self.mhdeq.pprim
+        ffprim = self.mhdeq.ffprim
+        p = self.mhdeq.p
+        f = self.mhdeq.f
+        # print(psin, pprim, ffprim, p, f)
 
-    xpoints = [(Rx_1, Zx_1), (Rx_2, Zx_2)]
+        pprim = zinterp(psin, pprim)
+        ffprim = zinterp(psin, ffprim)
+        pressure = zinterp(psin, p)
+        fpol = zinterp(psin, f)
 
-    n_isoflux = len(r_isoflux)
-    isoflux = []
-    for k in range(n_isoflux-1):
-        p = [(r_isoflux[k], z_isoflux[k], r_isoflux[k+1], z_isoflux[k+1],)]
-        isoflux += p
-
-    scale = r0/r0_scale
-    coils_shape = read_coil_data(f_coil_data, scale)
-    tokamak = freegs.machine.Machine(coils_shape, freegs.machine.Wall(rwall, zwall))
-
-    nx = 129
-    ny = 129
-
-    eq = freegs.Equilibrium(
-        tokamak=tokamak,
-        Rmin=r0-1.5*a0, Rmax=r0+1.5*a0, # Radial domain
-        Zmin=-3*a0, Zmax=3*a0, # Height range
-        nx=nx, ny=ny, # Number of grid points
-        boundary=freegs.boundary.freeBoundaryHagenow) # Boundary condition
-
-    if init:
-        profiles = freegs.jtor.ConstrainPaxisIp(
-            press[0], # Plasma pressure on axis [Pascals]
-            ip, # Plasma current [Amps]
-            r0*b0) # Vacuum f=R*Bt
-    else:
-        infreegs = Namelist('infreegs')
-        pprime_ext = infreegs['profile_ext']['pprime_ext']
-        ffprime_ext = infreegs['profile_ext']['ffprim_ext']
-        p_ext = infreegs['profile_ext']['p_ext']
-        f_ext = infreegs['profile_ext']['f_ext']
-
-        npsi = infreegs['profile_ext']['npsi_ext'][0]
-        psin = infreegs['profile_ext']['psin_ext']
-
-        pprime = zinterp(psin, pprime_ext)
-        ffprime = zinterp(psin, ffprime_ext)
-        pressure =  zinterp(psin, p_ext)
-        fpol =  zinterp(psin, f_ext)
+        r0 = self.instate['r0'][0]
+        b0 = self.instate['b0'][0]
 
         def pprime_func(psin):
-            return pprime(psin)
+            return pprim(psin)
 
         def ffprime_func(psin):
-           return ffprime(psin)
+           return ffprim(psin)
 
         def p_func(psin):
            return pressure(psin)
@@ -123,26 +104,94 @@ def call_freegs(f_instate, f_inefit, init=False, boundary='all', f_coil_data = '
         def f_func(psin):
            return fpol(psin)
 
-        profiles = freegs.jtor.ProfilesPprimeFfprime(
+        self.profiles = freegs.jtor.ProfilesPprimeFfprime(
             pprime_func,
             ffprime_func,
             r0*b0,
             p_func=p_func,
             f_func=f_func)
 
-#   constrain = freegs.control.constrain(xpoints=xpoints, isoflux=isoflux)
-    constrain = freegs.control.constrain(isoflux=isoflux)
+    def solve(self, p0=[0.1, 0.5, 1.0], verbose=True, method=0):
+        # find control points
+        rbdry = self.instate['rbdry']
+        zbdry = self.instate['zbdry']
 
-    freegs.solve(
-        eq, # The equilibrium to adjust
-        profiles, # The toroidal current profile function
-        constrain) # Constraint function to set coil currents
+        k_x1 = np.argmin(zbdry)
+        k_x2 = np.argmax(zbdry)
+        k_in = np.argmin(rbdry)
+        k_out = np.argmax(rbdry)
 
-    # eq now contains the solution
-    print("Done!")
-    print("Plasma current: %e Amps" % (eq.plasmaCurrent()))
-    print("Plasma pressure on axis: %e Pascals" % (eq.pressure(0.0)))
-    print("Poloidal beta: %e" % (eq.poloidalBeta()))
+        Rx_1, Zx_1 = rbdry[k_x1], zbdry[k_x1]
+        Rx_2, Zx_2 = rbdry[k_x2], zbdry[k_x2]
+        R_in, Z_in = rbdry[k_in], zbdry[k_in]
+        R_out, Z_out = rbdry[k_out], zbdry[k_out]
+        a0 = 0.5 * (R_out - R_in)
 
-    with open("lsn.geqdsk", "w") as f:
-        freegs.geqdsk.write(eq, f, R0=r0)
+        if verbose:
+            print('Rx_1 =', Rx_1)
+            print('Rx_2 =', Rx_2)
+            print('Zx_1 =', Zx_1)
+            print('Zx_2 =', Zx_2)
+            print('R_in, R_out =', R_in, R_out)
+            print('a0 =', a0)
+
+        # x-points 
+        if self.topology == 'DN':
+            xpoints = [(Rx_1, Zx_1), (Rx_2, Zx_2)]
+        elif self.topology == 'LSN':
+            xpoints = [(Rx_1, Zx_1)]
+        elif self.topology == 'USN':
+            xpoints = [(Rx_2, Zx_2)]
+
+        # isoflux
+        isoflux = [(R_out, 0., Rx_1, Zx_1), # Outboard midplane, lower X-point
+                   (R_out, 0., Rx_2, Zx_2), # Outboard midplane, upper X-point
+                   (R_in, 0., R_out, 0.)  # R_in and R_out
+                  ]
+
+        # profiles
+        # inmhd = mhdeq_io(instate=self.instate)
+        # press = inmhd.get_p() # self.instate['p_eq']
+
+        # constraint
+        constrain = freegs.control.constrain(xpoints=xpoints, isoflux=isoflux, gamma=1.e-12)
+        constrain(self.eq)
+
+        # solve 
+        r0 = self.instate['r0'][0]
+        b0 = self.instate['b0'][0]
+        ip = self.instate['ip'][0]
+        print('r0, b0, ip = ', r0, b0, ip)
+
+        # solve
+        if method == 0:
+            paxis = self.profiles.paxis
+            for k in range(len(p0)):
+                print(f'freegs iteration {k}')
+                profiles = freegs.jtor.ConstrainPaxisIp(
+                    self.eq, 
+                    p0[k] * paxis,  # Plasma pressure on axis [Pascals]
+                    ip * 1.e6 ,  # Plasma current [Amps]
+                    r0 * b0)  # Vacuum f=R*Bt
+
+                freegs.solve(
+                    self.eq,  # The equilibrium to adjust
+                    profiles,  # The toroidal current profile function
+                    constrain)  # Constraint function to set coil currents
+        else:
+            freegs.solve(
+                self.eq,  # The equilibrium to adjust
+                self.profiles,  # The toroidal current profile function
+                constrain)  # Constraint function to set coil currents
+
+        # eq now contains the solution
+        print('Done!')
+        print('Plasma current: %e Amps' % (self.eq.plasmaCurrent()))
+        print('Plasma pressure on axis: %e Pascals' % (self.eq.pressure(0.)))
+        print('Poloidal beta: %e' % (self.eq.poloidalBeta()))
+
+    def write_geqdsk(self, f_geqdsk):
+        r0 = self.instate['r0'][0]
+        with open(f_geqdsk, 'w') as f:
+            freegs.geqdsk.write(self.eq, f, R0=r0)
+
