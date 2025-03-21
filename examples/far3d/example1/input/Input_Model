@@ -1,0 +1,232 @@
+============================/ MAIM NPUT VARIABLES \===================================
+!!!!!!!!!!! nstres: if 0 new run, if 1 the run is a continuation
+0
+!!!!!!!!!!! numrun: run number
+0000
+!!!!!!!!!!! numruno: name of the previous run output
+0000z
+!!!!!!!!!!! numvac: run number index
+41503
+!!!!!!!!!!! nonlin: linear run if 0, non linear run if 1 (no available yet) 
+0
+!!!!!!!!!!! ngeneq: equilibrium input (only VMEC available now) 
+1
+!!!!!!!!!!! eq_name: equilibrium name 
+woutb_9917
+!!!!!!!!!!! maxstp: simulation time steps 
+1000
+!!!!!!!!!!! dt0: simulation time step 
+2.0
+!!!!!!!!!!! ldim: total number of poloidal modes (equilibrium + dynamic) 
+36
+!!!!!!!!!!! leqdim: equilibrium poloidal modes 
+12
+!!!!!!!!!!! jdim: number of radial points
+1000
+!!!!!!!!!!! ext_prof: include external profiles if 1
+1
+!!!!!!!!!!! ext_prof_name: external profile file name
+Profile.txt
+!!!!!!!!!!! ext_prof_len: number of lines in the external profile
+100
+!!!!!!!!!!! iflr_on: activate thermal ion FLR damping effects if 1
+0
+!!!!!!!!!!! epflr_on: activate fast particle FLR damping effects if 1
+0
+!!!!!!!!!!! ieldamp_on: activate electron-ion Landau damping effect if 1
+0
+!!!!!!!!!!! twofl_on: activate two fluid effects if 1
+0
+!!!!!!!!!!! alpha_on: activate a 2nd fast particle species if 1
+1
+!!!!!!!!!!! Trapped_on: activate correction for trapped 1st fast particle species if 1
+0
+!!!!!!!!!!! matrix_out: activate eigensolver output
+.false.	
+!!!!!!!!!!! m0dy: equilibrium modes as dynamic
+0
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+==================================/ MODEL PARAMETERS \===================================
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!! MODES INCLUDED IN THE MODEL !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!!!!!!!!!! mm: poloidal dynamic and equilibrium modes
+40,39,38,37,36,35,34,33,32,31,30,29
+-40,-39,-38,-37,-36,-35,-34,-33,-32,-31,-30,-29,                                                                         
+0,1,2,3,4,5,6,7,8,9,10,11
+!!!!!!!!!!! nn: toroidal dynamic and equilibrium modes
+12*10,12*-10,12*0
+!!!!!!!!!!! mmeq: poloidal equilibrium modes
+0,1,2,3,4,5,6,7,8,9,10,11,
+!!!!!!!!!!! nneq: toroidal equilibrium modes
+12*0
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! PERTURBATION !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!!!!!!!!!! ipert: different options to drive a perturbation in the equilibria
+1
+!!!!!!!!!!! widthi: size of the perturbation
+1.e-140
+!!!!!!!!!!! Auto_grid_on: auto grid spacing option
+1
+!!!!!!!!!!! ni: number of points interior to the island
+499
+!!!!!!!!!!! nis: number of points in the island
+251
+!!!!!!!!!!! ne: number of points exterior to the island
+250
+!!!!!!!!!!! delta: normalized width of the uniform fine grid (island)
+0.25
+!!!!!!!!!!! rc: center of the fine grid (island) along the normalized minor radius
+0.625
+!!!!!!!!!!! Edge_on
+0
+!!!!!!!!!!! edge_p
+995
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! PLASMA PARAMETERS !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!!!!!!!!!! gamma: adiabatic index
+1.35
+!!!!!!!!!!! s: magnetic Lundquist number
+5.e6
+!!!!!!!!!!! betath_factor: thermal beta factor
+1
+!!!!!!!!!!! ietaeq: resistivity profile index
+1
+!!!!!!!!!!! spe1: species first EP population 
+2
+!!!!!!!!!!! bet0_f: fast particle beta
+0.000018
+!!!!!!!!!!! spe2: species second EP population
+4
+!!!!!!!!!!! bet0_falp: 2nd species fast particle beta
+0.0124
+!!!!!!!!!!! omcy: normalized fast particle cyclotron frequency
+190.6
+!!!!!!!!!!! omcyb: normalized helicaly trapped fast particle frequency
+0.01
+!!!!!!!!!!! rbound: normalized helicaly trapped bound length
+0.002
+!!!!!!!!!!! omcyalp: normalized 2nd species fast particle cyclotron frequency
+95.3
+!!!!!!!!!!! itime: time normalization option
+2
+!!!!!!!!!!! dpres: electron pressure normalized to the total pressure (two fluid effects)
+0.35
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! DIFFUSIVITIES !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!!!!!!!!!! stdifp: thermal pressure eq. diffusivity
+0
+!!!!!!!!!!! stdifu: vorticity eq. diffusivity
+0
+!!!!!!!!!!! stdifv: thermal particle parallel velocity eq. diffusivity
+0
+!!!!!!!!!!! stdifnf: fast particle density eq. diffusivity
+0
+!!!!!!!!!!! stdifvf: fast particle parallel velocity eq. diffusivity
+0
+!!!!!!!!!!! stdifnfalp: fast particle density eq. diffusivity
+0
+!!!!!!!!!!! stdifvfalp: fast particle parallel velocity eq. diffusivity
+0
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! LANDAU CLOSURE !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!!!!!!!!!! LcA0: Landau closure 1
+2.718
+!!!!!!!!!!! LcA1: Landau closure 2
+-1.311
+!!!!!!!!!!! LcA2: correction to the fast particle beta
+0.889
+!!!!!!!!!!! LcA3: correction to the ratio between fast particle thermal velocity and Alfven velocity
+1.077
+!!!!!!!!!!! LcA0alp: Landau closure 1 2nd species
+2.718
+!!!!!!!!!!! LcA1alp: Landau closure 2 2nd species
+-1.311
+!!!!!!!!!!! LcA2alp: correction to the 2nd species fast particle beta
+0.889
+!!!!!!!!!!! LcA3alp: correction to the ratio between fast particle thermal velocity and Alfven velocity 2nd species
+1.077
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! DAMPINGS !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!!!!!!!!!! omegar: eigenmode frequency without damping effects
+0.2
+!!!!!!!!!!! iflr: thermal ions larmor radius normalized to the minor radius
+0.008
+!!!!!!!!!!! r_epflr: energetic particle larmor radius normalized to the minor radius
+0.1
+!!!!!!!!!!! r_epflralp: 2nd species energetic particle larmor radius normalized to the minor radius
+0.1
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! OUTPUT !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!!!!!!!!!! lplots: number of eigenfunction modes in the output files
+24
+!!!!!!!!!!! nprint: number of step for an output in farprt file
+100
+!!!!!!!!!!! ndump: number of step for an output 
+1000
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! OTHER PARAMETERS !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!!!!!!!!!! DIIID_u: turn on to use the same units than TRANSP output in the external profiles (cm not m)
+1
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+================================/ SELF PROFILES PARAMETERS \============================
+!!!!!!!!!!! EP_dens_on: user defined fast particle density profile (if 1)
+0
+!!!!!!!!!!! Adens: fast particle density profile flatness
+7
+!!!!!!!!!!! Bdens: location of the fast particle density profile gradient
+0.1
+!!!!!!!!!!! Alpha_dens_on: user defined 2nd species fast particle density profile (if 1)
+0
+!!!!!!!!!!! Adensalp: 2nd species fast particle density profile flatness
+1
+!!!!!!!!!!! Bdensalp: location of the 2nd species fast particle density profile gradient
+0.1
+!!!!!!!!!!! EP_vel_on: user defined fast particle vth/vA0 profile (if 1)
+0
+!!!!!!!!!!! Alpha_vel_on: user defined 2nd species fast particle vth/vA0 profile (if 1)
+0
+!!!!!!!!!!! q_prof_on: the safety factor profile of the external profile is used (is 1)
+0
+!!!!!!!!!!! Eq_vel_on: the equilibrium toroidal velocity profile of the external profile is used (is 1)
+0
+!!!!!!!!!!! Eq_velp_on: the equilibrium poloidal velocity profile of the external profile is used (if 1)
+0
+!!!!!!!!!!! Eq_Presseq_on: the equilibrium pressure profile of the external profile is used (is 1)
+0
+!!!!!!!!!!! Eq_Presstot_on: the equilibrium + fast particle pressure profiles of the external profile is used (is 1)
+0
+!!!!!!!!!!! deltaq: safety factor displacement (only tokamak eq.)
+0
+!!!!!!!!!!! deltaiota: iota displacement (only stellarator eq.)
+0
+!!!!!!!!!!! etascl: user defined constant resistivity (if ietaeq=2)
+1
+!!!!!!!!!!! eta0: user defined resistivity profile (if ietaeq=3)
+1
+!!!!!!!!!!! reta: user defined resistivity profile (if ietaeq=3)
+0.5
+!!!!!!!!!!! etalmb: user defined resistivity profile (if ietaeq=3)
+0.5
+!!!!!!!!!!! cnep: user defined thermal plasma density profile 
+5.349622177242649E-01, -8.158145079082755E-01,  9.051313827341806E+00,
+-9.908622794510921E+01,  5.436130071633405E+02, -1.683588662473988E+03,
+3.184577674238863E+03, -3.789454655055126E+03,  2.786069409436922E+03,
+-1.160818784526462E+03,  2.100700986027593E+02
+!!!!!!!!!!! ctep: user defined thermal electron plasma temperature profile
+2.466297479423131E+00, -3.123519794977899E+00,  1.455166487731591E+01,
+-8.288042333625850E+01,  3.310397776819081E+02, -9.891030935273041E+02,
+2.133646774676442E+03, -3.082790956275732E+03,  2.757324727437074E+03,
+-1.367187266111290E+03,  2.864529219889411E+02
+!!!!!!!!!!! cnfp: user defined energetic particles density profile
+0.3, 0.1, 0.1, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0
+!!!!!!!!!!! cvep: user defined thermal ions parallel velocity profile (only for thermal ion FLR effects)
+5.349622177242649E-01, -8.158145079082755E-01,  9.051313827341806E+00,
+-9.908622794510921E+01,  5.436130071633405E+02, -1.683588662473988E+03,
+3.184577674238863E+03, -3.789454655055126E+03,  2.786069409436922E+03,
+-1.160818784526462E+03,  2.100700986027593E+02
+!!!!!!!!!!! cvfp: user defined energetic particles parallel velocity profile
+1.16, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0
+!!!!!!!!!!! cnfpalp: user defined 2nd species energetic particles density profile
+5.349622177242649E-01, -8.158145079082755E-01,  9.051313827341806E+00,
+-9.908622794510921E+01,  5.436130071633405E+02, -1.683588662473988E+03,
+3.184577674238863E+03, -3.789454655055126E+03,  2.786069409436922E+03,
+-1.160818784526462E+03,  2.100700986027593E+02
+!!!!!!!!!!! cvfpalp: user defined 2nd species energetic particles parallel velocity profile
+1.2, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0
+!!!!!!!!!!! eqvt: user defined equilibrium thermal toroidal velocity profile
+0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0
+!!!!!!!!!!! eqvp: user defined equilibrium thermal poloidal velocity profile
+0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!

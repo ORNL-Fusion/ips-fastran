@@ -1,0 +1,23 @@
+  {
+    "variable": {
+        "r"          : ["instate" , "r0"       , "input" ],
+        "a"          : ["instate" , "a0"       , "input" ],
+        "bt"         : ["instate" , "b0"       , "input" ],
+        "ip"         : ["instate" , "ip"       , "input" ],
+        "q95"        : ["aeqdsk"  , "q95"      , "output"],
+        "li"         : ["aeqdsk"  , "li"       , "output"],
+        "betap"      : ["aeqdsk"  , "betap"    , "output"],
+        "betat"      : ["aeqdsk"  , "betat"    , "output"],
+        "ne_ped"     : ["instate" , "ne_ped"   , "input" ],
+        "nebar"      : ["fastran" , "nebar"    , "output"],
+        "betan"      : ["fastran" , "betan"    , "output"],
+        "pfuse"      : ["fastran" , "pfuse"    , "output"],
+        "pfusi"      : ["fastran" , "pfusi"    , "output"],
+        "ibs"        : ["fastran" , "ibs"      , "output"]
+    },
+    "model": {
+        "aratio"     : ["expr", "r / a" ],
+        "pfus"       : ["expr", "5.0 * ( pfuse + pfusi )"],
+        "fbs"        : ["expr", "ibs / ip"]
+    }
+  }

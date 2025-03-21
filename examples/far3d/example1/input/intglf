@@ -1,0 +1,26 @@
+&intglf
+
+    tglf_ns_in = 3
+
+    tglf_mass_in(1) = 2.723D-4
+    tglf_mass_in(2) = 1.25
+    tglf_mass_in(3) = 2.0
+
+    tglf_zs_in(1) = -1.0
+    tglf_zs_in(2) = 1.0
+    tglf_zs_in(3) = 2.0
+
+    tglf_xnu_model_in = 2
+
+    tglf_alpha_quench_in = 1.0
+
+    tglf_alpha_e_in = 1.0
+    tglf_alpha_p_in = 1.0
+
+    tglf_use_bper_in = .true. 
+    tglf_use_bpar_in = .false. 
+
+!   tglf_use_bper_in = .false. 
+!   tglf_use_bpar_in = .false. 
+
+/

@@ -1,0 +1,117 @@
+&INSTATE
+
+  DENSITY_MODEL = 1 
+  MODEL_SHAPE = 2 
+  NBDRY = 15
+  USE_INPED = 0
+
+  ! -----------------------------------------------------------
+  ! GRID
+
+  NRHO = 101
+
+  R0 = 4.0
+  A0 = 1.33
+  KAPPA = 2.0
+  DELTA = 0.6
+
+  ! -----------------------------------------------------------
+  ! CONFIGURATION
+
+  B0 = 7.0 
+  IP = 8.1 
+
+  ! -----------------------------------------------------------
+  ! PLASMA COMPOSITION
+
+  N_ION = 2 
+  Z_ION = 1 1 
+  A_ION = 2 3 
+  F_ION = 0.5 0.5 
+  N_IMP = 3 
+  Z_IMP = 2 4 18 
+  A_IMP = 4 9 40 
+  F_IMP = 0.0 0.02 0.0005 
+  N_MIN = 0 
+  Z_MIN = 1 
+  A_MIN = 1 
+  N_BEAM = 1 
+  Z_BEAM = 1 
+  A_BEAM = 2 
+  N_FUSION = 1 
+  Z_FUSION = 2 
+  A_FUSION = 4 
+
+  ! -----------------------------------------------------------
+  ! KINETIC PROFILES 
+
+  NE_AXIS = 26.24 
+  NE_PED = 14.56 
+  NE_SEP = 7.28
+  NE_ALPHA = 1.5 
+  NE_BETA = 1.1 
+  NE_FIT = 1
+  NE_XMID = 0.952724
+  NE_XWID = 0.094552
+
+  TE_AXIS = 17.25   
+  TE_PED = 3.274687 
+  TE_SEP = 0.075
+  TE_ALPHA = 1.5
+  TE_BETA = 1.5
+  TE_FIT = 1
+  TE_XMID = 0.952724
+  TE_XWID = 0.094552
+
+  TI_AXIS = 15.0
+  TI_PED = 3.274687
+  TI_SEP = 0.075
+  TI_ALPHA = 1.5
+  TI_BETA = 1.5
+  TI_FIT = 1
+  TI_XMID = 0.952724
+  TI_XWID = 0.094552
+
+  ZEFF_AXIS = 1.7
+
+  OMEGA_AXIS = 5.0e3
+  OMEGA_SEP = 0.0e3
+  OMEGA_ALPHA = 1.5
+  OMEGA_BETA = 1.5
+
+  JPAR_AXIS = 1.0
+  JPAR_SEP = 0.05
+  JPAR_ALPHA = 2.0
+  JPAR_BETA  = 1.0
+
+  NBEAM_AXIS = 0.0
+  NBEAM_SEP  = 0.0
+  NBEAM_ALPHA= 1.5
+  NBEAM_BETA = 1.5
+  TBEAMI = 20.0
+
+  BETAN_PED = -1.0
+  XMID = -1.0
+  XWID = -1.0
+
+  ! -----------------------------------------------------------
+  ! PRESSURE
+
+  PRESSURE_MODEL = "full"
+
+  H98_TARGET = 1.3
+  BETAN_TARGET = 0.0
+  BETAN_BEAM_TARGET = 0.0
+  
+  ! -----------------------------------------------------------
+  ! CURRENT
+
+  CURRENT_MODEL = "broad"
+
+  RHO_JBDRY = 0.85
+  RHO_JPEAK = 0.65
+  JAXIS = 0.6 
+  JAXIS_PRIME = 1.0
+  JBDRY_PRIME =-1.0
+
+/

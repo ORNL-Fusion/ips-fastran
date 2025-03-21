@@ -1,0 +1,71 @@
+{
+  "scan": {
+    "aratio": {"type": "range", "ymin":2.5, "ymax":3.5, "ndata":8},
+    "pinj"  : {"type": "list", "data":[20.0, 30.0, 40.0, 50.0]}
+  },
+
+  "const": {
+    "a"       : 1.3333,
+    "kappa"   : 2.0,
+    "delta"   : 0.6,
+
+    "bt"      : 7.0,
+    "ip"      : 8.1, 
+
+    "xwid"    : 0.08,
+    "xmid"    : 0.96,
+
+    "nepeak"  : 1.75,
+    "fgw_ped" : 0.9, 
+    "f_nesep" : 0.5,
+
+    "h98"     : 1.35,
+
+    "f_pinj_e": 0.75
+ },
+
+ "model": {
+    "r"           : ["expr", "a * aratio"                 ],
+    "betan_ped"   : ["base", {}                           ],
+    "te_ped"      : ["base", {"dependency":"betan_ped"}   ],
+    "ti_ped"      : ["expr", "te_ped"                     ],
+    "te_axis"     : ["expr", "5.75 * te_ped"              ],
+    "ti_axis"     : ["expr", "5.0 * ti_ped"               ],
+    "ngw"         : ["base", {}                           ],
+    "ne_ped"      : ["expr", "fgw_ped * ngw"              ], 
+    "ne_axis"     : ["expr", "nepeak * ne_ped"            ],
+    "ne_sep"      : ["expr", "f_nesep * ne_ped"           ],
+    "pinj_e"      : ["expr", "pinj * f_pinj_e"            ],
+    "pinj_i"      : ["expr", "pinj * ( 1.0 - f_pinj_e ) " ]
+  },
+
+ "io": {
+    "index"       : ["efit"        , "TIME_ID"    ],
+
+    "r"           : ["fastran_init", "R0"         ],
+    "a"           : ["fastran_init", "A0"         ],
+    "kappa"       : ["fastran_init", "KAPPA"      ],
+    "delta"       : ["fastran_init", "DELTA"      ],
+
+    "bt"          : ["fastran_init", "B0"         ],
+    "ip"          : ["fastran_init", "IP"         ],
+
+    "xwid"        : ["fastran_init", "XWID"       ],
+    "xmid"        : ["fastran_init", "XMID"       ],
+
+    "ne_axis"     : ["fastran_init", "NE_AXIS"    ],
+    "ne_ped"      : ["fastran_init", "NE_PED"     ],
+    "ne_sep"      : ["fastran_init", "NE_SEP"     ],
+
+    "te_axis"     : ["fastran_init", "TE_AXIS"    ],
+    "te_ped"      : ["fastran_init", "TE_PED"     ],
+
+    "ti_axis"     : ["fastran_init", "TI_AXIS"    ],
+    "ti_ped"      : ["fastran_init", "TI_PED"     ],
+
+    "h98"         : ["fastran_init", "H98_TARGET" ],
+
+    "pinj_e"      : ["hcd_model"   , "INHCD_PE_0" ],
+    "pinj_i"      : ["hcd_model"   , "INHCD_PI_0" ]
+  }
+}

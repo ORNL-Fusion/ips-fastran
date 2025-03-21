@@ -1,0 +1,12 @@
+&inhcd
+  nsrc = 1  ! Number of H/CD systems
+  Pe = 30.0 ! Electron power [MW]
+  Pi = 8.0  ! Ion power [MW] 
+  xmid = 0.0 ! Center of Gaussian heating profile 
+  xwid = 0.3 ! Width of Gaussian heating profile
+
+  j0_seed = 0.0 ! Peak current density [MA/m^2]
+  x0_seed = 0.0 ! Center of Gaussian current profile 
+  drho_seed = 0.3 ! Width of Gaussian current profile 
+/
+

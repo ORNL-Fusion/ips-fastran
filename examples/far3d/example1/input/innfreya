@@ -1,0 +1,48 @@
+&innfreya
+
+  bptor   = 23.75e6 ! <=======
+
+  anglev  = 0.0  
+  angleh  = 90.0 
+  bvofset = 0.0
+  bhofset = 0.0
+  bleni   = 0.0
+  bheigh  = 40.0 ! <======= 
+  bwidth  = 40.0 ! <=======
+  nbshape = 'rect'
+  nashape = 's-rect'
+  bhfoc = 1.0e6
+  bvfoc = 1.0e6
+  bhdiv = 0.51
+  bvdiv = 0.51
+  ebkev = 750.0 ! 1000.0
+  fbcur = 1.0 0.0 0.0
+  sfrac1 = 1.0
+  blenp = 0.0
+  rpivot = 400.0 ! <=======
+  zpivot = 65.0  ! <=======  
+  naptr = 1
+  aheigh = 50. ! <=======
+  awidth = 50. ! <=======
+  alen = 2345.3
+  nbeamtcx = 1
+  ibslow = 1
+  fast_ion_target = 1
+  rtstcx = 1.0
+  beamon = -1000.0
+  btime = 1000000.0
+  timbplt = 0.0
+  iterate_beam = .true.
+  nameb = 'd'
+  fdbeam = 1.0
+  npart = 500000
+  npskip = 1
+  mf = 51
+  iexcit = 5
+  izstrp = 1
+  nbeams = 1
+  nsourc = 1
+  relnub = 0.1
+ !hdepsmth = 1.0
+
+/
