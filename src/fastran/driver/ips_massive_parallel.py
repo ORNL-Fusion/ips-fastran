@@ -96,7 +96,10 @@ class ips_massive_parallel(Component):
                  f.write(f'rm -rf {tmp_xfs}/run?????\n')
 
             cwd = self.services.get_working_dir()
-            cmd =  f'shifter sh cmd.sh'
+            if int(getattr(self, "USE_SHIFTER", "1")) > 0:
+                cmd = f'shifter sh cmd.sh'
+            else:
+                cmd = f'sh cmd.sh'
             task_id = self.services.launch_task(self.DASK_NODES, cwd, cmd, task_ppn=1, logfile='clean.log')
             retcode = self.services.wait_task(task_id)
             if (retcode != 0):
