@@ -96,7 +96,10 @@ class ips_massive_parallel(Component):
                  f.write(f'rm -rf {tmp_xfs}/run?????\n')
 
             cwd = self.services.get_working_dir()
-            cmd =  f'shifter sh cmd.sh'
+            if int(getattr(self, "USE_SHIFTER", "1")) > 0:
+                cmd = f'shifter sh cmd.sh'
+            else:
+                cmd = f'sh cmd.sh'
             task_id = self.services.launch_task(self.DASK_NODES, cwd, cmd, task_ppn=1, logfile='clean.log')
             retcode = self.services.wait_task(task_id)
             if (retcode != 0):
@@ -112,6 +115,7 @@ class ips_massive_parallel(Component):
         pool = services.create_task_pool('pool')
         cwd = services.get_working_dir()
 
+        sim["INPUT_DIR_SIM_TEMP"] = os.path.realpath(os.path.join(self.services.get_config_param("INPUT_DIR_SIM"), "input"))
         for k in range(nsim):
             rundir = os.path.realpath(os.path.join(tmp_xfs, "run%05d"%k)) if tmp_xfs else os.path.realpath("run%05d"%k)
             logfile = "ipslog.%05d"%k
@@ -132,7 +136,7 @@ class ips_massive_parallel(Component):
 
             sim["PWD"] = tmp_xfs if tmp_xfs else pwd
            #sim["INPUT_DIR_SIM"] = pwd + "/input"
-            sim["INPUT_DIR_SIM_TEMP"] = os.path.realpath(os.path.join(pwd , "input"))
+           #sim["INPUT_DIR_SIM_TEMP"] = os.path.realpath(os.path.join(pwd , "input"))
             sim["INPUT_DIR_SIM"] = os.path.join(rundir , "input")
             sim["RUN_ID"] = "run%05d"%k
             sim["SIM_ROOT"] = rundir
@@ -160,14 +164,18 @@ class ips_massive_parallel(Component):
                 self.TMPXFS,
                 logfile=logfile)
 
-        archive_files = getattr(self, "ARCHIVE_FILES", "")
-        worker_plugin = ArchievingPlugin(self.TMPXFS, dir_summary, archive_files)
-
         #--- run
-        ret_val = services.submit_tasks('pool', use_dask=True, dask_nodes=dask_nodes,
-                                        use_shifter=True,
-                                        dask_ppw=task_ppn,
-                                        dask_worker_plugin=worker_plugin)
+        if int(getattr(self, "USE_SHIFTER", "1")) > 0:
+            archive_files = getattr(self, "ARCHIVE_FILES", "")
+            worker_plugin = ArchievingPlugin(self.TMPXFS, dir_summary, archive_files)
+            ret_val = services.submit_tasks('pool', use_dask=True, dask_nodes=dask_nodes,
+                                            use_shifter=True,
+                                            dask_ppw=task_ppn,
+                                            dask_worker_plugin=worker_plugin)
+        else:
+            ret_val = services.submit_tasks('pool', use_dask=True, dask_nodes=dask_nodes,
+                                            use_shifter=False,
+                                            dask_ppw=task_ppn)
 
         print('ret_val = ', ret_val)
         exit_status = services.get_finished_tasks('pool')
@@ -182,7 +190,7 @@ class ips_massive_parallel(Component):
 
 
 def taskRunner(runname, sim, tmp_xfs, timeout=1e9):
-    if os.system(f'findmnt -nt xfs -T {tmp_xfs}') != 0:
+    if tmp_xfs and os.system(f'findmnt -nt xfs -T {tmp_xfs}') != 0:
         raise Exception(f"TMPXFS is set but this is either not running in a shifter container "
                         f"or {tmp_xfs} is not mounted as a temporary xfs file")
 
@@ -194,13 +202,13 @@ def taskRunner(runname, sim, tmp_xfs, timeout=1e9):
 
     task_nproc = int(sim["TASK_NPROC"])
 
-    input_dir = sim["INPUT_DIR_SIM_TEMP"] 
-    print(input_dir )
-    shutil.copytree(input_dir, os.path.join(rundir, "input"))
+    input_dir = sim["INPUT_DIR_SIM_TEMP"]
+    run_input_dir = sim["INPUT_DIR_SIM"]
+    shutil.copytree(input_dir, run_input_dir, dirs_exist_ok=True)
     #sim["INPUT_DIR_SIM"] =  os.path.join(rundir, "input")
 
     sim.write(open(os.path.join(rundir, f"{runname}.config"), "wb"))
-     
+
 #   ips_bin = "which ips.py\n"
     ips_bin = "echo $PYTHONPATH\n"
     ips_bin += "which ips.py\n"
@@ -231,10 +239,10 @@ def wrt_localconf(fname="local.conf", task_nproc=1):
        cmd = "mpiexec"
     s = \
 """HOST = local
-MPIRUN = %s  
+MPIRUN = %s
 NODE_DETECTION = manual
-PROCS_PER_NODE = %d 
-CORES_PER_NODE = %d 
+PROCS_PER_NODE = %d
+CORES_PER_NODE = %d
 SOCKETS_PER_NODE = 1
 NODE_ALLOCATION_MODE = SHARED
 USE_ACCURATE_NODES = ON
@@ -243,3 +251,4 @@ USE_ACCURATE_NODES = ON
     f=open(fname, "w")
     f.write(s)
     f.close()
+
