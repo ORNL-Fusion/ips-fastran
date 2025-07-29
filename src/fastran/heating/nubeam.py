@@ -8,11 +8,11 @@ import shutil
 import numpy as np
 import netCDF4
 from Namelist import Namelist
-from fastran.plasmastate.plasmastate import plasmastate
 from ipsframework import Component
 from fastran.heating import nubeam_io
-from fastran.util import dakota_io
+from fastran.plasmastate.plasmastate import plasmastate
 from fastran.state.instate import Instate
+from fastran.util import dakota_io
 from fastran.util.fastranutil import freeze
 from fastran.util.input_default import input_default
 
@@ -54,14 +54,11 @@ class nubeam(Component):
         dakota_io.update_namelist(self, innubeam)
 
         # -- from instate
-        if int(getattr(self, 'TRACE', '0')):
-            print('update NB:workdir power from instate')
-            cur_instate_file = self.services.get_config_param('CURRENT_INSTATE')
-            instate = Instate(cur_instate_file)
-            pnbi = instate['pech'] 
-            intoray['intoray']['rfpow'] = pech
-                
-        intoray.write("intoray")
+        #if int(getattr(self, 'TRACE', '0')):
+        #    print('update NB:workdir power from instate')
+        #    cur_instate_file = self.services.get_config_param('CURRENT_INSTATE')
+        #    instate = Instate(cur_instate_file)
+        #    instate.to_ps_pnbi(ps) 
 
         innubeam.write('innubeam')
 
@@ -175,7 +172,7 @@ class nubeam(Component):
         ps.read(cur_state_file)
         ps.update_particle_balance()
         ps.store(cur_state_file)
-        self.services.update_state() # <------- needed since the merge_current_state will be applied to STATE_WORK_DIR/CURRENT_STATE
+        self.services.update_state() # needed since the merge_current_state will be applied to STATE_WORK_DIR/CURRENT_STATE
 
         nubeam_bin = os.path.join(self.BIN_PATH, self.BIN)
         os.environ['NUBEAM_ACTION'] = 'STEP'
@@ -248,21 +245,6 @@ class nubeam(Component):
            nubeam_io.update_instate(cur_state_file, cur_instate_file) 
 
         self.services.update_state()
-
-        # -- update plasma state
-        # ps = plasmastate('ips', 1)
-        # ps.read(cur_state_file)
-        # vol = ps['vol'][:]
-        # self.services.merge_current_state('state_changes.cdf', logfile='log.update_state')
- 
-        # # --
-        # self.services.stage_state()
-        # ps = plasmastate('ips', 1)
-        # ps.read(cur_state_file)
-        # ps['vol'][:] = vol
-        # ps.update_particle_balance()
-        # ps.store(cur_state_file)
-        # self.services.update_state()
 
         # -- archive output files
         self.services.stage_output_files(timeid, self.OUTPUT_FILES, save_plasma_state=False)

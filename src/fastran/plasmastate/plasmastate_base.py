@@ -4,7 +4,7 @@
  -----------------------------------------------------------------------
 """
 
-from numpy import *
+import numpy as np
 from fastran.util.zinterp import zinterp as interp
 from Namelist import Namelist
 
@@ -23,7 +23,7 @@ class plasmastate_base():
             kappa = 0.5 * (1. + kappa0 + (kappa0 - 1.) * rho**2)
             delta = delta0 * rho**2
 
-            self['vol'][i] = pi * 2. * pi * a**2 * \
+            self['vol'][i] = np.pi * 2. * np.pi * a**2 * \
                 kappa * (r0 - 0.25 * a * kappa)
             self['g_eq'][i] = r0 * abs(b0)
 
@@ -37,7 +37,7 @@ class plasmastate_base():
         prof_spl = interp(rho, prof)
 
         rho_ps = self[xkey]
-        dat = zeros(len(rho_ps) - 1)
+        dat = np.zeros(len(rho_ps) - 1)
         vol_integral = 0.
         for i in range(len(rho_ps) - 1):
             dat[i] = 0.5 * (prof_spl(rho_ps[i + 1]) + prof_spl(rho_ps[i])) \
@@ -65,7 +65,7 @@ class plasmastate_base():
         prof_spl = interp(rho, prof)
 
         rho_ps = self[xkey]
-        dat = zeros(len(rho_ps) - 1)
+        dat = np.zeros(len(rho_ps) - 1)
         vol_integral = 0.
         for i in range(len(rho_ps) - 1):
             dat[i] = 0.5 * (prof_spl(rho_ps[i + 1]) + prof_spl(rho_ps[i])) \
@@ -77,6 +77,10 @@ class plasmastate_base():
         print('integrated : ', vol_integral)
 
     def dump_vol_profile(self, rho, xkey, ykey, k=-1):
+        if xkey not in self or ykey not in self:
+            print(f'{xkey} or {ykey} not in plasma state')
+            return np.zeros(len(rho))
+
         zone_spl = interp(self['rho_eq'], self['vol'])
 
         rho_ps = self[xkey]
@@ -86,7 +90,7 @@ class plasmastate_base():
         else:
             prof_ps = self[ykey][k]
 
-        cell = zeros(len(rho_ps) - 1)
+        cell = np.zeros(len(rho_ps) - 1)
         sum = 0.
         for i in range(len(rho_ps) - 1):
             cell[i] = prof_ps[i] / \
@@ -99,12 +103,16 @@ class plasmastate_base():
         return interp(rho_ps, node)(rho)
 
     def dump_vol_profile_m(self, rho, xkey, ykey, ksrc, k):
+        if xkey not in self or ykey not in self:
+            print(f'{xkey} or {ykey} not in plasma state')
+            return np.zeros(len(rho))
+
         zone_spl = interp(self['rho_eq'], self['vol'])
 
         rho_ps = self[xkey]
         prof_ps = self[ykey][ksrc, k]
 
-        cell = zeros(len(rho_ps) - 1)
+        cell = np.zeros(len(rho_ps) - 1)
         sum = 0.
         for i in range(len(rho_ps) - 1):
             cell[i] = prof_ps[i] / \
@@ -139,6 +147,10 @@ class plasmastate_base():
             self[ykey][k, :] = prof_ps
 
     def dump_profile(self, rho, xkey, ykey, k=-1):
+        if xkey not in self or ykey not in self:
+            print(f'{xkey} or {ykey} not in plasma state')
+            return np.zeros(len(rho))
+
         rho_ps = self[xkey]
 
         if k < 0:
@@ -154,7 +166,7 @@ class plasmastate_base():
 
     def cell2node(self, cell):
         nrho = len(cell) + 1
-        node = zeros(nrho)
+        node = np.zeros(nrho)
         node[0] = cell[0]
         for i in range(1, nrho - 1):
             node[i] = 0.5 * (cell[i - 1] + cell[i])
@@ -163,7 +175,7 @@ class plasmastate_base():
 
     def node2cell(self, node):
         nrho = len(node)
-        cell = zeros(nrho - 1)
+        cell = np.zeros(nrho - 1)
         cell[0] = node[1]
         for i in range(1, nrho - 1):
             cell[i] = 0.5 * (node[i] + node[i + 1])
@@ -171,7 +183,7 @@ class plasmastate_base():
 
     def cell2node_bdry(self, cell):
         nrho = len(cell) + 1
-        node = zeros(nrho)
+        node = np.zeros(nrho)
         node[0] = cell[0]
         node[1] = cell[0]
         for k in range(2, nrho):
@@ -198,14 +210,14 @@ class plasmastate_base():
 
         jpar_ps = interp(rho, jpar)(rho_ps)
 
-        curt = zeros(len(rho_ps))
+        curt = np.zeros(len(rho_ps))
         curt[0] = 0.
         for i in range(len(rho_ps) - 1):
             dV = vol[i + 1] - vol[i]
             jparm = 0.5 * (jpar_ps[i] + jpar_ps[i + 1])
             ipolm = 0.5 * (ipol[i] + ipol[i + 1])
             curt[i + 1] = (curt[i] / ipol[i] + jparm * dV /
-                           (2. * pi * r0 * ipolm**2)) * ipol[i + 1]
+                           (2. * np.pi * r0 * ipolm**2)) * ipol[i + 1]
 
         print('I%s=%5.3e' % (ykey, 1.e-6 * curt[-1]) + 'MA')
 
@@ -220,6 +232,10 @@ class plasmastate_base():
                     self[ykey][i] = curt[i + 1] - curt[i]
 
     def dump_j_parallel(self, rho, xkey, ykey, r0, b0, tot=False, k=-1):
+        if xkey not in self or ykey not in self:
+            print(f'{xkey} or {ykey} not in plasma state')
+            return np.zeros(len(rho))
+
         rho_ps = self[xkey]
         jpar_ps = self[ykey]
 
@@ -230,16 +246,16 @@ class plasmastate_base():
         if tot:
             curt = jpar_ps
         else:
-            curt = zeros(len(rho_ps))
+            curt = np.zeros(len(rho_ps))
             curt[0] = 0.
             for i in range(len(rho) - 1):
                 curt[i + 1] = curt[i] + jpar_ps[i]
 
-        jpar = zeros(len(rho_ps) - 1)
+        jpar = np.zeros(len(rho_ps) - 1)
         for i in range(len(rho_ps) - 1):
             dV = vol[i + 1] - vol[i]
             ipolm = 0.5 * (ipol[i] + ipol[i + 1])
-            jpar[i] = 2. * pi * r0 * ipolm**2 / dV * \
+            jpar[i] = 2. * np.pi * r0 * ipolm**2 / dV * \
                 (curt[i + 1] / ipol[i + 1] - curt[i] / ipol[i])
 
         return interp(rho, self.cell2node(jpar))(rho)
@@ -261,10 +277,10 @@ class plasmastate_base():
         z_imp = []
         a_imp = []
         k_imp = []
-        np = []
+        ni = []
         nz = []
         f_imp = []
-        nhe4 = zeros(nrho)
+        nhe4 = np.zeros(nrho)
         k_he4 = -1
         # print self['S_name'][1:]
         print(z_spec)
@@ -276,7 +292,7 @@ class plasmastate_base():
                 print('ion', spec_list[k])
                 z_ion.append(z_spec[k])
                 a_ion.append(a_spec[k])
-                np.append(self.cell2node_bdry(self['ns'][k + 1, :]))
+                ni.append(self.cell2node_bdry(self['ns'][k + 1, :]))
                 k_ion.append(k + 1)
             elif spec_list[k] == 'He4':
                 print('He4 found')
@@ -289,25 +305,25 @@ class plasmastate_base():
                 nz.append(self.cell2node_bdry(self['ns'][k + 1, :]))
                 k_imp.append(k + 1)
 
-        np = array(np)
-        nz = array(nz)
-        z_ion = array(z_ion)
-        a_ion = array(a_ion)
-        z_imp = array(z_imp)
-        a_imp = array(a_imp)
+        ni = np.array(ni)
+        nz = np.array(nz)
+        z_ion = np.array(z_ion)
+        a_ion = np.array(a_ion)
+        z_imp = np.array(z_imp)
+        a_imp = np.array(a_imp)
 
         n_ion = len(z_ion)
         n_imp = len(z_imp)
 
-        amain = sum(array([a_ion[k] * np[k] for k in range(n_ion)]), axis=0)
-        zmain = sum(array([z_ion[k] * np[k] for k in range(n_ion)]), axis=0)
-        nitot = sum(array([np[k] for k in range(n_ion)]), axis=0)
+        amain = np.sum(np.array([a_ion[k] * ni[k] for k in range(n_ion)]), axis=0)
+        zmain = np.sum(np.array([z_ion[k] * ni[k] for k in range(n_ion)]), axis=0)
+        nitot = np.sum(np.array([ni[k] for k in range(n_ion)]), axis=0)
         amain /= nitot
         zmain /= nitot
 
         ne = self.cell2node_bdry(self['ns'][0, :])
-        f_imp = array([nz[k] / ne for k in range(n_imp)])
-        f_ion = array([np[k] / nitot for k in range(n_ion)])
+        f_imp = np.array([nz[k] / ne for k in range(n_imp)])
+        f_ion = np.array([ni[k] / nitot for k in range(n_ion)])
 
         return {
             'n_ion': n_ion,
@@ -316,7 +332,7 @@ class plasmastate_base():
             'n_imp': n_imp,
             'z_imp': z_imp,
             'a_imp': a_imp,
-            'np': np,
+            'np': ni,
             'nz': nz,
             'nhe4': nhe4,
             'amain': amain,
@@ -360,16 +376,16 @@ class plasmastate_base():
         # density
         density_ion = {}
         for k in range(n_ion):
-            density_ion[k] = zeros(nrho - 1)
+            density_ion[k] = np.zeros(nrho - 1)
 
         density_imp = {}
         for k in range(n_imp):
-            density_imp[k] = zeros(nrho - 1)
+            density_imp[k] = np.zeros(nrho - 1)
 
-        density_th = zeros(nrho)
+        density_th = np.zeros(nrho)
 
-        f_ion = ns_ion / sum(ns_ion, axis=0)
-        f_imp = ns_imp / sum(ns_imp, axis=0)
+        f_ion = ns_ion / np.sum(ns_ion, axis=0)
+        f_imp = ns_imp / np.sum(ns_imp, axis=0)
 
         for i in range(nrho - 1):
             a = 0
