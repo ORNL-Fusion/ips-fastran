@@ -37,27 +37,61 @@ def write_inputfiles(f_state, f_eqdsk, nexp=201):
     ps = plasmastate('ips', 1)
     ps.read(f_state)
     spec = ps.get_species()
+    a_ion = spec['a_ion']  # a_spec?
+    z_ion = spec['z_ion']  # z_spec?
+    n_imp = spec['n_imp']
+    a_imp = spec['a_imp']
+    z_imp = spec['z_imp']
+    f_imp = spec['f_imp']
 
     # --  profiles
     nrho = len(ps['rho'])
+    nions = 5    # len(a_ion)
+    nions_alt = len(a_ion) + 2 + len(a_imp) # mains+beam+alpha+impurities
+
     rho = ps['rho'][:]
-    ne = ps['ns'][0, :]*1.e-19
+    ne = ps['ns'][0, :]  #*1.e-19
+#    ni_cell = ps['ns'][1:nions][:]
     te = ps['Ts'][0, :]
+    T_ions = np.zeros((nions,nrho))
+    for i in range(nions):
+        T_ions[i] = ps.cell2node_bdry(ps['Ts'][i+1])
     ti = ps['Ti'][:]
     zeff = ps['Zeff'][:]
     omega = ps['omegat'][:]
     ne = ps.cell2node_bdry(ne)
+    ni = np.zeros((nions,nrho))
+    for i in range(nions):
+        ni[i] = ps.cell2node_bdry(ps['ns'][i+1])
+    ni = ni * 1.0E-19
+    ne = ne * 1.0E-19
     te = ps.cell2node_bdry(te)
     ti = ps.cell2node_bdry(ti)
     zeff = ps.cell2node_bdry(zeff)
     omega = ps.cell2node_bdry(omega)
 
-    omega = ps['p_EQ'][:]
-
-    density_beam = ps.dump_profile(rho, 'rho_nbi', 'nbeami', k=0)*1.e-19
-    wbeam = ps.dump_profile(rho, 'rho_nbi', 'eperp_beami', k=0) \
+    density_beam = ps.dump_profile(rho, 'rho_nbi', 'nbeami', k=0) * 1.e-19
+    density_alpha = ps.dump_profile(rho, 'rho_fus', 'nfusi', k=0) * 1.e-19
+    tbeam = ps.dump_profile(rho, 'rho_nbi', 'eperp_beami', k=0) \
         + ps.dump_profile(rho, 'rho_nbi', 'epll_beami', k=0)
-    wbeam = density_beam*wbeam*1.602e-3 # MJ/m**3
+    talpha = ps.dump_profile(rho, 'rho_fus', 'eperp_fusi', k=0) \
+        + ps.dump_profile(rho, 'rho_fus', 'epll_fusi', k=0)  # Temps in keV already
+#    wbeam = density_beam*wbeam*1.602e-3 # MJ/m**3
+#    density_beam = ps.cell2node_bdry(density_beam)
+#    tbeam = ps.cell2node_bdry(tbeam)
+#    density_alpha = ps.cell2node_bdry(density_alpha)
+#    talpha = ps.cell2node_bdry(talpha)
+    print('Test native lengths')
+    print(a_ion)
+    print(a_imp)
+    print(z_ion)
+    print(z_imp)
+    print('NUBEAM OUTPUT LENGTHS')
+    print(len(density_beam),len(density_alpha),len(tbeam),len(talpha))
+    for i_r in range(nrho):
+        tbeam[i_r] = max(tbeam[i_r],1.0e-3)
+        talpha[i_r] = max(talpha[i_r],1.0e-3)
+
 
     # -- metrics
     psi = ps['psipol'][:]/ps['psipol'][-1]  # equi-drho grid
@@ -79,93 +113,130 @@ def write_inputfiles(f_state, f_eqdsk, nexp=201):
     shift = rmajor-r0
     kappa = ps['elong'][:]
     delta = ps['triang'][:]
-    pmhd = ps['P_eq'][:]
+#    pmhd = ps['pmhd'][:]
+    pmhd = ne * te
+    for i_ion in range(nions):
+        pmhd = pmhd + ni[i_ion]*ti[i_ion]
+    pmhd = pmhd + density_beam*tbeam + density_alpha*talpha
+    pmhd = 1.6018*1.e3 * pmhd
     qmhd = ps['q_eq'][:]
-    
-    zaxis = ps['Z_axis']
-    # zeta = 0.5 * (ps['squareLO'][:] + squareUO[:]) 
+
+
+    zaxis = ps['Z_midp'][:]
+    zeta = 0.5 * (ps['squareLO'][:] + ps['squareUO'][:]) 
 
     # write input.gacode
-    nions = len ps['ns']-1
 
-    f = open('input.gacode', 'w')
-      f.write('# transitory statefile for TGLF-EP.'+'\n')
-      f.write('# nexp'+'\n')
-      f.write('{nrho}'+'\n')
-      f.write('# nion'+'\n')
-      f.write('{nions}'+'\n')
-      f.write('# name'+'\n')
-      f.write('D D C'+'\n')
-      f.write('# type'+'\n')
-      f.write('[therm] [fast] [therm]'+'\n')
-      f.write('# masse'+'\n')
-      f.write('5.4488739E-04'+'\n')
-      f.write('# mass'+'\n')
-      f.write('2.0000000E+00 2.0000000E+00 12.0000000E+00'+'\n')
-      f.write('# ze'+'\n')
-      f.write('# z'+'\n')
-      f.write('1.0000000E+00 1.0000000E+00 6.0000000E+00'+'\n')
-      f.write('# torfluxa | Wb/radian')
-      f.write('{rhob}'+'\n')
-      f.write('# rcentr | m',+'\n')
-      f.write('{r0}'+'\n')
-      f.write('# bcentr | T'+'\n')
-      f.write('{b0}'+'\n')
-      f.write('# current'+'\n')
-      f.write('{ip}'+'\n')
-      f.write('# rho | -'+'\n')
-      for ir in range(nrho):
-          f.write('{:>3} {:>14.7E}'+'\n'.format(ir,rho[ir]))
-      f.write('# rmin | m'+'\n')
-      for ir in range(nrho):
-          f.write('{:>3} {:>14.7E}'+'\n'.format(ir,rminor[ir]))
-      f.write('# polflux | Wb/radian'+'\n')
-      for ir in range(nrho):
-          f.write('{:>3} {:>14.7E}'+'\n'.format(ir,psi[ir]))
-      f.write('# q | -'+'\n')
-      for ir in range(nrho):
-          f.write('{:>3} {:>14.7E}'+'\n'.format(ir,qmhd[ir]))
-      f.write('# rmaj | m'+'\n')
-      for ir in range(nrho):
-          f.write('{:>3} {:>14.7E}'+'\n'.format(ir,rmajor[ir]))
-      f.write('# zmag | m'+'\n')
-      for ir in range(nrho):
-          f.write('{:>3} {:>14.7E}'+'\n'.format(ir,zaxis[ir]))
-      f.write('# kappa | -'+'\n')
-      for ir in range(nrho):
-          f.write('{:>3} {:>14.7E}'+'\n'.format(ir,kappa[ir]))
-      f.write('# delta | -'+'\n')
-      for ir in range(nrho):
-          f.write('{:>3} {:>14.7E}'+'\n'.format(ir,delta[ir]))
-      f.write('# zeta | -'+'\n')
-      for ir in range(nrho):
-          f.write('{:>3} {:>14.7E}'+'\n'.format(ir,zeta[ir]))
-      f.write('# ne | 10^19/m^3'+'\n')
-      for ir in range(nrho):
-          f.write('{:>3} {:>14.7E}'+'\n'.format(ir,ne[ir]))
-      f.write('# ni | 10^19/m^3'+'\n')
-      for ir in range(nrho):
-          f.write('{:>3}'.format(ir,ps[ir]))
-          for jions in range(nions):
-              f.write(' {:>14.7E}'.format(ps['ns'][jions+1,ir]))
-          f.write('\n')
-      f.write('# te | keV'+'\n')
-      for ir in range(nrho):
-          f.write('{:>3} {:>14.7E}'+'\n'.format(ir,te[ir]))
-      f.write('# ti | keV'+'\n')
-      for ir in range(nrho):
-          f.write('{:>3}'.format(ir,ps[ir])))                          
-          for jions in range(nions):
-              f.write(' {:>14.7E}'.format(ps['Ts'][jions+1,ir]))
-          f.write('\n')    
-      f.write('# ptot | Pa'+'\n')
-      for ir in range(nrho):
-          f.write('{:>3} {:>14.7E}'+'\n'.format(ir,pmhd[ir]))
-      f.write('# z_eff | -'+'\n')
-      for ir in range(nrho):
-          f.write('{:>3} {:>14.7E}'+'\n'.format(ir,zeff[ir]))
+    with open('input.gacode', 'w') as f:
+        f.write('# transitory statefile for TGLF-EP.'+'\n')
+        f.write('# nexp'+'\n')
+        f.write(f'{nrho}'+'\n')
+        f.write('# nion'+'\n')
+        f.write(f'{nions_alt}'+'\n')
+        f.write('# name'+'\n')
+        f.write('D T ')  # Hardcoded ion names
+        f.write('D He ')  # Hardcoded D beam and alphas
+        f.write('He Be Ar') # Hardcoded thermal impurities
+        f.write('\n')
+        f.write('# type'+'\n')
+        for x in a_ion:
+            f.write('[therm] ')  # Main ions
+        f.write('[fast] [fast]')   # Hardcoded 2 EP species
+        for x in a_imp:
+            f.write('[therm] ')  # For each impurity
+        f.write('\n')
+        f.write('# masse'+'\n')
+        f.write('5.4488739E-04'+'\n')
+        f.write('# mass'+'\n')
+        for x in a_ion:
+            f.write(f'{x:>14.7E}')   # Mmain ions
+        f.write(f'{2.0:>14.7E}')     # D beam
+        f.write(f'{4.0:>14.7E}')     # alpha particles
+        for x in a_imp:
+            f.write(f'{x:>14.7E}')      # For each impurity
+        f.write('\n')
+        f.write('# ze'+'\n')
+        f.write('-1.0000000E+00'+'\n')
+        f.write('# z'+'\n')
+        for x in z_ion:
+            f.write(f'{x:>14.7E}')  # Main ions
+        f.write(f'{1.0:>14.7E}')        # D beam
+        f.write(f'{2.0:>14.7E}')        # alphas
+        for x in z_imp:
+            f.write(f'{x:>14.7E}')
+        f.write('\n')
+        f.write('# torfluxa | Wb/radian'+'\n')
+        f.write(f'{rhob:>14.7E}'+'\n')
+        f.write('# rcentr | m'+'\n')
+        f.write(f'{r0:>14.7E}'+'\n')
+        f.write('# bcentr | T'+'\n')
+        f.write(f'{b0:>14.7E}'+'\n')
+        f.write('# current | MA'+'\n')
+        f.write(f'{ip*10E-6:>14.7E}'+'\n')
+        f.write('# rho | -'+'\n')
+        for ir in range(nrho):
+            f.write(f'{ir+1:>3} {rho[ir]:>14.7E}'+'\n')
+        f.write('# rmin | m'+'\n')
+        for ir in range(nrho):
+            f.write(f'{ir+1:>3} {rminor[ir]:>14.7E}'+'\n')
+        f.write('# polflux | Wb/radian'+'\n')
+        for ir in range(nrho):
+            f.write(f'{ir+1:>3} {psi[ir]:>14.7E}'+'\n')
+        f.write('# q | -'+'\n')
+        for ir in range(nrho):
+            f.write(f'{ir+1:>3} {qmhd[ir]:>14.7E}'+'\n')
+        f.write('# rmaj | m'+'\n')
+        for ir in range(nrho):
+            f.write(f'{ir+1:>3} {rmajor[ir]:>14.7E}'+'\n')
+        f.write('# zmag | m'+'\n')
+        for ir in range(nrho):
+            f.write(f'{ir+1:>3} {zaxis[ir]:>14.7E}'+'\n')
+        f.write('# kappa | -'+'\n')
+        for ir in range(nrho):
+            f.write(f'{ir+1:>3} {kappa[ir]:>14.7E}'+'\n')
+        f.write('# delta | -'+'\n')
+        for ir in range(nrho):
+            f.write(f'{ir+1:>3} {delta[ir]:>14.7E}'+'\n')
+        f.write('# zeta | -'+'\n')
+        for ir in range(nrho):
+            f.write(f'{ir+1:>3} {zeta[ir]:>14.7E}'+'\n')
+        f.write('# ne | 10^19/m^3'+'\n')
+        for ir in range(nrho):
+            f.write(f'{ir+1:>3} {ne[ir]:>14.7E}'+'\n')
+        f.write('# ni | 10^19/m^3'+'\n')
+        for ir in range(nrho):
+            f.write(f'{ir+1:>3}')
+            jion = 0
+            for x in a_ion:
+                f.write(f' {ni[jion][ir]:>14.7E}')    # main ions
+                jion = jion + 1
+            f.write(f' {density_beam[ir]:>14.7E}')  # D beam
+            f.write(f' {density_alpha[ir]:>14.7E}') # alpha particles
+            for x in a_imp:
+                f.write(f" {ni[jion][ir]:>14.7E}") # All impurities
+                jion = jion + 1
+            f.write('\n')
+        f.write('# te | keV'+'\n')
+        for ir in range(nrho):
+            f.write(f'{ir+1:>3} {te[ir]:>14.7E}'+'\n')
+        f.write('# ti | keV'+'\n')
+        for ir in range(nrho):
+            f.write(f'{ir+1:>3}')
+            for x in a_ion:
+                f.write(f' {ti[ir]:>14.7E}')        # main ions
+            f.write(f' {tbeam[ir]:>14.7E}')     # D beam
+            f.write(f' {talpha[ir]:>14.7E}')    # alpha particles
+            for x in a_imp:
+                f.write(f" {ti[ir]:>14.7E}")   # Each impurity (ion temps all same)
+            f.write('\n')    
+        f.write('# ptot | Pa'+'\n')
+        for ir in range(nrho):
+            f.write(f'{ir+1:>3} {pmhd[ir]:>14.7E}'+'\n')
+        f.write('# z_eff | -'+'\n')
+        for ir in range(nrho):
+            f.write(f'{ir+1:>3} {zeff[ir]:>14.7E}'+'\n')
 
-    f.close()
+        f.close()
 
 def update_state():
     print('tglfep update_state')
