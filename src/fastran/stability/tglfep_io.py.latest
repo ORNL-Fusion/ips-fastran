@@ -141,7 +141,7 @@ def write_inputfiles(f_state, f_eqdsk, nexp=201):
         f.write('# type'+'\n')
         for x in a_ion:
             f.write('[therm] ')  # Main ions
-        f.write('[fast] [fast] ')   # Hardcoded 2 EP species
+        f.write('[fast] [fast]')   # Hardcoded 2 EP species
         for x in a_imp:
             f.write('[therm] ')  # For each impurity
         f.write('\n')
