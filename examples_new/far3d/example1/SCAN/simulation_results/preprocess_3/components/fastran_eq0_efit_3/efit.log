@@ -1,0 +1,54 @@
+NCAPTC: : NetCDF: Variable not found
+Warning: ieee_overflow is signaling
+Warning: ieee_underflow is signaling
+Warning: ieee_inexact is signaling
+FORTRAN STOP
+ solver
+ /global/common/software/atom/perlmutter/data/greentable/
+ /global/common/software/atom/perlmutter/data/greentable/
+
+          EFITD Version  07/09/2014
+
+
+ type mode (2=file, 3=snap, 4=time, 5=input, 6=com file, 7=snap_ext):
+
+ number of time slices?
+
+ type input file names:
+ #
+ table_dir = </global/common/software/atom/perlmutter/data/greentable/>
+
+  ----- time =     1 ms ----- ( 0)
+ it=  1 chi2=0.00E+00 zm=-1.18E-04 err=1.882E+00 dz=-1.175E-04 chigam= 0.00E+00
+ it=  2 chi2=0.00E+00 zm=-1.15E-04 err=2.606E-01 dz= 2.794E-06 chigam= 0.00E+00
+ it=  3 chi2=0.00E+00 zm=-7.70E-05 err=1.487E-01 dz= 3.774E-05 chigam= 0.00E+00
+ it=  4 chi2=0.00E+00 zm=-5.52E-05 err=8.435E-02 dz= 2.181E-05 chigam= 0.00E+00
+ it=  5 chi2=0.00E+00 zm=-4.55E-05 err=4.598E-02 dz= 9.721E-06 chigam= 0.00E+00
+ it=  6 chi2=0.00E+00 zm=-4.27E-05 err=2.503E-02 dz= 2.758E-06 chigam= 0.00E+00
+ it=  7 chi2=0.00E+00 zm=-3.67E-05 err=1.257E-02 dz= 6.003E-06 chigam= 0.00E+00
+ it=  8 chi2=0.00E+00 zm=-3.63E-05 err=6.686E-03 dz= 4.544E-07 chigam= 0.00E+00
+ it=  9 chi2=0.00E+00 zm=-4.09E-05 err=3.615E-03 dz=-4.628E-06 chigam= 0.00E+00
+ it= 10 chi2=0.00E+00 zm=-4.04E-05 err=1.955E-03 dz= 4.888E-07 chigam= 0.00E+00
+ it= 11 chi2=0.00E+00 zm=-3.98E-05 err=1.059E-03 dz= 5.635E-07 chigam= 0.00E+00
+ it= 12 chi2=0.00E+00 zm=-3.95E-05 err=5.756E-04 dz= 3.021E-07 chigam= 0.00E+00
+ it= 13 chi2=0.00E+00 zm=-3.94E-05 err=3.375E-04 dz= 1.527E-07 chigam= 0.00E+00
+ it= 14 chi2=0.00E+00 zm=-3.93E-05 err=2.053E-04 dz= 8.346E-08 chigam= 0.00E+00
+ it= 15 chi2=0.00E+00 zm=-3.92E-05 err=1.247E-04 dz= 5.054E-08 chigam= 0.00E+00
+ it= 16 chi2=0.00E+00 zm=-3.92E-05 err=7.568E-05 dz= 2.734E-08 chigam= 0.00E+00
+
+      ******************** EFITD129 x 129  output ********************
+
+       data used:   
+  0 flux loops
+  0 magnetic probes(i)
+  0 full rogowski
+  0 diamagnetic loop
+
+
+ shot #   =          1 time(ms) =          1 chi**2   =  0.000E+00
+ betat(%) =      2.300 betap    =      1.746 li       =      0.631
+ vol(cm3) =  0.186E+08 rout(cm) =    170.473 zout(cm) =     -0.038
+ elong    =      1.985 utriang  =      0.609 ltriang  =      0.609
+ a(cm)    =     56.934 lin(cm)  = ********** lout(cm) =      1.243
+ ltop(cm) = ********** q*       =      9.889 rc(cm)   =    177.430
+ zc(cm)   =     -0.030 bt0(t)   =      2.000 qout     =     10.525

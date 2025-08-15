@@ -1,0 +1,12 @@
+&INHCD
+  NSRC = 1 
+  PE = 30.0 
+  PI = 8.0 
+  XMID = 0.0 
+  XWID = 0.3 
+  J0_SEED = 0.0 
+  X0_SEED = 0.0 
+  DRHO_SEED = 0.3 
+/
+
+

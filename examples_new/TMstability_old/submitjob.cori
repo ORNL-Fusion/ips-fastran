@@ -1,0 +1,84 @@
+#!/bin/bash -l
+
+##SBATCH -p debug
+###SBATCH -N 1
+##SBATCH -N 5 
+##SBATCH -t 00:30:00
+
+#SBATCH -p regular
+#SBATCH --qos=premium
+#SBATCH -N 5 
+#SBATCH -t 01:00:00
+
+#SBATCH -J ips_fastran
+#SBATCH -e ips.err
+#SBATCH -o ips.out
+
+#SBATCH -C haswell
+
+module load python/2.7-anaconda-4.4 cray-netcdf
+module load ncl
+
+export ATOM=/project/projectdirs/atom/atom-install-edison
+export LOCAL=/global/project/projectdirs/atom/atom-install-edison/cesol
+export IPSCONFIG_DIR=$LOCAL/conf
+
+export IPS_ROOT=$ATOM/ips-gnu-sf
+export DAKOTA_ROOT=$ATOM/dakota
+export FASTRAN_ROOT=$LOCAL/ips-fastran
+export EPED_ROOT=$ATOM/ips-eped
+export DATA_ROOT=$ATOM/data
+
+export LD_LIBRARY_PATH=$LOCAL/lib/netcdf_intel_16.0_11/lib:$LOCAL/lib/hdf5_intel_16.0_11/lib:$DAKOTA_ROOT/lib:$LD_LIBRARY_PATH
+export PATH=$DAKOTA_ROOT/bin:$IPS_ROOT/bin:$PATH
+
+export PYTHONPATH=$EPED_ROOT/src:$PYTHONPATH
+export PYTHONPATH=$EPED_ROOT/lib:$PYTHONPATH
+export PYTHONPATH=$FASTRAN_ROOT/lib:$PYTHONPATH
+export PYTHONPATH=$FASTRAN_ROOT/utils:$PYTHONPATH
+export PYTHONPATH=$FASTRAN_ROOT/src:$PYTHONPATH
+export PYTHONPATH=$IPS_ROOT/bin:$PYTHONPATH
+
+export PYTHONPATH=$LOCAL/share/pyps:$PYTHONPATH
+
+export ATOM_BIN_DIR=$ATOM/binaries
+export PSTOOL_BIN_DIR=$ATOM_BIN_DIR/pstool/default
+export PSTOOL_BIN_NAME=pstool
+export WGEQDSK_BIN_DIR=$ATOM_BIN_DIR/wgeqdsk/default
+export WGEQDSK_BIN_NAME=wgeqdsk
+export FASTRAN_BIN_DIR=$ATOM_BIN_DIR/fastran/default
+export FASTRAN_BIN_NAME=xfastran_ver0.9  
+export FASTRAN_SERIAL_BIN_NAME=xfastran_ver0.9_ser  
+export EFIT_BIN_DIR=$ATOM_BIN_DIR/efit/default
+export EFIT_BIN_NAME=efitd90
+export ESC_BIN_DIR=$ATOM_BIN_DIR/esc/default
+export ESC_BIN_NAME=xesc
+export NUBEAM_BIN_DIR=$ATOM_BIN_DIR/nubeam/default
+export NUBEAM_BIN_NAME=mpi_nubeam_comp_exec
+export TORAY_BIN_DIR=$ATOM_BIN_DIR/toray/default
+export TORAY_BIN_NAME=xtoray
+export CURRAY_BIN_DIR=$ATOM_BIN_DIR/curray/default
+export CURRAY_BIN_NAME=xcurray
+export GENRAY_BIN_DIR=$ATOM_BIN_DIR/genray/default
+export GENRAY_BIN_NAME=xgenray.intel.edison
+export NFREYA_BIN_PATH=$FASTRAN_ROOT/bin
+export NFREYA_BIN_NAME=onetwo_129_201
+export NFREYA_DATA_ROOT=/project/projectdirs/atom/users/parkjm
+
+export PS_BACKEND=pyps
+
+export CPU=LINUX
+
+export CORSICA_ROOT=/global/project/projectdirs/atom/atom-install-edison/cesol/dcon
+export DCON=$CORSICA_ROOT/dcon
+export CORSICA_PFB=$CORSICA_ROOT/scripts
+export CORSICA_SCRIPTS=$CORSICA_ROOT/scripts
+
+export CALTRANS_BIN_DIR=$CORSICA_ROOT/bin
+export CALTRANS_BIN_NAME=caltrans
+
+export PEST3_BIN_DIR=$ATOM_BIN_DIR/pest3/default
+export PEST3_BIN_NAME=pest3x
+
+#python $IPS_ROOT/bin/ips.py --config=fastran_modeleq.config --platform=$IPSCONFIG_DIR/edison.conf_serial --log=ips.log
+srun -n 5 -c 48 python $FASTRAN_ROOT/massive_serial/ips_massive_serial.py inscan fastran_modeleq.config 24
