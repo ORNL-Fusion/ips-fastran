@@ -1,0 +1,20 @@
+#!/bin/bash -l
+#SBATCH -q debug
+#SBATCH -N 1
+#SBATCH -t 00:30:00
+#SBATCH -J ips_fastran 
+#SBATCH -e ips.err
+#SBATCH -o ips.out
+#SBATCH -C cpu
+
+module load python
+source activate /global/common/software/atom/perlmutter/cesol/conda/dev
+export PYTHONPATH=$HOME/FREDA_EP/ips-fastran/src:$PYTHONPATH # <== set to your local path
+export FAR3D_BIN_DIR=$BIN_DIR/far3d/linear
+export FAR3D_BIN_NAME=xfar3d
+export SHOT_NUMBER=000001
+export TIME_ID=00001
+
+ips.py --simulation=fastran_scenario.config --platform=$MACHINE_CONFIG --log=ips.log
+
+conda deactivate

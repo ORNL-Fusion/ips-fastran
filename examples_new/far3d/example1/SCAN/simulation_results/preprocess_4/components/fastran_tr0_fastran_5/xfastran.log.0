@@ -1,0 +1,67 @@
+========================================================================
+= FASTRAN
+
+nonlinear model = 1
+ichi = 1
+ineo = 0
+reading state...
+read formatted input, inprof...
+init geometry...
+read formatted input, inmetric...
+nrho in inmetric = 101
+rhob in inmetric = 1.838143e+00
+solve avg grad-shafranv...
+solve_avg_gs::Ip_temp = 7.913681e+00 
+solve_avg_gs::Ip      = 8.100000e+00 
+>>> tau_he = 5.000000, nhe(0)=-nan
+
+ plasma volume = 242.084896
+ stored energy(e,i,b,a) = 2.492545e+01 -nan 0.000000e+00 0.000000e+00
+ betan = -nan
+*power
+ Pnb(e,i) = 0.000000e+00 0.000000e+00
+ Prf(e,i) = 3.000079e+01 8.000210e+00
+ Prad     = -nan 
+ Pei      = -nan 
+ Pfuse    = -nan 
+ Pfusi    = -nan 
+ Poh      = 0.000000e+00 
+*confinement time
+ taut, tauITER98y2, H98y2 : -nan -nan -nan
+ taue, taui : -nan -nan
+ taut, tau89, H89 : -nan -nan -nan
+*temperature
+ nea, nebar : 1.856046e+01 2.106126e+01 
+ tea, tia : 2.365447e+00 2.365447e+00 (1.000000e+00)
+ te0, ti0 : -2.156937e-02 -2.156937e-02 (1.000000e+00)
+ Sn : 0.000000e+00 
+*current balance
+ Ip,Ibs,Inb,Irf: 8.100000e+00 1.492384e+00 0.000000e+00 0.000000e+00
+ fni,fbs: 0.184 0.184
+
+ plasma volume = 242.084896
+ stored energy(e,i,b,a) = 2.492545e+01 -nan 0.000000e+00 0.000000e+00
+ betan = -nan
+*power
+ Pnb(e,i) = 0.000000e+00 0.000000e+00
+ Prf(e,i) = 3.000079e+01 8.000210e+00
+ Prad     = -nan 
+ Pei      = -nan 
+ Pfuse    = -nan 
+ Pfusi    = -nan 
+ Poh      = 0.000000e+00 
+*confinement time
+ taut, tauITER98y2, H98y2 : -nan -nan -nan
+ taue, taui : -nan -nan
+ taut, tau89, H89 : -nan -nan -nan
+*temperature
+ nea, nebar : 1.856046e+01 2.106126e+01 
+ tea, tia : 2.365447e+00 2.365447e+00 (1.000000e+00)
+ te0, ti0 : -2.156937e-02 -2.156937e-02 (1.000000e+00)
+ Sn : 0.000000e+00 
+*current balance
+ Ip,Ibs,Inb,Irf: 8.100000e+00 1.492384e+00 0.000000e+00 0.000000e+00
+ fni,fbs: 0.184 0.184
+ ELAPASED TIME = 1 sec
+
+finalize

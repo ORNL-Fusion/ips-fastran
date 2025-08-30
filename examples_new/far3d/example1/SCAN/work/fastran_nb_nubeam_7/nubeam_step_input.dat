@@ -1,0 +1,5 @@
+&NBI_UPDATE
+  NLTEST_OUTPUT = 0 
+  NBBCX_BB = 0 
+/
+

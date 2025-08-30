@@ -1,0 +1,621 @@
+  
+  ==> nubeam_comp_exec Jun 2011 vsn (server mod: DMC) 
+  
+%nubeam_comp_exec: MPI Mode: myid=     0 proc_name= nid004348
+  
+  %nubeam_comp_exec: FRANTIC_ACTION value: NONE
+  %nubeam_comp_exec: NUBEAM_WORKPATH: ./
+  
+  ==> nubeam_comp_exec Jun 2011 vsn (server mod: DMC) 
+  
+%nubeam_comp_exec: MPI Mode: myid=     2 proc_name= nid004348
+  
+  ==> nubeam_comp_exec Jun 2011 vsn (server mod: DMC) 
+  
+%nubeam_comp_exec: MPI Mode: myid=     3 proc_name= nid004348
+  
+  ==> nubeam_comp_exec Jun 2011 vsn (server mod: DMC) 
+  
+%nubeam_comp_exec: MPI Mode: myid=     8 proc_name= nid004348
+  
+  ==> nubeam_comp_exec Jun 2011 vsn (server mod: DMC) 
+  
+%nubeam_comp_exec: MPI Mode: myid=    14 proc_name= nid004348
+  
+  ==> nubeam_comp_exec Jun 2011 vsn (server mod: DMC) 
+  
+%nubeam_comp_exec: MPI Mode: myid=    16 proc_name= nid004348
+%nubeam_comp_exec: MPI Mode: myid=    17 proc_name= nid004348
+  
+  ==> nubeam_comp_exec Jun 2011 vsn (server mod: DMC) 
+  
+%nubeam_comp_exec: MPI Mode: myid=    22 proc_name= nid004348
+  %nubeam_comp_exec: FRANTIC_ACTION value:NONE
+  %nubeam_comp_exec:  NUBEAM_ACTION = STEP.
+  open_append: ./nubeam_status_summary.log
+  
+  ==> nubeam_comp_exec Jun 2011 vsn (server mod: DMC) 
+  
+%nubeam_comp_exec: MPI Mode: myid=     1 proc_name= nid004348
+  
+  ==> nubeam_comp_exec Jun 2011 vsn (server mod: DMC) 
+  
+%nubeam_comp_exec: MPI Mode: myid=     4 proc_name= nid004348
+  
+  ==> nubeam_comp_exec Jun 2011 vsn (server mod: DMC) 
+  
+%nubeam_comp_exec: MPI Mode: myid=     5 proc_name= nid004348
+  
+  ==> nubeam_comp_exec Jun 2011 vsn (server mod: DMC) 
+  
+%nubeam_comp_exec: MPI Mode: myid=     6 proc_name= nid004348
+  
+  ==> nubeam_comp_exec Jun 2011 vsn (server mod: DMC) 
+  
+%nubeam_comp_exec: MPI Mode: myid=     7 proc_name= nid004348
+  
+  ==> nubeam_comp_exec Jun 2011 vsn (server mod: DMC) 
+  
+%nubeam_comp_exec: MPI Mode: myid=     9 proc_name= nid004348
+  
+  ==> nubeam_comp_exec Jun 2011 vsn (server mod: DMC) 
+  
+%nubeam_comp_exec: MPI Mode: myid=    10 proc_name= nid004348
+  
+  ==> nubeam_comp_exec Jun 2011 vsn (server mod: DMC) 
+  
+%nubeam_comp_exec: MPI Mode: myid=    11 proc_name= nid004348
+  
+  ==> nubeam_comp_exec Jun 2011 vsn (server mod: DMC) 
+  
+%nubeam_comp_exec: MPI Mode: myid=    12 proc_name= nid004348
+  
+  ==> nubeam_comp_exec Jun 2011 vsn (server mod: DMC) 
+  
+%nubeam_comp_exec: MPI Mode: myid=    13 proc_name= nid004348
+  
+  ==> nubeam_comp_exec Jun 2011 vsn (server mod: DMC) 
+  
+%nubeam_comp_exec: MPI Mode: myid=    15 proc_name= nid004348
+  
+  ==> nubeam_comp_exec Jun 2011 vsn (server mod: DMC) 
+  
+  
+  ==> nubeam_comp_exec Jun 2011 vsn (server mod: DMC) 
+  
+%nubeam_comp_exec: MPI Mode: myid=    18 proc_name= nid004348
+  
+  ==> nubeam_comp_exec Jun 2011 vsn (server mod: DMC) 
+  
+%nubeam_comp_exec: MPI Mode: myid=    19 proc_name= nid004348
+  
+  ==> nubeam_comp_exec Jun 2011 vsn (server mod: DMC) 
+  
+%nubeam_comp_exec: MPI Mode: myid=    20 proc_name= nid004348
+  
+  ==> nubeam_comp_exec Jun 2011 vsn (server mod: DMC) 
+  
+%nubeam_comp_exec: MPI Mode: myid=    21 proc_name= nid004348
+  
+  ==> nubeam_comp_exec Jun 2011 vsn (server mod: DMC) 
+  
+%nubeam_comp_exec: MPI Mode: myid=    23 proc_name= nid004348
+  open_append: ./nubeam_save_files.output
+  %nubeam_comp_exec: LOG_LEVEL env. var:
+  !nubeam_comp_exec:   LOGFILE_LEVEL: warn
+  %nubeam_comp_exec: SUMMARY_TEST postprocessing requested.
+  %nubeam_comp_exec(0) NUBEAM_REPEAT_COUNT: 1x0.050000
+  %nubeam_comp_exec: open file: ./nubeam_step_files.dat
+  %nubeam_comp_exec: read namelist in file:
+  
+   NUBEAM_FILES namelist contents:
+  
+      input_plasma_state = "s000001.00001"
+      output_plasma_state = ""
+      plasma_state_update = "state_changes.cdf"
+  
+      init_namelist = ""
+      init_cdf = ""
+  
+      step_namelist = "nubeam_step_input.dat"
+      step_cdf = ""
+  
+      RF_idata = ""
+      RF_odata = ""
+  
+  %nubeam_comp_exec: namelist logic check OK.
+ nubeam_comp_exec: complete STEP environment.
+ nubeam_comp_exec finished with environment.
+  (mpi_share_env) process myid=           0  cwd: /global/u2/y/yashu_gh/FREDA_EP/ips-fastran/examples_new/far3d/example1/SCAN/work/fastran_nb_nubeam_7
+  (mpi_share_env) process myid=           2  cwd: /global/u2/y/yashu_gh/FREDA_EP/ips-fastran/examples_new/far3d/example1/SCAN/work/fastran_nb_nubeam_7
+  (mpi_share_env) process myid=          13  cwd: /global/u2/y/yashu_gh/FREDA_EP/ips-fastran/examples_new/far3d/example1/SCAN/work/fastran_nb_nubeam_7
+  (mpi_share_env) process myid=          22  cwd: /global/u2/y/yashu_gh/FREDA_EP/ips-fastran/examples_new/far3d/example1/SCAN/work/fastran_nb_nubeam_7
+  (mpi_share_env) process myid=           1  cwd: /global/u2/y/yashu_gh/FREDA_EP/ips-fastran/examples_new/far3d/example1/SCAN/work/fastran_nb_nubeam_7
+  (mpi_share_env) process myid=           3  cwd: /global/u2/y/yashu_gh/FREDA_EP/ips-fastran/examples_new/far3d/example1/SCAN/work/fastran_nb_nubeam_7
+  (mpi_share_env) process myid=           8  cwd: /global/u2/y/yashu_gh/FREDA_EP/ips-fastran/examples_new/far3d/example1/SCAN/work/fastran_nb_nubeam_7
+  (mpi_share_env) process myid=           9  cwd: /global/u2/y/yashu_gh/FREDA_EP/ips-fastran/examples_new/far3d/example1/SCAN/work/fastran_nb_nubeam_7
+  (mpi_share_env) process myid=          10  cwd: /global/u2/y/yashu_gh/FREDA_EP/ips-fastran/examples_new/far3d/example1/SCAN/work/fastran_nb_nubeam_7
+  (mpi_share_env) process myid=          11  cwd: /global/u2/y/yashu_gh/FREDA_EP/ips-fastran/examples_new/far3d/example1/SCAN/work/fastran_nb_nubeam_7
+  (mpi_share_env) process myid=          15  cwd: /global/u2/y/yashu_gh/FREDA_EP/ips-fastran/examples_new/far3d/example1/SCAN/work/fastran_nb_nubeam_7
+ -------------------------------------------- 
+ process_id:            0  mpi_printenv:
+  _cwd =
+    /global/u2/y/yashu_gh/FREDA_EP/ips-fastran/examples_new/far3d/example1/SCAN/work/fastran_nb_nubeam_7
+  _nargs = 0
+  FRANTIC_INIT = 
+  FRANTIC_ACTION = NONE
+  %nubeam_comp_exec[0:3]: myid=           0  -- mpi_share_env OK.
+  %nubeam_comp_exec[0:3]: myid=           1  -- mpi_share_env OK.
+  (mpi_share_env) process myid=           4  cwd: /global/u2/y/yashu_gh/FREDA_EP/ips-fastran/examples_new/far3d/example1/SCAN/work/fastran_nb_nubeam_7
+  (mpi_share_env) process myid=           5  cwd: /global/u2/y/yashu_gh/FREDA_EP/ips-fastran/examples_new/far3d/example1/SCAN/work/fastran_nb_nubeam_7
+  (mpi_share_env) process myid=           6  cwd: /global/u2/y/yashu_gh/FREDA_EP/ips-fastran/examples_new/far3d/example1/SCAN/work/fastran_nb_nubeam_7
+  (mpi_share_env) process myid=           7  cwd: /global/u2/y/yashu_gh/FREDA_EP/ips-fastran/examples_new/far3d/example1/SCAN/work/fastran_nb_nubeam_7
+  (mpi_share_env) process myid=          12  cwd: /global/u2/y/yashu_gh/FREDA_EP/ips-fastran/examples_new/far3d/example1/SCAN/work/fastran_nb_nubeam_7
+  (mpi_share_env) process myid=          14  cwd: /global/u2/y/yashu_gh/FREDA_EP/ips-fastran/examples_new/far3d/example1/SCAN/work/fastran_nb_nubeam_7
+  (mpi_share_env) process myid=          16  cwd: /global/u2/y/yashu_gh/FREDA_EP/ips-fastran/examples_new/far3d/example1/SCAN/work/fastran_nb_nubeam_7
+  (mpi_share_env) process myid=          17  cwd: /global/u2/y/yashu_gh/FREDA_EP/ips-fastran/examples_new/far3d/example1/SCAN/work/fastran_nb_nubeam_7
+  (mpi_share_env) process myid=          18  cwd: /global/u2/y/yashu_gh/FREDA_EP/ips-fastran/examples_new/far3d/example1/SCAN/work/fastran_nb_nubeam_7
+  (mpi_share_env) process myid=          19  cwd: /global/u2/y/yashu_gh/FREDA_EP/ips-fastran/examples_new/far3d/example1/SCAN/work/fastran_nb_nubeam_7
+  (mpi_share_env) process myid=          20  cwd: /global/u2/y/yashu_gh/FREDA_EP/ips-fastran/examples_new/far3d/example1/SCAN/work/fastran_nb_nubeam_7
+  (mpi_share_env) process myid=          21  cwd: /global/u2/y/yashu_gh/FREDA_EP/ips-fastran/examples_new/far3d/example1/SCAN/work/fastran_nb_nubeam_7
+  (mpi_share_env) process myid=          23  cwd: /global/u2/y/yashu_gh/FREDA_EP/ips-fastran/examples_new/far3d/example1/SCAN/work/fastran_nb_nubeam_7
+  myid=          23   msg I/O on unit            6  written to: ./nubeam_comp_23.msgs
+  NUBEAM_ACTION = STEP
+  NUBEAM_WORKPATH = ./
+  LOG_LEVEL = 
+  LOGFILE_LEVEL = warn
+  MAX_MPI_INT_BLOCK = 
+  MAX_MPI_R8_BLOCK = 
+  PREACTDIR = /global/common/software/atom/perlmutter/data/nubeam/PREACT
+  ADASDIR = /global/common/software/atom/perlmutter/data/nubeam/ADAS
+  NUBEAM_POSTPROC = SUMMARY_TEST
+  NUBEAM_REPEAT_COUNT = 1x0.050000
+  STEPFLAG = TRUE
+  LIST_FLAG = FALSE
+  SERVER_FLAG = FALSE
+  PPPLCLUSTER_HOME = 
+  MPI_SHARE_ENV_DEBUG = 
+ end mpi_printenv
+ ------------------------ 
+ 
+  myid=           1   msg I/O on unit            6  written to: ./nubeam_comp_1.msgs
+  %nubeam_comp_exec[0:3]: myid=           2  -- mpi_share_env OK.
+  myid=           2   msg I/O on unit            6  written to: ./nubeam_comp_2.msgs
+  %nubeam_comp_exec[0:3]: myid=           3  -- mpi_share_env OK.
+  myid=           3   msg I/O on unit            6  written to: ./nubeam_comp_3.msgs
+  myid=           4   msg I/O on unit            6  written to: ./nubeam_comp_4.msgs
+  myid=           6   msg I/O on unit            6  written to: ./nubeam_comp_6.msgs
+  myid=           7   msg I/O on unit            6  written to: ./nubeam_comp_7.msgs
+  myid=           9   msg I/O on unit            6  written to: ./nubeam_comp_9.msgs
+  myid=          11   msg I/O on unit            6  written to: ./nubeam_comp_11.msgs
+  myid=          12   msg I/O on unit            6  written to: ./nubeam_comp_12.msgs
+  myid=          14   msg I/O on unit            6  written to: ./nubeam_comp_14.msgs
+  myid=          15   msg I/O on unit            6  written to: ./nubeam_comp_15.msgs
+  myid=          16   msg I/O on unit            6  written to: ./nubeam_comp_16.msgs
+  myid=          17   msg I/O on unit            6  written to: ./nubeam_comp_17.msgs
+  myid=          18   msg I/O on unit            6  written to: ./nubeam_comp_18.msgs
+  myid=          19   msg I/O on unit            6  written to: ./nubeam_comp_19.msgs
+  myid=          20   msg I/O on unit            6  written to: ./nubeam_comp_20.msgs
+  myid=           5   msg I/O on unit            6  written to: ./nubeam_comp_5.msgs
+  myid=           8   msg I/O on unit            6  written to: ./nubeam_comp_8.msgs
+  myid=          10   msg I/O on unit            6  written to: ./nubeam_comp_10.msgs
+  myid=          13   msg I/O on unit            6  written to: ./nubeam_comp_13.msgs
+  myid=          21   msg I/O on unit            6  written to: ./nubeam_comp_21.msgs
+  myid=          22   msg I/O on unit            6  written to: ./nubeam_comp_22.msgs
+  %using default filename: ./ips_nbi_fld_state.cdf
+  ...CALL nbi_states(...,"R",...)
+  (cpu0) ...CALL nbi_states(...,"R",...)
+ % nbi_alloc2_init: nbi_alloc2 done
+  ps_init_tag: Plasma State v2.035 f90 module initialization.
+  
+  %plasma_state_get: WARNING, version_id mismatch:
+   Version_ID of current software: "2.035".
+   Version_ID found in file:       "2.055".
+  
+   ...Hash code checks disabled.
+   ...Error handling modified.
+  
+  %plasma_state_get: warning: variable name = "nmini_bdy":
+   NetCDF message: NetCDF: Variable not found
+  %nubeam_comp_exec: state file(s) read OK.
+  ...nubeam_comp_exec[0:3] myid=           3 : at jstep loop...
+  ...nubeam_comp_exec[0:3] myid=           1 : at jstep loop...
+  ...nubeam_comp_exec[0:3] myid=           2 : at jstep loop...
+  %nubeam_comp_exec: step_namelist read OK.
+  %nubeam_comp_exec: LEVMOD_HALO=   -123456789
+  ...nubeam_comp_exec[0:3] myid=           0 : at jstep loop...
+  
+   executing NUBEAM step:           1
+   executing NUBEAM step:           1
+  %nubeam_step ++++++++ NLTRK_DEP0 F
+  %nubeam_step ++++++++ NLBOUT (lost ptcl.) T
+  ==> Entering NUBEAM_STEP_CHILD, MPI myidd =            0
+  NBI_INTERP_PROFILES... 
+    nbi_getprofiles ne*dVol sum (input): 4.5640E+22
+    nbi_getprofiles ne*dVol sum (ions):  4.5726E+22
+  %nbi_getprofiles: quasineutrality check => 
+   use externally provided fast ion densities.
+  ==> retry using input data for fast densities.
+    nbi_getprofiles ne*dVol sum (input): 4.5640E+22
+    nbi_getprofiles ne*dVol sum (ions):  4.5640E+22
+  NBSTART... 
+  %nbatom deposition model: lev_nbidep=           1
+  %nbatom deposition model: NSIGEXC=           1
+ %sigfacz (exc.states) Erel= 1.0621E+04 out of range
+   min= 2.0000E+04 max= 1.0000E+07 eV/amu; fixup taken.
+ %sigfacz (exc.states) Erel= 1.2966E+04 out of range
+   min= 2.0000E+04 max= 1.0000E+07 eV/amu; fixup taken.
+ %sigfacz (exc.states) Erel= 1.5312E+04 out of range
+   min= 2.0000E+04 max= 1.0000E+07 eV/amu; fixup taken.
+ %sigfacz (exc.states) Erel= 1.7658E+04 out of range
+   min= 2.0000E+04 max= 1.0000E+07 eV/amu; fixup taken.
+ %sigfacz (exc.states) Te= 7.5108E+02 out of range
+   min= 1.0000E+03 max= 5.0000E+04 eV; fixup taken.
+ %sigfacz (exc.states) Te= 7.5108E+02 out of range
+   min= 1.0000E+03 max= 5.0000E+04 eV; fixup taken.
+ %sigfacz (exc.states) Te= 7.5108E+02 out of range
+   min= 1.0000E+03 max= 5.0000E+04 eV; fixup taken.
+ %sigfacz (exc.states) Te= 7.5108E+02 out of range
+   min= 1.0000E+03 max= 5.0000E+04 eV; fixup taken.
+  %nbatom deposition model: lev_nbidep=           1
+  %nbatom deposition model: NSIGEXC=           1
+  DEPALL... 
+ %DEPALL specie #1  ->      2673 -        0 (killed) +      600 (dep) =     3273 ptcls.
+ %DEPALL specie #2  ->       785 -        0 (killed) +      215 (dep) =     1000 ptcls.
+  DEPALL EXITED            0
+  ORBALL... 
+In Processor ,    0 %MC ptcl counts, specie #1: ORIG= 3273 SPL=    1 TOT= 2636
+In Processor ,    0 %MC ptcl counts, specie #2: ORIG= 1000 SPL=    0 TOT=  806
+  %ORBALL: lost ptcl. gather
+  ORBALL EXITED            0
+  NBFINISH... 
+  ==> Exiting NUBEAM_STEP_CHILD, MPI myidd =            0
+  NUBEAM_LOAD_STATE... 
+  NUBEAM_STEP: LEVMOD_HALO=            0
+  ---------------------------------------
+  %nubeam_comp_exec: nubeam_ctrl_step OK: N(ptcls) & <<E>>(KeV):
+ beam ions D_beam: N= 3.8384E+19 <<Eperp>>= 1.6105E+02 <<Epll>>= 1.5767E+02
+ fusion ions He4_fusn: N= 2.3725E+19 <<Eperp>>= 8.5008E+02 <<Epll>>= 4.4322E+02
+  ---------------------------------------
+  -------------------------------------------- 
+  summary output: 
+  
+  nubeam_ctrl_step timer results:
+ wallclock time  6.9360E+00 seconds.
+ root thread cpu 3.2554E+00 seconds.
+ min thread cpu  2.3701E+00 seconds.
+ max thread cpu  4.6620E+00 seconds.
+  
+  heating: 
+  zone   Pbe          Pbi          Pbth   (watts/zone)
+    1   1.6031E+03   1.6141E+03   1.7511E+02
+    2   4.7650E+03   4.7645E+03   5.3368E+02
+    3   7.8791E+03   7.8096E+03   8.4874E+02
+    4   1.0948E+04   1.0715E+04   1.0790E+03
+    5   1.3976E+04   1.3551E+04   1.2709E+03
+    6   1.6993E+04   1.6453E+04   1.4233E+03
+    7   2.0179E+04   1.9655E+04   1.5151E+03
+    8   2.3756E+04   2.3164E+04   1.7084E+03
+    9   2.7834E+04   2.7185E+04   2.0086E+03
+   10   3.2234E+04   3.1479E+04   2.3259E+03
+   11   3.6921E+04   3.5849E+04   2.6071E+03
+   12   4.1434E+04   3.9831E+04   2.8828E+03
+   13   4.5293E+04   4.3079E+04   3.0465E+03
+   14   4.8409E+04   4.5389E+04   3.2104E+03
+   15   5.1227E+04   4.7302E+04   3.4292E+03
+   16   5.4187E+04   4.9347E+04   3.7364E+03
+   17   5.7518E+04   5.1873E+04   4.0379E+03
+   18   6.1518E+04   5.5081E+04   4.4253E+03
+   19   6.5933E+04   5.9023E+04   4.8061E+03
+   20   7.0083E+04   6.2648E+04   5.0953E+03
+   21   7.3874E+04   6.5484E+04   5.2351E+03
+   22   7.7193E+04   6.7539E+04   5.2832E+03
+   23   7.9379E+04   6.8547E+04   5.1618E+03
+   24   8.1328E+04   6.8881E+04   4.9457E+03
+   25   8.3570E+04   6.9466E+04   4.8161E+03
+   26   8.6172E+04   7.0582E+04   4.7977E+03
+   27   8.9568E+04   7.2307E+04   4.9235E+03
+   28   9.4256E+04   7.4950E+04   5.2892E+03
+   29   9.8823E+04   7.8032E+04   5.8554E+03
+   30   1.0297E+05   8.1117E+04   6.3278E+03
+   31   1.0610E+05   8.3374E+04   6.5216E+03
+   32   1.0832E+05   8.4424E+04   6.3951E+03
+   33   1.0987E+05   8.4211E+04   5.9943E+03
+   34   1.1130E+05   8.2659E+04   5.3605E+03
+   35   1.1381E+05   8.0257E+04   4.6537E+03
+   36   1.1790E+05   7.8097E+04   4.1978E+03
+   37   1.2317E+05   7.6995E+04   4.0952E+03
+   38   1.2860E+05   7.6909E+04   4.1466E+03
+   39   1.3478E+05   7.8211E+04   4.3027E+03
+   40   1.4085E+05   8.0855E+04   4.6142E+03
+   41   1.4630E+05   8.4615E+04   4.8835E+03
+   42   1.5095E+05   8.8330E+04   4.9739E+03
+   43   1.5622E+05   9.1817E+04   4.9968E+03
+   44   1.6131E+05   9.4621E+04   5.0113E+03
+   45   1.6611E+05   9.6327E+04   5.0279E+03
+   46   1.7085E+05   9.6540E+04   5.0291E+03
+   47   1.7556E+05   9.6261E+04   5.0316E+03
+   48   1.7923E+05   9.5938E+04   5.0822E+03
+   49   1.8247E+05   9.5949E+04   5.1965E+03
+   50   1.8483E+05   9.6349E+04   5.2489E+03
+   51   1.8724E+05   9.7292E+04   5.3055E+03
+   52   1.9081E+05   9.8208E+04   5.4284E+03
+   53   1.9693E+05   9.9402E+04   5.6176E+03
+   54   2.0532E+05   1.0086E+05   5.6670E+03
+   55   2.1558E+05   1.0237E+05   5.6672E+03
+   56   2.2665E+05   1.0431E+05   5.6661E+03
+   57   2.3746E+05   1.0704E+05   5.7265E+03
+   58   2.4659E+05   1.0970E+05   5.8182E+03
+   59   2.5494E+05   1.1237E+05   6.0326E+03
+   60   2.6286E+05   1.1489E+05   6.2349E+03
+   61   2.7048E+05   1.1685E+05   6.4311E+03
+   62   2.7821E+05   1.1797E+05   6.4276E+03
+   63   2.8569E+05   1.1835E+05   6.1628E+03
+   64   2.9076E+05   1.1781E+05   5.7662E+03
+   65   2.9526E+05   1.1756E+05   5.4503E+03
+   66   3.0051E+05   1.1785E+05   5.1672E+03
+   67   3.0696E+05   1.1917E+05   5.1670E+03
+   68   3.1569E+05   1.2165E+05   5.4180E+03
+   69   3.2736E+05   1.2464E+05   5.8704E+03
+   70   3.3984E+05   1.2647E+05   6.2379E+03
+   71   3.5079E+05   1.2655E+05   6.4431E+03
+   72   3.5750E+05   1.2383E+05   6.2728E+03
+   73   3.5846E+05   1.1859E+05   5.8230E+03
+   74   3.5449E+05   1.1109E+05   5.1027E+03
+   75   3.4695E+05   1.0287E+05   4.4659E+03
+   76   3.3642E+05   9.4637E+04   3.9768E+03
+   77   3.2571E+05   8.7057E+04   3.6185E+03
+   78   3.1675E+05   8.0011E+04   3.4027E+03
+   79   3.0946E+05   7.4634E+04   3.3159E+03
+   80   3.0285E+05   6.9982E+04   3.1003E+03
+   81   2.9722E+05   6.5601E+04   2.7715E+03
+   82   2.9028E+05   6.1436E+04   2.5240E+03
+   83   2.8022E+05   5.7455E+04   2.2857E+03
+   84   2.6596E+05   5.2881E+04   2.0268E+03
+   85   2.4714E+05   4.8158E+04   1.8588E+03
+   86   2.2437E+05   4.3690E+04   1.7780E+03
+   87   1.9957E+05   3.9401E+04   1.6332E+03
+   88   1.7316E+05   3.4848E+04   1.4759E+03
+   89   1.4699E+05   2.9979E+04   1.3119E+03
+   90   1.2229E+05   2.4846E+04   1.1117E+03
+   91   9.9139E+04   1.9478E+04   8.8434E+02
+   92   7.8283E+04   1.4221E+04   6.9258E+02
+   93   6.1533E+04   9.7344E+03   5.2464E+02
+   94   4.8764E+04   6.3078E+03   3.7010E+02
+   95   4.0088E+04   3.8593E+03   2.4917E+02
+   96   3.5875E+04   2.2610E+03   1.6283E+02
+   97   3.5204E+04   1.3111E+03   9.5857E+01
+   98   3.6212E+04   7.6119E+02   4.0887E+01
+   99   3.7856E+04   4.6235E+02   2.0535E+01
+  100   3.9409E+04   3.3459E+02   1.8092E+01
+  %nubeam_comp_exec: #zones for FRANTIC set to match fast ion grid(s):         100
+  %frantic_init_check: completed.
+  %nubeam_comp_exec: nubeam_comp_ps_ini completed.
+  *ps_update_file_write: normal exit,           23  update elements written.
+  ...CALL nbi_states(...,"S",...)
+  (cpu0) ...CALL nbi_states(...,"S",...)
+  % nbi_states: fld_states write OK to filename: ./ips_nbi_fld_state.cdf
+  
+  SUMMARY_TEST output: 
+  
+
+ D beam ion:
+   rho <= 0.25 average  density:  2.568D+11 n/cm3
+   whole plasma average density:  1.585D+11 n/cm3
+   rho <= 0.25 average  parallel energy density:  8.780D-03 Jles/cm3
+   whole plasma average parallel energy density:  3.995D-03 Jles/cm3
+   rho <= 0.25 average  perp energy density:  8.780D-03 Jles/cm3
+   whole plasma average perp energy density:  3.995D-03 Jles/cm3
+
+ He4 fusion product ion:
+   rho <= 0.25 average  density:  3.861D+11 n/cm3
+   whole plasma average density:  9.798D+10 n/cm3
+   rho <= 0.25 average  parallel energy density:  2.759D-02 Jles/cm3
+   whole plasma average parallel energy density:  6.965D-03 Jles/cm3
+   rho <= 0.25 average  perp energy density:  2.759D-02 Jles/cm3
+   whole plasma average perp energy density:  6.965D-03 Jles/cm3
+
+ beam-target neutrons (total):  2.767D+18
+   beam-beam neutrons (total):  1.736D+14
+
+ D beam ion:
+   rho <= 0.25 average  deposition source:  6.915D+11 n/cm3/sec
+   whole plasma average deposition source:  8.010D+11 n/cm3/sec
+   rho <= 0.25 average  deposition source:  8.932D+11 n/cm3/sec
+   whole plasma average deposition source:  7.993D+11 n/cm3/sec
+
+ He4 fusion product ion:
+   deposition source n/cm3/sec: no NUBEAM profile available.
+   rho <= 0.25 average  deposition source:  2.249D+12 n/cm3/sec
+   whole plasma average deposition source:  5.300D+11 n/cm3/sec
+
+ D beam ion trapping fraction:  1.466D-01
+
+ He4 fusion product ion trapping fraction:  2.653D-01
+
+ D beam ion:
+   rho <= 0.25 average  ion parallel energy:  2.137D+02 KeV
+   whole plasma average ion parallel energy:  1.579D+02 KeV
+   rho <= 0.25 average  ion perpendicular energy:  1.335D+02 KeV
+   whole plasma average ion perpendicular energy:  1.629D+02 KeV
+
+ He4 fusion product ion:
+   rho <= 0.25 average  ion parallel energy:  4.459D+02 KeV
+   whole plasma average ion parallel energy:  4.175D+02 KeV
+   rho <= 0.25 average  ion perpendicular energy:  8.901D+02 KeV
+   whole plasma average ion perpendicular energy:  9.934D+02 KeV
+
+ D beam ion:
+   rho <= 0.25 average  lab frame angular velocity:  8.382D+05 1/sec
+   whole plasma average lab frame angular velocity:  7.286D+05 1/sec
+
+ He4 fusion product ion:
+   rho <= 0.25 average  lab frame angular velocity:  6.352D+04 1/sec
+   whole plasma average lab frame angular velocity:  1.061D+04 1/sec
+
+ from all fast ions:
+   rho <= 0.25 average  electron heating (beams):  5.649D-02 W/cm3
+   whole plasma average electron heating (beams):  6.518D-02 W/cm3
+   rho <= 0.25 average  ion heating (beams):  5.117D-02 W/cm3
+   whole plasma average ion heating (beams):  2.832D-02 W/cm3
+   rho <= 0.25 average  beam thermalization power:  9.985D-03 W/cm3
+   whole plasma average beam thermalization power:  2.846D-03 W/cm3
+   rho <= 0.25 average  electron heating (fusion products):  6.952D-01 W/cm3
+   whole plasma average electron heating (fusion products):  2.335D-01 W/cm3
+   rho <= 0.25 average  ion heating (fusion products):  2.556D-01 W/cm3
+   whole plasma average ion heating (fusion products):  6.021D-02 W/cm3
+
+ from all fast ions:
+   rho <= 0.25 average  beam driven current:  7.620D+00 Amps/cm2
+   whole plasma average beam driven current:  4.702D+00 Amps/cm2
+  Total beam driven current:  4.678D+05 Amps.
+   rho <= 0.25 average  fusion product driven current:  2.494D-01 Amps/cm2
+   whole plasma average fusion product driven current:  1.912D-01 Amps/cm2
+  Total fusion product driven current:  1.902D+04 Amps.
+
+ from all fast ions:
+   rho <= 0.25 average  D halo neutral source:  1.541D+08 n/cm3/sec
+   whole plasma average D halo neutral source:  1.518D+08 n/cm3/sec
+   rho <= 0.25 average  T halo neutral source:  1.349D+08 n/cm3/sec
+   whole plasma average T halo neutral source:  1.417D+08 n/cm3/sec
+   He4 halo neutral source n/cm3/sec: no NUBEAM profile available.
+
+ from all fast ions:
+    beam charge exch. sink rate for D 1/sec: no NUBEAM profile available.
+    beam impact ioniz sink rate for D 1/sec: no NUBEAM profile available.
+    beam charge exch. sink rate for T 1/sec: no NUBEAM profile available.
+    beam impact ioniz sink rate for T 1/sec: no NUBEAM profile available.
+    beam charge exch. sink rate for He4 1/sec: no NUBEAM profile available.
+    beam impact ioniz sink rate for He4 1/sec: no NUBEAM profile available.
+
+ from all fast ions:
+   rho <= 0.25 average  electron source:  6.912D+11 n/cm3/sec
+   whole plasma average electron source:  8.006D+11 n/cm3/sec
+   rho <= 0.25 average  D thermal ion source:  1.187D+12 n/cm3/sec
+   whole plasma average D thermal ion source:  8.357D+11 n/cm3/sec
+   rho <= 0.25 average  T thermal ion source: -1.349D+08 n/cm3/sec
+   whole plasma average T thermal ion source: -1.417D+08 n/cm3/sec
+   rho <= 0.25 average  He4 thermal ion source:  1.778D+12 n/cm3/sec
+   whole plasma average He4 thermal ion source:  4.786D+11 n/cm3/sec
+
+ D beam ion:
+   rho <= 0.25 average  90 degree p.a. scatter time:  1.202D+00 sec
+   whole plasma average 90 degree p.a. scatter time:  1.879D+00 sec
+   rho <= 0.25 average  slowing down time:  2.570D-01 sec
+   whole plasma average slowing down time:  1.718D-01 sec
+
+ He4 fusion product ion:
+   rho <= 0.25 average  90 degree p.a. scatter time:  4.185D+00 sec
+   whole plasma average 90 degree p.a. scatter time:  6.495D+00 sec
+   rho <= 0.25 average  slowing down time:  2.156D-01 sec
+   whole plasma average slowing down time:  1.286D-01 sec
+
+ from all fast ions:
+   rho <= 0.25 average  net fast ion torque to plasma:  9.256D-08 Nt-m/cm3
+   whole plasma average net fast ion torque to plasma:  8.479D-08 Nt-m/cm3
+ ... rough power balance ...
+
+ D beam ion:
+    +injected power (W):   2.330D+07
+    +OH -> beam ions:      0.000D+00
+    +compression input:   -1.293D+02
+    -electron heating:     1.578D+07
+    -ion heating:          6.856D+06
+    -"internal" cx loss:   0.000D+00
+    -"external" cx loss:   0.000D+00
+    -shine-through:        1.655D+00
+    -bad orbit loss:       0.000D+00
+    -thermalization:       3.862D+05
+    -ripple loss:          0.000D+00
+    -fishbone loss:        0.000D+00
+    -torque work (JxB):    0.000D+00
+    -torque work (other):  2.858D+04
+    -d/dt(f.i. energy):    2.525D+05
+       ->residual:        -6.300D+03
+
+ He4 fusion product ion:
+    +injected power (W):   7.204D+07
+    +OH -> beam ions:      0.000D+00
+    +compression input:   -3.725D+02
+    -electron heating:     5.654D+07
+    -ion heating:          1.458D+07
+    -"internal" cx loss:   0.000D+00
+    -"external" cx loss:   0.000D+00
+    -shine-through:        0.000D+00
+    -bad orbit loss:       0.000D+00
+    -thermalization:       3.029D+05
+    -ripple loss:          0.000D+00
+    -fishbone loss:        0.000D+00
+    -torque work (JxB):    0.000D+00
+    -torque work (other):  8.265D+03
+    -d/dt(f.i. energy):    6.195D+05
+       ->residual:        -1.199D+04
+
+ NUBEAM 2d output sampled at [R,Z] = [ 4.630D+02, 5.209D+01] cm
+        flux coords: (rho,theta)   = ( 3.467D-01, 7.827D-01)
+ MCgrid zone index:   34
+ ---> outputs refer to this zone, until noted.
+   MCgrid zone volume:  9.026D+05 cm**3
+
+ D_MCBEAM             n(BDENS2)= 1.927D+11 n(FBM)= 1.927D+11 ptcls/cm3
+ He4_MCFUSN           n(BDENS2)= 2.675D+11 n(FBM)= 2.675D+11 ptcls/cm3
+ D_MCBEAM             Eperp(EBA2PP)= 1.273D+05 Eperp(FBM)= 1.273D+05 eV
+ He4_MCFUSN           Eperp(EBA2PP)= 8.977D+05 Eperp(FBM)= 8.977D+05 eV
+ D_MCBEAM             Epll(EBA2PL)= 2.106D+05 Epll(FBM)= 2.106D+05 eV
+ He4_MCFUSN           Epll(EBA2PL)= 4.255D+05 Epll(FBM)= 4.255D+05 eV
+ D_MCBEAM             v_toroidal(VBTOR2)= 3.509D+08 vpll(FBM)= 3.518D+08 cm/sec
+ He4_MCFUSN           v_toroidal(VBTOR2)= 1.198D+08 vpll(FBM)= 1.201D+08 cm/sec
+
+ D_MCBEAM             cx fast neutral density = 0.000D+00 [neutral atoms]/cm3
+ He4_MCFUSN           cx fast neutral density = 0.000D+00 [neutral atoms]/cm3
+ D_MCBEAM             cx fast neutral <energy> = 0.000D+00 eV
+ He4_MCFUSN           cx fast neutral <energy> = 0.000D+00 eV
+ D_MCBEAM             cx fast neutral <v_toroidal> = 0.000D+00 cm/sec
+ He4_MCFUSN           cx fast neutral <v_toroidal> = 0.000D+00 cm/sec
+
+   interaction of D_MCBEAM and D neutral atoms:
+ SRBN02_D0_D_MCBEAM               neutral source 6.589D+08 atoms/cm3/sec
+   stopping rates for thermal neutrals:
+ SNBN02_D0_D_MCBEAM               <nfast*sigma*v>(cx) 0.000D+00 1/sec
+ SNB0I2_D0_D_MCBEAM               <nfast*sigma*v>(ii) 0.000D+00 1/sec
+
+   interaction of D_MCBEAM and T neutral atoms:
+ SRBN02_T0_D_MCBEAM               neutral source 5.913D+08 atoms/cm3/sec
+   stopping rates for thermal neutrals:
+ SNBN02_T0_D_MCBEAM               <nfast*sigma*v>(cx) 0.000D+00 1/sec
+ SNB0I2_T0_D_MCBEAM               <nfast*sigma*v>(ii) 0.000D+00 1/sec
+
+   interaction of D_MCBEAM and He4 neutral atoms:
+ SRBN02_He40_D_MCBEAM             neutral source 0.000D+00 atoms/cm3/sec
+   stopping rates for thermal neutrals:
+ SNBN02_He40_D_MCBEAM             <nfast*sigma*v>(cx) 0.000D+00 1/sec
+ SNB0I2_He40_D_MCBEAM             <nfast*sigma*v>(ii) 0.000D+00 1/sec
+
+   interaction of He4_MCFUSN and D neutral atoms:
+ SRBN02_D0_He4_MCFUSN             neutral source 0.000D+00 atoms/cm3/sec
+   stopping rates for thermal neutrals:
+ SNBN02_D0_He4_MCFUSN             <nfast*sigma*v>(cx) 0.000D+00 1/sec
+ SNB0I2_D0_He4_MCFUSN             <nfast*sigma*v>(ii) 0.000D+00 1/sec
+
+   interaction of He4_MCFUSN and T neutral atoms:
+ SRBN02_T0_He4_MCFUSN             neutral source 0.000D+00 atoms/cm3/sec
+   stopping rates for thermal neutrals:
+ SNBN02_T0_He4_MCFUSN             <nfast*sigma*v>(cx) 0.000D+00 1/sec
+ SNB0I2_T0_He4_MCFUSN             <nfast*sigma*v>(ii) 0.000D+00 1/sec
+
+   interaction of He4_MCFUSN and He4 neutral atoms:
+ SRBN02_He40_He4_MCFUSN           neutral source 0.000D+00 atoms/cm3/sec
+   stopping rates for thermal neutrals:
+ SNBN02_He40_He4_MCFUSN           <nfast*sigma*v>(cx) 0.000D+00 1/sec
+ SNB0I2_He40_He4_MCFUSN           <nfast*sigma*v>(ii) 0.000D+00 1/sec
+
+ fusion rate data on 2d grid:
+
+ BT_DT_2d                         fusion 1.443D+10 reactions/cm3/sec
+ BT_DDP_2d                        fusion 5.256D+08 reactions/cm3/sec
+ BB_DDP_2d                        fusion 2.649D+05 reactions/cm3/sec
+ BT_DDN_2d                        fusion 6.298D+08 reactions/cm3/sec
+ BB_DDN_2d                        fusion 9.595D+05 reactions/cm3/sec
+
+ ---> end of output for MCgrid zone:   34
+ nubeam STEP completed:  normal exit.

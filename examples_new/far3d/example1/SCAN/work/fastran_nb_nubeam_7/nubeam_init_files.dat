@@ -1,0 +1,6 @@
+&NUBEAM_FILES
+  INPUT_PLASMA_STATE = 's000001.00001' 
+  PLASMA_STATE_UPDATE = 'state_changes.cdf' 
+  INIT_NAMELIST = 'nubeam_init_input.dat' 
+/
+

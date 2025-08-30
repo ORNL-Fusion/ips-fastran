@@ -1,0 +1,65 @@
+========================================================================
+= FASTRAN
+
+nonlinear model = 1
+ichi = 0
+ineo = 0
+reading state...
+read formatted input, inprof...
+init geometry...
+read formatted input, inmetric...
+nrho in inmetric = 101
+rhob in inmetric = 1.832251e+00
+solve avg grad-shafranv...
+solve_avg_gs::Ip_temp = 8.097664e+00 
+solve_avg_gs::Ip      = 8.100000e+00 
+>>> tau_he = 5.000000, nhe(0)=1.339014e+00
+
+ plasma volume = 242.158306
+ stored energy(e,i,b) = 8.854976e+01 7.315444e+01 0.000000e+00
+ betan = 2.624453
+*power
+ Pnb(e,i) = 0.000000e+00 0.000000e+00
+ Prf(e,i) = 2.999999e+01 7.999998e+00
+ Prad     = -1.897181e+01 
+ Pei      = -3.798405e+01 
+ Pfuse    = 5.613004e+01 
+ Pfusi    = 1.609061e+01 
+ Poh      = 0.000000e+00 
+*confinement time
+ taut, tauITER98y2, H98y2 : 1.772124e+00 1.354921e+00 1.307916e+00
+ taue, taui : 3.035210e+00 1.352842e+00
+ taut, tau89, H89 : 1.772124e+00 6.083415e-01 2.913041e+00
+*temperature
+ nea, nebar : 1.885620e+01 2.122045e+01 
+ tea, tia : 7.186774e+00 6.548686e+00 (1.097438e+00)
+ te0, ti0 : 1.621330e+01 1.409103e+01 (1.150611e+00)
+ Sn : 0.000000e+00 
+*current balance
+ Ip,Ibs,Inb,Irf: 8.100000e+00 5.965298e+00 0.000000e+00 0.000000e+00
+ fni,fbs: 0.736 0.736
+
+ plasma volume = 242.158306
+ stored energy(e,i,b) = 8.854976e+01 7.315444e+01 0.000000e+00
+ betan = 2.624453
+*power
+ Pnb(e,i) = 0.000000e+00 0.000000e+00
+ Prf(e,i) = 2.999999e+01 7.999998e+00
+ Prad     = -1.897181e+01 
+ Pei      = -3.798405e+01 
+ Pfuse    = 5.613004e+01 
+ Pfusi    = 1.609061e+01 
+ Poh      = 0.000000e+00 
+*confinement time
+ taut, tauITER98y2, H98y2 : 1.772124e+00 1.354921e+00 1.307916e+00
+ taue, taui : 3.035210e+00 1.352842e+00
+ taut, tau89, H89 : 1.772124e+00 6.083415e-01 2.913041e+00
+*temperature
+ nea, nebar : 1.885620e+01 2.122045e+01 
+ tea, tia : 7.186774e+00 6.548686e+00 (1.097438e+00)
+ te0, ti0 : 1.621330e+01 1.409103e+01 (1.150611e+00)
+ Sn : 0.000000e+00 
+*current balance
+ Ip,Ibs,Inb,Irf: 8.100000e+00 5.965298e+00 0.000000e+00 0.000000e+00
+ fni,fbs: 0.736 0.736
+ ELAPASED TIME = 0 sec

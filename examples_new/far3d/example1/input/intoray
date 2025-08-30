@@ -1,0 +1,37 @@
+&intoray
+   ntoray = 1 
+   idamp  = 8
+   nray   = 30
+   nbfld  = 3
+   freq   = 2.3e11
+   wrfo   = 1.0 
+   x      = 500.0
+   z      = 300.0
+   hlw    = 2.55 
+   ratw   = 1.0
+   rfpow  = 30.0e6
+   thet   = 140
+   phai   = 205
+/
+
+&adjust
+   width = 0.0 
+   j_multi = 1.2
+/
+
+&edata
+   powinc    = 1.0e+13
+   smax      = 1500.0
+   ds        = 1.0
+   pwrfmin   = 0.01
+   fdout     = 1
+   nharm     = 1
+   mray      = 1 5 12 12 18
+   gauszone  = 5
+   netcdfdat = .true.
+   cqldat    = .false.
+!  nlout(1)  = .false.
+!  nlout(2)  = .false.
+   igafit    = 1
+! modelc = 5
+/
