@@ -1,3 +1,2125 @@
 /global/homes/b/bassem/ips-fastran/src:/opt/nersc/pymon
-/global/homes/b/bassem/ips-fastran/examples/tglf-ep/
-TGLFEP_driver
+
+TGLF-EP/TGLFEP_driver
+Starting IPS 0.8.1
+Created <class 'fastran.driver.fastran_init.fastran_init'>
+Created <class 'fastran.driver.fastran_driver.fastran_driver'>
+Created <class 'fastran.equilibrium.efit.efit'>
+Created <class 'fastran.heating.hcd_model.hcd_model'>
+Created <class 'fastran.solver.fastran.fastran'>
+Created <class 'fastran.driver.modeleq_constraint.modeleq_constraint'>
+Created <class 'fastran.heating.nubeam.nubeam'>
+Created <class 'fastran.stability.tglfep.tglfep'>
+IPS SLURM_NODES =  [('nid005605', 128), ('nid005709', 128), ('nid005742', 128), ('nid006092', 128), ('nid006162', 128), ('nid006431', 128), ('nid006438', 128), ('nid006447', 128), ('nid006519', 128), ('nid006823', 128)]
+fastran_init.init() started
+state_files: s000001.00001 g000001.00001 i000001.00001 b000001.00001
+create null s000001.00001
+create null g000001.00001
+create null i000001.00001
+create null b000001.00001
+fastran_init.step() started
+tokamak_id = FPP
+shot_number = 000001
+INPUT_DIR = /pscratch/sd/b/bassem/ips/tglf-ep_32_repeat/input
+model_beam = 0
+start dakota update
+update_namelist called
+instate_method: model
+Luce shape
+ne from model profile, ped
+te from model profile, ped
+ti from model profile, ped
+density_beam from model profile, parab
+j_tot from model profile, parab
+omega from model profile, parab
+zeff from model profile, const
+tbeami from model profile, const
+density_alpha from model profile, zero
+walpha from model profile, zero
+wbeam from the model profile
+density_model = 1: impurity = f*ne
+init from instate: instate
+usng analytic volume
+end
+rho_rad prad 100 100
+integrated :  0.0
+rho pohme 100 100
+integrated :  0.0
+Icurt=4.695e+00MA
+rho_nbi pbe 100 100
+integrated :  0.0
+rho_nbi pbi 100 100
+integrated :  0.0
+rho_nbi sbedep 100 100
+integrated :  0.0
+rho_nbi tqbe 100 100
+integrated :  0.0
+Icurbeam=0.000e+00MA
+rho_ecrf peech 100 100
+integrated :  0.0
+rho_icrf picrf_totals 8 100
+integrated :  0.0
+rho_icrf picrf_totals 8 100
+integrated :  0.0
+Icurech=0.000e+00MA
+Icurich=0.000e+00MA
+fastran_init.finalize() called
+********************************************************************************
+FASTRAN DIRVER INIT
+PORTS (all) = ['INIT', 'DRIVER', 'EQ0', 'HCD0', 'TR0', 'BC0', 'NB', 'EP']
+PORTS = ['INIT', 'DRIVER', 'EQ0', 'HCD0', 'TR0', 'BC0', 'NB', 'EP']
+SIMULATION_MODE = NORMAL
+*** t0 = 0
+EQ0 init ********
+>>> efit.init() started
+INPUT: SCALE_GS found 1 , mapped value =  enabled
+INPUT: R0_SCALE not found, use default value: 1.7
+INPUT: B0_SCALE not found, use default value: 2.0
+efit time = 1
+init_run =  1
+force free
+scaled  1.7 2.0
+ps_update disabled
+HCD0 init ********
+hcd_model.init() called
+TR0 init ********
+fastran.init() entered
+BC0 init ********
+modeleq_constraint.init() called
+NB init ********
+>> nubeam.init() started
+load equilibrium
+Icurt=5.327e+00MA
+start dakota update
+update_namelist called
+load innubeam
+load difb
+/global/common/software/atom/perlmutter/binaries/nubeam/default/mpi_nubeam_comp_exec
+EP init ********
+tglfep.init() called
+nstep_pre: 10
+
+========================================================================
+= fastran driver: preprocess iteration number =  0
+
+EQ0 step
+>>> efit.step() started
+INPUT: PRESSURE found kinetic , mapped value =  kinetic
+INPUT: RELAX_PROFILE not found, use default value: 0
+INPUT: RELAX_METRIC not found, use default value: 0.5
+INPUT: BETAN_TARGET not found, use default value: -1.0
+model_beam = 0
+model_pressure = kinetic
+INPUT: TOPOLOGY found DN , mapped value =  DN
+INPUT: ERROR not found, use default value: 1.0e-4
+INPUT: MAX_EFIT_ERROR not found, use default value: 0.1
+init_run_step = 0
+niter =  10
+*** generate kfile 0
+r0 = 4.0
+b0 = 7.0
+ip = 8100000.004
+ip, ip cal, ip/(ip cal) = 8.100 5.327 1.521
+weigting upper xpoint: [14, 15, 16, 17]
+weigting lower xpoint: [44, 45, 46, 47]
+run efit
+efit, subprocess
+elapsed time =  0.279  1.333
+error_efit = 5.736e-05
+*** generate kfile 1
+apply underrelaxation
+r0 = 4.0
+b0 = 7.0
+ip = 8100000.004
+inmtric under-relax: 0.5
+ip, ip cal, ip/(ip cal) = 8.100 5.457 1.484
+weigting upper xpoint: [14, 15, 16, 17]
+weigting lower xpoint: [44, 45, 46, 47]
+diff_p = 0.14699109941040772
+diff_f = 0.37443573666593755
+run efit
+efit, subprocess
+elapsed time =  0.245  1.485
+error_efit = 8.91e-05
+*** generate kfile 2
+apply underrelaxation
+r0 = 4.0
+b0 = 7.0
+ip = 8100000.004
+inmtric under-relax: 0.5
+ip, ip cal, ip/(ip cal) = 8.100 5.496 1.474
+weigting upper xpoint: [14, 15, 16, 17]
+weigting lower xpoint: [44, 45, 46, 47]
+diff_p = 0.12569220465507577
+diff_f = 0.3870882289060812
+run efit
+efit, subprocess
+elapsed time =  0.242  1.224
+error_efit = 8.145e-05
+*** generate kfile 3
+apply underrelaxation
+r0 = 4.0
+b0 = 7.0
+ip = 8100000.004
+inmtric under-relax: 0.5
+ip, ip cal, ip/(ip cal) = 8.100 5.498 1.473
+weigting upper xpoint: [14, 15, 16, 17]
+weigting lower xpoint: [44, 45, 46, 47]
+diff_p = 0.07976725313081023
+diff_f = 0.283809306508198
+run efit
+efit, subprocess
+elapsed time =  0.261  1.238
+error_efit = 9.805e-05
+*** generate kfile 4
+apply underrelaxation
+r0 = 4.0
+b0 = 7.0
+ip = 8100000.004
+inmtric under-relax: 0.5
+ip, ip cal, ip/(ip cal) = 8.100 5.488 1.476
+weigting upper xpoint: [14, 15, 16, 17]
+weigting lower xpoint: [44, 45, 46, 47]
+diff_p = 0.04338316623643166
+diff_f = 0.16656573545555206
+run efit
+efit, subprocess
+elapsed time =  0.234  1.257
+error_efit = 9.805e-05
+*** generate kfile 5
+apply underrelaxation
+r0 = 4.0
+b0 = 7.0
+ip = 8100000.004
+  ps_init_tag: Plasma State v2.055 f90 module initialization.
+  %ps_update_fromxplasma: allocating nr,nz  =          129 ,         129
+  %ps_update_fromxplasma: allocating nlim   =            5
+  %ps_mhdeq_derive: compute <1/R^2> and <|grad(rho)|^2/R^2>.
+  %ps_mhdeq_derive: compute metric averages <1/R>, <|grad(rho)|>, etc.
+  %ps_mhdeq_derive: compute R & Z minmax profiles; triangularity, etc.
+  %ps_mhdeq_derive: compute <1/B^2>, NCLASS moments, etc.
+  %ps_mhdeq_nclass: allocating 16 Pfirsch-Schlutter moments profiles.
+  %ps_mhdeq_derive: compute NC sqrt-singular flux surface averages.
+  %ps_mhdeq_derive: compute profiles of Bmin, Bmax.
+  %ps_update_fromxplasma: allocating nr,nz  =          129 ,         129
+  %ps_update_fromxplasma: allocating nlim   =            5
+  %ps_mhdeq_derive: compute <1/R^2> and <|grad(rho)|^2/R^2>.
+  %ps_mhdeq_derive: compute metric averages <1/R>, <|grad(rho)|>, etc.
+  %ps_mhdeq_derive: compute R & Z minmax profiles; triangularity, etc.
+  %ps_mhdeq_derive: compute <1/B^2>, NCLASS moments, etc.
+  %ps_mhdeq_nclass: allocating 16 Pfirsch-Schlutter moments profiles.
+  %ps_mhdeq_derive: compute NC sqrt-singular flux surface averages.
+  %ps_mhdeq_derive: compute profiles of Bmin, Bmax.
+  %ps_update_fromxplasma: allocating nr,nz  =          129 ,         129
+  %ps_update_fromxplasma: allocating nlim   =            5
+  %ps_mhdeq_derive: compute <1/R^2> and <|grad(rho)|^2/R^2>.
+  %ps_mhdeq_derive: compute metric averages <1/R>, <|grad(rho)|>, etc.
+  %ps_mhdeq_derive: compute R & Z minmax profiles; triangularity, etc.
+  %ps_mhdeq_derive: compute <1/B^2>, NCLASS moments, etc.
+  %ps_mhdeq_nclass: allocating 16 Pfirsch-Schlutter moments profiles.
+  %ps_mhdeq_derive: compute NC sqrt-singular flux surface averages.
+  %ps_mhdeq_derive: compute profiles of Bmin, Bmax.
+  %ps_update_fromxplasma: allocating nr,nz  =          129 ,         129
+  %ps_update_fromxplasma: allocating nlim   =            5
+  %ps_mhdeq_derive: compute <1/R^2> and <|grad(rho)|^2/R^2>.
+  %ps_mhdeq_derive: compute metric averages <1/R>, <|grad(rho)|>, etc.
+  %ps_mhdeq_derive: compute R & Z minmax profiles; triangularity, etc.
+  %ps_mhdeq_derive: compute <1/B^2>, NCLASS moments, etc.
+  %ps_mhdeq_nclass: allocating 16 Pfirsch-Schlutter moments profiles.
+  %ps_mhdeq_derive: compute NC sqrt-singular flux surface averages.
+  %ps_mhdeq_derive: compute profiles of Bmin, Bmax.
+  %ps_update_fromxplasma: allocating nr,nz  =          129 ,         129
+  %ps_update_fromxplasma: allocating nlim   =            5
+  %ps_mhdeq_derive: compute <1/R^2> and <|grad(rho)|^2/R^2>.
+  %ps_mhdeq_derive: compute metric averages <1/R>, <|grad(rho)|>, etc.
+  %ps_mhdeq_derive: compute R & Z minmax profiles; triangularity, etc.
+  %ps_mhdeq_derive: compute <1/B^2>, NCLASS moments, etc.
+  %ps_mhdeq_nclass: allocating 16 Pfirsch-Schlutter moments profiles.
+  %ps_mhdeq_derive: compute NC sqrt-singular flux surface averages.
+  %ps_mhdeq_derive: compute profiles of Bmin, Bmax.
+  %ps_update_fromxplasma: allocating nr,nz  =          129 ,         129
+  %ps_update_fromxplasma: allocating nlim   =            5
+  %ps_mhdeq_derive: compute <1/R^2> and <|grad(rho)|^2/R^2>.
+  %ps_mhdeq_derive: compute metric averages <1/R>, <|grad(rho)|>, etc.
+  %ps_mhdeq_derive: compute R & Z minmax profiles; triangularity, etc.
+  %ps_mhdeq_derive: compute <1/B^2>, NCLASS moments, etc.
+  %ps_mhdeq_nclass: allocating 16 Pfirsch-Schlutter moments profiles.
+  %ps_mhdeq_derive: compute NC sqrt-singular flux surface averages.
+  %ps_mhdeq_derive: compute profiles of Bmin, Bmax.
+  %ps_update_fromxplasma: allocating nr,nz  =          129 ,         129
+  %ps_update_fromxplasma: allocating nlim   =            5
+  %ps_mhdeq_derive: compute <1/R^2> and <|grad(rho)|^2/R^2>.
+  %ps_mhdeq_derive: compute metric averages <1/R>, <|grad(rho)|>, etc.
+  %ps_mhdeq_derive: compute R & Z minmax profiles; triangularity, etc.
+  %ps_mhdeq_derive: compute <1/B^2>, NCLASS moments, etc.
+  %ps_mhdeq_nclass: allocating 16 Pfirsch-Schlutter moments profiles.
+  %ps_mhdeq_derive: compute NC sqrt-singular flux surface averages.
+  %ps_mhdeq_derive: compute profiles of Bmin, Bmax.
+inmtric under-relax: 0.5
+ip, ip cal, ip/(ip cal) = 8.100 5.477 1.479
+weigting upper xpoint: [14, 15, 16, 17]
+weigting lower xpoint: [44, 45, 46, 47]
+diff_p = 0.021164395405711602
+diff_f = 0.08210449620075057
+run efit
+efit, subprocess
+elapsed time =  0.237  1.235
+error_efit = 9.359e-05
+*** generate kfile 6
+apply underrelaxation
+r0 = 4.0
+b0 = 7.0
+ip = 8100000.004
+inmtric under-relax: 0.5
+ip, ip cal, ip/(ip cal) = 8.100 5.469 1.481
+weigting upper xpoint: [14, 15, 16, 17]
+weigting lower xpoint: [44, 45, 46, 47]
+diff_p = 0.00958627943003868
+diff_f = 0.03570248392481341
+run efit
+efit, subprocess
+elapsed time =  0.236  1.220
+error_efit = 6.251e-05
+*** generate kfile 7
+apply underrelaxation
+r0 = 4.0
+b0 = 7.0
+ip = 8100000.004
+inmtric under-relax: 0.5
+ip, ip cal, ip/(ip cal) = 8.100 5.463 1.483
+weigting upper xpoint: [14, 15, 16, 17]
+weigting lower xpoint: [44, 45, 46, 47]
+diff_p = 0.004329184877500629
+diff_f = 0.014812336354039118
+run efit
+efit, subprocess
+elapsed time =  0.236  1.228
+error_efit = 6.573e-05
+*** generate kfile 8
+apply underrelaxation
+r0 = 4.0
+b0 = 7.0
+ip = 8100000.004
+inmtric under-relax: 0.5
+ip, ip cal, ip/(ip cal) = 8.100 5.460 1.484
+weigting upper xpoint: [14, 15, 16, 17]
+weigting lower xpoint: [44, 45, 46, 47]
+diff_p = 0.0023464931093495935
+diff_f = 0.007102959912393363
+converged
+EQ0 step finished
+HCD0 step
+hcd_model.init() started
+start dakota update
+add =  0
+ps_backend =  INSTATE
+Pe = [30.0]
+Pi = [8.0]
+xmid = [0.0]
+xwid = [0.3]
+HCD0 step finished
+TR0 step
+fastran.step() entered
+update_next = disabled
+update_instate =  True
+model_beam = 0
+/global/common/software/atom/perlmutter/binaries/fastran/default/xfastran_ver1.00_ser
+ncpu =  1
+n1d  =  1
+nky  =  1
+model_beam = 0
+TR0 step finished
+BC0 step
+modeleq_constraint.step() started
+model_beam = 0
+betan_th   = 2.7661455763812492
+betan_beam = 0.0
+h98_target = 1.3
+nebar =  21.48519843082747
+m =  2.5
+pe_ec, pe_ic, pi_ic, pe_nb, pi_nb = 0.0 30.027453211593002 8.0073208564248 0.0 0.0
+pe_fus, pi_fus = 61.51487621751416 18.462481965614433
+ploss = 98.6026473516538
+tau98 = 1.2909084732571705
+betan_th_target =  2.6862572565902054
+wth_target = 165.47309083739017, wth = 170.39420074419408
+tauth = 1.7280895120037176, h98 = 1.3386615300800286
+density_model = 1: impurity = f*ne
+He profile found
+scale to match betan_th :
+tscale = 5.000e+00, betan_th = 1.060e+01, betan_th_target = 2.686e+00
+scale to match betan_th :
+tscale = 2.500e+00, betan_th = 5.685e+00, betan_th_target = 2.686e+00
+scale to match betan_th :
+tscale = 1.250e+00, betan_th = 3.228e+00, betan_th_target = 2.686e+00
+scale to match betan_th :
+tscale = 6.250e-01, betan_th = 2.000e+00, betan_th_target = 2.686e+00
+scale to match betan_th :
+tscale = 9.375e-01, betan_th = 2.614e+00, betan_th_target = 2.686e+00
+scale to match betan_th :
+tscale = 1.094e+00, betan_th = 2.921e+00, betan_th_target = 2.686e+00
+scale to match betan_th :
+tscale = 1.016e+00, betan_th = 2.768e+00, betan_th_target = 2.686e+00
+scale to match betan_th :
+tscale = 9.766e-01, betan_th = 2.691e+00, betan_th_target = 2.686e+00
+scale to match betan_th :
+tscale = 9.570e-01, betan_th = 2.652e+00, betan_th_target = 2.686e+00
+scale to match betan_th :
+tscale = 9.668e-01, betan_th = 2.672e+00, betan_th_target = 2.686e+00
+scale to match betan_th :
+tscale = 9.717e-01, betan_th = 2.681e+00, betan_th_target = 2.686e+00
+Temperature scale: 16.877 14.673 1.000 0.974
+jpeak = 1.0915710449218752 1.09217529296875
+ip_cal =  8.099825837393267 8.1
+model_beam = 0
+Icurt=5.456e+00MA
+rho_rad prad 100 100
+integrated :  19401651.212830923
+rho pohme 100 100
+integrated :  0.0
+Icurt=8.097e+00MA
+rho_nbi pbe 100 100
+integrated :  0.0
+rho_nbi pbi 100 100
+integrated :  0.0
+rho_nbi sbedep 100 100
+integrated :  0.0
+rho_nbi tqbe 100 100
+integrated :  0.0
+Icurbeam=0.000e+00MA
+rho_ecrf peech 100 100
+integrated :  0.0
+rho_icrf picrf_totals 8 100
+integrated :  30005124.200795457
+rho_icrf picrf_totals 8 100
+integrated :  8001366.45354546
+Icurech=0.000e+00MA
+Icurich=0.000e+00MA
+BC0 step finished
+
+========================================================================
+= fastran driver: preprocess iteration number =  1
+
+EQ0 step
+>>> efit.step() started
+INPUT: PRESSURE found kinetic , mapped value =  kinetic
+INPUT: RELAX_PROFILE not found, use default value: 0
+INPUT: RELAX_METRIC not found, use default value: 0.5
+INPUT: BETAN_TARGET not found, use default value: -1.0
+model_beam = 0
+model_pressure = kinetic
+INPUT: TOPOLOGY found DN , mapped value =  DN
+INPUT: ERROR not found, use default value: 1.0e-4
+INPUT: MAX_EFIT_ERROR not found, use default value: 0.1
+init_run_step = 0
+niter =  10
+*** generate kfile 0
+r0 = 4.0
+b0 = 7.0
+ip = 8100000.004
+ip, ip cal, ip/(ip cal) = 8.100 8.097 1.000
+weigting upper xpoint: [14, 15, 16, 17]
+weigting lower xpoint: [44, 45, 46, 47]
+run efit
+efit, subprocess
+elapsed time =  0.216  1.224
+error_efit = 6.594e-05
+*** generate kfile 1
+apply underrelaxation
+r0 = 4.0
+b0 = 7.0
+ip = 8100000.004
+inmtric under-relax: 0.5
+ip, ip cal, ip/(ip cal) = 8.100 8.073 1.003
+weigting upper xpoint: [14, 15, 16, 17]
+weigting lower xpoint: [44, 45, 46, 47]
+diff_p = 0.08476299679600888
+diff_f = 0.22932443086347715
+run efit
+efit, subprocess
+elapsed time =  0.259  1.428
+error_efit = 9.076e-05
+*** generate kfile 2
+apply underrelaxation
+r0 = 4.0
+b0 = 7.0
+ip = 8100000.004
+inmtric under-relax: 0.5
+ip, ip cal, ip/(ip cal) = 8.100 8.065 1.004
+weigting upper xpoint: [14, 15, 16, 17]
+weigting lower xpoint: [44, 45, 46, 47]
+diff_p = 0.08434440773751302
+diff_f = 0.20694543434400267
+run efit
+efit, subprocess
+elapsed time =  0.238  1.201
+error_efit = 8.029e-05
+*** generate kfile 3
+apply underrelaxation
+r0 = 4.0
+b0 = 7.0
+ip = 8100000.004
+inmtric under-relax: 0.5
+ip, ip cal, ip/(ip cal) = 8.100 8.065 1.004
+weigting upper xpoint: [14, 15, 16, 17]
+weigting lower xpoint: [44, 45, 46, 47]
+diff_p = 0.0596740647996262
+diff_f = 0.13650900627945983
+run efit
+efit, subprocess
+elapsed time =  0.249  1.200
+error_efit = 7.237e-05
+*** generate kfile 4
+apply underrelaxation
+r0 = 4.0
+b0 = 7.0
+ip = 8100000.004
+  %ps_update_fromxplasma: allocating nr,nz  =          129 ,         129
+  %ps_update_fromxplasma: allocating nlim   =            5
+  %ps_mhdeq_derive: compute <1/R^2> and <|grad(rho)|^2/R^2>.
+  %ps_mhdeq_derive: compute metric averages <1/R>, <|grad(rho)|>, etc.
+  %ps_mhdeq_derive: compute R & Z minmax profiles; triangularity, etc.
+  %ps_mhdeq_derive: compute <1/B^2>, NCLASS moments, etc.
+  %ps_mhdeq_nclass: allocating 16 Pfirsch-Schlutter moments profiles.
+  %ps_mhdeq_derive: compute NC sqrt-singular flux surface averages.
+  %ps_mhdeq_derive: compute profiles of Bmin, Bmax.
+  %ps_update_fromxplasma: allocating nr,nz  =          129 ,         129
+  %ps_update_fromxplasma: allocating nlim   =            5
+  %ps_mhdeq_derive: compute <1/R^2> and <|grad(rho)|^2/R^2>.
+  %ps_mhdeq_derive: compute metric averages <1/R>, <|grad(rho)|>, etc.
+  %ps_mhdeq_derive: compute R & Z minmax profiles; triangularity, etc.
+  %ps_mhdeq_derive: compute <1/B^2>, NCLASS moments, etc.
+  %ps_mhdeq_nclass: allocating 16 Pfirsch-Schlutter moments profiles.
+  %ps_mhdeq_derive: compute NC sqrt-singular flux surface averages.
+  %ps_mhdeq_derive: compute profiles of Bmin, Bmax.
+  %ps_update_fromxplasma: allocating nr,nz  =          129 ,         129
+  %ps_update_fromxplasma: allocating nlim   =            5
+  %ps_mhdeq_derive: compute <1/R^2> and <|grad(rho)|^2/R^2>.
+  %ps_mhdeq_derive: compute metric averages <1/R>, <|grad(rho)|>, etc.
+  %ps_mhdeq_derive: compute R & Z minmax profiles; triangularity, etc.
+  %ps_mhdeq_derive: compute <1/B^2>, NCLASS moments, etc.
+  %ps_mhdeq_nclass: allocating 16 Pfirsch-Schlutter moments profiles.
+  %ps_mhdeq_derive: compute NC sqrt-singular flux surface averages.
+  %ps_mhdeq_derive: compute profiles of Bmin, Bmax.
+  %ps_update_fromxplasma: allocating nr,nz  =          129 ,         129
+  %ps_update_fromxplasma: allocating nlim   =            5
+  %ps_mhdeq_derive: compute <1/R^2> and <|grad(rho)|^2/R^2>.
+  %ps_mhdeq_derive: compute metric averages <1/R>, <|grad(rho)|>, etc.
+  %ps_mhdeq_derive: compute R & Z minmax profiles; triangularity, etc.
+  %ps_mhdeq_derive: compute <1/B^2>, NCLASS moments, etc.
+  %ps_mhdeq_nclass: allocating 16 Pfirsch-Schlutter moments profiles.
+  %ps_mhdeq_derive: compute NC sqrt-singular flux surface averages.
+  %ps_mhdeq_derive: compute profiles of Bmin, Bmax.
+  %ps_update_fromxplasma: allocating nr,nz  =          129 ,         129
+  %ps_update_fromxplasma: allocating nlim   =            5
+  %ps_mhdeq_derive: compute <1/R^2> and <|grad(rho)|^2/R^2>.
+  %ps_mhdeq_derive: compute metric averages <1/R>, <|grad(rho)|>, etc.
+  %ps_mhdeq_derive: compute R & Z minmax profiles; triangularity, etc.
+  %ps_mhdeq_derive: compute <1/B^2>, NCLASS moments, etc.
+  %ps_mhdeq_nclass: allocating 16 Pfirsch-Schlutter moments profiles.
+  %ps_mhdeq_derive: compute NC sqrt-singular flux surface averages.
+  %ps_mhdeq_derive: compute profiles of Bmin, Bmax.
+  %ps_update_fromxplasma: allocating nr,nz  =          129 ,         129
+  %ps_update_fromxplasma: allocating nlim   =            5
+  %ps_mhdeq_derive: compute <1/R^2> and <|grad(rho)|^2/R^2>.
+  %ps_mhdeq_derive: compute metric averages <1/R>, <|grad(rho)|>, etc.
+  %ps_mhdeq_derive: compute R & Z minmax profiles; triangularity, etc.
+  %ps_mhdeq_derive: compute <1/B^2>, NCLASS moments, etc.
+  %ps_mhdeq_nclass: allocating 16 Pfirsch-Schlutter moments profiles.
+  %ps_mhdeq_derive: compute NC sqrt-singular flux surface averages.
+  %ps_mhdeq_derive: compute profiles of Bmin, Bmax.
+  %ps_update_fromxplasma: allocating nr,nz  =          129 ,         129
+  %ps_update_fromxplasma: allocating nlim   =            5
+  %ps_mhdeq_derive: compute <1/R^2> and <|grad(rho)|^2/R^2>.
+  %ps_mhdeq_derive: compute metric averages <1/R>, <|grad(rho)|>, etc.
+  %ps_mhdeq_derive: compute R & Z minmax profiles; triangularity, etc.
+  %ps_mhdeq_derive: compute <1/B^2>, NCLASS moments, etc.
+  %ps_mhdeq_nclass: allocating 16 Pfirsch-Schlutter moments profiles.
+  %ps_mhdeq_derive: compute NC sqrt-singular flux surface averages.
+  %ps_mhdeq_derive: compute profiles of Bmin, Bmax.
+  %ps_update_fromxplasma: allocating nr,nz  =          129 ,         129
+inmtric under-relax: 0.5
+ip, ip cal, ip/(ip cal) = 8.100 8.069 1.004
+weigting upper xpoint: [14, 15, 16, 17]
+weigting lower xpoint: [44, 45, 46, 47]
+diff_p = 0.03608487832061618
+diff_f = 0.07934627635666101
+run efit
+efit, subprocess
+elapsed time =  0.257  1.209
+error_efit = 6.727e-05
+*** generate kfile 5
+apply underrelaxation
+r0 = 4.0
+b0 = 7.0
+ip = 8100000.004
+inmtric under-relax: 0.5
+ip, ip cal, ip/(ip cal) = 8.100 8.074 1.003
+weigting upper xpoint: [14, 15, 16, 17]
+weigting lower xpoint: [44, 45, 46, 47]
+diff_p = 0.02030298598251082
+diff_f = 0.04377111803004317
+run efit
+efit, subprocess
+elapsed time =  0.248  1.184
+error_efit = 6.278e-05
+*** generate kfile 6
+apply underrelaxation
+r0 = 4.0
+b0 = 7.0
+ip = 8100000.004
+inmtric under-relax: 0.5
+ip, ip cal, ip/(ip cal) = 8.100 8.078 1.003
+weigting upper xpoint: [14, 15, 16, 17]
+weigting lower xpoint: [44, 45, 46, 47]
+diff_p = 0.01152467244661767
+diff_f = 0.024500867072588042
+run efit
+efit, subprocess
+elapsed time =  0.245  1.351
+error_efit = 6.284e-05
+*** generate kfile 7
+apply underrelaxation
+r0 = 4.0
+b0 = 7.0
+ip = 8100000.004
+inmtric under-relax: 0.5
+ip, ip cal, ip/(ip cal) = 8.100 8.081 1.002
+weigting upper xpoint: [14, 15, 16, 17]
+weigting lower xpoint: [44, 45, 46, 47]
+diff_p = 0.007079012957785964
+diff_f = 0.01504605244887614
+run efit
+efit, subprocess
+elapsed time =  0.253  1.204
+error_efit = 7.304e-05
+*** generate kfile 8
+apply underrelaxation
+r0 = 4.0
+b0 = 7.0
+ip = 8100000.004
+inmtric under-relax: 0.5
+ip, ip cal, ip/(ip cal) = 8.100 8.082 1.002
+weigting upper xpoint: [14, 15, 16, 17]
+weigting lower xpoint: [44, 45, 46, 47]
+diff_p = 0.004830238619093125
+diff_f = 0.010374778532056579
+run efit
+efit, subprocess
+elapsed time =  0.255  1.219
+error_efit = 7.309e-05
+*** generate kfile 9
+apply underrelaxation
+r0 = 4.0
+b0 = 7.0
+ip = 8100000.004
+inmtric under-relax: 0.5
+ip, ip cal, ip/(ip cal) = 8.100 8.084 1.002
+weigting upper xpoint: [14, 15, 16, 17]
+weigting lower xpoint: [44, 45, 46, 47]
+diff_p = 0.0035447970163378193
+diff_f = 0.007679384746107594
+converged
+EQ0 step finished
+HCD0 step
+hcd_model.init() started
+start dakota update
+add =  0
+ps_backend =  INSTATE
+Pe = [30.0]
+Pi = [8.0]
+xmid = [0.0]
+xwid = [0.3]
+HCD0 step finished
+TR0 step
+fastran.step() entered
+update_next = disabled
+update_instate =  True
+model_beam = 0
+/global/common/software/atom/perlmutter/binaries/fastran/default/xfastran_ver1.00_ser
+ncpu =  1
+n1d  =  1
+nky  =  1
+model_beam = 0
+TR0 step finished
+BC0 step
+modeleq_constraint.step() started
+model_beam = 0
+betan_th   = 2.6990042613211096
+betan_beam = 0.0
+h98_target = 1.3
+nebar =  21.229642099902595
+m =  2.5
+pe_ec, pe_ic, pi_ic, pe_nb, pi_nb = 0.0 29.985628669489394 7.996167645197169 0.0 0.0
+pe_fus, pi_fus = 59.897669261615526 17.703606218188213
+ploss = 96.28777607113567
+tau98 = 1.3058215311116532
+betan_th_target =  2.6527825138989014
+wth_target = 163.45504652951027, wth = 166.30306661256947
+tauth = 1.72714620067357, h98 = 1.322651035783765
+density_model = 1: impurity = f*ne
+He profile found
+scale to match betan_th :
+tscale = 5.000e+00, betan_th = 1.048e+01, betan_th_target = 2.653e+00
+scale to match betan_th :
+tscale = 2.500e+00, betan_th = 5.623e+00, betan_th_target = 2.653e+00
+scale to match betan_th :
+tscale = 1.250e+00, betan_th = 3.194e+00, betan_th_target = 2.653e+00
+scale to match betan_th :
+tscale = 6.250e-01, betan_th = 1.980e+00, betan_th_target = 2.653e+00
+scale to match betan_th :
+tscale = 9.375e-01, betan_th = 2.587e+00, betan_th_target = 2.653e+00
+scale to match betan_th :
+tscale = 1.094e+00, betan_th = 2.891e+00, betan_th_target = 2.653e+00
+scale to match betan_th :
+tscale = 1.016e+00, betan_th = 2.739e+00, betan_th_target = 2.653e+00
+scale to match betan_th :
+tscale = 9.766e-01, betan_th = 2.663e+00, betan_th_target = 2.653e+00
+scale to match betan_th :
+tscale = 9.570e-01, betan_th = 2.625e+00, betan_th_target = 2.653e+00
+scale to match betan_th :
+tscale = 9.668e-01, betan_th = 2.644e+00, betan_th_target = 2.653e+00
+Temperature scale: 16.470 14.316 1.000 0.972
+jpeak = 1.0788818359375 1.081298828125
+ip_cal =  8.100496902441403 8.1
+model_beam = 0
+Icurt=8.085e+00MA
+rho_rad prad 100 100
+integrated :  19301361.11201727
+rho pohme 100 100
+integrated :  0.0
+Icurt=8.102e+00MA
+rho_nbi pbe 100 100
+integrated :  0.0
+rho_nbi pbi 100 100
+integrated :  0.0
+rho_nbi sbedep 100 100
+integrated :  0.0
+rho_nbi tqbe 100 100
+integrated :  0.0
+Icurbeam=0.000e+00MA
+rho_ecrf peech 100 100
+integrated :  0.0
+rho_icrf picrf_totals 8 100
+integrated :  30003481.221718892
+rho_icrf picrf_totals 8 100
+integrated :  8000928.325791703
+Icurech=0.000e+00MA
+Icurich=0.000e+00MA
+BC0 step finished
+
+========================================================================
+= fastran driver: preprocess iteration number =  2
+
+EQ0 step
+>>> efit.step() started
+INPUT: PRESSURE found kinetic , mapped value =  kinetic
+INPUT: RELAX_PROFILE not found, use default value: 0
+INPUT: RELAX_METRIC not found, use default value: 0.5
+INPUT: BETAN_TARGET not found, use default value: -1.0
+model_beam = 0
+model_pressure = kinetic
+INPUT: TOPOLOGY found DN , mapped value =  DN
+INPUT: ERROR not found, use default value: 1.0e-4
+INPUT: MAX_EFIT_ERROR not found, use default value: 0.1
+init_run_step = 0
+niter =  10
+*** generate kfile 0
+r0 = 4.0
+b0 = 7.0
+ip = 8100000.004
+ip, ip cal, ip/(ip cal) = 8.100 8.102 1.000
+weigting upper xpoint: [14, 15, 16, 17]
+weigting lower xpoint: [44, 45, 46, 47]
+run efit
+efit, subprocess
+elapsed time =  0.212  1.189
+error_efit = 8.041e-05
+*** generate kfile 1
+apply underrelaxation
+r0 = 4.0
+b0 = 7.0
+ip = 8100000.004
+  %ps_update_fromxplasma: allocating nlim   =            5
+  %ps_mhdeq_derive: compute <1/R^2> and <|grad(rho)|^2/R^2>.
+  %ps_mhdeq_derive: compute metric averages <1/R>, <|grad(rho)|>, etc.
+  %ps_mhdeq_derive: compute R & Z minmax profiles; triangularity, etc.
+  %ps_mhdeq_derive: compute <1/B^2>, NCLASS moments, etc.
+  %ps_mhdeq_nclass: allocating 16 Pfirsch-Schlutter moments profiles.
+  %ps_mhdeq_derive: compute NC sqrt-singular flux surface averages.
+  %ps_mhdeq_derive: compute profiles of Bmin, Bmax.
+  %ps_update_fromxplasma: allocating nr,nz  =          129 ,         129
+  %ps_update_fromxplasma: allocating nlim   =            5
+  %ps_mhdeq_derive: compute <1/R^2> and <|grad(rho)|^2/R^2>.
+  %ps_mhdeq_derive: compute metric averages <1/R>, <|grad(rho)|>, etc.
+  %ps_mhdeq_derive: compute R & Z minmax profiles; triangularity, etc.
+  %ps_mhdeq_derive: compute <1/B^2>, NCLASS moments, etc.
+  %ps_mhdeq_nclass: allocating 16 Pfirsch-Schlutter moments profiles.
+  %ps_mhdeq_derive: compute NC sqrt-singular flux surface averages.
+  %ps_mhdeq_derive: compute profiles of Bmin, Bmax.
+  %ps_update_fromxplasma: allocating nr,nz  =          129 ,         129
+  %ps_update_fromxplasma: allocating nlim   =            5
+  %ps_mhdeq_derive: compute <1/R^2> and <|grad(rho)|^2/R^2>.
+  %ps_mhdeq_derive: compute metric averages <1/R>, <|grad(rho)|>, etc.
+  %ps_mhdeq_derive: compute R & Z minmax profiles; triangularity, etc.
+  %ps_mhdeq_derive: compute <1/B^2>, NCLASS moments, etc.
+  %ps_mhdeq_nclass: allocating 16 Pfirsch-Schlutter moments profiles.
+  %ps_mhdeq_derive: compute NC sqrt-singular flux surface averages.
+  %ps_mhdeq_derive: compute profiles of Bmin, Bmax.
+  %ps_update_fromxplasma: allocating nr,nz  =          129 ,         129
+  %ps_update_fromxplasma: allocating nlim   =            5
+  %ps_mhdeq_derive: compute <1/R^2> and <|grad(rho)|^2/R^2>.
+  %ps_mhdeq_derive: compute metric averages <1/R>, <|grad(rho)|>, etc.
+  %ps_mhdeq_derive: compute R & Z minmax profiles; triangularity, etc.
+  %ps_mhdeq_derive: compute <1/B^2>, NCLASS moments, etc.
+  %ps_mhdeq_nclass: allocating 16 Pfirsch-Schlutter moments profiles.
+  %ps_mhdeq_derive: compute NC sqrt-singular flux surface averages.
+  %ps_mhdeq_derive: compute profiles of Bmin, Bmax.
+  %ps_update_fromxplasma: allocating nr,nz  =          129 ,         129
+  %ps_update_fromxplasma: allocating nlim   =            5
+  %ps_mhdeq_derive: compute <1/R^2> and <|grad(rho)|^2/R^2>.
+  %ps_mhdeq_derive: compute metric averages <1/R>, <|grad(rho)|>, etc.
+  %ps_mhdeq_derive: compute R & Z minmax profiles; triangularity, etc.
+  %ps_mhdeq_derive: compute <1/B^2>, NCLASS moments, etc.
+  %ps_mhdeq_nclass: allocating 16 Pfirsch-Schlutter moments profiles.
+  %ps_mhdeq_derive: compute NC sqrt-singular flux surface averages.
+  %ps_mhdeq_derive: compute profiles of Bmin, Bmax.
+  %ps_update_fromxplasma: allocating nr,nz  =          129 ,         129
+  %ps_update_fromxplasma: allocating nlim   =            5
+  %ps_mhdeq_derive: compute <1/R^2> and <|grad(rho)|^2/R^2>.
+  %ps_mhdeq_derive: compute metric averages <1/R>, <|grad(rho)|>, etc.
+  %ps_mhdeq_derive: compute R & Z minmax profiles; triangularity, etc.
+  %ps_mhdeq_derive: compute <1/B^2>, NCLASS moments, etc.
+  %ps_mhdeq_nclass: allocating 16 Pfirsch-Schlutter moments profiles.
+  %ps_mhdeq_derive: compute NC sqrt-singular flux surface averages.
+  %ps_mhdeq_derive: compute profiles of Bmin, Bmax.
+  %ps_update_fromxplasma: allocating nr,nz  =          129 ,         129
+  %ps_update_fromxplasma: allocating nlim   =            5
+  %ps_mhdeq_derive: compute <1/R^2> and <|grad(rho)|^2/R^2>.
+  %ps_mhdeq_derive: compute metric averages <1/R>, <|grad(rho)|>, etc.
+  %ps_mhdeq_derive: compute R & Z minmax profiles; triangularity, etc.
+  %ps_mhdeq_derive: compute <1/B^2>, NCLASS moments, etc.
+  %ps_mhdeq_nclass: allocating 16 Pfirsch-Schlutter moments profiles.
+  %ps_mhdeq_derive: compute NC sqrt-singular flux surface averages.
+  %ps_mhdeq_derive: compute profiles of Bmin, Bmax.
+  %ps_update_fromxplasma: allocating nr,nz  =          129 ,         129
+  %ps_update_fromxplasma: allocating nlim   =            5
+inmtric under-relax: 0.5
+ip, ip cal, ip/(ip cal) = 8.100 8.099 1.000
+weigting upper xpoint: [14, 15, 16, 17]
+weigting lower xpoint: [44, 45, 46, 47]
+diff_p = 0.0045948674191507895
+diff_f = 0.009238634081008721
+converged
+EQ0 step finished
+HCD0 step
+hcd_model.init() started
+start dakota update
+add =  0
+ps_backend =  INSTATE
+Pe = [30.0]
+Pi = [8.0]
+xmid = [0.0]
+xwid = [0.3]
+HCD0 step finished
+TR0 step
+fastran.step() entered
+update_next = disabled
+update_instate =  True
+model_beam = 0
+/global/common/software/atom/perlmutter/binaries/fastran/default/xfastran_ver1.00_ser
+ncpu =  1
+n1d  =  1
+nky  =  1
+model_beam = 0
+TR0 step finished
+BC0 step
+modeleq_constraint.step() started
+model_beam = 0
+betan_th   = 2.6534882944598084
+betan_beam = 0.0
+h98_target = 1.3
+nebar =  21.21519195282286
+m =  2.5
+pe_ec, pe_ic, pi_ic, pe_nb, pi_nb = 0.0 30.021017725696375 8.005604726852367 0.0 0.0
+pe_fus, pi_fus = 57.62576953984342 16.72004088386584
+ploss = 93.26930102529353
+tau98 = 1.3344643148525372
+betan_th_target =  2.6260490816792044
+wth_target = 161.8039200563414, wth = 163.49458616846255
+tauth = 1.752930325103699, h98 = 1.3135835148183814
+density_model = 1: impurity = f*ne
+He profile found
+scale to match betan_th :
+tscale = 5.000e+00, betan_th = 1.025e+01, betan_th_target = 2.626e+00
+scale to match betan_th :
+tscale = 2.500e+00, betan_th = 5.508e+00, betan_th_target = 2.626e+00
+scale to match betan_th :
+tscale = 1.250e+00, betan_th = 3.137e+00, betan_th_target = 2.626e+00
+scale to match betan_th :
+tscale = 6.250e-01, betan_th = 1.951e+00, betan_th_target = 2.626e+00
+scale to match betan_th :
+tscale = 9.375e-01, betan_th = 2.544e+00, betan_th_target = 2.626e+00
+scale to match betan_th :
+tscale = 1.094e+00, betan_th = 2.841e+00, betan_th_target = 2.626e+00
+scale to match betan_th :
+tscale = 1.016e+00, betan_th = 2.692e+00, betan_th_target = 2.626e+00
+scale to match betan_th :
+tscale = 9.766e-01, betan_th = 2.618e+00, betan_th_target = 2.626e+00
+scale to match betan_th :
+tscale = 9.961e-01, betan_th = 2.655e+00, betan_th_target = 2.626e+00
+scale to match betan_th :
+tscale = 9.863e-01, betan_th = 2.637e+00, betan_th_target = 2.626e+00
+scale to match betan_th :
+tscale = 9.814e-01, betan_th = 2.627e+00, betan_th_target = 2.626e+00
+scale to match betan_th :
+tscale = 9.790e-01, betan_th = 2.623e+00, betan_th_target = 2.626e+00
+Temperature scale: 16.213 14.091 1.000 0.980
+jpeak = 1.0837158203125 1.08492431640625
+ip_cal =  8.100238736550896 8.1
+model_beam = 0
+Icurt=8.096e+00MA
+rho_rad prad 100 100
+integrated :  19096096.271313157
+rho pohme 100 100
+integrated :  0.0
+Icurt=8.097e+00MA
+rho_nbi pbe 100 100
+integrated :  0.0
+rho_nbi pbi 100 100
+integrated :  0.0
+rho_nbi sbedep 100 100
+integrated :  0.0
+rho_nbi tqbe 100 100
+integrated :  0.0
+Icurbeam=0.000e+00MA
+rho_ecrf peech 100 100
+integrated :  0.0
+rho_icrf picrf_totals 8 100
+integrated :  30005901.32831708
+rho_icrf picrf_totals 8 100
+integrated :  8001573.687551215
+Icurech=0.000e+00MA
+Icurich=0.000e+00MA
+BC0 step finished
+
+========================================================================
+= fastran driver: preprocess iteration number =  3
+
+EQ0 step
+>>> efit.step() started
+INPUT: PRESSURE found kinetic , mapped value =  kinetic
+INPUT: RELAX_PROFILE not found, use default value: 0
+INPUT: RELAX_METRIC not found, use default value: 0.5
+INPUT: BETAN_TARGET not found, use default value: -1.0
+model_beam = 0
+model_pressure = kinetic
+INPUT: TOPOLOGY found DN , mapped value =  DN
+INPUT: ERROR not found, use default value: 1.0e-4
+INPUT: MAX_EFIT_ERROR not found, use default value: 0.1
+init_run_step = 0
+niter =  10
+*** generate kfile 0
+r0 = 4.0
+b0 = 7.0
+ip = 8100000.004
+ip, ip cal, ip/(ip cal) = 8.100 8.097 1.000
+weigting upper xpoint: [14, 15, 16, 17]
+weigting lower xpoint: [44, 45, 46, 47]
+run efit
+efit, subprocess
+elapsed time =  0.211  1.193
+error_efit = 7.568e-05
+*** generate kfile 1
+apply underrelaxation
+r0 = 4.0
+b0 = 7.0
+ip = 8100000.004
+inmtric under-relax: 0.5
+ip, ip cal, ip/(ip cal) = 8.100 8.098 1.000
+weigting upper xpoint: [14, 15, 16, 17]
+weigting lower xpoint: [44, 45, 46, 47]
+diff_p = 0.0020122608824936325
+diff_f = 0.00451104792445707
+converged
+EQ0 step finished
+HCD0 step
+hcd_model.init() started
+start dakota update
+add =  0
+ps_backend =  INSTATE
+Pe = [30.0]
+Pi = [8.0]
+xmid = [0.0]
+xwid = [0.3]
+HCD0 step finished
+TR0 step
+fastran.step() entered
+update_next = disabled
+update_instate =  True
+model_beam = 0
+/global/common/software/atom/perlmutter/binaries/fastran/default/xfastran_ver1.00_ser
+ncpu =  1
+n1d  =  1
+nky  =  1
+model_beam = 0
+TR0 step finished
+BC0 step
+modeleq_constraint.step() started
+model_beam = 0
+betan_th   = 2.624109979871282
+betan_beam = 0.0
+h98_target = 1.3
+nebar =  21.220452453799957
+m =  2.5
+pe_ec, pe_ic, pi_ic, pe_nb, pi_nb = 0.0 30.007472160182093 8.00199257604856 0.0 0.0
+pe_fus, pi_fus = 56.14404133739004 16.09532903453442
+ploss = 91.27446840327092
+tau98 = 1.354658429745707
+betan_th_target =  2.60882724457725
+wth_target = 160.73944645596384, wth = 161.68107201457534
+tauth = 1.7713723765580576, h98 = 1.3076155122664945
+density_model = 1: impurity = f*ne
+He profile found
+scale to match betan_th :
+tscale = 5.000e+00, betan_th = 1.010e+01, betan_th_target = 2.609e+00
+scale to match betan_th :
+tscale = 2.500e+00, betan_th = 5.433e+00, betan_th_target = 2.609e+00
+scale to match betan_th :
+tscale = 1.250e+00, betan_th = 3.099e+00, betan_th_target = 2.609e+00
+scale to match betan_th :
+tscale = 6.250e-01, betan_th = 1.933e+00, betan_th_target = 2.609e+00
+scale to match betan_th :
+tscale = 9.375e-01, betan_th = 2.516e+00, betan_th_target = 2.609e+00
+scale to match betan_th :
+tscale = 1.094e+00, betan_th = 2.808e+00, betan_th_target = 2.609e+00
+scale to match betan_th :
+tscale = 1.016e+00, betan_th = 2.662e+00, betan_th_target = 2.609e+00
+scale to match betan_th :
+tscale = 9.766e-01, betan_th = 2.589e+00, betan_th_target = 2.609e+00
+scale to match betan_th :
+tscale = 9.961e-01, betan_th = 2.625e+00, betan_th_target = 2.609e+00
+scale to match betan_th :
+tscale = 9.863e-01, betan_th = 2.607e+00, betan_th_target = 2.609e+00
+scale to match betan_th :
+tscale = 9.912e-01, betan_th = 2.616e+00, betan_th_target = 2.609e+00
+scale to match betan_th :
+tscale = 9.888e-01, betan_th = 2.612e+00, betan_th_target = 2.609e+00
+Temperature scale: 16.080 13.973 1.000 0.988
+jpeak = 1.066796875 1.10546875
+ip_cal =  8.100596062418104 8.1
+model_beam = 0
+Icurt=8.098e+00MA
+rho_rad prad 100 100
+integrated :  18973476.53978697
+rho pohme 100 100
+integrated :  0.0
+Icurt=8.101e+00MA
+rho_nbi pbe 100 100
+integrated :  0.0
+rho_nbi pbi 100 100
+integrated :  0.0
+rho_nbi sbedep 100 100
+integrated :  0.0
+rho_nbi tqbe 100 100
+integrated :  0.0
+Icurbeam=0.000e+00MA
+rho_ecrf peech 100 100
+integrated :  0.0
+rho_icrf picrf_totals 8 100
+integrated :  30003606.31960354
+rho_icrf picrf_totals 8 100
+integrated :  8000961.685227606
+Icurech=0.000e+00MA
+Icurich=0.000e+00MA
+BC0 step finished
+
+========================================================================
+= fastran driver: preprocess iteration number =  4
+
+EQ0 step
+>>> efit.step() started
+INPUT: PRESSURE found kinetic , mapped value =  kinetic
+INPUT: RELAX_PROFILE not found, use default value: 0
+INPUT: RELAX_METRIC not found, use default value: 0.5
+INPUT: BETAN_TARGET not found, use default value: -1.0
+model_beam = 0
+model_pressure = kinetic
+INPUT: TOPOLOGY found DN , mapped value =  DN
+INPUT: ERROR not found, use default value: 1.0e-4
+INPUT: MAX_EFIT_ERROR not found, use default value: 0.1
+init_run_step = 0
+niter =  10
+*** generate kfile 0
+r0 = 4.0
+b0 = 7.0
+ip = 8100000.004
+ip, ip cal, ip/(ip cal) = 8.100 8.101 1.000
+weigting upper xpoint: [14, 15, 16, 17]
+weigting lower xpoint: [44, 45, 46, 47]
+run efit
+efit, subprocess
+elapsed time =  0.210  1.187
+error_efit = 7.714e-05
+*** generate kfile 1
+apply underrelaxation
+r0 = 4.0
+b0 = 7.0
+ip = 8100000.004
+inmtric under-relax: 0.5
+ip, ip cal, ip/(ip cal) = 8.100 8.099 1.000
+weigting upper xpoint: [14, 15, 16, 17]
+weigting lower xpoint: [44, 45, 46, 47]
+diff_p = 0.0005905791026629758
+diff_f = 0.000700964914042631
+converged
+EQ0 step finished
+HCD0 step
+hcd_model.init() started
+start dakota update
+add =  0
+ps_backend =  INSTATE
+Pe = [30.0]
+Pi = [8.0]
+xmid = [0.0]
+xwid = [0.3]
+HCD0 step finished
+TR0 step
+fastran.step() entered
+update_next = disabled
+update_instate =  True
+model_beam = 0
+/global/common/software/atom/perlmutter/binaries/fastran/default/xfastran_ver1.00_ser
+ncpu =  1
+n1d  =  1
+nky  =  1
+model_beam = 0
+TR0 step finished
+BC0 step
+modeleq_constraint.step() started
+model_beam = 0
+betan_th   = 2.6083724006585713
+betan_beam = 0.0
+h98_target = 1.3
+nebar =  21.218686907815265
+m =  2.5
+pe_ec, pe_ic, pi_ic, pe_nb, pi_nb = 0.0 30.02391645174787 8.006377720466096 0.0 0.0
+pe_fus, pi_fus = 55.33994124883246 15.762931425934116
+ploss = 90.22965211950384
+tau98 = 1.365416066448052
+betan_th_target =  2.599478945032084
+wth_target = 160.1613216761858, wth = 160.70927287622493
+tauth = 1.78111373701602, h98 = 1.3044476191417245
+density_model = 1: impurity = f*ne
+He profile found
+scale to match betan_th :
+tscale = 5.000e+00, betan_th = 1.002e+01, betan_th_target = 2.599e+00
+scale to match betan_th :
+tscale = 2.500e+00, betan_th = 5.393e+00, betan_th_target = 2.599e+00
+scale to match betan_th :
+tscale = 1.250e+00, betan_th = 3.079e+00, betan_th_target = 2.599e+00
+scale to match betan_th :
+tscale = 6.250e-01, betan_th = 1.923e+00, betan_th_target = 2.599e+00
+scale to match betan_th :
+tscale = 9.375e-01, betan_th = 2.501e+00, betan_th_target = 2.599e+00
+scale to match betan_th :
+tscale = 1.094e+00, betan_th = 2.790e+00, betan_th_target = 2.599e+00
+scale to match betan_th :
+tscale = 1.016e+00, betan_th = 2.645e+00, betan_th_target = 2.599e+00
+scale to match betan_th :
+tscale = 9.766e-01, betan_th = 2.573e+00, betan_th_target = 2.599e+00
+scale to match betan_th :
+tscale = 9.961e-01, betan_th = 2.609e+00, betan_th_target = 2.599e+00
+scale to match betan_th :
+tscale = 9.863e-01, betan_th = 2.591e+00, betan_th_target = 2.599e+00
+Temperature scale: 16.007 13.907 1.000 0.991
+jpeak = 1.0861328125 1.0885498046875002
+ip_cal =  8.099488357109212 8.1
+model_beam = 0
+  ps_init_tag: Plasma State v2.055 f90 module initialization.
+  %ps_mhdeq_derive: compute <1/R^2> and <|grad(rho)|^2/R^2>.
+  %ps_mhdeq_derive: compute metric averages <1/R>, <|grad(rho)|>, etc.
+  %ps_mhdeq_derive: compute R & Z minmax profiles; triangularity, etc.
+  %ps_mhdeq_derive: compute <1/B^2>, NCLASS moments, etc.
+  %ps_mhdeq_derive: compute NC sqrt-singular flux surface averages.
+  %ps_mhdeq_derive: compute profiles of Bmin, Bmax.
+  %ps_update_fromxplasma: allocating nr,nz  =          129 ,         129
+  %ps_update_fromxplasma: allocating nlim   =            5
+  %ps_mhdeq_derive: compute <1/R^2> and <|grad(rho)|^2/R^2>.
+  %ps_mhdeq_derive: compute metric averages <1/R>, <|grad(rho)|>, etc.
+  %ps_mhdeq_derive: compute R & Z minmax profiles; triangularity, etc.
+  %ps_mhdeq_derive: compute <1/B^2>, NCLASS moments, etc.
+  %ps_mhdeq_nclass: allocating 16 Pfirsch-Schlutter moments profiles.
+  %ps_mhdeq_derive: compute NC sqrt-singular flux surface averages.
+  %ps_mhdeq_derive: compute profiles of Bmin, Bmax.
+  %ps_mhdeq_derive: compute <1/R^2> and <|grad(rho)|^2/R^2>.
+  %ps_mhdeq_derive: compute metric averages <1/R>, <|grad(rho)|>, etc.
+  %ps_mhdeq_derive: compute R & Z minmax profiles; triangularity, etc.
+  %ps_mhdeq_derive: compute <1/B^2>, NCLASS moments, etc.
+  %ps_mhdeq_derive: compute NC sqrt-singular flux surface averages.
+  %ps_mhdeq_derive: compute profiles of Bmin, Bmax.
+  %ps_update_fromxplasma: allocating nr,nz  =          129 ,         129
+  %ps_update_fromxplasma: allocating nlim   =            5
+  %ps_mhdeq_derive: compute <1/R^2> and <|grad(rho)|^2/R^2>.
+  %ps_mhdeq_derive: compute metric averages <1/R>, <|grad(rho)|>, etc.
+  %ps_mhdeq_derive: compute R & Z minmax profiles; triangularity, etc.
+  %ps_mhdeq_derive: compute <1/B^2>, NCLASS moments, etc.
+  %ps_mhdeq_nclass: allocating 16 Pfirsch-Schlutter moments profiles.
+  %ps_mhdeq_derive: compute NC sqrt-singular flux surface averages.
+  %ps_mhdeq_derive: compute profiles of Bmin, Bmax.
+  %ps_mhdeq_derive: compute <1/R^2> and <|grad(rho)|^2/R^2>.
+  %ps_mhdeq_derive: compute metric averages <1/R>, <|grad(rho)|>, etc.
+  %ps_mhdeq_derive: compute R & Z minmax profiles; triangularity, etc.
+  %ps_mhdeq_derive: compute <1/B^2>, NCLASS moments, etc.
+  %ps_mhdeq_derive: compute NC sqrt-singular flux surface averages.
+  %ps_mhdeq_derive: compute profiles of Bmin, Bmax.
+  %ps_update_fromxplasma: allocating nr,nz  =          129 ,         129
+  %ps_update_fromxplasma: allocating nlim   =            5
+  %ps_mhdeq_derive: compute <1/R^2> and <|grad(rho)|^2/R^2>.
+  %ps_mhdeq_derive: compute metric averages <1/R>, <|grad(rho)|>, etc.
+  %ps_mhdeq_derive: compute R & Z minmax profiles; triangularity, etc.
+  %ps_mhdeq_derive: compute <1/B^2>, NCLASS moments, etc.
+  %ps_mhdeq_nclass: allocating 16 Pfirsch-Schlutter moments profiles.
+  %ps_mhdeq_derive: compute NC sqrt-singular flux surface averages.
+  %ps_mhdeq_derive: compute profiles of Bmin, Bmax.
+  %ps_mhdeq_derive: compute <1/R^2> and <|grad(rho)|^2/R^2>.
+  %ps_mhdeq_derive: compute metric averages <1/R>, <|grad(rho)|>, etc.
+  %ps_mhdeq_derive: compute R & Z minmax profiles; triangularity, etc.
+  %ps_mhdeq_derive: compute <1/B^2>, NCLASS moments, etc.
+  %ps_mhdeq_derive: compute NC sqrt-singular flux surface averages.
+  %ps_mhdeq_derive: compute profiles of Bmin, Bmax.
+  %ps_update_fromxplasma: allocating nr,nz  =          129 ,         129
+  %ps_update_fromxplasma: allocating nlim   =            5
+  %ps_mhdeq_derive: compute <1/R^2> and <|grad(rho)|^2/R^2>.
+  %ps_mhdeq_derive: compute metric averages <1/R>, <|grad(rho)|>, etc.
+  %ps_mhdeq_derive: compute R & Z minmax profiles; triangularity, etc.
+  %ps_mhdeq_derive: compute <1/B^2>, NCLASS moments, etc.
+  %ps_mhdeq_nclass: allocating 16 Pfirsch-Schlutter moments profiles.
+  %ps_mhdeq_derive: compute NC sqrt-singular flux surface averages.
+  %ps_mhdeq_derive: compute profiles of Bmin, Bmax.
+  %ps_mhdeq_derive: compute <1/R^2> and <|grad(rho)|^2/R^2>.
+  %ps_mhdeq_derive: compute metric averages <1/R>, <|grad(rho)|>, etc.
+  %ps_mhdeq_derive: compute R & Z minmax profiles; triangularity, etc.
+Icurt=8.097e+00MA
+rho_rad prad 100 100
+integrated :  18896585.164300427
+rho pohme 100 100
+integrated :  0.0
+Icurt=8.098e+00MA
+rho_nbi pbe 100 100
+integrated :  0.0
+rho_nbi pbi 100 100
+integrated :  0.0
+rho_nbi sbedep 100 100
+integrated :  0.0
+rho_nbi tqbe 100 100
+integrated :  0.0
+Icurbeam=0.000e+00MA
+rho_ecrf peech 100 100
+integrated :  0.0
+rho_icrf picrf_totals 8 100
+integrated :  30004367.9238861
+rho_icrf picrf_totals 8 100
+integrated :  8001164.779702958
+Icurech=0.000e+00MA
+Icurich=0.000e+00MA
+BC0 step finished
+
+========================================================================
+= fastran driver: preprocess iteration number =  5
+
+EQ0 step
+>>> efit.step() started
+INPUT: PRESSURE found kinetic , mapped value =  kinetic
+INPUT: RELAX_PROFILE not found, use default value: 0
+INPUT: RELAX_METRIC not found, use default value: 0.5
+INPUT: BETAN_TARGET not found, use default value: -1.0
+model_beam = 0
+model_pressure = kinetic
+INPUT: TOPOLOGY found DN , mapped value =  DN
+INPUT: ERROR not found, use default value: 1.0e-4
+INPUT: MAX_EFIT_ERROR not found, use default value: 0.1
+init_run_step = 0
+niter =  10
+*** generate kfile 0
+r0 = 4.0
+b0 = 7.0
+ip = 8100000.004
+ip, ip cal, ip/(ip cal) = 8.100 8.098 1.000
+weigting upper xpoint: [14, 15, 16, 17]
+weigting lower xpoint: [44, 45, 46, 47]
+run efit
+efit, subprocess
+elapsed time =  0.215  1.206
+error_efit = 7.589e-05
+*** generate kfile 1
+apply underrelaxation
+r0 = 4.0
+b0 = 7.0
+ip = 8100000.004
+inmtric under-relax: 0.5
+ip, ip cal, ip/(ip cal) = 8.100 8.097 1.000
+weigting upper xpoint: [14, 15, 16, 17]
+weigting lower xpoint: [44, 45, 46, 47]
+diff_p = 0.0009748161733963861
+diff_f = 0.0022775815264490153
+converged
+EQ0 step finished
+HCD0 step
+hcd_model.init() started
+start dakota update
+add =  0
+ps_backend =  INSTATE
+Pe = [30.0]
+Pi = [8.0]
+xmid = [0.0]
+xwid = [0.3]
+HCD0 step finished
+TR0 step
+fastran.step() entered
+update_next = disabled
+update_instate =  True
+model_beam = 0
+/global/common/software/atom/perlmutter/binaries/fastran/default/xfastran_ver1.00_ser
+ncpu =  1
+n1d  =  1
+nky  =  1
+model_beam = 0
+TR0 step finished
+BC0 step
+modeleq_constraint.step() started
+model_beam = 0
+betan_th   = 2.598987947763957
+betan_beam = 0.0
+h98_target = 1.3
+nebar =  21.22188797656161
+m =  2.5
+pe_ec, pe_ic, pi_ic, pe_nb, pi_nb = 0.0 30.01042552397766 8.002780139727374 0.0 0.0
+pe_fus, pi_fus = 54.86649677188003 15.571650735474808
+ploss = 89.59157949775671
+tau98 = 1.372203462994406
+betan_th_target =  2.5939534537885547
+wth_target = 159.8192383345485, wth = 160.12942469944784
+tauth = 1.7873267286626788, h98 = 1.3025231147299365
+density_model = 1: impurity = f*ne
+He profile found
+scale to match betan_th :
+tscale = 5.000e+00, betan_th = 9.972e+00, betan_th_target = 2.594e+00
+scale to match betan_th :
+tscale = 2.500e+00, betan_th = 5.368e+00, betan_th_target = 2.594e+00
+scale to match betan_th :
+tscale = 1.250e+00, betan_th = 3.067e+00, betan_th_target = 2.594e+00
+scale to match betan_th :
+tscale = 6.250e-01, betan_th = 1.917e+00, betan_th_target = 2.594e+00
+scale to match betan_th :
+tscale = 9.375e-01, betan_th = 2.492e+00, betan_th_target = 2.594e+00
+scale to match betan_th :
+tscale = 1.094e+00, betan_th = 2.779e+00, betan_th_target = 2.594e+00
+scale to match betan_th :
+tscale = 1.016e+00, betan_th = 2.636e+00, betan_th_target = 2.594e+00
+scale to match betan_th :
+tscale = 9.766e-01, betan_th = 2.564e+00, betan_th_target = 2.594e+00
+scale to match betan_th :
+tscale = 9.961e-01, betan_th = 2.600e+00, betan_th_target = 2.594e+00
+scale to match betan_th :
+tscale = 9.863e-01, betan_th = 2.582e+00, betan_th_target = 2.594e+00
+scale to match betan_th :
+tscale = 9.912e-01, betan_th = 2.591e+00, betan_th_target = 2.594e+00
+scale to match betan_th :
+tscale = 9.937e-01, betan_th = 2.595e+00, betan_th_target = 2.594e+00
+Temperature scale: 15.954 13.858 1.000 0.992
+jpeak = 1.08734130859375 1.0885498046875002
+ip_cal =  8.09911220294887 8.1
+model_beam = 0
+Icurt=8.097e+00MA
+rho_rad prad 100 100
+integrated :  18857606.939167913
+rho pohme 100 100
+integrated :  0.0
+Icurt=8.099e+00MA
+rho_nbi pbe 100 100
+integrated :  0.0
+rho_nbi pbi 100 100
+integrated :  0.0
+rho_nbi sbedep 100 100
+integrated :  0.0
+rho_nbi tqbe 100 100
+integrated :  0.0
+Icurbeam=0.000e+00MA
+rho_ecrf peech 100 100
+integrated :  0.0
+rho_icrf picrf_totals 8 100
+integrated :  30003817.32726734
+rho_icrf picrf_totals 8 100
+integrated :  8001017.953937956
+Icurech=0.000e+00MA
+Icurich=0.000e+00MA
+BC0 step finished
+
+========================================================================
+= fastran driver: preprocess iteration number =  6
+
+EQ0 step
+>>> efit.step() started
+INPUT: PRESSURE found kinetic , mapped value =  kinetic
+INPUT: RELAX_PROFILE not found, use default value: 0
+INPUT: RELAX_METRIC not found, use default value: 0.5
+INPUT: BETAN_TARGET not found, use default value: -1.0
+model_beam = 0
+model_pressure = kinetic
+INPUT: TOPOLOGY found DN , mapped value =  DN
+INPUT: ERROR not found, use default value: 1.0e-4
+INPUT: MAX_EFIT_ERROR not found, use default value: 0.1
+init_run_step = 0
+niter =  10
+*** generate kfile 0
+r0 = 4.0
+b0 = 7.0
+ip = 8100000.004
+  %ps_mhdeq_derive: compute <1/R^2> and <|grad(rho)|^2/R^2>.
+  %ps_mhdeq_derive: compute metric averages <1/R>, <|grad(rho)|>, etc.
+  %ps_mhdeq_derive: compute R & Z minmax profiles; triangularity, etc.
+  %ps_mhdeq_derive: compute <1/B^2>, NCLASS moments, etc.
+  %ps_mhdeq_nclass: allocating 16 Pfirsch-Schlutter moments profiles.
+  %ps_mhdeq_derive: compute NC sqrt-singular flux surface averages.
+  %ps_mhdeq_derive: compute profiles of Bmin, Bmax.
+  %ps_update_fromxplasma: allocating nr,nz  =          129 ,         129
+  %ps_update_fromxplasma: allocating nlim   =            5
+  %ps_mhdeq_derive: compute <1/R^2> and <|grad(rho)|^2/R^2>.
+  %ps_mhdeq_derive: compute metric averages <1/R>, <|grad(rho)|>, etc.
+  %ps_mhdeq_derive: compute R & Z minmax profiles; triangularity, etc.
+  %ps_mhdeq_derive: compute <1/B^2>, NCLASS moments, etc.
+  %ps_mhdeq_nclass: allocating 16 Pfirsch-Schlutter moments profiles.
+  %ps_mhdeq_derive: compute NC sqrt-singular flux surface averages.
+  %ps_mhdeq_derive: compute profiles of Bmin, Bmax.
+  %ps_update_fromxplasma: allocating nr,nz  =          129 ,         129
+  %ps_update_fromxplasma: allocating nlim   =            5
+  %ps_mhdeq_derive: compute <1/R^2> and <|grad(rho)|^2/R^2>.
+  %ps_mhdeq_derive: compute metric averages <1/R>, <|grad(rho)|>, etc.
+  %ps_mhdeq_derive: compute R & Z minmax profiles; triangularity, etc.
+  %ps_mhdeq_derive: compute <1/B^2>, NCLASS moments, etc.
+  %ps_mhdeq_nclass: allocating 16 Pfirsch-Schlutter moments profiles.
+  %ps_mhdeq_derive: compute NC sqrt-singular flux surface averages.
+  %ps_mhdeq_derive: compute profiles of Bmin, Bmax.
+  %ps_update_fromxplasma: allocating nr,nz  =          129 ,         129
+  %ps_update_fromxplasma: allocating nlim   =            5
+  %ps_mhdeq_derive: compute <1/R^2> and <|grad(rho)|^2/R^2>.
+  %ps_mhdeq_derive: compute metric averages <1/R>, <|grad(rho)|>, etc.
+  %ps_mhdeq_derive: compute R & Z minmax profiles; triangularity, etc.
+  %ps_mhdeq_derive: compute <1/B^2>, NCLASS moments, etc.
+  %ps_mhdeq_nclass: allocating 16 Pfirsch-Schlutter moments profiles.
+  %ps_mhdeq_derive: compute NC sqrt-singular flux surface averages.
+  %ps_mhdeq_derive: compute profiles of Bmin, Bmax.
+  %ps_update_fromxplasma: allocating nr,nz  =          129 ,         129
+  %ps_update_fromxplasma: allocating nlim   =            5
+  %ps_mhdeq_derive: compute <1/R^2> and <|grad(rho)|^2/R^2>.
+  %ps_mhdeq_derive: compute metric averages <1/R>, <|grad(rho)|>, etc.
+  %ps_mhdeq_derive: compute R & Z minmax profiles; triangularity, etc.
+  %ps_mhdeq_derive: compute <1/B^2>, NCLASS moments, etc.
+  %ps_mhdeq_nclass: allocating 16 Pfirsch-Schlutter moments profiles.
+  %ps_mhdeq_derive: compute NC sqrt-singular flux surface averages.
+  %ps_mhdeq_derive: compute profiles of Bmin, Bmax.
+  %ps_update_fromxplasma: allocating nr,nz  =          129 ,         129
+  %ps_update_fromxplasma: allocating nlim   =            5
+  %ps_mhdeq_derive: compute <1/R^2> and <|grad(rho)|^2/R^2>.
+  %ps_mhdeq_derive: compute metric averages <1/R>, <|grad(rho)|>, etc.
+  %ps_mhdeq_derive: compute R & Z minmax profiles; triangularity, etc.
+  %ps_mhdeq_derive: compute <1/B^2>, NCLASS moments, etc.
+  %ps_mhdeq_nclass: allocating 16 Pfirsch-Schlutter moments profiles.
+  %ps_mhdeq_derive: compute NC sqrt-singular flux surface averages.
+  %ps_mhdeq_derive: compute profiles of Bmin, Bmax.
+  %ps_update_fromxplasma: allocating nr,nz  =          129 ,         129
+  %ps_update_fromxplasma: allocating nlim   =            5
+  %ps_mhdeq_derive: compute <1/R^2> and <|grad(rho)|^2/R^2>.
+  %ps_mhdeq_derive: compute metric averages <1/R>, <|grad(rho)|>, etc.
+  %ps_mhdeq_derive: compute R & Z minmax profiles; triangularity, etc.
+  %ps_mhdeq_derive: compute <1/B^2>, NCLASS moments, etc.
+  %ps_mhdeq_nclass: allocating 16 Pfirsch-Schlutter moments profiles.
+  %ps_mhdeq_derive: compute NC sqrt-singular flux surface averages.
+  %ps_mhdeq_derive: compute profiles of Bmin, Bmax.
+  %ps_update_fromxplasma: allocating nr,nz  =          129 ,         129
+  %ps_update_fromxplasma: allocating nlim   =            5
+  %ps_mhdeq_derive: compute <1/R^2> and <|grad(rho)|^2/R^2>.
+ip, ip cal, ip/(ip cal) = 8.100 8.099 1.000
+weigting upper xpoint: [14, 15, 16, 17]
+weigting lower xpoint: [44, 45, 46, 47]
+run efit
+efit, subprocess
+elapsed time =  0.212  1.194
+error_efit = 7.659e-05
+*** generate kfile 1
+apply underrelaxation
+r0 = 4.0
+b0 = 7.0
+ip = 8100000.004
+inmtric under-relax: 0.5
+ip, ip cal, ip/(ip cal) = 8.100 8.098 1.000
+weigting upper xpoint: [14, 15, 16, 17]
+weigting lower xpoint: [44, 45, 46, 47]
+diff_p = 0.00020282193121007463
+diff_f = 0.00020688986264810218
+converged
+EQ0 step finished
+HCD0 step
+hcd_model.init() started
+start dakota update
+add =  0
+ps_backend =  INSTATE
+Pe = [30.0]
+Pi = [8.0]
+xmid = [0.0]
+xwid = [0.3]
+HCD0 step finished
+TR0 step
+fastran.step() entered
+update_next = disabled
+update_instate =  True
+model_beam = 0
+/global/common/software/atom/perlmutter/binaries/fastran/default/xfastran_ver1.00_ser
+ncpu =  1
+n1d  =  1
+nky  =  1
+model_beam = 0
+TR0 step finished
+BC0 step
+modeleq_constraint.step() started
+model_beam = 0
+betan_th   = 2.592272614320638
+betan_beam = 0.0
+h98_target = 1.3
+nebar =  21.221318310982195
+m =  2.5
+pe_ec, pe_ic, pi_ic, pe_nb, pi_nb = 0.0 30.01174080977783 8.003130882607424 0.0 0.0
+pe_fus, pi_fus = 54.52478765517146 15.434107915699933
+ploss = 89.1443454109671
+tau98 = 1.376934787731878
+betan_th_target =  2.5899216500575544
+wth_target = 159.56973542373137, wth = 159.7145825643553
+tauth = 1.791640084719341, h98 = 1.3011800563704081
+density_model = 1: impurity = f*ne
+He profile found
+scale to match betan_th :
+tscale = 5.000e+00, betan_th = 9.937e+00, betan_th_target = 2.590e+00
+scale to match betan_th :
+tscale = 2.500e+00, betan_th = 5.351e+00, betan_th_target = 2.590e+00
+scale to match betan_th :
+tscale = 1.250e+00, betan_th = 3.059e+00, betan_th_target = 2.590e+00
+scale to match betan_th :
+tscale = 6.250e-01, betan_th = 1.912e+00, betan_th_target = 2.590e+00
+scale to match betan_th :
+tscale = 9.375e-01, betan_th = 2.485e+00, betan_th_target = 2.590e+00
+scale to match betan_th :
+tscale = 1.094e+00, betan_th = 2.772e+00, betan_th_target = 2.590e+00
+scale to match betan_th :
+tscale = 1.016e+00, betan_th = 2.629e+00, betan_th_target = 2.590e+00
+scale to match betan_th :
+tscale = 9.766e-01, betan_th = 2.557e+00, betan_th_target = 2.590e+00
+scale to match betan_th :
+tscale = 9.961e-01, betan_th = 2.593e+00, betan_th_target = 2.590e+00
+scale to match betan_th :
+tscale = 9.863e-01, betan_th = 2.575e+00, betan_th_target = 2.590e+00
+scale to match betan_th :
+tscale = 9.912e-01, betan_th = 2.584e+00, betan_th_target = 2.590e+00
+scale to match betan_th :
+tscale = 9.937e-01, betan_th = 2.588e+00, betan_th_target = 2.590e+00
+Temperature scale: 15.940 13.843 1.000 0.995
+jpeak = 1.0885498046875002 1.0891540527343753
+ip_cal =  8.100342539496008 8.1
+model_beam = 0
+Icurt=8.097e+00MA
+rho_rad prad 100 100
+integrated :  18826499.959886108
+rho pohme 100 100
+integrated :  0.0
+Icurt=8.100e+00MA
+rho_nbi pbe 100 100
+integrated :  0.0
+rho_nbi pbi 100 100
+integrated :  0.0
+rho_nbi sbedep 100 100
+integrated :  0.0
+rho_nbi tqbe 100 100
+integrated :  0.0
+Icurbeam=0.000e+00MA
+rho_ecrf peech 100 100
+integrated :  0.0
+rho_icrf picrf_totals 8 100
+integrated :  30003386.86644997
+rho_icrf picrf_totals 8 100
+integrated :  8000903.164386659
+Icurech=0.000e+00MA
+Icurich=0.000e+00MA
+BC0 step finished
+
+========================================================================
+= fastran driver: preprocess iteration number =  7
+
+EQ0 step
+>>> efit.step() started
+INPUT: PRESSURE found kinetic , mapped value =  kinetic
+INPUT: RELAX_PROFILE not found, use default value: 0
+INPUT: RELAX_METRIC not found, use default value: 0.5
+INPUT: BETAN_TARGET not found, use default value: -1.0
+model_beam = 0
+model_pressure = kinetic
+INPUT: TOPOLOGY found DN , mapped value =  DN
+INPUT: ERROR not found, use default value: 1.0e-4
+INPUT: MAX_EFIT_ERROR not found, use default value: 0.1
+init_run_step = 0
+niter =  10
+*** generate kfile 0
+r0 = 4.0
+b0 = 7.0
+ip = 8100000.004
+ip, ip cal, ip/(ip cal) = 8.100 8.100 1.000
+weigting upper xpoint: [14, 15, 16, 17]
+weigting lower xpoint: [44, 45, 46, 47]
+run efit
+efit, subprocess
+elapsed time =  0.213  1.234
+error_efit = 7.587e-05
+*** generate kfile 1
+apply underrelaxation
+r0 = 4.0
+b0 = 7.0
+ip = 8100000.004
+inmtric under-relax: 0.5
+ip, ip cal, ip/(ip cal) = 8.100 8.100 1.000
+weigting upper xpoint: [14, 15, 16, 17]
+weigting lower xpoint: [44, 45, 46, 47]
+diff_p = 0.0004355044501219419
+diff_f = 0.0009879137968158813
+converged
+EQ0 step finished
+HCD0 step
+hcd_model.init() started
+start dakota update
+add =  0
+ps_backend =  INSTATE
+Pe = [30.0]
+Pi = [8.0]
+xmid = [0.0]
+xwid = [0.3]
+HCD0 step finished
+TR0 step
+fastran.step() entered
+update_next = disabled
+update_instate =  True
+model_beam = 0
+/global/common/software/atom/perlmutter/binaries/fastran/default/xfastran_ver1.00_ser
+ncpu =  1
+n1d  =  1
+nky  =  1
+model_beam = 0
+TR0 step finished
+BC0 step
+modeleq_constraint.step() started
+model_beam = 0
+betan_th   = 2.5902294312486447
+betan_beam = 0.0
+h98_target = 1.3
+nebar =  21.222796272732985
+m =  2.5
+pe_ec, pe_ic, pi_ic, pe_nb, pi_nb = 0.0 30.005537816276043 8.001476751006946 0.0 0.0
+pe_fus, pi_fus = 54.411419606299354 15.391131532052901
+ploss = 88.99020595742053
+tau98 = 1.378619347205815
+betan_th_target =  2.5886145283816804
+wth_target = 159.48870553814913, wth = 159.58820230176465
+tauth = 1.7933232155696257, h98 = 1.300811002837246
+density_model = 1: impurity = f*ne
+He profile found
+scale to match betan_th :
+tscale = 5.000e+00, betan_th = 9.926e+00, betan_th_target = 2.589e+00
+scale to match betan_th :
+tscale = 2.500e+00, betan_th = 5.346e+00, betan_th_target = 2.589e+00
+scale to match betan_th :
+tscale = 1.250e+00, betan_th = 3.056e+00, betan_th_target = 2.589e+00
+scale to match betan_th :
+tscale = 6.250e-01, betan_th = 1.911e+00, betan_th_target = 2.589e+00
+scale to match betan_th :
+tscale = 9.375e-01, betan_th = 2.483e+00, betan_th_target = 2.589e+00
+scale to match betan_th :
+tscale = 1.094e+00, betan_th = 2.770e+00, betan_th_target = 2.589e+00
+scale to match betan_th :
+tscale = 1.016e+00, betan_th = 2.627e+00, betan_th_target = 2.589e+00
+scale to match betan_th :
+tscale = 9.766e-01, betan_th = 2.555e+00, betan_th_target = 2.589e+00
+scale to match betan_th :
+tscale = 9.961e-01, betan_th = 2.591e+00, betan_th_target = 2.589e+00
+scale to match betan_th :
+tscale = 9.863e-01, betan_th = 2.573e+00, betan_th_target = 2.589e+00
+scale to match betan_th :
+tscale = 9.912e-01, betan_th = 2.582e+00, betan_th_target = 2.589e+00
+scale to match betan_th :
+tscale = 9.937e-01, betan_th = 2.586e+00, betan_th_target = 2.589e+00
+Temperature scale: 15.926 13.829 1.000 0.995
+jpeak = 1.0885498046875002 1.0891540527343753
+ip_cal =  8.099419576696237 8.1
+model_beam = 0
+Icurt=8.099e+00MA
+rho_rad prad 100 100
+integrated :  18818925.060550116
+rho pohme 100 100
+integrated :  0.0
+Icurt=8.099e+00MA
+rho_nbi pbe 100 100
+integrated :  0.0
+rho_nbi pbi 100 100
+integrated :  0.0
+rho_nbi sbedep 100 100
+integrated :  0.0
+rho_nbi tqbe 100 100
+integrated :  0.0
+Icurbeam=0.000e+00MA
+rho_ecrf peech 100 100
+integrated :  0.0
+rho_icrf picrf_totals 8 100
+integrated :  30004073.573540572
+rho_icrf picrf_totals 8 100
+integrated :  8001086.286277488
+Icurech=0.000e+00MA
+Icurich=0.000e+00MA
+BC0 step finished
+
+========================================================================
+= fastran driver: preprocess iteration number =  8
+
+EQ0 step
+>>> efit.step() started
+INPUT: PRESSURE found kinetic , mapped value =  kinetic
+INPUT: RELAX_PROFILE not found, use default value: 0
+INPUT: RELAX_METRIC not found, use default value: 0.5
+INPUT: BETAN_TARGET not found, use default value: -1.0
+model_beam = 0
+model_pressure = kinetic
+INPUT: TOPOLOGY found DN , mapped value =  DN
+INPUT: ERROR not found, use default value: 1.0e-4
+INPUT: MAX_EFIT_ERROR not found, use default value: 0.1
+init_run_step = 0
+niter =  10
+*** generate kfile 0
+r0 = 4.0
+b0 = 7.0
+ip = 8100000.004
+ip, ip cal, ip/(ip cal) = 8.100 8.099 1.000
+weigting upper xpoint: [14, 15, 16, 17]
+weigting lower xpoint: [44, 45, 46, 47]
+run efit
+efit, subprocess
+elapsed time =  0.222  1.197
+error_efit = 7.624e-05
+*** generate kfile 1
+apply underrelaxation
+r0 = 4.0
+b0 = 7.0
+ip = 8100000.004
+inmtric under-relax: 0.5
+ip, ip cal, ip/(ip cal) = 8.100 8.099 1.000
+weigting upper xpoint: [14, 15, 16, 17]
+weigting lower xpoint: [44, 45, 46, 47]
+diff_p = 0.0001505433729087292
+diff_f = 0.0002570070399663867
+converged
+EQ0 step finished
+HCD0 step
+hcd_model.init() started
+start dakota update
+add =  0
+ps_backend =  INSTATE
+Pe = [30.0]
+Pi = [8.0]
+xmid = [0.0]
+xwid = [0.3]
+HCD0 step finished
+TR0 step
+fastran.step() entered
+update_next = disabled
+update_instate =  True
+model_beam = 0
+/global/common/software/atom/perlmutter/binaries/fastran/default/xfastran_ver1.00_ser
+ncpu =  1
+n1d  =  1
+nky  =  1
+model_beam = 0
+TR0 step finished
+BC0 step
+modeleq_constraint.step() started
+model_beam = 0
+betan_th   = 2.588345293561211
+betan_beam = 0.0
+h98_target = 1.3
+nebar =  21.222346014308155
+m =  2.5
+pe_ec, pe_ic, pi_ic, pe_nb, pi_nb = 0.0 30.006692716804956 8.001784724481322 0.0 0.0
+pe_fus, pi_fus = 54.30808784271876 15.351477895251122
+ploss = 88.85682002289225
+tau98 = 1.3800349599015507
+betan_th_target =  2.5873925062980865
+wth_target = 159.41317347445283, wth = 159.47187614167132
+tauth = 1.7947060912216581, h98 = 1.3004787149375472
+density_model = 1: impurity = f*ne
+He profile found
+scale to match betan_th :
+tscale = 5.000e+00, betan_th = 9.917e+00, betan_th_target = 2.587e+00
+scale to match betan_th :
+tscale = 2.500e+00, betan_th = 5.341e+00, betan_th_target = 2.587e+00
+scale to match betan_th :
+tscale = 1.250e+00, betan_th = 3.054e+00, betan_th_target = 2.587e+00
+scale to match betan_th :
+tscale = 6.250e-01, betan_th = 1.910e+00, betan_th_target = 2.587e+00
+scale to match betan_th :
+tscale = 9.375e-01, betan_th = 2.482e+00, betan_th_target = 2.587e+00
+scale to match betan_th :
+tscale = 1.094e+00, betan_th = 2.768e+00, betan_th_target = 2.587e+00
+scale to match betan_th :
+tscale = 1.016e+00, betan_th = 2.625e+00, betan_th_target = 2.587e+00
+scale to match betan_th :
+tscale = 9.766e-01, betan_th = 2.553e+00, betan_th_target = 2.587e+00
+scale to match betan_th :
+tscale = 9.961e-01, betan_th = 2.589e+00, betan_th_target = 2.587e+00
+scale to match betan_th :
+tscale = 9.863e-01, betan_th = 2.571e+00, betan_th_target = 2.587e+00
+scale to match betan_th :
+tscale = 9.912e-01, betan_th = 2.580e+00, betan_th_target = 2.587e+00
+scale to match betan_th :
+tscale = 9.937e-01, betan_th = 2.584e+00, betan_th_target = 2.587e+00
+Temperature scale: 15.912 13.814 1.000 0.995
+jpeak = 1.0885498046875002 1.0897583007812501
+ip_cal =  8.099914299343926 8.1
+model_beam = 0
+  %ps_mhdeq_derive: compute <1/B^2>, NCLASS moments, etc.
+  %ps_mhdeq_derive: compute NC sqrt-singular flux surface averages.
+  %ps_mhdeq_derive: compute profiles of Bmin, Bmax.
+  %ps_update_fromxplasma: allocating nr,nz  =          129 ,         129
+  %ps_update_fromxplasma: allocating nlim   =            5
+  %ps_mhdeq_derive: compute <1/R^2> and <|grad(rho)|^2/R^2>.
+  %ps_mhdeq_derive: compute metric averages <1/R>, <|grad(rho)|>, etc.
+  %ps_mhdeq_derive: compute R & Z minmax profiles; triangularity, etc.
+  %ps_mhdeq_derive: compute <1/B^2>, NCLASS moments, etc.
+  %ps_mhdeq_nclass: allocating 16 Pfirsch-Schlutter moments profiles.
+  %ps_mhdeq_derive: compute NC sqrt-singular flux surface averages.
+  %ps_mhdeq_derive: compute profiles of Bmin, Bmax.
+  %ps_mhdeq_derive: compute <1/R^2> and <|grad(rho)|^2/R^2>.
+  %ps_mhdeq_derive: compute metric averages <1/R>, <|grad(rho)|>, etc.
+  %ps_mhdeq_derive: compute R & Z minmax profiles; triangularity, etc.
+  %ps_mhdeq_derive: compute <1/B^2>, NCLASS moments, etc.
+  %ps_mhdeq_derive: compute NC sqrt-singular flux surface averages.
+  %ps_mhdeq_derive: compute profiles of Bmin, Bmax.
+  %ps_update_fromxplasma: allocating nr,nz  =          129 ,         129
+  %ps_update_fromxplasma: allocating nlim   =            5
+  %ps_mhdeq_derive: compute <1/R^2> and <|grad(rho)|^2/R^2>.
+  %ps_mhdeq_derive: compute metric averages <1/R>, <|grad(rho)|>, etc.
+  %ps_mhdeq_derive: compute R & Z minmax profiles; triangularity, etc.
+  %ps_mhdeq_derive: compute <1/B^2>, NCLASS moments, etc.
+  %ps_mhdeq_nclass: allocating 16 Pfirsch-Schlutter moments profiles.
+  %ps_mhdeq_derive: compute NC sqrt-singular flux surface averages.
+  %ps_mhdeq_derive: compute profiles of Bmin, Bmax.
+  %ps_mhdeq_derive: compute <1/R^2> and <|grad(rho)|^2/R^2>.
+  %ps_mhdeq_derive: compute metric averages <1/R>, <|grad(rho)|>, etc.
+  %ps_mhdeq_derive: compute R & Z minmax profiles; triangularity, etc.
+  %ps_mhdeq_derive: compute <1/B^2>, NCLASS moments, etc.
+  %ps_mhdeq_derive: compute NC sqrt-singular flux surface averages.
+  %ps_mhdeq_derive: compute profiles of Bmin, Bmax.
+  %ps_update_fromxplasma: allocating nr,nz  =          129 ,         129
+  %ps_update_fromxplasma: allocating nlim   =            5
+  %ps_mhdeq_derive: compute <1/R^2> and <|grad(rho)|^2/R^2>.
+  %ps_mhdeq_derive: compute metric averages <1/R>, <|grad(rho)|>, etc.
+  %ps_mhdeq_derive: compute R & Z minmax profiles; triangularity, etc.
+  %ps_mhdeq_derive: compute <1/B^2>, NCLASS moments, etc.
+  %ps_mhdeq_nclass: allocating 16 Pfirsch-Schlutter moments profiles.
+  %ps_mhdeq_derive: compute NC sqrt-singular flux surface averages.
+  %ps_mhdeq_derive: compute profiles of Bmin, Bmax.
+  %ps_mhdeq_derive: compute <1/R^2> and <|grad(rho)|^2/R^2>.
+  %ps_mhdeq_derive: compute metric averages <1/R>, <|grad(rho)|>, etc.
+  %ps_mhdeq_derive: compute R & Z minmax profiles; triangularity, etc.
+  %ps_mhdeq_derive: compute <1/B^2>, NCLASS moments, etc.
+  %ps_mhdeq_derive: compute NC sqrt-singular flux surface averages.
+  %ps_mhdeq_derive: compute profiles of Bmin, Bmax.
+  %ps_update_fromxplasma: allocating nr,nz  =          129 ,         129
+  %ps_update_fromxplasma: allocating nlim   =            5
+  %ps_mhdeq_derive: compute <1/R^2> and <|grad(rho)|^2/R^2>.
+  %ps_mhdeq_derive: compute metric averages <1/R>, <|grad(rho)|>, etc.
+  %ps_mhdeq_derive: compute R & Z minmax profiles; triangularity, etc.
+  %ps_mhdeq_derive: compute <1/B^2>, NCLASS moments, etc.
+  %ps_mhdeq_nclass: allocating 16 Pfirsch-Schlutter moments profiles.
+  %ps_mhdeq_derive: compute NC sqrt-singular flux surface averages.
+  %ps_mhdeq_derive: compute profiles of Bmin, Bmax.
+  %ps_mhdeq_derive: compute <1/R^2> and <|grad(rho)|^2/R^2>.
+  %ps_mhdeq_derive: compute metric averages <1/R>, <|grad(rho)|>, etc.
+  %ps_mhdeq_derive: compute R & Z minmax profiles; triangularity, etc.
+  %ps_mhdeq_derive: compute <1/B^2>, NCLASS moments, etc.
+  %ps_mhdeq_derive: compute NC sqrt-singular flux surface averages.
+  %ps_mhdeq_derive: compute profiles of Bmin, Bmax.
+  %ps_update_fromxplasma: allocating nr,nz  =          129 ,         129
+Icurt=8.099e+00MA
+rho_rad prad 100 100
+integrated :  18810229.658324674
+rho pohme 100 100
+integrated :  0.0
+Icurt=8.100e+00MA
+rho_nbi pbe 100 100
+integrated :  0.0
+rho_nbi pbi 100 100
+integrated :  0.0
+rho_nbi sbedep 100 100
+integrated :  0.0
+rho_nbi tqbe 100 100
+integrated :  0.0
+Icurbeam=0.000e+00MA
+rho_ecrf peech 100 100
+integrated :  0.0
+rho_icrf picrf_totals 8 100
+integrated :  30003889.600455415
+rho_icrf picrf_totals 8 100
+integrated :  8001037.226788122
+Icurech=0.000e+00MA
+Icurich=0.000e+00MA
+BC0 step finished
+
+========================================================================
+= fastran driver: preprocess iteration number =  9
+
+EQ0 step
+>>> efit.step() started
+INPUT: PRESSURE found kinetic , mapped value =  kinetic
+INPUT: RELAX_PROFILE not found, use default value: 0
+INPUT: RELAX_METRIC not found, use default value: 0.5
+INPUT: BETAN_TARGET not found, use default value: -1.0
+model_beam = 0
+model_pressure = kinetic
+INPUT: TOPOLOGY found DN , mapped value =  DN
+INPUT: ERROR not found, use default value: 1.0e-4
+INPUT: MAX_EFIT_ERROR not found, use default value: 0.1
+init_run_step = 0
+niter =  10
+*** generate kfile 0
+r0 = 4.0
+b0 = 7.0
+ip = 8100000.004
+ip, ip cal, ip/(ip cal) = 8.100 8.100 1.000
+weigting upper xpoint: [14, 15, 16, 17]
+weigting lower xpoint: [44, 45, 46, 47]
+run efit
+efit, subprocess
+elapsed time =  0.223  1.209
+error_efit = 7.602e-05
+*** generate kfile 1
+apply underrelaxation
+r0 = 4.0
+b0 = 7.0
+ip = 8100000.004
+  %ps_mhdeq_derive: compute metric averages <1/R>, <|grad(rho)|>, etc.
+  %ps_mhdeq_derive: compute R & Z minmax profiles; triangularity, etc.
+  %ps_mhdeq_derive: compute <1/B^2>, NCLASS moments, etc.
+  %ps_mhdeq_nclass: allocating 16 Pfirsch-Schlutter moments profiles.
+  %ps_mhdeq_derive: compute NC sqrt-singular flux surface averages.
+  %ps_mhdeq_derive: compute profiles of Bmin, Bmax.
+  %ps_update_fromxplasma: allocating nr,nz  =          129 ,         129
+  %ps_update_fromxplasma: allocating nlim   =            5
+  %ps_mhdeq_derive: compute <1/R^2> and <|grad(rho)|^2/R^2>.
+  %ps_mhdeq_derive: compute metric averages <1/R>, <|grad(rho)|>, etc.
+  %ps_mhdeq_derive: compute R & Z minmax profiles; triangularity, etc.
+  %ps_mhdeq_derive: compute <1/B^2>, NCLASS moments, etc.
+  %ps_mhdeq_nclass: allocating 16 Pfirsch-Schlutter moments profiles.
+  %ps_mhdeq_derive: compute NC sqrt-singular flux surface averages.
+  %ps_mhdeq_derive: compute profiles of Bmin, Bmax.
+  %ps_update_fromxplasma: allocating nr,nz  =          129 ,         129
+  %ps_update_fromxplasma: allocating nlim   =            5
+  %ps_mhdeq_derive: compute <1/R^2> and <|grad(rho)|^2/R^2>.
+  %ps_mhdeq_derive: compute metric averages <1/R>, <|grad(rho)|>, etc.
+  %ps_mhdeq_derive: compute R & Z minmax profiles; triangularity, etc.
+  %ps_mhdeq_derive: compute <1/B^2>, NCLASS moments, etc.
+  %ps_mhdeq_nclass: allocating 16 Pfirsch-Schlutter moments profiles.
+  %ps_mhdeq_derive: compute NC sqrt-singular flux surface averages.
+  %ps_mhdeq_derive: compute profiles of Bmin, Bmax.
+  %ps_update_fromxplasma: allocating nr,nz  =          129 ,         129
+  %ps_update_fromxplasma: allocating nlim   =            5
+  %ps_mhdeq_derive: compute <1/R^2> and <|grad(rho)|^2/R^2>.
+  %ps_mhdeq_derive: compute metric averages <1/R>, <|grad(rho)|>, etc.
+  %ps_mhdeq_derive: compute R & Z minmax profiles; triangularity, etc.
+  %ps_mhdeq_derive: compute <1/B^2>, NCLASS moments, etc.
+  %ps_mhdeq_nclass: allocating 16 Pfirsch-Schlutter moments profiles.
+  %ps_mhdeq_derive: compute NC sqrt-singular flux surface averages.
+  %ps_mhdeq_derive: compute profiles of Bmin, Bmax.
+  %ps_update_fromxplasma: allocating nr,nz  =          129 ,         129
+  %ps_update_fromxplasma: allocating nlim   =            5
+  %ps_mhdeq_derive: compute <1/R^2> and <|grad(rho)|^2/R^2>.
+  %ps_mhdeq_derive: compute metric averages <1/R>, <|grad(rho)|>, etc.
+  %ps_mhdeq_derive: compute R & Z minmax profiles; triangularity, etc.
+  %ps_mhdeq_derive: compute <1/B^2>, NCLASS moments, etc.
+  %ps_mhdeq_nclass: allocating 16 Pfirsch-Schlutter moments profiles.
+  %ps_mhdeq_derive: compute NC sqrt-singular flux surface averages.
+  %ps_mhdeq_derive: compute profiles of Bmin, Bmax.
+  %ps_update_fromxplasma: allocating nr,nz  =          129 ,         129
+  %ps_update_fromxplasma: allocating nlim   =            5
+  %ps_mhdeq_derive: compute <1/R^2> and <|grad(rho)|^2/R^2>.
+  %ps_mhdeq_derive: compute metric averages <1/R>, <|grad(rho)|>, etc.
+  %ps_mhdeq_derive: compute R & Z minmax profiles; triangularity, etc.
+  %ps_mhdeq_derive: compute <1/B^2>, NCLASS moments, etc.
+  %ps_mhdeq_nclass: allocating 16 Pfirsch-Schlutter moments profiles.
+  %ps_mhdeq_derive: compute NC sqrt-singular flux surface averages.
+  %ps_mhdeq_derive: compute profiles of Bmin, Bmax.
+  %ps_update_fromxplasma: allocating nr,nz  =          129 ,         129
+  %ps_update_fromxplasma: allocating nlim   =            5
+  %ps_mhdeq_derive: compute <1/R^2> and <|grad(rho)|^2/R^2>.
+  %ps_mhdeq_derive: compute metric averages <1/R>, <|grad(rho)|>, etc.
+  %ps_mhdeq_derive: compute R & Z minmax profiles; triangularity, etc.
+  %ps_mhdeq_derive: compute <1/B^2>, NCLASS moments, etc.
+  %ps_mhdeq_nclass: allocating 16 Pfirsch-Schlutter moments profiles.
+  %ps_mhdeq_derive: compute NC sqrt-singular flux surface averages.
+  %ps_mhdeq_derive: compute profiles of Bmin, Bmax.
+  %ps_update_fromxplasma: allocating nr,nz  =          129 ,         129
+  %ps_update_fromxplasma: allocating nlim   =            5
+  %ps_mhdeq_derive: compute <1/R^2> and <|grad(rho)|^2/R^2>.
+  %ps_mhdeq_derive: compute metric averages <1/R>, <|grad(rho)|>, etc.
+inmtric under-relax: 0.5
+ip, ip cal, ip/(ip cal) = 8.100 8.100 1.000
+weigting upper xpoint: [14, 15, 16, 17]
+weigting lower xpoint: [44, 45, 46, 47]
+diff_p = 0.00014833305218541374
+diff_f = 0.000344189420356089
+converged
+EQ0 step finished
+HCD0 step
+hcd_model.init() started
+start dakota update
+add =  0
+ps_backend =  INSTATE
+Pe = [30.0]
+Pi = [8.0]
+xmid = [0.0]
+xwid = [0.3]
+HCD0 step finished
+TR0 step
+fastran.step() entered
+update_next = disabled
+update_instate =  True
+model_beam = 0
+/global/common/software/atom/perlmutter/binaries/fastran/default/xfastran_ver1.00_ser
+ncpu =  1
+n1d  =  1
+nky  =  1
+model_beam = 0
+TR0 step finished
+BC0 step
+modeleq_constraint.step() started
+model_beam = 0
+betan_th   = 2.58648307848103
+betan_beam = 0.0
+h98_target = 1.3
+nebar =  21.222850904200353
+m =  2.5
+pe_ec, pe_ic, pi_ic, pe_nb, pi_nb = 0.0 30.004865409718015 8.00129744259147 0.0 0.0
+pe_fus, pi_fus = 54.205849502120216 15.312252994366563
+ploss = 88.72101148486296
+tau98 = 1.3815056941411157
+betan_th_target =  2.5861933439619684
+wth_target = 159.33915732318675, wth = 159.35700829098954
+tauth = 1.7961586057681282, h98 = 1.3001456406481213
+density_model = 1: impurity = f*ne
+He profile found
+scale to match betan_th :
+tscale = 5.000e+00, betan_th = 9.907e+00, betan_th_target = 2.586e+00
+scale to match betan_th :
+tscale = 2.500e+00, betan_th = 5.336e+00, betan_th_target = 2.586e+00
+scale to match betan_th :
+tscale = 1.250e+00, betan_th = 3.051e+00, betan_th_target = 2.586e+00
+scale to match betan_th :
+tscale = 6.250e-01, betan_th = 1.909e+00, betan_th_target = 2.586e+00
+scale to match betan_th :
+tscale = 9.375e-01, betan_th = 2.480e+00, betan_th_target = 2.586e+00
+scale to match betan_th :
+tscale = 1.094e+00, betan_th = 2.766e+00, betan_th_target = 2.586e+00
+scale to match betan_th :
+tscale = 1.016e+00, betan_th = 2.623e+00, betan_th_target = 2.586e+00
+scale to match betan_th :
+tscale = 9.766e-01, betan_th = 2.551e+00, betan_th_target = 2.586e+00
+Temperature scale: 15.918 13.816 1.000 0.996
+jpeak = 1.0885498046875002 1.0897583007812501
+ip_cal =  8.099259311897876 8.1
+model_beam = 0
+Icurt=8.099e+00MA
+rho_rad prad 100 100
+integrated :  18802988.766268797
+rho pohme 100 100
+integrated :  0.0
+Icurt=8.099e+00MA
+rho_nbi pbe 100 100
+integrated :  0.0
+rho_nbi pbi 100 100
+integrated :  0.0
+rho_nbi sbedep 100 100
+integrated :  0.0
+rho_nbi tqbe 100 100
+integrated :  0.0
+Icurbeam=0.000e+00MA
+rho_ecrf peech 100 100
+integrated :  0.0
+rho_icrf picrf_totals 8 100
+integrated :  30004034.136762947
+rho_icrf picrf_totals 8 100
+integrated :  8001075.769803451
+Icurech=0.000e+00MA
+Icurich=0.000e+00MA
+BC0 step finished
+number of iteration : 1
+
+========================================================================
+= fastran driver: iteration number =  0
+
+NB step
+>> nubeam.step() started
+ncpu  =  24
+dt    =  0.05
+nstep =  40
+navg  =  10
+30x0.050000
+run navg
+INPUT: UPDATE_INSTATE not found, use default value: disabled
+NB step finished
+EP step
+tglfep.step() started
+/global/common/software/atom/gacode_add_TGLFEP/TGLF-EP/TGLFEP_driver
+/global/common/software/atom/gacode_add_TGLFEP/Alpha/Alpha_driver
+tglfep: write_inputfiles
+[1, 1, 2, 4, 18]
+['D', 'T', 'He4', 'Be', 'Ar']
+ion D
+ion T
+He4 found
+imp Be
+imp Ar
+run tglfep
+tglfep update_state
+EP step finished
+
+========================================================================
+= fastran driver: finalize
+
+EQ0 finalize
+>>> efit.finalize() started
+EQ0 finalize finished
+HCD0 finalize
+hcd_model.finalize() called
+HCD0 finalize finished
+TR0 finalize
+fastran.finalize() entered
+TR0 finalize finished
+BC0 finalize
+BC0 finalize finished
+NB finalize
+nubeam.finalize() called
+NB finalize finished
+EP finalize
+tglfep.finalize() called
+EP finalize finished
+********************************************************************************
+FASTRAN DIRVER FINALIZE
+/pscratch/sd/b/bassem/ips/tglf-ep_32_repeat/SCAN/work/plasma_state/f000001.00001
+/pscratch/sd/b/bassem/ips/tglf-ep_32_repeat/SCAN/work/plasma_state/s000001.00001
+/pscratch/sd/b/bassem/ips/tglf-ep_32_repeat/SCAN/work/plasma_state/g000001.00001
+/pscratch/sd/b/bassem/ips/tglf-ep_32_repeat/SCAN/work/plasma_state/b000001.00001
+/pscratch/sd/b/bassem/ips/tglf-ep_32_repeat/SCAN/work/plasma_state/k000001.00001
+/pscratch/sd/b/bassem/ips/tglf-ep_32_repeat/SCAN/work/plasma_state/i000001.00001
+/pscratch/sd/b/bassem/ips/tglf-ep_32_repeat/SCAN/work/plasma_state/a000001.00001

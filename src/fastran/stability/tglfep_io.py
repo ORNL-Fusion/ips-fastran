@@ -4,6 +4,8 @@ import netCDF4
 from fastran.equilibrium.efit_eqdsk import readg
 from fastran.plasmastate.plasmastate import plasmastate
 from fastran.util.zinterp import zinterp
+#from fastran.stability import tglfep
+
 
 def write_inputfiles(f_state, f_eqdsk, nexp=201):
     print('tglfep: write_inputfiles')
@@ -46,8 +48,8 @@ def write_inputfiles(f_state, f_eqdsk, nexp=201):
 
     # --  profiles
     nrho = len(ps['rho'])
-    nions = 5    # len(a_ion)
-    nions_alt = len(a_ion) + 2 + len(a_imp) # mains+beam+alpha+impurities
+    nions = len(a_ion) + len(a_imp) + 1   # thermal+impurity+helium ash (hardocded)
+    nions_alt = len(a_ion) + 2 + len(a_imp) + 1 # mains+beam+alpha+impurities+helium ash (hardcoded)
 
     rho = ps['rho'][:]
     ne = ps['ns'][0, :]  #*1.e-19
@@ -81,13 +83,13 @@ def write_inputfiles(f_state, f_eqdsk, nexp=201):
 #    tbeam = ps.cell2node_bdry(tbeam)
 #    density_alpha = ps.cell2node_bdry(density_alpha)
 #    talpha = ps.cell2node_bdry(talpha)
-    print('Test native lengths')
-    print(a_ion)
-    print(a_imp)
-    print(z_ion)
-    print(z_imp)
-    print('NUBEAM OUTPUT LENGTHS')
-    print(len(density_beam),len(density_alpha),len(tbeam),len(talpha))
+#    print('Test native lengths')
+#    print(a_ion)
+#    print(a_imp)
+#    print(z_ion)
+#    print(z_imp)
+#    print('NUBEAM OUTPUT LENGTHS')
+#    print(len(density_beam),len(density_alpha),len(tbeam),len(talpha))
     for i_r in range(nrho):
         tbeam[i_r] = max(tbeam[i_r],1.0e-3)
         talpha[i_r] = max(talpha[i_r],1.0e-3)
@@ -142,6 +144,7 @@ def write_inputfiles(f_state, f_eqdsk, nexp=201):
         for x in a_ion:
             f.write('[therm] ')  # Main ions
         f.write('[fast] [fast] ')   # Hardcoded 2 EP species
+        f.write('[therm] ')      # Extra '[therm]' label for hardcoded He ash
         for x in a_imp:
             f.write('[therm] ')  # For each impurity
         f.write('\n')
@@ -152,6 +155,7 @@ def write_inputfiles(f_state, f_eqdsk, nexp=201):
             f.write(f'{x:>14.7E}')   # Mmain ions
         f.write(f'{2.0:>14.7E}')     # D beam
         f.write(f'{4.0:>14.7E}')     # alpha particles
+        f.write(f'{4.0:>14.7E}')     # He ash
         for x in a_imp:
             f.write(f'{x:>14.7E}')      # For each impurity
         f.write('\n')
@@ -162,6 +166,7 @@ def write_inputfiles(f_state, f_eqdsk, nexp=201):
             f.write(f'{x:>14.7E}')  # Main ions
         f.write(f'{1.0:>14.7E}')        # D beam
         f.write(f'{2.0:>14.7E}')        # alphas
+        f.write(f'{2.0:>14.7E}')        # He ash
         for x in z_imp:
             f.write(f'{x:>14.7E}')
         f.write('\n')
@@ -212,6 +217,8 @@ def write_inputfiles(f_state, f_eqdsk, nexp=201):
                 jion = jion + 1
             f.write(f' {density_beam[ir]:>14.7E}')  # D beam
             f.write(f' {density_alpha[ir]:>14.7E}') # alpha particles
+            f.write(f' {ni[jion][ir]:>14.7E}')          # He ash
+            jion = jion + 1
             for x in a_imp:
                 f.write(f" {ni[jion][ir]:>14.7E}") # All impurities
                 jion = jion + 1
@@ -226,6 +233,7 @@ def write_inputfiles(f_state, f_eqdsk, nexp=201):
                 f.write(f' {ti[ir]:>14.7E}')        # main ions
             f.write(f' {tbeam[ir]:>14.7E}')     # D beam
             f.write(f' {talpha[ir]:>14.7E}')    # alpha particles
+            f.write(f' {ti[ir]:>14.7E}')        # He ash
             for x in a_imp:
                 f.write(f" {ti[ir]:>14.7E}")   # Each impurity (ion temps all same)
             f.write('\n')    
@@ -238,9 +246,39 @@ def write_inputfiles(f_state, f_eqdsk, nexp=201):
 
         f.close()
 
-def update_state():
-    print('tglfep update_state')
-    # read tglfep output
-    # update state file
-   
-
+#def update_state():
+#
+#    from Namelist import Namelist
+#
+#    print('tglfep update_state')
+#
+#    # read tglfep output
+#
+#    with open('alpha_dpdr_crit.input', 'r') as f:
+#        cg_str = f.readlines()
+#        f.close()
+#
+#    nr = len(cg_str) - 1
+#    cg_list = [0.] * nr
+#    for ir in range(nr):
+#        cg_list[ir] = cg_str[ir+1]
+#    
+#    with open('alpha_flow.out', 'r') as f:
+#        flow_str = f.readlines()
+#        f.close
+#
+#    nr = len(flow_str) - 1
+#    flow_list = [0.] * nr
+#    for ir in range(nr):
+#        flow_list[ir] = flow_str[ir+1]
+#
+#    # update state file
+#
+#    cur_instate_file = self.services.get_config_param('CURRENT_INSTATE')
+#
+#    instate = Namelist(cur_instate_file)
+#    instate['EP']['alpha_critical_gradient'] = cg_list
+#    instate['EP']['critical_gradient_units'] = '10 kPa/m'
+#    instate['EP']['alpha_flow'] = flow_list
+#    instate['EP']['alpha_flow_units'] = '10^19/s'
+#    instate.write(cur_instate_file)

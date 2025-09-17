@@ -22,8 +22,10 @@ class tglfep(Component):
         print('tglfep.step() started')
 
         # -- excutable
-        tglfep_bin = os.path.join(self.BIN_PATH, self.BIN)
+        tglfep_bin = os.path.join(self.BIN_PATH, self.BIN_TGLFEP)
+        alpha_bin = os.path.join(self.BIN_PATH, self.BIN_ALPHA)
         print(tglfep_bin)
+        print(alpha_bin)
 
         # -- stage plasma state files
         self.services.stage_state()
@@ -45,9 +47,48 @@ class tglfep(Component):
         retcode = self.services.wait_task(task_id)
         if (retcode != 0):
             raise Exception('Error executing: tglfep')
+        task_id = self.services.launch_task(self.NPROC, cwd, alpha_bin, logfile='alpha.log')
+        retcode = self.services.wait_task(task_id)
+        if (retcode != 0):
+            raise Exception('Error executing: Alpha')
 
         # -- get tglfep output
-        tglfep_io.update_state()
+#        tglfep_io.update_state()
+        from Namelist import Namelist
+
+        print('tglfep update_state')
+    
+        # read tglfep output
+
+        with open('alpha_dpdr_crit.input', 'r') as f:
+            cg_str = f.readlines()
+            f.close()
+
+        nr = len(cg_str) - 1
+        cg_list = [0.] * nr
+        for ir in range(nr):
+            cg_list[ir] = cg_str[ir+1]
+
+        with open('alpha_flow.out', 'r') as f:
+            flow_str = f.readlines()
+            f.close
+
+        nr = len(flow_str) - 1
+        flow_list = [0.] * nr
+        for ir in range(nr):
+            flow_list[ir] = flow_str[ir+1]
+
+        # update state file
+
+        cur_instate_file = self.services.get_config_param('CURRENT_INSTATE')
+
+        instate = Namelist(cur_instate_file)
+        instate['EP']['alpha_critical_gradient'] = cg_list
+        instate['EP']['critical_gradient_units'] = '10 kPa/m'
+        instate['EP']['alpha_flow'] = flow_list
+        instate['EP']['alpha_flow_units'] = '10^19/s'
+
+        instate.write(cur_instate_file)
 
         # -- update plasma state files
         self.services.update_state()

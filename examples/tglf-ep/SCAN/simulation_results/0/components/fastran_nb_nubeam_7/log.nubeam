@@ -1,0 +1,1742 @@
+srun: Job step's --cpus-per-task value exceeds that of job (5 > 1). Job step may never run.
+  
+  ==> nubeam_comp_exec Jun 2011 vsn (server mod: DMC) 
+  
+%nubeam_comp_exec: MPI Mode: myid=     5 proc_name= nid005709
+  
+  ==> nubeam_comp_exec Jun 2011 vsn (server mod: DMC) 
+  
+%nubeam_comp_exec: MPI Mode: myid=     6 proc_name= nid005709
+  
+  ==> nubeam_comp_exec Jun 2011 vsn (server mod: DMC) 
+  
+%nubeam_comp_exec: MPI Mode: myid=     7 proc_name= nid005709
+%nubeam_comp_exec: MPI Mode: myid=     8 proc_name= nid005709
+  
+  ==> nubeam_comp_exec Jun 2011 vsn (server mod: DMC) 
+  
+%nubeam_comp_exec: MPI Mode: myid=     9 proc_name= nid005709
+  
+  ==> nubeam_comp_exec Jun 2011 vsn (server mod: DMC) 
+  
+%nubeam_comp_exec: MPI Mode: myid=    12 proc_name= nid005709
+%nubeam_comp_exec: MPI Mode: myid=    13 proc_name= nid005709
+  
+  ==> nubeam_comp_exec Jun 2011 vsn (server mod: DMC) 
+  
+%nubeam_comp_exec: MPI Mode: myid=    14 proc_name= nid005709
+  
+  ==> nubeam_comp_exec Jun 2011 vsn (server mod: DMC) 
+  
+%nubeam_comp_exec: MPI Mode: myid=    15 proc_name= nid005709
+  
+  ==> nubeam_comp_exec Jun 2011 vsn (server mod: DMC) 
+  
+%nubeam_comp_exec: MPI Mode: myid=    17 proc_name= nid005709
+  
+  ==> nubeam_comp_exec Jun 2011 vsn (server mod: DMC) 
+  
+%nubeam_comp_exec: MPI Mode: myid=    18 proc_name= nid005709
+%nubeam_comp_exec: MPI Mode: myid=    19 proc_name= nid005709
+  
+  ==> nubeam_comp_exec Jun 2011 vsn (server mod: DMC) 
+  
+%nubeam_comp_exec: MPI Mode: myid=    20 proc_name= nid005709
+%nubeam_comp_exec: MPI Mode: myid=    21 proc_name= nid005709
+  
+  ==> nubeam_comp_exec Jun 2011 vsn (server mod: DMC) 
+  
+%nubeam_comp_exec: MPI Mode: myid=    22 proc_name= nid005709
+  
+  ==> nubeam_comp_exec Jun 2011 vsn (server mod: DMC) 
+  
+%nubeam_comp_exec: MPI Mode: myid=    23 proc_name= nid005709
+  
+  ==> nubeam_comp_exec Jun 2011 vsn (server mod: DMC) 
+  
+  %nubeam_comp_exec: FRANTIC_ACTION value:NONE
+  %nubeam_comp_exec:  NUBEAM_ACTION = STEP.
+  open_append: ./nubeam_status_summary.log
+%nubeam_comp_exec: MPI Mode: myid=     0 proc_name= nid005709
+  
+  %nubeam_comp_exec: FRANTIC_ACTION value: NONE
+  %nubeam_comp_exec: NUBEAM_WORKPATH: ./
+  
+  ==> nubeam_comp_exec Jun 2011 vsn (server mod: DMC) 
+  
+%nubeam_comp_exec: MPI Mode: myid=     1 proc_name= nid005709
+  
+  ==> nubeam_comp_exec Jun 2011 vsn (server mod: DMC) 
+  
+%nubeam_comp_exec: MPI Mode: myid=     2 proc_name= nid005709
+  
+  ==> nubeam_comp_exec Jun 2011 vsn (server mod: DMC) 
+  
+%nubeam_comp_exec: MPI Mode: myid=     3 proc_name= nid005709
+  
+  ==> nubeam_comp_exec Jun 2011 vsn (server mod: DMC) 
+  
+%nubeam_comp_exec: MPI Mode: myid=     4 proc_name= nid005709
+  
+  ==> nubeam_comp_exec Jun 2011 vsn (server mod: DMC) 
+  
+  
+  ==> nubeam_comp_exec Jun 2011 vsn (server mod: DMC) 
+  
+%nubeam_comp_exec: MPI Mode: myid=    10 proc_name= nid005709
+  
+  ==> nubeam_comp_exec Jun 2011 vsn (server mod: DMC) 
+  
+%nubeam_comp_exec: MPI Mode: myid=    11 proc_name= nid005709
+  
+  ==> nubeam_comp_exec Jun 2011 vsn (server mod: DMC) 
+  
+  
+  ==> nubeam_comp_exec Jun 2011 vsn (server mod: DMC) 
+  
+%nubeam_comp_exec: MPI Mode: myid=    16 proc_name= nid005709
+  
+  ==> nubeam_comp_exec Jun 2011 vsn (server mod: DMC) 
+  
+  
+  ==> nubeam_comp_exec Jun 2011 vsn (server mod: DMC) 
+  
+  open_append: ./nubeam_save_files.output
+  %nubeam_comp_exec: LOG_LEVEL env. var:
+  !nubeam_comp_exec:   LOGFILE_LEVEL: warn
+  %nubeam_comp_exec: SUMMARY_TEST postprocessing requested.
+  %nubeam_comp_exec: open file: ./nubeam_step_files.dat
+  %nubeam_comp_exec(0) NUBEAM_REPEAT_COUNT: 30x0.050000
+  %nubeam_comp_exec: read namelist in file:
+  
+   NUBEAM_FILES namelist contents:
+  
+      input_plasma_state = "s000001.00001"
+      output_plasma_state = ""
+      plasma_state_update = "state_changes.cdf"
+  
+      init_namelist = ""
+      init_cdf = ""
+  
+      step_namelist = "nubeam_step_input.dat"
+      step_cdf = ""
+  
+      RF_idata = ""
+      RF_odata = ""
+  
+  %nubeam_comp_exec: namelist logic check OK.
+ nubeam_comp_exec: complete STEP environment.
+ nubeam_comp_exec finished with environment.
+  (mpi_share_env) process myid=           0  cwd: /pscratch/sd/b/bassem/ips/tglf-ep_32_repeat/SCAN/work/fastran_nb_nubeam_7
+  (mpi_share_env) process myid=           1  cwd: /pscratch/sd/b/bassem/ips/tglf-ep_32_repeat/SCAN/work/fastran_nb_nubeam_7
+  (mpi_share_env) process myid=          23  cwd: /pscratch/sd/b/bassem/ips/tglf-ep_32_repeat/SCAN/work/fastran_nb_nubeam_7
+  (mpi_share_env) process myid=           6  cwd: /pscratch/sd/b/bassem/ips/tglf-ep_32_repeat/SCAN/work/fastran_nb_nubeam_7
+  (mpi_share_env) process myid=          17  cwd: /pscratch/sd/b/bassem/ips/tglf-ep_32_repeat/SCAN/work/fastran_nb_nubeam_7
+  (mpi_share_env) process myid=          22  cwd: /pscratch/sd/b/bassem/ips/tglf-ep_32_repeat/SCAN/work/fastran_nb_nubeam_7
+  (mpi_share_env) process myid=           4  cwd: /pscratch/sd/b/bassem/ips/tglf-ep_32_repeat/SCAN/work/fastran_nb_nubeam_7
+  (mpi_share_env) process myid=           5  cwd: /pscratch/sd/b/bassem/ips/tglf-ep_32_repeat/SCAN/work/fastran_nb_nubeam_7
+  (mpi_share_env) process myid=           7  cwd: /pscratch/sd/b/bassem/ips/tglf-ep_32_repeat/SCAN/work/fastran_nb_nubeam_7
+  (mpi_share_env) process myid=          11  cwd: /pscratch/sd/b/bassem/ips/tglf-ep_32_repeat/SCAN/work/fastran_nb_nubeam_7
+  (mpi_share_env) process myid=          16  cwd: /pscratch/sd/b/bassem/ips/tglf-ep_32_repeat/SCAN/work/fastran_nb_nubeam_7
+  (mpi_share_env) process myid=          19  cwd: /pscratch/sd/b/bassem/ips/tglf-ep_32_repeat/SCAN/work/fastran_nb_nubeam_7
+  (mpi_share_env) process myid=           2  cwd: /pscratch/sd/b/bassem/ips/tglf-ep_32_repeat/SCAN/work/fastran_nb_nubeam_7
+  (mpi_share_env) process myid=           3  cwd: /pscratch/sd/b/bassem/ips/tglf-ep_32_repeat/SCAN/work/fastran_nb_nubeam_7
+  (mpi_share_env) process myid=           8  cwd: /pscratch/sd/b/bassem/ips/tglf-ep_32_repeat/SCAN/work/fastran_nb_nubeam_7
+  (mpi_share_env) process myid=          12  cwd: /pscratch/sd/b/bassem/ips/tglf-ep_32_repeat/SCAN/work/fastran_nb_nubeam_7
+  (mpi_share_env) process myid=          14  cwd: /pscratch/sd/b/bassem/ips/tglf-ep_32_repeat/SCAN/work/fastran_nb_nubeam_7
+  (mpi_share_env) process myid=          18  cwd: /pscratch/sd/b/bassem/ips/tglf-ep_32_repeat/SCAN/work/fastran_nb_nubeam_7
+  (mpi_share_env) process myid=          20  cwd: /pscratch/sd/b/bassem/ips/tglf-ep_32_repeat/SCAN/work/fastran_nb_nubeam_7
+  (mpi_share_env) process myid=          21  cwd: /pscratch/sd/b/bassem/ips/tglf-ep_32_repeat/SCAN/work/fastran_nb_nubeam_7
+ -------------------------------------------- 
+ process_id:            0  mpi_printenv:
+  _cwd =
+    /pscratch/sd/b/bassem/ips/tglf-ep_32_repeat/SCAN/work/fastran_nb_nubeam_7
+  _nargs = 0
+  FRANTIC_INIT = 
+  FRANTIC_ACTION = NONE
+  NUBEAM_ACTION = STEP
+  NUBEAM_WORKPATH = ./
+  LOG_LEVEL = 
+  LOGFILE_LEVEL = warn
+  MAX_MPI_INT_BLOCK = 
+  MAX_MPI_R8_BLOCK = 
+  PREACTDIR = /global/common/software/atom/perlmutter/data/nubeam/PREACT
+  ADASDIR = /global/common/software/atom/perlmutter/data/nubeam/ADAS
+  NUBEAM_POSTPROC = SUMMARY_TEST
+  NUBEAM_REPEAT_COUNT = 30x0.050000
+  %nubeam_comp_exec[0:3]: myid=           0  -- mpi_share_env OK.
+  %nubeam_comp_exec[0:3]: myid=           1  -- mpi_share_env OK.
+  (mpi_share_env) process myid=           9  cwd: /pscratch/sd/b/bassem/ips/tglf-ep_32_repeat/SCAN/work/fastran_nb_nubeam_7
+  (mpi_share_env) process myid=          10  cwd: /pscratch/sd/b/bassem/ips/tglf-ep_32_repeat/SCAN/work/fastran_nb_nubeam_7
+  (mpi_share_env) process myid=          13  cwd: /pscratch/sd/b/bassem/ips/tglf-ep_32_repeat/SCAN/work/fastran_nb_nubeam_7
+  (mpi_share_env) process myid=          15  cwd: /pscratch/sd/b/bassem/ips/tglf-ep_32_repeat/SCAN/work/fastran_nb_nubeam_7
+  STEPFLAG = TRUE
+  LIST_FLAG = FALSE
+  SERVER_FLAG = FALSE
+  PPPLCLUSTER_HOME = 
+  MPI_SHARE_ENV_DEBUG = 
+ end mpi_printenv
+ ------------------------ 
+ 
+  myid=           1   msg I/O on unit            6  written to: ./nubeam_comp_1.msgs
+  %nubeam_comp_exec[0:3]: myid=           2  -- mpi_share_env OK.
+  %nubeam_comp_exec[0:3]: myid=           3  -- mpi_share_env OK.
+  myid=           4   msg I/O on unit            6  written to: ./nubeam_comp_4.msgs
+  myid=           5   msg I/O on unit            6  written to: ./nubeam_comp_5.msgs
+  myid=           9   msg I/O on unit            6  written to: ./nubeam_comp_9.msgs
+  myid=          12   msg I/O on unit            6  written to: ./nubeam_comp_12.msgs
+  myid=          16   msg I/O on unit            6  written to: ./nubeam_comp_16.msgs
+  myid=          17   msg I/O on unit            6  written to: ./nubeam_comp_17.msgs
+  myid=          20   msg I/O on unit            6  written to: ./nubeam_comp_20.msgs
+  myid=          23   msg I/O on unit            6  written to: ./nubeam_comp_23.msgs
+  myid=           2   msg I/O on unit            6  written to: ./nubeam_comp_2.msgs
+  myid=           3   msg I/O on unit            6  written to: ./nubeam_comp_3.msgs
+  myid=           6   msg I/O on unit            6  written to: ./nubeam_comp_6.msgs
+  myid=           7   msg I/O on unit            6  written to: ./nubeam_comp_7.msgs
+  myid=           8   msg I/O on unit            6  written to: ./nubeam_comp_8.msgs
+  myid=          10   msg I/O on unit            6  written to: ./nubeam_comp_10.msgs
+  myid=          11   msg I/O on unit            6  written to: ./nubeam_comp_11.msgs
+  myid=          13   msg I/O on unit            6  written to: ./nubeam_comp_13.msgs
+  myid=          14   msg I/O on unit            6  written to: ./nubeam_comp_14.msgs
+  myid=          15   msg I/O on unit            6  written to: ./nubeam_comp_15.msgs
+  myid=          18   msg I/O on unit            6  written to: ./nubeam_comp_18.msgs
+  myid=          19   msg I/O on unit            6  written to: ./nubeam_comp_19.msgs
+  myid=          21   msg I/O on unit            6  written to: ./nubeam_comp_21.msgs
+  myid=          22   msg I/O on unit            6  written to: ./nubeam_comp_22.msgs
+  %using default filename: ./ips_nbi_fld_state.cdf
+  ...CALL nbi_states(...,"R",...)
+  (cpu0) ...CALL nbi_states(...,"R",...)
+ % nbi_alloc2_init: nbi_alloc2 done
+  ps_init_tag: Plasma State v2.035 f90 module initialization.
+  
+  %plasma_state_get: WARNING, version_id mismatch:
+   Version_ID of current software: "2.035".
+   Version_ID found in file:       "2.055".
+  
+   ...Hash code checks disabled.
+   ...Error handling modified.
+  
+  %plasma_state_get: warning: variable name = "nmini_bdy":
+   NetCDF message: NetCDF: Variable not found
+  %nubeam_comp_exec: state file(s) read OK.
+  ...nubeam_comp_exec[0:3] myid=           2 : at jstep loop...
+  ...nubeam_comp_exec[0:3] myid=           1 : at jstep loop...
+  ...nubeam_comp_exec[0:3] myid=           3 : at jstep loop...
+  %nubeam_comp_exec: step_namelist read OK.
+  %nubeam_comp_exec: LEVMOD_HALO=   -123456789
+  ...nubeam_comp_exec[0:3] myid=           0 : at jstep loop...
+  
+   executing NUBEAM step:           1
+   executing NUBEAM step:           1
+  %nubeam_step ++++++++ NLTRK_DEP0 F
+  %nubeam_step ++++++++ NLBOUT (lost ptcl.) T
+  ==> Entering NUBEAM_STEP_CHILD, MPI myidd =            0
+  NBI_INTERP_PROFILES... 
+    nbi_getprofiles ne*dVol sum (input): 4.5640E+22
+    nbi_getprofiles ne*dVol sum (ions):  4.5640E+22
+  NBSTART... 
+  %nbatom deposition model: lev_nbidep=           1
+  %nbatom deposition model: NSIGEXC=           1
+ %sigfacz (exc.states) Erel= 1.0621E+04 out of range
+   min= 2.0000E+04 max= 1.0000E+07 eV/amu; fixup taken.
+ %sigfacz (exc.states) Erel= 1.2966E+04 out of range
+   min= 2.0000E+04 max= 1.0000E+07 eV/amu; fixup taken.
+ %sigfacz (exc.states) Erel= 1.5312E+04 out of range
+   min= 2.0000E+04 max= 1.0000E+07 eV/amu; fixup taken.
+ %sigfacz (exc.states) Erel= 1.7658E+04 out of range
+   min= 2.0000E+04 max= 1.0000E+07 eV/amu; fixup taken.
+ %sigfacz (exc.states) Te= 7.5108E+02 out of range
+   min= 1.0000E+03 max= 5.0000E+04 eV; fixup taken.
+ %sigfacz (exc.states) Te= 7.5108E+02 out of range
+   min= 1.0000E+03 max= 5.0000E+04 eV; fixup taken.
+ %sigfacz (exc.states) Te= 7.5108E+02 out of range
+   min= 1.0000E+03 max= 5.0000E+04 eV; fixup taken.
+ %sigfacz (exc.states) Te= 7.5108E+02 out of range
+   min= 1.0000E+03 max= 5.0000E+04 eV; fixup taken.
+  %nbatom deposition model: lev_nbidep=           1
+  %nbatom deposition model: NSIGEXC=           1
+  DEPALL... 
+  %DEPALL depall_mpi_split initinal done
+  %DEPALL nuse(isb)=            0
+  %DEPALL depall_mpi_split initinal done
+  %DEPALL nuse(isb)=            0
+ %DEPALL specie #1  ->         0 -        0 (killed) +     1308 (dep) =     1308 ptcls.
+ %DEPALL specie #2  ->         0 -        0 (killed) +      583 (dep) =      583 ptcls.
+  DEPALL EXITED            0
+  ORBALL... 
+ %ORBALL:  In processor     0: orbit # IORB=     30 never inside plasma.
+In Processor ,    0 %MC ptcl counts, specie #1: ORIG= 1308 SPL=    0 TOT= 1307
+  ORBALL need          120  CX tracks
+In Processor ,    0 %MC ptcl counts, specie #2: ORIG=  583 SPL=    0 TOT=  577
+  %ORBALL: lost ptcl. gather
+ % nbi_alloc_lost: nbi_alloc_lost done
+  ORBALL EXITED            0
+  NBFINISH... 
+  ==> Exiting NUBEAM_STEP_CHILD, MPI myidd =            0
+  NUBEAM_LOAD_STATE... 
+  NUBEAM_STEP: LEVMOD_HALO=            0
+  ---------------------------------------
+  %nubeam_comp_exec: nubeam_ctrl_step OK: N(ptcls) & <<E>>(KeV):
+ beam ions D_beam: N= 4.8093E+18 <<Eperp>>= 3.1089E+02 <<Epll>>= 3.2026E+02
+ fusion ions He4_fusn: N= 3.0923E+18 <<Eperp>>= 1.9046E+03 <<Epll>>= 9.6536E+02
+  ---------------------------------------
+  
+   executing NUBEAM step:           2
+   executing NUBEAM step:           2
+  %nubeam_step ++++++++ NLTRK_DEP0 F
+  %nubeam_step ++++++++ NLBOUT (lost ptcl.) T
+  ==> Entering NUBEAM_STEP_CHILD, MPI myidd =            0
+  NBI_INTERP_PROFILES... 
+    nbi_getprofiles ne*dVol sum (input): 4.5640E+22
+    nbi_getprofiles ne*dVol sum (ions):  4.5651E+22
+  NBSTART... 
+  %nbatom deposition model: lev_nbidep=           1
+  %nbatom deposition model: NSIGEXC=           1
+  %nbatom deposition model: lev_nbidep=           1
+  %nbatom deposition model: NSIGEXC=           1
+  DEPALL... 
+ %DEPALL specie #1  ->      1307 -        0 (killed) +     1693 (dep) =     3000 ptcls.
+ %DEPALL specie #2  ->       577 -        0 (killed) +      503 (dep) =     1080 ptcls.
+  DEPALL EXITED            0
+  ORBALL... 
+In Processor ,    0 %MC ptcl counts, specie #1: ORIG= 3000 SPL=    0 TOT= 2997
+  ORBALL need          120  CX tracks
+In Processor ,    0 %MC ptcl counts, specie #2: ORIG= 1080 SPL=    0 TOT= 1071
+  %ORBALL: lost ptcl. gather
+ % nbi_alloc_lost: nbi_alloc_lost done
+  ORBALL EXITED            0
+  NBFINISH... 
+  ==> Exiting NUBEAM_STEP_CHILD, MPI myidd =            0
+  NUBEAM_LOAD_STATE... 
+  NUBEAM_STEP: LEVMOD_HALO=            0
+  ---------------------------------------
+  %nubeam_comp_exec: nubeam_ctrl_step OK: N(ptcls) & <<E>>(KeV):
+ beam ions D_beam: N= 1.4573E+19 <<Eperp>>= 2.5331E+02 <<Epll>>= 2.5870E+02
+ fusion ions He4_fusn: N= 9.2986E+18 <<Eperp>>= 1.5072E+03 <<Epll>>= 7.5496E+02
+  ---------------------------------------
+  
+   executing NUBEAM step:           3
+   executing NUBEAM step:           3
+  %nubeam_step ++++++++ NLTRK_DEP0 F
+  %nubeam_step ++++++++ NLBOUT (lost ptcl.) T
+  ==> Entering NUBEAM_STEP_CHILD, MPI myidd =            0
+  NBI_INTERP_PROFILES... 
+    nbi_getprofiles ne*dVol sum (input): 4.5640E+22
+    nbi_getprofiles ne*dVol sum (ions):  4.5674E+22
+  NBSTART... 
+  %nbatom deposition model: lev_nbidep=           1
+  %nbatom deposition model: NSIGEXC=           1
+  %nbatom deposition model: lev_nbidep=           1
+  %nbatom deposition model: NSIGEXC=           1
+  DEPALL... 
+ %DEPALL specie #1  ->      2997 -        0 (killed) +     1002 (dep) =     3999 ptcls.
+ %DEPALL specie #2  ->      1071 -        0 (killed) +      337 (dep) =     1408 ptcls.
+  DEPALL EXITED            0
+  ORBALL... 
+In Processor ,    0 %MC ptcl counts, specie #1: ORIG= 3999 SPL=    0 TOT= 3941
+  ORBALL need          120  CX tracks
+In Processor ,    0 %MC ptcl counts, specie #2: ORIG= 1408 SPL=    0 TOT= 1370
+  %ORBALL: lost ptcl. gather
+ % nbi_alloc_lost: nbi_alloc_lost done
+  ORBALL EXITED            0
+  NBFINISH... 
+  ==> Exiting NUBEAM_STEP_CHILD, MPI myidd =            0
+  NUBEAM_LOAD_STATE... 
+  NUBEAM_STEP: LEVMOD_HALO=            0
+  ---------------------------------------
+  %nubeam_comp_exec: nubeam_ctrl_step OK: N(ptcls) & <<E>>(KeV):
+ beam ions D_beam: N= 2.4001E+19 <<Eperp>>= 2.0722E+02 <<Epll>>= 2.0773E+02
+ fusion ions He4_fusn: N= 1.5372E+19 <<Eperp>>= 1.1905E+03 <<Epll>>= 5.7764E+02
+  ---------------------------------------
+  
+   executing NUBEAM step:           4
+   executing NUBEAM step:           4
+  %nubeam_step ++++++++ NLTRK_DEP0 F
+  %nubeam_step ++++++++ NLBOUT (lost ptcl.) T
+  ==> Entering NUBEAM_STEP_CHILD, MPI myidd =            0
+  NBI_INTERP_PROFILES... 
+    nbi_getprofiles ne*dVol sum (input): 4.5640E+22
+    nbi_getprofiles ne*dVol sum (ions):  4.5695E+22
+  %nbi_getprofiles: quasineutrality check => 
+   use externally provided fast ion densities.
+  ==> retry using input data for fast densities.
+    nbi_getprofiles ne*dVol sum (input): 4.5640E+22
+    nbi_getprofiles ne*dVol sum (ions):  4.5640E+22
+  NBSTART... 
+  %nbatom deposition model: lev_nbidep=           1
+  %nbatom deposition model: NSIGEXC=           1
+  %nbatom deposition model: lev_nbidep=           1
+  %nbatom deposition model: NSIGEXC=           1
+  DEPALL... 
+ %DEPALL specie #1  ->      3941 -        0 (killed) +      765 (dep) =     4706 ptcls.
+ %DEPALL specie #2  ->      1370 -        0 (killed) +      258 (dep) =     1628 ptcls.
+  DEPALL EXITED            0
+  ORBALL... 
+In Processor ,    0 %MC ptcl counts, specie #1: ORIG= 4706 SPL=    0 TOT= 4335
+  ORBALL need          120  CX tracks
+In Processor ,    0 %MC ptcl counts, specie #2: ORIG= 1628 SPL=    0 TOT= 1441
+  %ORBALL: lost ptcl. gather
+ % nbi_alloc_lost: nbi_alloc_lost done
+  ORBALL EXITED            0
+  NBFINISH... 
+  ==> Exiting NUBEAM_STEP_CHILD, MPI myidd =            0
+  NUBEAM_LOAD_STATE... 
+  NUBEAM_STEP: LEVMOD_HALO=            0
+  ---------------------------------------
+  %nubeam_comp_exec: nubeam_ctrl_step OK: N(ptcls) & <<E>>(KeV):
+ beam ions D_beam: N= 3.1555E+19 <<Eperp>>= 1.7939E+02 <<Epll>>= 1.7885E+02
+ fusion ions He4_fusn: N= 2.0616E+19 <<Eperp>>= 9.8253E+02 <<Epll>>= 4.7679E+02
+  ---------------------------------------
+  
+   executing NUBEAM step:           5
+   executing NUBEAM step:           5
+  %nubeam_step ++++++++ NLTRK_DEP0 F
+  %nubeam_step ++++++++ NLBOUT (lost ptcl.) T
+  ==> Entering NUBEAM_STEP_CHILD, MPI myidd =            0
+  NBI_INTERP_PROFILES... 
+    nbi_getprofiles ne*dVol sum (input): 4.5640E+22
+    nbi_getprofiles ne*dVol sum (ions):  4.5713E+22
+  %nbi_getprofiles: quasineutrality check => 
+   use externally provided fast ion densities.
+  ==> retry using input data for fast densities.
+    nbi_getprofiles ne*dVol sum (input): 4.5640E+22
+    nbi_getprofiles ne*dVol sum (ions):  4.5640E+22
+  NBSTART... 
+  %nbatom deposition model: lev_nbidep=           1
+  %nbatom deposition model: NSIGEXC=           1
+  %nbatom deposition model: lev_nbidep=           1
+  %nbatom deposition model: NSIGEXC=           1
+  DEPALL... 
+  %depall: avoid RR
+  %DEPALL: ptcl.list was extended from MINB=         202  to MINB=         237
+ %DEPALL specie #1  ->      4335 -        0 (killed) +      663 (dep) =     4998 ptcls.
+ %DEPALL specie #2  ->      1441 -        0 (killed) +      221 (dep) =     1662 ptcls.
+  DEPALL EXITED            0
+  ORBALL... 
+In Processor ,    0 %MC ptcl counts, specie #1: ORIG= 4998 SPL=    0 TOT= 4147
+  ORBALL need           96  CX tracks
+In Processor ,    0 %MC ptcl counts, specie #2: ORIG= 1662 SPL=    0 TOT= 1220
+  %ORBALL: lost ptcl. gather
+ % nbi_alloc_lost: nbi_alloc_lost done
+  ORBALL EXITED            0
+  NBFINISH... 
+  ==> Exiting NUBEAM_STEP_CHILD, MPI myidd =            0
+  NUBEAM_LOAD_STATE... 
+  NUBEAM_STEP: LEVMOD_HALO=            0
+  ---------------------------------------
+  %nubeam_comp_exec: nubeam_ctrl_step OK: N(ptcls) & <<E>>(KeV):
+ beam ions D_beam: N= 3.5629E+19 <<Eperp>>= 1.6555E+02 <<Epll>>= 1.6516E+02
+ fusion ions He4_fusn: N= 2.3171E+19 <<Eperp>>= 8.9719E+02 <<Epll>>= 4.2110E+02
+  ---------------------------------------
+  
+   executing NUBEAM step:           6
+   executing NUBEAM step:           6
+  %nubeam_step ++++++++ NLTRK_DEP0 F
+  %nubeam_step ++++++++ NLBOUT (lost ptcl.) T
+  ==> Entering NUBEAM_STEP_CHILD, MPI myidd =            0
+  NBI_INTERP_PROFILES... 
+    nbi_getprofiles ne*dVol sum (input): 4.5640E+22
+    nbi_getprofiles ne*dVol sum (ions):  4.5722E+22
+  %nbi_getprofiles: quasineutrality check => 
+   use externally provided fast ion densities.
+  ==> retry using input data for fast densities.
+    nbi_getprofiles ne*dVol sum (input): 4.5640E+22
+    nbi_getprofiles ne*dVol sum (ions):  4.5640E+22
+  NBSTART... 
+  %nbatom deposition model: lev_nbidep=           1
+  %nbatom deposition model: NSIGEXC=           1
+  %nbatom deposition model: lev_nbidep=           1
+  %nbatom deposition model: NSIGEXC=           1
+  DEPALL... 
+ %DEPALL specie #1  ->      4147 -        0 (killed) +      626 (dep) =     4773 ptcls.
+ %DEPALL specie #2  ->      1220 -        0 (killed) +      213 (dep) =     1433 ptcls.
+  DEPALL EXITED            0
+  ORBALL... 
+In Processor ,    0 %MC ptcl counts, specie #1: ORIG= 4773 SPL=    0 TOT= 3653
+  ORBALL need           96  CX tracks
+In Processor ,    0 %MC ptcl counts, specie #2: ORIG= 1433 SPL=    0 TOT=  979
+  %ORBALL: lost ptcl. gather
+ % nbi_alloc_lost: nbi_alloc_lost done
+  ORBALL EXITED            0
+  NBFINISH... 
+  ==> Exiting NUBEAM_STEP_CHILD, MPI myidd =            0
+  NUBEAM_LOAD_STATE... 
+  NUBEAM_STEP: LEVMOD_HALO=            0
+  ---------------------------------------
+  %nubeam_comp_exec: nubeam_ctrl_step OK: N(ptcls) & <<E>>(KeV):
+ beam ions D_beam: N= 3.7313E+19 <<Eperp>>= 1.6030E+02 <<Epll>>= 1.5833E+02
+ fusion ions He4_fusn: N= 2.3857E+19 <<Eperp>>= 8.8276E+02 <<Epll>>= 4.0822E+02
+  ---------------------------------------
+  
+   executing NUBEAM step:           7
+   executing NUBEAM step:           7
+  %nubeam_step ++++++++ NLTRK_DEP0 F
+  %nubeam_step ++++++++ NLBOUT (lost ptcl.) T
+  ==> Entering NUBEAM_STEP_CHILD, MPI myidd =            0
+  NBI_INTERP_PROFILES... 
+    nbi_getprofiles ne*dVol sum (input): 4.5640E+22
+    nbi_getprofiles ne*dVol sum (ions):  4.5725E+22
+  %nbi_getprofiles: quasineutrality check => 
+   use externally provided fast ion densities.
+  ==> retry using input data for fast densities.
+    nbi_getprofiles ne*dVol sum (input): 4.5640E+22
+    nbi_getprofiles ne*dVol sum (ions):  4.5640E+22
+  NBSTART... 
+  %nbatom deposition model: lev_nbidep=           1
+  %nbatom deposition model: NSIGEXC=           1
+  %nbatom deposition model: lev_nbidep=           1
+  %nbatom deposition model: NSIGEXC=           1
+  DEPALL... 
+ %DEPALL specie #1  ->      3653 -        0 (killed) +      614 (dep) =     4267 ptcls.
+ %DEPALL specie #2  ->       979 -        0 (killed) +      213 (dep) =     1192 ptcls.
+  DEPALL EXITED            0
+  ORBALL... 
+In Processor ,    0 %MC ptcl counts, specie #1: ORIG= 4267 SPL=    0 TOT= 3148
+In Processor ,    0 %MC ptcl counts, specie #2: ORIG= 1192 SPL=    0 TOT=  844
+  %ORBALL: lost ptcl. gather
+ % nbi_alloc_lost: nbi_alloc_lost done
+  ORBALL EXITED            0
+  NBFINISH... 
+  ==> Exiting NUBEAM_STEP_CHILD, MPI myidd =            0
+  NUBEAM_LOAD_STATE... 
+  NUBEAM_STEP: LEVMOD_HALO=            0
+  ---------------------------------------
+  %nubeam_comp_exec: nubeam_ctrl_step OK: N(ptcls) & <<E>>(KeV):
+ beam ions D_beam: N= 3.7594E+19 <<Eperp>>= 1.6264E+02 <<Epll>>= 1.6078E+02
+ fusion ions He4_fusn: N= 2.3743E+19 <<Eperp>>= 9.0662E+02 <<Epll>>= 4.1164E+02
+  ---------------------------------------
+  
+   executing NUBEAM step:           8
+   executing NUBEAM step:           8
+  %nubeam_step ++++++++ NLTRK_DEP0 F
+  %nubeam_step ++++++++ NLBOUT (lost ptcl.) T
+  ==> Entering NUBEAM_STEP_CHILD, MPI myidd =            0
+  NBI_INTERP_PROFILES... 
+    nbi_getprofiles ne*dVol sum (input): 4.5640E+22
+    nbi_getprofiles ne*dVol sum (ions):  4.5725E+22
+  %nbi_getprofiles: quasineutrality check => 
+   use externally provided fast ion densities.
+  ==> retry using input data for fast densities.
+    nbi_getprofiles ne*dVol sum (input): 4.5640E+22
+    nbi_getprofiles ne*dVol sum (ions):  4.5640E+22
+  NBSTART... 
+  %nbatom deposition model: lev_nbidep=           1
+  %nbatom deposition model: NSIGEXC=           1
+  %nbatom deposition model: lev_nbidep=           1
+  %nbatom deposition model: NSIGEXC=           1
+  DEPALL... 
+ %DEPALL specie #1  ->      3148 -        0 (killed) +      615 (dep) =     3763 ptcls.
+ %DEPALL specie #2  ->       844 -        0 (killed) +      214 (dep) =     1058 ptcls.
+  DEPALL EXITED            0
+  ORBALL... 
+In Processor ,    0 %MC ptcl counts, specie #1: ORIG= 3763 SPL=    0 TOT= 2880
+  ORBALL need           96  CX tracks
+In Processor ,    0 %MC ptcl counts, specie #2: ORIG= 1058 SPL=    0 TOT=  796
+  %ORBALL: lost ptcl. gather
+ % nbi_alloc_lost: nbi_alloc_lost done
+  ORBALL EXITED            0
+  NBFINISH... 
+  ==> Exiting NUBEAM_STEP_CHILD, MPI myidd =            0
+  NUBEAM_LOAD_STATE... 
+  NUBEAM_STEP: LEVMOD_HALO=            0
+  ---------------------------------------
+  %nubeam_comp_exec: nubeam_ctrl_step OK: N(ptcls) & <<E>>(KeV):
+ beam ions D_beam: N= 3.7747E+19 <<Eperp>>= 1.6202E+02 <<Epll>>= 1.6078E+02
+ fusion ions He4_fusn: N= 2.3646E+19 <<Eperp>>= 9.0890E+02 <<Epll>>= 4.1583E+02
+  ---------------------------------------
+  
+   executing NUBEAM step:           9
+   executing NUBEAM step:           9
+  %nubeam_step ++++++++ NLTRK_DEP0 F
+  %nubeam_step ++++++++ NLBOUT (lost ptcl.) T
+  ==> Entering NUBEAM_STEP_CHILD, MPI myidd =            0
+  NBI_INTERP_PROFILES... 
+    nbi_getprofiles ne*dVol sum (input): 4.5640E+22
+    nbi_getprofiles ne*dVol sum (ions):  4.5725E+22
+  %nbi_getprofiles: quasineutrality check => 
+   use externally provided fast ion densities.
+  ==> retry using input data for fast densities.
+    nbi_getprofiles ne*dVol sum (input): 4.5640E+22
+    nbi_getprofiles ne*dVol sum (ions):  4.5640E+22
+  NBSTART... 
+  %nbatom deposition model: lev_nbidep=           1
+  %nbatom deposition model: NSIGEXC=           1
+  %nbatom deposition model: lev_nbidep=           1
+  %nbatom deposition model: NSIGEXC=           1
+  DEPALL... 
+ %DEPALL specie #1  ->      2880 -        0 (killed) +      609 (dep) =     3489 ptcls.
+ %DEPALL specie #2  ->       796 -        0 (killed) +      214 (dep) =     1010 ptcls.
+  DEPALL EXITED            0
+  ORBALL... 
+In Processor ,    0 %MC ptcl counts, specie #1: ORIG= 3489 SPL=    0 TOT= 2768
+  ORBALL need          120  CX tracks
+In Processor ,    0 %MC ptcl counts, specie #2: ORIG= 1010 SPL=    0 TOT=  801
+  %ORBALL: lost ptcl. gather
+ % nbi_alloc_lost: nbi_alloc_lost done
+  ORBALL EXITED            0
+  NBFINISH... 
+  ==> Exiting NUBEAM_STEP_CHILD, MPI myidd =            0
+  NUBEAM_LOAD_STATE... 
+  NUBEAM_STEP: LEVMOD_HALO=            0
+  ---------------------------------------
+  %nubeam_comp_exec: nubeam_ctrl_step OK: N(ptcls) & <<E>>(KeV):
+ beam ions D_beam: N= 3.8116E+19 <<Eperp>>= 1.6040E+02 <<Epll>>= 1.5730E+02
+ fusion ions He4_fusn: N= 2.3848E+19 <<Eperp>>= 8.7140E+02 <<Epll>>= 4.6082E+02
+  ---------------------------------------
+  
+   executing NUBEAM step:          10
+   executing NUBEAM step:          10
+  %nubeam_step ++++++++ NLTRK_DEP0 F
+  %nubeam_step ++++++++ NLBOUT (lost ptcl.) T
+  ==> Entering NUBEAM_STEP_CHILD, MPI myidd =            0
+  NBI_INTERP_PROFILES... 
+    nbi_getprofiles ne*dVol sum (input): 4.5640E+22
+    nbi_getprofiles ne*dVol sum (ions):  4.5726E+22
+  %nbi_getprofiles: quasineutrality check => 
+   use externally provided fast ion densities.
+  ==> retry using input data for fast densities.
+    nbi_getprofiles ne*dVol sum (input): 4.5640E+22
+    nbi_getprofiles ne*dVol sum (ions):  4.5640E+22
+  NBSTART... 
+  %nbatom deposition model: lev_nbidep=           1
+  %nbatom deposition model: NSIGEXC=           1
+  %nbatom deposition model: lev_nbidep=           1
+  %nbatom deposition model: NSIGEXC=           1
+  DEPALL... 
+ %DEPALL specie #1  ->      2768 -        0 (killed) +      604 (dep) =     3372 ptcls.
+ %DEPALL specie #2  ->       801 -        0 (killed) +      211 (dep) =     1012 ptcls.
+  DEPALL EXITED            0
+  ORBALL... 
+In Processor ,    0 %MC ptcl counts, specie #1: ORIG= 3372 SPL=    0 TOT= 2668
+In Processor ,    0 %MC ptcl counts, specie #2: ORIG= 1012 SPL=    0 TOT=  796
+  %ORBALL: lost ptcl. gather
+ % nbi_alloc_lost: nbi_alloc_lost done
+  ORBALL EXITED            0
+  NBFINISH... 
+  ==> Exiting NUBEAM_STEP_CHILD, MPI myidd =            0
+  NUBEAM_LOAD_STATE... 
+  NUBEAM_STEP: LEVMOD_HALO=            0
+  ---------------------------------------
+  %nubeam_comp_exec: nubeam_ctrl_step OK: N(ptcls) & <<E>>(KeV):
+ beam ions D_beam: N= 3.8306E+19 <<Eperp>>= 1.6223E+02 <<Epll>>= 1.5791E+02
+ fusion ions He4_fusn: N= 2.3768E+19 <<Eperp>>= 8.4852E+02 <<Epll>>= 4.5942E+02
+  ---------------------------------------
+  
+   executing NUBEAM step:          11
+   executing NUBEAM step:          11
+  %nubeam_step ++++++++ NLTRK_DEP0 F
+  %nubeam_step ++++++++ NLBOUT (lost ptcl.) T
+  ==> Entering NUBEAM_STEP_CHILD, MPI myidd =            0
+  NBI_INTERP_PROFILES... 
+    nbi_getprofiles ne*dVol sum (input): 4.5640E+22
+    nbi_getprofiles ne*dVol sum (ions):  4.5726E+22
+  %nbi_getprofiles: quasineutrality check => 
+   use externally provided fast ion densities.
+  ==> retry using input data for fast densities.
+    nbi_getprofiles ne*dVol sum (input): 4.5640E+22
+    nbi_getprofiles ne*dVol sum (ions):  4.5640E+22
+  NBSTART... 
+  %nbatom deposition model: lev_nbidep=           1
+  %nbatom deposition model: NSIGEXC=           1
+  %nbatom deposition model: lev_nbidep=           1
+  %nbatom deposition model: NSIGEXC=           1
+  DEPALL... 
+ %DEPALL specie #1  ->      2668 -        0 (killed) +      614 (dep) =     3282 ptcls.
+ %DEPALL specie #2  ->       796 -        0 (killed) +      211 (dep) =     1007 ptcls.
+  DEPALL EXITED            0
+  ORBALL... 
+In Processor ,    0 %MC ptcl counts, specie #1: ORIG= 3282 SPL=    1 TOT= 2673
+  ORBALL need          120  CX tracks
+In Processor ,    0 %MC ptcl counts, specie #2: ORIG= 1007 SPL=    0 TOT=  806
+  %ORBALL: lost ptcl. gather
+ % nbi_alloc_lost: nbi_alloc_lost done
+  ORBALL EXITED            0
+  NBFINISH... 
+  ==> Exiting NUBEAM_STEP_CHILD, MPI myidd =            0
+  NUBEAM_LOAD_STATE... 
+  NUBEAM_STEP: LEVMOD_HALO=            0
+  ---------------------------------------
+  %nubeam_comp_exec: nubeam_ctrl_step OK: N(ptcls) & <<E>>(KeV):
+ beam ions D_beam: N= 3.8070E+19 <<Eperp>>= 1.6326E+02 <<Epll>>= 1.5604E+02
+ fusion ions He4_fusn: N= 2.3978E+19 <<Eperp>>= 8.6294E+02 <<Epll>>= 4.4659E+02
+  ---------------------------------------
+  
+   executing NUBEAM step:          12
+   executing NUBEAM step:          12
+  %nubeam_step ++++++++ NLTRK_DEP0 F
+  %nubeam_step ++++++++ NLBOUT (lost ptcl.) T
+  ==> Entering NUBEAM_STEP_CHILD, MPI myidd =            0
+  NBI_INTERP_PROFILES... 
+    nbi_getprofiles ne*dVol sum (input): 4.5640E+22
+    nbi_getprofiles ne*dVol sum (ions):  4.5726E+22
+  %nbi_getprofiles: quasineutrality check => 
+   use externally provided fast ion densities.
+  ==> retry using input data for fast densities.
+    nbi_getprofiles ne*dVol sum (input): 4.5640E+22
+    nbi_getprofiles ne*dVol sum (ions):  4.5640E+22
+  NBSTART... 
+  %nbatom deposition model: lev_nbidep=           1
+  %nbatom deposition model: NSIGEXC=           1
+  %nbatom deposition model: lev_nbidep=           1
+  %nbatom deposition model: NSIGEXC=           1
+  DEPALL... 
+ %DEPALL specie #1  ->      2673 -        0 (killed) +      604 (dep) =     3277 ptcls.
+ %DEPALL specie #2  ->       806 -        0 (killed) +      209 (dep) =     1015 ptcls.
+  DEPALL EXITED            0
+  ORBALL... 
+In Processor ,    0 %MC ptcl counts, specie #1: ORIG= 3277 SPL=    0 TOT= 2637
+  ORBALL need          120  CX tracks
+In Processor ,    0 %MC ptcl counts, specie #2: ORIG= 1015 SPL=    0 TOT=  786
+  %ORBALL: lost ptcl. gather
+ % nbi_alloc_lost: nbi_alloc_lost done
+  ORBALL EXITED            0
+  NBFINISH... 
+  ==> Exiting NUBEAM_STEP_CHILD, MPI myidd =            0
+  NUBEAM_LOAD_STATE... 
+  NUBEAM_STEP: LEVMOD_HALO=            0
+  ---------------------------------------
+  %nubeam_comp_exec: nubeam_ctrl_step OK: N(ptcls) & <<E>>(KeV):
+ beam ions D_beam: N= 3.8175E+19 <<Eperp>>= 1.6074E+02 <<Epll>>= 1.5274E+02
+ fusion ions He4_fusn: N= 2.4353E+19 <<Eperp>>= 8.6610E+02 <<Epll>>= 4.3388E+02
+  ---------------------------------------
+  
+   executing NUBEAM step:          13
+   executing NUBEAM step:          13
+  %nubeam_step ++++++++ NLTRK_DEP0 F
+  %nubeam_step ++++++++ NLBOUT (lost ptcl.) T
+  ==> Entering NUBEAM_STEP_CHILD, MPI myidd =            0
+  NBI_INTERP_PROFILES... 
+    nbi_getprofiles ne*dVol sum (input): 4.5640E+22
+    nbi_getprofiles ne*dVol sum (ions):  4.5727E+22
+  %nbi_getprofiles: quasineutrality check => 
+   use externally provided fast ion densities.
+  ==> retry using input data for fast densities.
+    nbi_getprofiles ne*dVol sum (input): 4.5640E+22
+    nbi_getprofiles ne*dVol sum (ions):  4.5640E+22
+  NBSTART... 
+  %nbatom deposition model: lev_nbidep=           1
+  %nbatom deposition model: NSIGEXC=           1
+  %nbatom deposition model: lev_nbidep=           1
+  %nbatom deposition model: NSIGEXC=           1
+  DEPALL... 
+ %DEPALL specie #1  ->      2637 -        0 (killed) +      610 (dep) =     3247 ptcls.
+ %DEPALL specie #2  ->       786 -        0 (killed) +      214 (dep) =     1000 ptcls.
+  DEPALL EXITED            0
+  ORBALL... 
+In Processor ,    0 %MC ptcl counts, specie #1: ORIG= 3247 SPL=    1 TOT= 2626
+In Processor ,    0 %MC ptcl counts, specie #2: ORIG= 1000 SPL=    0 TOT=  787
+  %ORBALL: lost ptcl. gather
+ % nbi_alloc_lost: nbi_alloc_lost done
+  ORBALL EXITED            0
+  NBFINISH... 
+  ==> Exiting NUBEAM_STEP_CHILD, MPI myidd =            0
+  NUBEAM_LOAD_STATE... 
+  NUBEAM_STEP: LEVMOD_HALO=            0
+  ---------------------------------------
+  %nubeam_comp_exec: nubeam_ctrl_step OK: N(ptcls) & <<E>>(KeV):
+ beam ions D_beam: N= 3.7957E+19 <<Eperp>>= 1.6504E+02 <<Epll>>= 1.5556E+02
+ fusion ions He4_fusn: N= 2.3782E+19 <<Eperp>>= 8.7262E+02 <<Epll>>= 4.2074E+02
+  ---------------------------------------
+  
+   executing NUBEAM step:          14
+   executing NUBEAM step:          14
+  %nubeam_step ++++++++ NLTRK_DEP0 F
+  %nubeam_step ++++++++ NLBOUT (lost ptcl.) T
+  ==> Entering NUBEAM_STEP_CHILD, MPI myidd =            0
+  NBI_INTERP_PROFILES... 
+    nbi_getprofiles ne*dVol sum (input): 4.5640E+22
+    nbi_getprofiles ne*dVol sum (ions):  4.5726E+22
+  %nbi_getprofiles: quasineutrality check => 
+   use externally provided fast ion densities.
+  ==> retry using input data for fast densities.
+    nbi_getprofiles ne*dVol sum (input): 4.5640E+22
+    nbi_getprofiles ne*dVol sum (ions):  4.5640E+22
+  NBSTART... 
+  %nbatom deposition model: lev_nbidep=           1
+  %nbatom deposition model: NSIGEXC=           1
+  %nbatom deposition model: lev_nbidep=           1
+  %nbatom deposition model: NSIGEXC=           1
+  DEPALL... 
+ %DEPALL specie #1  ->      2626 -        0 (killed) +      614 (dep) =     3240 ptcls.
+ %DEPALL specie #2  ->       787 -        0 (killed) +      213 (dep) =     1000 ptcls.
+  DEPALL EXITED            0
+  ORBALL... 
+In Processor ,    0 %MC ptcl counts, specie #1: ORIG= 3240 SPL=    0 TOT= 2662
+In Processor ,    0 %MC ptcl counts, specie #2: ORIG= 1000 SPL=    0 TOT=  788
+  %ORBALL: lost ptcl. gather
+ % nbi_alloc_lost: nbi_alloc_lost done
+  ORBALL EXITED            0
+  NBFINISH... 
+  ==> Exiting NUBEAM_STEP_CHILD, MPI myidd =            0
+  NUBEAM_LOAD_STATE... 
+  NUBEAM_STEP: LEVMOD_HALO=            0
+  ---------------------------------------
+  %nubeam_comp_exec: nubeam_ctrl_step OK: N(ptcls) & <<E>>(KeV):
+ beam ions D_beam: N= 3.7989E+19 <<Eperp>>= 1.6237E+02 <<Epll>>= 1.5768E+02
+ fusion ions He4_fusn: N= 2.4056E+19 <<Eperp>>= 8.5768E+02 <<Epll>>= 4.5201E+02
+  ---------------------------------------
+  
+   executing NUBEAM step:          15
+   executing NUBEAM step:          15
+  %nubeam_step ++++++++ NLTRK_DEP0 F
+  %nubeam_step ++++++++ NLBOUT (lost ptcl.) T
+  ==> Entering NUBEAM_STEP_CHILD, MPI myidd =            0
+  NBI_INTERP_PROFILES... 
+    nbi_getprofiles ne*dVol sum (input): 4.5640E+22
+    nbi_getprofiles ne*dVol sum (ions):  4.5726E+22
+  %nbi_getprofiles: quasineutrality check => 
+   use externally provided fast ion densities.
+  ==> retry using input data for fast densities.
+    nbi_getprofiles ne*dVol sum (input): 4.5640E+22
+    nbi_getprofiles ne*dVol sum (ions):  4.5640E+22
+  NBSTART... 
+  %nbatom deposition model: lev_nbidep=           1
+  %nbatom deposition model: NSIGEXC=           1
+  %nbatom deposition model: lev_nbidep=           1
+  %nbatom deposition model: NSIGEXC=           1
+  DEPALL... 
+ %DEPALL specie #1  ->      2662 -        0 (killed) +      606 (dep) =     3268 ptcls.
+ %DEPALL specie #2  ->       788 -        0 (killed) +      212 (dep) =     1000 ptcls.
+  DEPALL EXITED            0
+  ORBALL... 
+In Processor ,    0 %MC ptcl counts, specie #1: ORIG= 3268 SPL=    0 TOT= 2654
+  ORBALL need          120  CX tracks
+In Processor ,    0 %MC ptcl counts, specie #2: ORIG= 1000 SPL=    0 TOT=  800
+  %ORBALL: lost ptcl. gather
+ % nbi_alloc_lost: nbi_alloc_lost done
+  ORBALL EXITED            0
+  NBFINISH... 
+  ==> Exiting NUBEAM_STEP_CHILD, MPI myidd =            0
+  NUBEAM_LOAD_STATE... 
+  NUBEAM_STEP: LEVMOD_HALO=            0
+  ---------------------------------------
+  %nubeam_comp_exec: nubeam_ctrl_step OK: N(ptcls) & <<E>>(KeV):
+ beam ions D_beam: N= 3.8063E+19 <<Eperp>>= 1.6270E+02 <<Epll>>= 1.5770E+02
+ fusion ions He4_fusn: N= 2.3937E+19 <<Eperp>>= 8.7266E+02 <<Epll>>= 4.3001E+02
+  ---------------------------------------
+  
+   executing NUBEAM step:          16
+   executing NUBEAM step:          16
+  %nubeam_step ++++++++ NLTRK_DEP0 F
+  %nubeam_step ++++++++ NLBOUT (lost ptcl.) T
+  ==> Entering NUBEAM_STEP_CHILD, MPI myidd =            0
+  NBI_INTERP_PROFILES... 
+    nbi_getprofiles ne*dVol sum (input): 4.5640E+22
+    nbi_getprofiles ne*dVol sum (ions):  4.5726E+22
+  %nbi_getprofiles: quasineutrality check => 
+   use externally provided fast ion densities.
+  ==> retry using input data for fast densities.
+    nbi_getprofiles ne*dVol sum (input): 4.5640E+22
+    nbi_getprofiles ne*dVol sum (ions):  4.5640E+22
+  NBSTART... 
+  %nbatom deposition model: lev_nbidep=           1
+  %nbatom deposition model: NSIGEXC=           1
+  %nbatom deposition model: lev_nbidep=           1
+  %nbatom deposition model: NSIGEXC=           1
+  DEPALL... 
+ %DEPALL specie #1  ->      2654 -        0 (killed) +      608 (dep) =     3262 ptcls.
+ %DEPALL specie #2  ->       800 -        0 (killed) +      210 (dep) =     1010 ptcls.
+  DEPALL EXITED            0
+  ORBALL... 
+In Processor ,    0 %MC ptcl counts, specie #1: ORIG= 3262 SPL=    0 TOT= 2665
+  ORBALL need           96  CX tracks
+In Processor ,    0 %MC ptcl counts, specie #2: ORIG= 1010 SPL=    0 TOT=  790
+  %ORBALL: lost ptcl. gather
+ % nbi_alloc_lost: nbi_alloc_lost done
+  ORBALL EXITED            0
+  NBFINISH... 
+  ==> Exiting NUBEAM_STEP_CHILD, MPI myidd =            0
+  NUBEAM_LOAD_STATE... 
+  NUBEAM_STEP: LEVMOD_HALO=            0
+  ---------------------------------------
+  %nubeam_comp_exec: nubeam_ctrl_step OK: N(ptcls) & <<E>>(KeV):
+ beam ions D_beam: N= 3.7945E+19 <<Eperp>>= 1.6215E+02 <<Epll>>= 1.5844E+02
+ fusion ions He4_fusn: N= 2.3876E+19 <<Eperp>>= 8.8412E+02 <<Epll>>= 4.2009E+02
+  ---------------------------------------
+  
+   executing NUBEAM step:          17
+   executing NUBEAM step:          17
+  %nubeam_step ++++++++ NLTRK_DEP0 F
+  %nubeam_step ++++++++ NLBOUT (lost ptcl.) T
+  ==> Entering NUBEAM_STEP_CHILD, MPI myidd =            0
+  NBI_INTERP_PROFILES... 
+    nbi_getprofiles ne*dVol sum (input): 4.5640E+22
+    nbi_getprofiles ne*dVol sum (ions):  4.5726E+22
+  %nbi_getprofiles: quasineutrality check => 
+   use externally provided fast ion densities.
+  ==> retry using input data for fast densities.
+    nbi_getprofiles ne*dVol sum (input): 4.5640E+22
+    nbi_getprofiles ne*dVol sum (ions):  4.5640E+22
+  NBSTART... 
+  %nbatom deposition model: lev_nbidep=           1
+  %nbatom deposition model: NSIGEXC=           1
+  %nbatom deposition model: lev_nbidep=           1
+  %nbatom deposition model: NSIGEXC=           1
+  DEPALL... 
+ %DEPALL specie #1  ->      2665 -        0 (killed) +      606 (dep) =     3271 ptcls.
+ %DEPALL specie #2  ->       790 -        0 (killed) +      212 (dep) =     1002 ptcls.
+  DEPALL EXITED            0
+  ORBALL... 
+In Processor ,    0 %MC ptcl counts, specie #1: ORIG= 3271 SPL=    0 TOT= 2642
+  ORBALL need          120  CX tracks
+In Processor ,    0 %MC ptcl counts, specie #2: ORIG= 1002 SPL=    0 TOT=  802
+  %ORBALL: lost ptcl. gather
+ % nbi_alloc_lost: nbi_alloc_lost done
+  ORBALL EXITED            0
+  NBFINISH... 
+  ==> Exiting NUBEAM_STEP_CHILD, MPI myidd =            0
+  NUBEAM_LOAD_STATE... 
+  NUBEAM_STEP: LEVMOD_HALO=            0
+  ---------------------------------------
+  %nubeam_comp_exec: nubeam_ctrl_step OK: N(ptcls) & <<E>>(KeV):
+ beam ions D_beam: N= 3.8294E+19 <<Eperp>>= 1.6035E+02 <<Epll>>= 1.5865E+02
+ fusion ions He4_fusn: N= 2.3997E+19 <<Eperp>>= 8.7891E+02 <<Epll>>= 4.3716E+02
+  ---------------------------------------
+  
+   executing NUBEAM step:          18
+   executing NUBEAM step:          18
+  %nubeam_step ++++++++ NLTRK_DEP0 F
+  %nubeam_step ++++++++ NLBOUT (lost ptcl.) T
+  ==> Entering NUBEAM_STEP_CHILD, MPI myidd =            0
+  NBI_INTERP_PROFILES... 
+    nbi_getprofiles ne*dVol sum (input): 4.5640E+22
+    nbi_getprofiles ne*dVol sum (ions):  4.5727E+22
+  %nbi_getprofiles: quasineutrality check => 
+   use externally provided fast ion densities.
+  ==> retry using input data for fast densities.
+    nbi_getprofiles ne*dVol sum (input): 4.5640E+22
+    nbi_getprofiles ne*dVol sum (ions):  4.5640E+22
+  NBSTART... 
+  %nbatom deposition model: lev_nbidep=           1
+  %nbatom deposition model: NSIGEXC=           1
+  %nbatom deposition model: lev_nbidep=           1
+  %nbatom deposition model: NSIGEXC=           1
+  DEPALL... 
+ %DEPALL specie #1  ->      2642 -        0 (killed) +      606 (dep) =     3248 ptcls.
+ %DEPALL specie #2  ->       802 -        0 (killed) +      209 (dep) =     1011 ptcls.
+  DEPALL EXITED            0
+  ORBALL... 
+In Processor ,    0 %MC ptcl counts, specie #1: ORIG= 3248 SPL=    0 TOT= 2637
+  ORBALL need          120  CX tracks
+In Processor ,    0 %MC ptcl counts, specie #2: ORIG= 1011 SPL=    0 TOT=  797
+  %ORBALL: lost ptcl. gather
+ % nbi_alloc_lost: nbi_alloc_lost done
+  ORBALL EXITED            0
+  NBFINISH... 
+  ==> Exiting NUBEAM_STEP_CHILD, MPI myidd =            0
+  NUBEAM_LOAD_STATE... 
+  NUBEAM_STEP: LEVMOD_HALO=            0
+  ---------------------------------------
+  %nubeam_comp_exec: nubeam_ctrl_step OK: N(ptcls) & <<E>>(KeV):
+ beam ions D_beam: N= 3.7758E+19 <<Eperp>>= 1.6188E+02 <<Epll>>= 1.5982E+02
+ fusion ions He4_fusn: N= 2.4490E+19 <<Eperp>>= 8.7341E+02 <<Epll>>= 4.3728E+02
+  ---------------------------------------
+  
+   executing NUBEAM step:          19
+   executing NUBEAM step:          19
+  %nubeam_step ++++++++ NLTRK_DEP0 F
+  %nubeam_step ++++++++ NLBOUT (lost ptcl.) T
+  ==> Entering NUBEAM_STEP_CHILD, MPI myidd =            0
+  NBI_INTERP_PROFILES... 
+    nbi_getprofiles ne*dVol sum (input): 4.5640E+22
+    nbi_getprofiles ne*dVol sum (ions):  4.5727E+22
+  %nbi_getprofiles: quasineutrality check => 
+   use externally provided fast ion densities.
+  ==> retry using input data for fast densities.
+    nbi_getprofiles ne*dVol sum (input): 4.5640E+22
+    nbi_getprofiles ne*dVol sum (ions):  4.5640E+22
+  NBSTART... 
+  %nbatom deposition model: lev_nbidep=           1
+  %nbatom deposition model: NSIGEXC=           1
+  %nbatom deposition model: lev_nbidep=           1
+  %nbatom deposition model: NSIGEXC=           1
+  DEPALL... 
+ %DEPALL specie #1  ->      2637 -        0 (killed) +      609 (dep) =     3246 ptcls.
+ %DEPALL specie #2  ->       797 -        0 (killed) +      209 (dep) =     1006 ptcls.
+  DEPALL EXITED            0
+  ORBALL... 
+In Processor ,    0 %MC ptcl counts, specie #1: ORIG= 3246 SPL=    0 TOT= 2651
+  ORBALL need           96  CX tracks
+In Processor ,    0 %MC ptcl counts, specie #2: ORIG= 1006 SPL=    0 TOT=  777
+  %ORBALL: lost ptcl. gather
+ % nbi_alloc_lost: nbi_alloc_lost done
+  ORBALL EXITED            0
+  NBFINISH... 
+  ==> Exiting NUBEAM_STEP_CHILD, MPI myidd =            0
+  NUBEAM_LOAD_STATE... 
+  NUBEAM_STEP: LEVMOD_HALO=            0
+  ---------------------------------------
+  %nubeam_comp_exec: nubeam_ctrl_step OK: N(ptcls) & <<E>>(KeV):
+ beam ions D_beam: N= 3.8018E+19 <<Eperp>>= 1.6210E+02 <<Epll>>= 1.5914E+02
+ fusion ions He4_fusn: N= 2.3948E+19 <<Eperp>>= 8.6628E+02 <<Epll>>= 4.5144E+02
+  ---------------------------------------
+  
+   executing NUBEAM step:          20
+   executing NUBEAM step:          20
+  %nubeam_step ++++++++ NLTRK_DEP0 F
+  %nubeam_step ++++++++ NLBOUT (lost ptcl.) T
+  ==> Entering NUBEAM_STEP_CHILD, MPI myidd =            0
+  NBI_INTERP_PROFILES... 
+    nbi_getprofiles ne*dVol sum (input): 4.5640E+22
+    nbi_getprofiles ne*dVol sum (ions):  4.5726E+22
+  %nbi_getprofiles: quasineutrality check => 
+   use externally provided fast ion densities.
+  ==> retry using input data for fast densities.
+    nbi_getprofiles ne*dVol sum (input): 4.5640E+22
+    nbi_getprofiles ne*dVol sum (ions):  4.5640E+22
+  NBSTART... 
+  %nbatom deposition model: lev_nbidep=           1
+  %nbatom deposition model: NSIGEXC=           1
+  %nbatom deposition model: lev_nbidep=           1
+  %nbatom deposition model: NSIGEXC=           1
+  DEPALL... 
+ %DEPALL specie #1  ->      2651 -        0 (killed) +      608 (dep) =     3259 ptcls.
+ %DEPALL specie #2  ->       777 -        0 (killed) +      223 (dep) =     1000 ptcls.
+  DEPALL EXITED            0
+  ORBALL... 
+In Processor ,    0 %MC ptcl counts, specie #1: ORIG= 3259 SPL=    0 TOT= 2648
+  ORBALL need           96  CX tracks
+In Processor ,    0 %MC ptcl counts, specie #2: ORIG= 1000 SPL=    0 TOT=  796
+  %ORBALL: lost ptcl. gather
+ % nbi_alloc_lost: nbi_alloc_lost done
+  ORBALL EXITED            0
+  NBFINISH... 
+  ==> Exiting NUBEAM_STEP_CHILD, MPI myidd =            0
+  NUBEAM_LOAD_STATE... 
+  NUBEAM_STEP: LEVMOD_HALO=            0
+  ---------------------------------------
+  %nubeam_comp_exec: nubeam_ctrl_step OK: N(ptcls) & <<E>>(KeV):
+ beam ions D_beam: N= 3.8291E+19 <<Eperp>>= 1.6182E+02 <<Epll>>= 1.5632E+02
+ fusion ions He4_fusn: N= 2.3879E+19 <<Eperp>>= 8.5600E+02 <<Epll>>= 4.3432E+02
+  ---------------------------------------
+  
+   executing NUBEAM step:          21
+   executing NUBEAM step:          21
+  %nubeam_step ++++++++ NLTRK_DEP0 F
+  %nubeam_step ++++++++ NLBOUT (lost ptcl.) T
+  ==> Entering NUBEAM_STEP_CHILD, MPI myidd =            0
+  NBI_INTERP_PROFILES... 
+    nbi_getprofiles ne*dVol sum (input): 4.5640E+22
+    nbi_getprofiles ne*dVol sum (ions):  4.5726E+22
+  %nbi_getprofiles: quasineutrality check => 
+   use externally provided fast ion densities.
+  ==> retry using input data for fast densities.
+    nbi_getprofiles ne*dVol sum (input): 4.5640E+22
+    nbi_getprofiles ne*dVol sum (ions):  4.5640E+22
+  NBSTART... 
+  %nbatom deposition model: lev_nbidep=           1
+  %nbatom deposition model: NSIGEXC=           1
+  %nbatom deposition model: lev_nbidep=           1
+  %nbatom deposition model: NSIGEXC=           1
+  DEPALL... 
+ %DEPALL specie #1  ->      2648 -        0 (killed) +      605 (dep) =     3253 ptcls.
+ %DEPALL specie #2  ->       796 -        0 (killed) +      211 (dep) =     1007 ptcls.
+  DEPALL EXITED            0
+  ORBALL... 
+In Processor ,    0 %MC ptcl counts, specie #1: ORIG= 3253 SPL=    0 TOT= 2633
+  ORBALL need           96  CX tracks
+In Processor ,    0 %MC ptcl counts, specie #2: ORIG= 1007 SPL=    0 TOT=  799
+  %ORBALL: lost ptcl. gather
+ % nbi_alloc_lost: nbi_alloc_lost done
+  ORBALL EXITED            0
+  NBFINISH... 
+  ==> Exiting NUBEAM_STEP_CHILD, MPI myidd =            0
+  NUBEAM_LOAD_STATE... 
+  NUBEAM_STEP: LEVMOD_HALO=            0
+  ---------------------------------------
+  %nubeam_comp_exec: nubeam_ctrl_step OK: N(ptcls) & <<E>>(KeV):
+ beam ions D_beam: N= 3.8207E+19 <<Eperp>>= 1.6098E+02 <<Epll>>= 1.5407E+02
+ fusion ions He4_fusn: N= 2.4153E+19 <<Eperp>>= 8.4338E+02 <<Epll>>= 4.5982E+02
+  ---------------------------------------
+  
+   executing NUBEAM step:          22
+   executing NUBEAM step:          22
+  %nubeam_step ++++++++ NLTRK_DEP0 F
+  %nubeam_step ++++++++ NLBOUT (lost ptcl.) T
+  ==> Entering NUBEAM_STEP_CHILD, MPI myidd =            0
+  NBI_INTERP_PROFILES... 
+    nbi_getprofiles ne*dVol sum (input): 4.5640E+22
+    nbi_getprofiles ne*dVol sum (ions):  4.5727E+22
+  %nbi_getprofiles: quasineutrality check => 
+   use externally provided fast ion densities.
+  ==> retry using input data for fast densities.
+    nbi_getprofiles ne*dVol sum (input): 4.5640E+22
+    nbi_getprofiles ne*dVol sum (ions):  4.5640E+22
+  NBSTART... 
+  %nbatom deposition model: lev_nbidep=           1
+  %nbatom deposition model: NSIGEXC=           1
+  %nbatom deposition model: lev_nbidep=           1
+  %nbatom deposition model: NSIGEXC=           1
+  DEPALL... 
+ %DEPALL specie #1  ->      2633 -        0 (killed) +      610 (dep) =     3243 ptcls.
+ %DEPALL specie #2  ->       799 -        0 (killed) +      211 (dep) =     1010 ptcls.
+  DEPALL EXITED            0
+  ORBALL... 
+In Processor ,    0 %MC ptcl counts, specie #1: ORIG= 3243 SPL=    0 TOT= 2617
+  ORBALL need          120  CX tracks
+In Processor ,    0 %MC ptcl counts, specie #2: ORIG= 1010 SPL=    0 TOT=  784
+  %ORBALL: lost ptcl. gather
+ % nbi_alloc_lost: nbi_alloc_lost done
+  ORBALL EXITED            0
+  NBFINISH... 
+  ==> Exiting NUBEAM_STEP_CHILD, MPI myidd =            0
+  NUBEAM_LOAD_STATE... 
+  NUBEAM_STEP: LEVMOD_HALO=            0
+  ---------------------------------------
+  %nubeam_comp_exec: nubeam_ctrl_step OK: N(ptcls) & <<E>>(KeV):
+ beam ions D_beam: N= 3.7938E+19 <<Eperp>>= 1.6418E+02 <<Epll>>= 1.5590E+02
+ fusion ions He4_fusn: N= 2.3950E+19 <<Eperp>>= 8.6016E+02 <<Epll>>= 4.4107E+02
+  ---------------------------------------
+  
+   executing NUBEAM step:          23
+   executing NUBEAM step:          23
+  %nubeam_step ++++++++ NLTRK_DEP0 F
+  %nubeam_step ++++++++ NLBOUT (lost ptcl.) T
+  ==> Entering NUBEAM_STEP_CHILD, MPI myidd =            0
+  NBI_INTERP_PROFILES... 
+    nbi_getprofiles ne*dVol sum (input): 4.5640E+22
+    nbi_getprofiles ne*dVol sum (ions):  4.5726E+22
+  %nbi_getprofiles: quasineutrality check => 
+   use externally provided fast ion densities.
+  ==> retry using input data for fast densities.
+    nbi_getprofiles ne*dVol sum (input): 4.5640E+22
+    nbi_getprofiles ne*dVol sum (ions):  4.5640E+22
+  NBSTART... 
+  %nbatom deposition model: lev_nbidep=           1
+  %nbatom deposition model: NSIGEXC=           1
+  %nbatom deposition model: lev_nbidep=           1
+  %nbatom deposition model: NSIGEXC=           1
+  DEPALL... 
+ %DEPALL specie #1  ->      2617 -        0 (killed) +      615 (dep) =     3232 ptcls.
+ %DEPALL specie #2  ->       784 -        0 (killed) +      216 (dep) =     1000 ptcls.
+  DEPALL EXITED            0
+  ORBALL... 
+In Processor ,    0 %MC ptcl counts, specie #1: ORIG= 3232 SPL=    0 TOT= 2630
+  ORBALL need          120  CX tracks
+In Processor ,    0 %MC ptcl counts, specie #2: ORIG= 1000 SPL=    0 TOT=  803
+  %ORBALL: lost ptcl. gather
+ % nbi_alloc_lost: nbi_alloc_lost done
+  ORBALL EXITED            0
+  NBFINISH... 
+  ==> Exiting NUBEAM_STEP_CHILD, MPI myidd =            0
+  NUBEAM_LOAD_STATE... 
+  NUBEAM_STEP: LEVMOD_HALO=            0
+  ---------------------------------------
+  %nubeam_comp_exec: nubeam_ctrl_step OK: N(ptcls) & <<E>>(KeV):
+ beam ions D_beam: N= 3.7722E+19 <<Eperp>>= 1.6313E+02 <<Epll>>= 1.5995E+02
+ fusion ions He4_fusn: N= 2.3830E+19 <<Eperp>>= 8.8928E+02 <<Epll>>= 4.2735E+02
+  ---------------------------------------
+  
+   executing NUBEAM step:          24
+   executing NUBEAM step:          24
+  %nubeam_step ++++++++ NLTRK_DEP0 F
+  %nubeam_step ++++++++ NLBOUT (lost ptcl.) T
+  ==> Entering NUBEAM_STEP_CHILD, MPI myidd =            0
+  NBI_INTERP_PROFILES... 
+    nbi_getprofiles ne*dVol sum (input): 4.5640E+22
+    nbi_getprofiles ne*dVol sum (ions):  4.5726E+22
+  %nbi_getprofiles: quasineutrality check => 
+   use externally provided fast ion densities.
+  ==> retry using input data for fast densities.
+    nbi_getprofiles ne*dVol sum (input): 4.5640E+22
+    nbi_getprofiles ne*dVol sum (ions):  4.5640E+22
+  NBSTART... 
+  %nbatom deposition model: lev_nbidep=           1
+  %nbatom deposition model: NSIGEXC=           1
+  %nbatom deposition model: lev_nbidep=           1
+  %nbatom deposition model: NSIGEXC=           1
+  DEPALL... 
+ %DEPALL specie #1  ->      2630 -        0 (killed) +      612 (dep) =     3242 ptcls.
+ %DEPALL specie #2  ->       803 -        0 (killed) +      211 (dep) =     1014 ptcls.
+  DEPALL EXITED            0
+  ORBALL... 
+In Processor ,    0 %MC ptcl counts, specie #1: ORIG= 3242 SPL=    1 TOT= 2653
+In Processor ,    0 %MC ptcl counts, specie #2: ORIG= 1014 SPL=    0 TOT=  792
+  %ORBALL: lost ptcl. gather
+ % nbi_alloc_lost: nbi_alloc_lost done
+  ORBALL EXITED            0
+  NBFINISH... 
+  ==> Exiting NUBEAM_STEP_CHILD, MPI myidd =            0
+  NUBEAM_LOAD_STATE... 
+  NUBEAM_STEP: LEVMOD_HALO=            0
+  ---------------------------------------
+  %nubeam_comp_exec: nubeam_ctrl_step OK: N(ptcls) & <<E>>(KeV):
+ beam ions D_beam: N= 3.7954E+19 <<Eperp>>= 1.5989E+02 <<Epll>>= 1.6027E+02
+ fusion ions He4_fusn: N= 2.4080E+19 <<Eperp>>= 8.7980E+02 <<Epll>>= 4.1973E+02
+  ---------------------------------------
+  
+   executing NUBEAM step:          25
+   executing NUBEAM step:          25
+  %nubeam_step ++++++++ NLTRK_DEP0 F
+  %nubeam_step ++++++++ NLBOUT (lost ptcl.) T
+  ==> Entering NUBEAM_STEP_CHILD, MPI myidd =            0
+  NBI_INTERP_PROFILES... 
+    nbi_getprofiles ne*dVol sum (input): 4.5640E+22
+    nbi_getprofiles ne*dVol sum (ions):  4.5726E+22
+  %nbi_getprofiles: quasineutrality check => 
+   use externally provided fast ion densities.
+  ==> retry using input data for fast densities.
+    nbi_getprofiles ne*dVol sum (input): 4.5640E+22
+    nbi_getprofiles ne*dVol sum (ions):  4.5640E+22
+  NBSTART... 
+  %nbatom deposition model: lev_nbidep=           1
+  %nbatom deposition model: NSIGEXC=           1
+  %nbatom deposition model: lev_nbidep=           1
+  %nbatom deposition model: NSIGEXC=           1
+  DEPALL... 
+ %DEPALL specie #1  ->      2653 -        0 (killed) +      609 (dep) =     3262 ptcls.
+ %DEPALL specie #2  ->       792 -        0 (killed) +      212 (dep) =     1004 ptcls.
+  DEPALL EXITED            0
+  ORBALL... 
+In Processor ,    0 %MC ptcl counts, specie #1: ORIG= 3262 SPL=    1 TOT= 2671
+  ORBALL need          120  CX tracks
+In Processor ,    0 %MC ptcl counts, specie #2: ORIG= 1004 SPL=    0 TOT=  779
+  %ORBALL: lost ptcl. gather
+ % nbi_alloc_lost: nbi_alloc_lost done
+  ORBALL EXITED            0
+  NBFINISH... 
+  ==> Exiting NUBEAM_STEP_CHILD, MPI myidd =            0
+  NUBEAM_LOAD_STATE... 
+  NUBEAM_STEP: LEVMOD_HALO=            0
+  ---------------------------------------
+  %nubeam_comp_exec: nubeam_ctrl_step OK: N(ptcls) & <<E>>(KeV):
+ beam ions D_beam: N= 3.7887E+19 <<Eperp>>= 1.5984E+02 <<Epll>>= 1.6036E+02
+ fusion ions He4_fusn: N= 2.3725E+19 <<Eperp>>= 8.8243E+02 <<Epll>>= 4.2748E+02
+  ---------------------------------------
+  
+   executing NUBEAM step:          26
+   executing NUBEAM step:          26
+  %nubeam_step ++++++++ NLTRK_DEP0 F
+  %nubeam_step ++++++++ NLBOUT (lost ptcl.) T
+  ==> Entering NUBEAM_STEP_CHILD, MPI myidd =            0
+  NBI_INTERP_PROFILES... 
+    nbi_getprofiles ne*dVol sum (input): 4.5640E+22
+    nbi_getprofiles ne*dVol sum (ions):  4.5726E+22
+  %nbi_getprofiles: quasineutrality check => 
+   use externally provided fast ion densities.
+  ==> retry using input data for fast densities.
+    nbi_getprofiles ne*dVol sum (input): 4.5640E+22
+    nbi_getprofiles ne*dVol sum (ions):  4.5640E+22
+  NBSTART... 
+  %nbatom deposition model: lev_nbidep=           1
+  %nbatom deposition model: NSIGEXC=           1
+  %nbatom deposition model: lev_nbidep=           1
+  %nbatom deposition model: NSIGEXC=           1
+  DEPALL... 
+ %DEPALL specie #1  ->      2671 -        0 (killed) +      606 (dep) =     3277 ptcls.
+ %DEPALL specie #2  ->       779 -        0 (killed) +      221 (dep) =     1000 ptcls.
+  DEPALL EXITED            0
+  ORBALL... 
+In Processor ,    0 %MC ptcl counts, specie #1: ORIG= 3277 SPL=    2 TOT= 2698
+  ORBALL need          120  CX tracks
+In Processor ,    0 %MC ptcl counts, specie #2: ORIG= 1000 SPL=    0 TOT=  792
+  %ORBALL: lost ptcl. gather
+ % nbi_alloc_lost: nbi_alloc_lost done
+  ORBALL EXITED            0
+  NBFINISH... 
+  ==> Exiting NUBEAM_STEP_CHILD, MPI myidd =            0
+  NUBEAM_LOAD_STATE... 
+  NUBEAM_STEP: LEVMOD_HALO=            0
+  ---------------------------------------
+  %nubeam_comp_exec: nubeam_ctrl_step OK: N(ptcls) & <<E>>(KeV):
+ beam ions D_beam: N= 3.8603E+19 <<Eperp>>= 1.6048E+02 <<Epll>>= 1.5535E+02
+ fusion ions He4_fusn: N= 2.3724E+19 <<Eperp>>= 8.6477E+02 <<Epll>>= 4.2739E+02
+  ---------------------------------------
+  
+   executing NUBEAM step:          27
+   executing NUBEAM step:          27
+  %nubeam_step ++++++++ NLTRK_DEP0 F
+  %nubeam_step ++++++++ NLBOUT (lost ptcl.) T
+  ==> Entering NUBEAM_STEP_CHILD, MPI myidd =            0
+  NBI_INTERP_PROFILES... 
+    nbi_getprofiles ne*dVol sum (input): 4.5640E+22
+    nbi_getprofiles ne*dVol sum (ions):  4.5726E+22
+  %nbi_getprofiles: quasineutrality check => 
+   use externally provided fast ion densities.
+  ==> retry using input data for fast densities.
+    nbi_getprofiles ne*dVol sum (input): 4.5640E+22
+    nbi_getprofiles ne*dVol sum (ions):  4.5640E+22
+  NBSTART... 
+  %nbatom deposition model: lev_nbidep=           1
+  %nbatom deposition model: NSIGEXC=           1
+  %nbatom deposition model: lev_nbidep=           1
+  %nbatom deposition model: NSIGEXC=           1
+  DEPALL... 
+ %DEPALL specie #1  ->      2698 -        0 (killed) +      599 (dep) =     3297 ptcls.
+ %DEPALL specie #2  ->       792 -        0 (killed) +      214 (dep) =     1006 ptcls.
+  DEPALL EXITED            0
+  ORBALL... 
+In Processor ,    0 %MC ptcl counts, specie #1: ORIG= 3297 SPL=    0 TOT= 2672
+  ORBALL need          120  CX tracks
+In Processor ,    0 %MC ptcl counts, specie #2: ORIG= 1006 SPL=    0 TOT=  801
+  %ORBALL: lost ptcl. gather
+ % nbi_alloc_lost: nbi_alloc_lost done
+  ORBALL EXITED            0
+  NBFINISH... 
+  ==> Exiting NUBEAM_STEP_CHILD, MPI myidd =            0
+  NUBEAM_LOAD_STATE... 
+  NUBEAM_STEP: LEVMOD_HALO=            0
+  ---------------------------------------
+  %nubeam_comp_exec: nubeam_ctrl_step OK: N(ptcls) & <<E>>(KeV):
+ beam ions D_beam: N= 3.8618E+19 <<Eperp>>= 1.5876E+02 <<Epll>>= 1.5697E+02
+ fusion ions He4_fusn: N= 2.3553E+19 <<Eperp>>= 8.5114E+02 <<Epll>>= 4.6674E+02
+  ---------------------------------------
+  
+   executing NUBEAM step:          28
+   executing NUBEAM step:          28
+  %nubeam_step ++++++++ NLTRK_DEP0 F
+  %nubeam_step ++++++++ NLBOUT (lost ptcl.) T
+  ==> Entering NUBEAM_STEP_CHILD, MPI myidd =            0
+  NBI_INTERP_PROFILES... 
+    nbi_getprofiles ne*dVol sum (input): 4.5640E+22
+    nbi_getprofiles ne*dVol sum (ions):  4.5726E+22
+  %nbi_getprofiles: quasineutrality check => 
+   use externally provided fast ion densities.
+  ==> retry using input data for fast densities.
+    nbi_getprofiles ne*dVol sum (input): 4.5640E+22
+    nbi_getprofiles ne*dVol sum (ions):  4.5640E+22
+  NBSTART... 
+  %nbatom deposition model: lev_nbidep=           1
+  %nbatom deposition model: NSIGEXC=           1
+  %nbatom deposition model: lev_nbidep=           1
+  %nbatom deposition model: NSIGEXC=           1
+  DEPALL... 
+ %DEPALL specie #1  ->      2672 -        0 (killed) +      604 (dep) =     3276 ptcls.
+ %DEPALL specie #2  ->       801 -        0 (killed) +      212 (dep) =     1013 ptcls.
+  DEPALL EXITED            0
+  ORBALL... 
+In Processor ,    0 %MC ptcl counts, specie #1: ORIG= 3276 SPL=    1 TOT= 2612
+  ORBALL need           96  CX tracks
+In Processor ,    0 %MC ptcl counts, specie #2: ORIG= 1013 SPL=    0 TOT=  788
+  %ORBALL: lost ptcl. gather
+ % nbi_alloc_lost: nbi_alloc_lost done
+  ORBALL EXITED            0
+  NBFINISH... 
+  ==> Exiting NUBEAM_STEP_CHILD, MPI myidd =            0
+  NUBEAM_LOAD_STATE... 
+  NUBEAM_STEP: LEVMOD_HALO=            0
+  ---------------------------------------
+  %nubeam_comp_exec: nubeam_ctrl_step OK: N(ptcls) & <<E>>(KeV):
+ beam ions D_beam: N= 3.8155E+19 <<Eperp>>= 1.5881E+02 <<Epll>>= 1.5781E+02
+ fusion ions He4_fusn: N= 2.3550E+19 <<Eperp>>= 8.7645E+02 <<Epll>>= 4.5677E+02
+  ---------------------------------------
+  
+   executing NUBEAM step:          29
+   executing NUBEAM step:          29
+  %nubeam_step ++++++++ NLTRK_DEP0 F
+  %nubeam_step ++++++++ NLBOUT (lost ptcl.) T
+  ==> Entering NUBEAM_STEP_CHILD, MPI myidd =            0
+  NBI_INTERP_PROFILES... 
+    nbi_getprofiles ne*dVol sum (input): 4.5640E+22
+    nbi_getprofiles ne*dVol sum (ions):  4.5726E+22
+  %nbi_getprofiles: quasineutrality check => 
+   use externally provided fast ion densities.
+  ==> retry using input data for fast densities.
+    nbi_getprofiles ne*dVol sum (input): 4.5640E+22
+    nbi_getprofiles ne*dVol sum (ions):  4.5640E+22
+  NBSTART... 
+  %nbatom deposition model: lev_nbidep=           1
+  %nbatom deposition model: NSIGEXC=           1
+  %nbatom deposition model: lev_nbidep=           1
+  %nbatom deposition model: NSIGEXC=           1
+  DEPALL... 
+ %DEPALL specie #1  ->      2612 -        0 (killed) +      614 (dep) =     3226 ptcls.
+ %DEPALL specie #2  ->       788 -        0 (killed) +      214 (dep) =     1002 ptcls.
+  DEPALL EXITED            0
+  ORBALL... 
+In Processor ,    0 %MC ptcl counts, specie #1: ORIG= 3226 SPL=    0 TOT= 2632
+  ORBALL need          120  CX tracks
+In Processor ,    0 %MC ptcl counts, specie #2: ORIG= 1002 SPL=    0 TOT=  807
+  %ORBALL: lost ptcl. gather
+ % nbi_alloc_lost: nbi_alloc_lost done
+  ORBALL EXITED            0
+  NBFINISH... 
+  ==> Exiting NUBEAM_STEP_CHILD, MPI myidd =            0
+  NUBEAM_LOAD_STATE... 
+  NUBEAM_STEP: LEVMOD_HALO=            0
+  ---------------------------------------
+  %nubeam_comp_exec: nubeam_ctrl_step OK: N(ptcls) & <<E>>(KeV):
+ beam ions D_beam: N= 3.7488E+19 <<Eperp>>= 1.6419E+02 <<Epll>>= 1.5999E+02
+ fusion ions He4_fusn: N= 2.4050E+19 <<Eperp>>= 8.7904E+02 <<Epll>>= 4.1154E+02
+  ---------------------------------------
+  
+   executing NUBEAM step:          30
+   executing NUBEAM step:          30
+  %nubeam_step ++++++++ NLTRK_DEP0 F
+  %nubeam_step ++++++++ NLBOUT (lost ptcl.) T
+  ==> Entering NUBEAM_STEP_CHILD, MPI myidd =            0
+  NBI_INTERP_PROFILES... 
+    nbi_getprofiles ne*dVol sum (input): 4.5640E+22
+    nbi_getprofiles ne*dVol sum (ions):  4.5726E+22
+  %nbi_getprofiles: quasineutrality check => 
+   use externally provided fast ion densities.
+  ==> retry using input data for fast densities.
+    nbi_getprofiles ne*dVol sum (input): 4.5640E+22
+    nbi_getprofiles ne*dVol sum (ions):  4.5640E+22
+  NBSTART... 
+  %nbatom deposition model: lev_nbidep=           1
+  %nbatom deposition model: NSIGEXC=           1
+  %nbatom deposition model: lev_nbidep=           1
+  %nbatom deposition model: NSIGEXC=           1
+  DEPALL... 
+ %DEPALL specie #1  ->      2632 -        0 (killed) +      612 (dep) =     3244 ptcls.
+ %DEPALL specie #2  ->       807 -        0 (killed) +      210 (dep) =     1017 ptcls.
+  DEPALL EXITED            0
+  ORBALL... 
+In Processor ,    0 %MC ptcl counts, specie #1: ORIG= 3244 SPL=    1 TOT= 2673
+  ORBALL need          120  CX tracks
+In Processor ,    0 %MC ptcl counts, specie #2: ORIG= 1017 SPL=    0 TOT=  786
+  %ORBALL: lost ptcl. gather
+ % nbi_alloc_lost: nbi_alloc_lost done
+  ORBALL EXITED            0
+  NBFINISH... 
+  ==> Exiting NUBEAM_STEP_CHILD, MPI myidd =            0
+  NUBEAM_LOAD_STATE... 
+  NUBEAM_STEP: LEVMOD_HALO=            0
+  ---------------------------------------
+  %nubeam_comp_exec: nubeam_ctrl_step OK: N(ptcls) & <<E>>(KeV):
+ beam ions D_beam: N= 3.8288E+19 <<Eperp>>= 1.6244E+02 <<Epll>>= 1.5747E+02
+ fusion ions He4_fusn: N= 2.3627E+19 <<Eperp>>= 8.7677E+02 <<Epll>>= 4.1544E+02
+  ---------------------------------------
+  -------------------------------------------- 
+  summary output: 
+  
+  nubeam_ctrl_step timer results:
+ wallclock time  8.4057E+01 seconds.
+ root thread cpu 8.3245E+01 seconds.
+ min thread cpu  8.2563E+01 seconds.
+ max thread cpu  8.3394E+01 seconds.
+  
+  heating: 
+  zone   Pbe          Pbi          Pbth   (watts/zone)
+    1   1.9295E+03   1.9526E+03   9.4785E+01
+    2   5.4973E+03   5.6636E+03   3.2086E+02
+    3   8.6902E+03   9.1073E+03   6.2749E+02
+    4   1.1591E+04   1.2368E+04   1.0074E+03
+    5   1.4109E+04   1.5442E+04   1.4334E+03
+    6   1.6832E+04   1.8679E+04   1.8481E+03
+    7   2.0175E+04   2.2235E+04   2.1879E+03
+    8   2.3936E+04   2.5944E+04   2.4585E+03
+    9   2.7815E+04   2.9606E+04   2.7141E+03
+   10   3.1958E+04   3.3245E+04   2.9090E+03
+   11   3.6229E+04   3.6809E+04   3.0452E+03
+   12   4.0641E+04   4.0456E+04   3.2087E+03
+   13   4.4789E+04   4.4033E+04   3.3533E+03
+   14   4.8671E+04   4.7381E+04   3.3958E+03
+   15   5.2332E+04   5.0353E+04   3.4911E+03
+   16   5.5931E+04   5.3045E+04   3.6752E+03
+   17   5.9478E+04   5.5604E+04   3.7622E+03
+   18   6.3100E+04   5.7912E+04   3.8208E+03
+   19   6.6835E+04   6.0026E+04   4.0116E+03
+   20   7.1049E+04   6.2644E+04   4.1550E+03
+   21   7.5469E+04   6.5671E+04   4.2710E+03
+   22   7.9281E+04   6.8418E+04   4.4982E+03
+   23   8.2753E+04   7.1109E+04   4.7972E+03
+   24   8.6053E+04   7.3542E+04   5.0633E+03
+   25   8.8248E+04   7.5084E+04   5.3954E+03
+   26   8.9574E+04   7.5879E+04   5.5843E+03
+   27   9.1040E+04   7.5894E+04   5.6758E+03
+   28   9.2578E+04   7.5205E+04   5.5916E+03
+   29   9.4459E+04   7.4715E+04   5.3587E+03
+   30   9.7403E+04   7.4648E+04   5.0020E+03
+   31   1.0109E+05   7.4589E+04   4.7421E+03
+   32   1.0530E+05   7.5235E+04   4.4560E+03
+   33   1.0983E+05   7.6347E+04   4.2627E+03
+   34   1.1401E+05   7.7114E+04   4.1408E+03
+   35   1.1726E+05   7.7181E+04   4.0601E+03
+   36   1.2045E+05   7.7166E+04   3.8677E+03
+   37   1.2342E+05   7.6969E+04   3.6641E+03
+   38   1.2658E+05   7.7012E+04   3.4415E+03
+   39   1.3077E+05   7.7583E+04   3.2370E+03
+   40   1.3654E+05   7.9582E+04   3.0354E+03
+   41   1.4279E+05   8.2773E+04   3.0126E+03
+   42   1.4911E+05   8.6317E+04   3.1942E+03
+   43   1.5444E+05   8.9216E+04   3.5306E+03
+   44   1.5786E+05   9.1647E+04   3.8734E+03
+   45   1.5992E+05   9.3116E+04   4.2253E+03
+   46   1.6183E+05   9.3627E+04   4.5099E+03
+   47   1.6402E+05   9.4302E+04   4.6098E+03
+   48   1.6744E+05   9.5968E+04   4.6821E+03
+   49   1.7292E+05   9.8449E+04   4.9115E+03
+   50   1.7978E+05   1.0122E+05   5.2041E+03
+   51   1.8678E+05   1.0381E+05   5.5318E+03
+   52   1.9404E+05   1.0568E+05   5.9347E+03
+   53   2.0130E+05   1.0666E+05   6.1776E+03
+   54   2.0752E+05   1.0667E+05   6.1409E+03
+   55   2.1193E+05   1.0593E+05   6.0530E+03
+   56   2.1521E+05   1.0491E+05   5.8008E+03
+   57   2.1695E+05   1.0348E+05   5.4621E+03
+   58   2.1847E+05   1.0192E+05   5.2450E+03
+   59   2.2244E+05   1.0047E+05   5.1601E+03
+   60   2.2982E+05   9.9508E+04   5.0052E+03
+   61   2.4014E+05   9.8948E+04   4.9930E+03
+   62   2.5385E+05   9.9248E+04   5.0378E+03
+   63   2.6870E+05   9.9985E+04   4.9283E+03
+   64   2.8195E+05   1.0059E+05   4.6768E+03
+   65   2.9334E+05   1.0081E+05   4.4285E+03
+   66   3.0322E+05   1.0089E+05   4.1060E+03
+   67   3.1217E+05   1.0124E+05   3.8175E+03
+   68   3.2090E+05   1.0168E+05   3.6904E+03
+   69   3.3034E+05   1.0264E+05   3.7616E+03
+   70   3.4055E+05   1.0443E+05   3.9325E+03
+   71   3.5225E+05   1.0737E+05   4.2092E+03
+   72   3.6310E+05   1.0976E+05   4.3697E+03
+   73   3.7390E+05   1.1203E+05   4.4335E+03
+   74   3.8374E+05   1.1391E+05   4.3845E+03
+   75   3.9189E+05   1.1437E+05   4.2347E+03
+   76   3.9689E+05   1.1255E+05   3.9459E+03
+   77   4.0080E+05   1.0950E+05   3.7334E+03
+   78   4.0102E+05   1.0491E+05   3.5817E+03
+   79   3.9691E+05   9.8727E+04   3.4312E+03
+   80   3.8886E+05   9.2066E+04   3.2759E+03
+   81   3.7438E+05   8.5040E+04   3.1432E+03
+   82   3.5157E+05   7.7692E+04   2.9471E+03
+   83   3.2322E+05   7.0055E+04   2.6754E+03
+   84   2.9056E+05   6.2202E+04   2.3697E+03
+   85   2.5405E+05   5.3745E+04   2.0634E+03
+   86   2.1892E+05   4.5239E+04   1.7469E+03
+   87   1.8720E+05   3.6873E+04   1.4147E+03
+   88   1.5797E+05   2.9020E+04   1.0565E+03
+   89   1.3203E+05   2.2278E+04   7.5594E+02
+   90   1.0988E+05   1.6911E+04   4.9061E+02
+   91   8.9806E+04   1.2697E+04   2.9434E+02
+   92   7.1818E+04   9.4108E+03   1.7924E+02
+   93   5.6949E+04   6.9443E+03   1.4748E+02
+   94   4.5527E+04   4.9903E+03   1.2404E+02
+   95   3.7611E+04   3.3662E+03   1.1620E+02
+   96   3.4069E+04   2.1147E+03   9.2310E+01
+   97   3.4515E+04   1.2505E+03   6.2847E+01
+   98   3.7160E+04   6.9324E+02   3.5536E+01
+   99   4.0407E+04   3.5685E+02   1.6665E+01
+  100   4.3150E+04   2.1284E+02   2.7791E+00
+  %nubeam_comp_exec: #zones for FRANTIC set to match fast ion grid(s):         100
+  %frantic_init_check: completed.
+  %nubeam_comp_exec: nubeam_comp_ps_ini completed.
+  *ps_update_file_write: normal exit,           23  update elements written.
+  ...CALL nbi_states(...,"S",...)
+  (cpu0) ...CALL nbi_states(...,"S",...)
+  % nbi_states: fld_states write OK to filename: ./ips_nbi_fld_state.cdf
+  
+  SUMMARY_TEST output: 
+  
+
+ D beam ion:
+   rho <= 0.25 average  density:  2.603D+11 n/cm3
+   whole plasma average density:  1.581D+11 n/cm3
+   rho <= 0.25 average  parallel energy density:  8.750D-03 Jles/cm3
+   whole plasma average parallel energy density:  3.981D-03 Jles/cm3
+   rho <= 0.25 average  perp energy density:  8.750D-03 Jles/cm3
+   whole plasma average perp energy density:  3.981D-03 Jles/cm3
+
+ He4 fusion product ion:
+   rho <= 0.25 average  density:  4.001D+11 n/cm3
+   whole plasma average density:  9.757D+10 n/cm3
+   rho <= 0.25 average  parallel energy density:  3.016D-02 Jles/cm3
+   whole plasma average parallel energy density:  6.479D-03 Jles/cm3
+   rho <= 0.25 average  perp energy density:  3.016D-02 Jles/cm3
+   whole plasma average perp energy density:  6.479D-03 Jles/cm3
+
+ beam-target neutrons (total):  2.803D+18
+   beam-beam neutrons (total):  1.681D+14
+
+ D beam ion:
+   rho <= 0.25 average  deposition source:  6.867D+11 n/cm3/sec
+   whole plasma average deposition source:  8.010D+11 n/cm3/sec
+   rho <= 0.25 average  deposition source:  8.873D+11 n/cm3/sec
+   whole plasma average deposition source:  7.992D+11 n/cm3/sec
+
+ He4 fusion product ion:
+   deposition source n/cm3/sec: no NUBEAM profile available.
+   rho <= 0.25 average  deposition source:  2.205D+12 n/cm3/sec
+   whole plasma average deposition source:  5.205D+11 n/cm3/sec
+
+ D beam ion trapping fraction:  1.513D-01
+
+ He4 fusion product ion trapping fraction:  2.648D-01
+
+ D beam ion:
+   rho <= 0.25 average  ion parallel energy:  2.103D+02 KeV
+   whole plasma average ion parallel energy:  1.565D+02 KeV
+   rho <= 0.25 average  ion perpendicular energy:  1.325D+02 KeV
+   whole plasma average ion perpendicular energy:  1.662D+02 KeV
+
+ He4 fusion product ion:
+   rho <= 0.25 average  ion parallel energy:  4.704D+02 KeV
+   whole plasma average ion parallel energy:  4.515D+02 KeV
+   rho <= 0.25 average  ion perpendicular energy:  8.934D+02 KeV
+   whole plasma average ion perpendicular energy:  7.763D+02 KeV
+
+ D beam ion:
+   rho <= 0.25 average  lab frame angular velocity:  8.279D+05 1/sec
+   whole plasma average lab frame angular velocity:  7.273D+05 1/sec
+
+ He4 fusion product ion:
+   rho <= 0.25 average  lab frame angular velocity:  1.253D+05 1/sec
+   whole plasma average lab frame angular velocity:  1.152D+05 1/sec
+
+ from all fast ions:
+   rho <= 0.25 average  electron heating (beams):  5.780D-02 W/cm3
+   whole plasma average electron heating (beams):  6.675D-02 W/cm3
+   rho <= 0.25 average  ion heating (beams):  5.380D-02 W/cm3
+   whole plasma average ion heating (beams):  2.797D-02 W/cm3
+   rho <= 0.25 average  beam thermalization power:  9.574D-03 W/cm3
+   whole plasma average beam thermalization power:  2.835D-03 W/cm3
+   rho <= 0.25 average  electron heating (fusion products):  7.354D-01 W/cm3
+   whole plasma average electron heating (fusion products):  2.292D-01 W/cm3
+   rho <= 0.25 average  ion heating (fusion products):  2.628D-01 W/cm3
+   whole plasma average ion heating (fusion products):  6.222D-02 W/cm3
+
+ from all fast ions:
+   rho <= 0.25 average  beam driven current:  7.600D+00 Amps/cm2
+   whole plasma average beam driven current:  4.668D+00 Amps/cm2
+  Total beam driven current:  4.644D+05 Amps.
+   rho <= 0.25 average  fusion product driven current:  5.289D-01 Amps/cm2
+   whole plasma average fusion product driven current:  2.604D-01 Amps/cm2
+  Total fusion product driven current:  2.591D+04 Amps.
+
+ from all fast ions:
+   rho <= 0.25 average  D halo neutral source:  1.533D+08 n/cm3/sec
+   whole plasma average D halo neutral source:  1.521D+08 n/cm3/sec
+   rho <= 0.25 average  T halo neutral source:  1.343D+08 n/cm3/sec
+   whole plasma average T halo neutral source:  1.419D+08 n/cm3/sec
+   He4 halo neutral source n/cm3/sec: no NUBEAM profile available.
+
+ from all fast ions:
+    beam charge exch. sink rate for D 1/sec: no NUBEAM profile available.
+    beam impact ioniz sink rate for D 1/sec: no NUBEAM profile available.
+    beam charge exch. sink rate for T 1/sec: no NUBEAM profile available.
+    beam impact ioniz sink rate for T 1/sec: no NUBEAM profile available.
+    beam charge exch. sink rate for He4 1/sec: no NUBEAM profile available.
+    beam impact ioniz sink rate for He4 1/sec: no NUBEAM profile available.
+
+ from all fast ions:
+   rho <= 0.25 average  electron source:  6.865D+11 n/cm3/sec
+   whole plasma average electron source:  8.007D+11 n/cm3/sec
+   rho <= 0.25 average  D thermal ion source:  1.175D+12 n/cm3/sec
+   whole plasma average D thermal ion source:  7.266D+11 n/cm3/sec
+   rho <= 0.25 average  T thermal ion source: -1.343D+08 n/cm3/sec
+   whole plasma average T thermal ion source: -1.419D+08 n/cm3/sec
+   rho <= 0.25 average  He4 thermal ion source:  1.717D+12 n/cm3/sec
+   whole plasma average He4 thermal ion source:  5.545D+11 n/cm3/sec
+
+ D beam ion:
+   rho <= 0.25 average  90 degree p.a. scatter time:  1.202D+00 sec
+   whole plasma average 90 degree p.a. scatter time:  1.879D+00 sec
+   rho <= 0.25 average  slowing down time:  2.570D-01 sec
+   whole plasma average slowing down time:  1.718D-01 sec
+
+ He4 fusion product ion:
+   rho <= 0.25 average  90 degree p.a. scatter time:  4.185D+00 sec
+   whole plasma average 90 degree p.a. scatter time:  6.495D+00 sec
+   rho <= 0.25 average  slowing down time:  2.156D-01 sec
+   whole plasma average slowing down time:  1.286D-01 sec
+
+ from all fast ions:
+   rho <= 0.25 average  net fast ion torque to plasma:  1.536D-07 Nt-m/cm3
+   whole plasma average net fast ion torque to plasma:  9.776D-08 Nt-m/cm3
+ ... rough power balance ...
+
+ D beam ion:
+    +injected power (W):   2.330D+07
+    +OH -> beam ions:      0.000D+00
+    +compression input:   -8.130D+01
+    -electron heating:     1.616D+07
+    -ion heating:          6.774D+06
+    -"internal" cx loss:   9.264D+01
+    -"external" cx loss:   1.895D+02
+    -shine-through:        1.643D+00
+    -bad orbit loss:       1.269D+05
+    -thermalization:       3.426D+05
+    -ripple loss:          0.000D+00
+    -fishbone loss:        0.000D+00
+    -torque work (JxB):    0.000D+00
+    -torque work (other):  2.881D+04
+    -d/dt(f.i. energy):   -1.381D+05
+       ->residual:         1.943D+03
+
+ He4 fusion product ion:
+    +injected power (W):   7.196D+07
+    +OH -> beam ions:      0.000D+00
+    +compression input:   -1.213D+02
+    -electron heating:     5.551D+07
+    -ion heating:          1.507D+07
+    -"internal" cx loss:   0.000D+00
+    -"external" cx loss:   0.000D+00
+    -shine-through:        0.000D+00
+    -bad orbit loss:       1.367D+06
+    -thermalization:       3.438D+05
+    -ripple loss:          0.000D+00
+    -fishbone loss:        0.000D+00
+    -torque work (JxB):    0.000D+00
+    -torque work (other):  1.465D+04
+    -d/dt(f.i. energy):   -3.215D+05
+       ->residual:        -1.104D+04
+
+ NUBEAM 2d output sampled at [R,Z] = [ 4.630D+02, 5.209D+01] cm
+        flux coords: (rho,theta)   = ( 3.467D-01, 7.827D-01)
+ MCgrid zone index:   34
+ ---> outputs refer to this zone, until noted.
+   MCgrid zone volume:  9.026D+05 cm**3
+
+ D_MCBEAM             n(BDENS2)= 1.863D+11 n(FBM)= 1.863D+11 ptcls/cm3
+ He4_MCFUSN           n(BDENS2)= 2.589D+11 n(FBM)= 2.589D+11 ptcls/cm3
+ D_MCBEAM             Eperp(EBA2PP)= 1.349D+05 Eperp(FBM)= 1.349D+05 eV
+ He4_MCFUSN           Eperp(EBA2PP)= 9.579D+05 Eperp(FBM)= 9.579D+05 eV
+ D_MCBEAM             Epll(EBA2PL)= 2.030D+05 Epll(FBM)= 2.030D+05 eV
+ He4_MCFUSN           Epll(EBA2PL)= 3.838D+05 Epll(FBM)= 3.838D+05 eV
+ D_MCBEAM             v_toroidal(VBTOR2)= 3.365D+08 vpll(FBM)= 3.374D+08 cm/sec
+ He4_MCFUSN           v_toroidal(VBTOR2)= 6.446D+07 vpll(FBM)= 6.464D+07 cm/sec
+
+ D_MCBEAM             cx fast neutral density = 9.803D+00 [neutral atoms]/cm3
+ He4_MCFUSN           cx fast neutral density = 0.000D+00 [neutral atoms]/cm3
+ D_MCBEAM             cx fast neutral <energy> = 9.543D+04 eV
+ He4_MCFUSN           cx fast neutral <energy> = 0.000D+00 eV
+ D_MCBEAM             cx fast neutral <v_toroidal> = 5.018D+08 cm/sec
+ He4_MCFUSN           cx fast neutral <v_toroidal> = 0.000D+00 cm/sec
+
+   interaction of D_MCBEAM and D neutral atoms:
+ SRBN02_D0_D_MCBEAM               neutral source 6.006D+08 atoms/cm3/sec
+   stopping rates for thermal neutrals:
+ SNBN02_D0_D_MCBEAM               <nfast*sigma*v>(cx) 0.000D+00 1/sec
+ SNB0I2_D0_D_MCBEAM               <nfast*sigma*v>(ii) 0.000D+00 1/sec
+
+   interaction of D_MCBEAM and T neutral atoms:
+ SRBN02_T0_D_MCBEAM               neutral source 5.391D+08 atoms/cm3/sec
+   stopping rates for thermal neutrals:
+ SNBN02_T0_D_MCBEAM               <nfast*sigma*v>(cx) 0.000D+00 1/sec
+ SNB0I2_T0_D_MCBEAM               <nfast*sigma*v>(ii) 0.000D+00 1/sec
+
+   interaction of D_MCBEAM and He4 neutral atoms:
+ SRBN02_He40_D_MCBEAM             neutral source 0.000D+00 atoms/cm3/sec
+   stopping rates for thermal neutrals:
+ SNBN02_He40_D_MCBEAM             <nfast*sigma*v>(cx) 0.000D+00 1/sec
+ SNB0I2_He40_D_MCBEAM             <nfast*sigma*v>(ii) 0.000D+00 1/sec
+
+   interaction of He4_MCFUSN and D neutral atoms:
+ SRBN02_D0_He4_MCFUSN             neutral source 0.000D+00 atoms/cm3/sec
+   stopping rates for thermal neutrals:
+ SNBN02_D0_He4_MCFUSN             <nfast*sigma*v>(cx) 0.000D+00 1/sec
+ SNB0I2_D0_He4_MCFUSN             <nfast*sigma*v>(ii) 0.000D+00 1/sec
+
+   interaction of He4_MCFUSN and T neutral atoms:
+ SRBN02_T0_He4_MCFUSN             neutral source 0.000D+00 atoms/cm3/sec
+   stopping rates for thermal neutrals:
+ SNBN02_T0_He4_MCFUSN             <nfast*sigma*v>(cx) 0.000D+00 1/sec
+ SNB0I2_T0_He4_MCFUSN             <nfast*sigma*v>(ii) 0.000D+00 1/sec
+
+   interaction of He4_MCFUSN and He4 neutral atoms:
+ SRBN02_He40_He4_MCFUSN           neutral source 0.000D+00 atoms/cm3/sec
+   stopping rates for thermal neutrals:
+ SNBN02_He40_He4_MCFUSN           <nfast*sigma*v>(cx) 0.000D+00 1/sec
+ SNB0I2_He40_He4_MCFUSN           <nfast*sigma*v>(ii) 0.000D+00 1/sec
+
+ fusion rate data on 2d grid:
+
+ BT_DT_2d                         fusion 1.436D+10 reactions/cm3/sec
+ BT_DDP_2d                        fusion 5.214D+08 reactions/cm3/sec
+ BB_DDP_2d                        fusion 8.056D+05 reactions/cm3/sec
+ BT_DDN_2d                        fusion 6.249D+08 reactions/cm3/sec
+ BB_DDN_2d                        fusion 5.619D+05 reactions/cm3/sec
+
+ ---> end of output for MCgrid zone:   34
+ nubeam STEP completed:  normal exit.

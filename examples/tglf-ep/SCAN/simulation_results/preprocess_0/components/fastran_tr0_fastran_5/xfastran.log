@@ -1,0 +1,66 @@
+srun: Job step's --cpus-per-task value exceeds that of job (128 > 1). Job step may never run.
+========================================================================
+= FASTRAN
+
+nonlinear model = 1
+ichi = 0
+ineo = 0
+reading state...
+read formatted input, inprof...
+init geometry...
+read formatted input, inmetric...
+nrho in inmetric = 101
+rhob in inmetric = 1.835343e+00
+solve avg grad-shafranv...
+solve_avg_gs::Ip_temp = 5.458927e+00 
+solve_avg_gs::Ip      = 8.100000e+00 
+>>> tau_he = 5.000000, nhe(0)=1.487407e+00
+
+ plasma volume = 242.830831
+ stored energy(e,i,b) = 9.242331e+01 7.606963e+01 0.000000e+00
+ betan = 2.727060
+*power
+ Pnb(e,i) = 0.000000e+00 0.000000e+00
+ Prf(e,i) = 2.999998e+01 7.999994e+00
+ Prad     = -1.939886e+01 
+ Pei      = -3.737670e+01 
+ Pfuse    = 6.145443e+01 
+ Pfusi    = 1.844237e+01 
+ Poh      = 0.000000e+00 
+*confinement time
+ taut, tauITER98y2, H98y2 : 1.710625e+00 1.291855e+00 1.324161e+00
+ taue, taui : 2.665120e+00 1.362789e+00
+ taut, tau89, H89 : 1.710625e+00 5.862543e-01 2.917888e+00
+*temperature
+ nea, nebar : 1.882548e+01 2.148520e+01 
+ tea, tia : 7.476604e+00 6.804016e+00 (1.098852e+00)
+ te0, ti0 : 1.732550e+01 1.506315e+01 (1.150190e+00)
+ Sn : 0.000000e+00 
+*current balance
+ Ip,Ibs,Inb,Irf: 8.100000e+00 5.005917e+00 0.000000e+00 0.000000e+00
+ fni,fbs: 0.618 0.618
+
+ plasma volume = 242.830831
+ stored energy(e,i,b) = 9.242331e+01 7.606963e+01 0.000000e+00
+ betan = 2.727060
+*power
+ Pnb(e,i) = 0.000000e+00 0.000000e+00
+ Prf(e,i) = 2.999998e+01 7.999994e+00
+ Prad     = -1.939886e+01 
+ Pei      = -3.737670e+01 
+ Pfuse    = 6.145443e+01 
+ Pfusi    = 1.844237e+01 
+ Poh      = 0.000000e+00 
+*confinement time
+ taut, tauITER98y2, H98y2 : 1.710625e+00 1.291855e+00 1.324161e+00
+ taue, taui : 2.665120e+00 1.362789e+00
+ taut, tau89, H89 : 1.710625e+00 5.862543e-01 2.917888e+00
+*temperature
+ nea, nebar : 1.882548e+01 2.148520e+01 
+ tea, tia : 7.476604e+00 6.804016e+00 (1.098852e+00)
+ te0, ti0 : 1.732550e+01 1.506315e+01 (1.150190e+00)
+ Sn : 0.000000e+00 
+*current balance
+ Ip,Ibs,Inb,Irf: 8.100000e+00 5.005917e+00 0.000000e+00 0.000000e+00
+ fni,fbs: 0.618 0.618
+ ELAPASED TIME = 0 sec

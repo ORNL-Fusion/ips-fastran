@@ -1,0 +1,7 @@
+NCAPTC: : NetCDF: Variable not found
+Warning: ieee_overflow is signaling
+Warning: ieee_underflow is signaling
+Warning: ieee_inexact is signaling
+FORTRAN STOP
+/global/common/software/atom/perlmutter/cesol/conda/v0.16.2/lib/python3.8/site-packages/scipy/optimize/_minpack_py.py:476: RuntimeWarning: Number of calls to function has reached maxfev = 3600.
+  warnings.warn(errors[info][0], RuntimeWarning)

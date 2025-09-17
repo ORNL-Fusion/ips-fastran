@@ -1,0 +1,5 @@
+2025-09-09 16:19:36,122 FRAMEWORK       WARNING  RM: listOfNodes = [('nid005605', 128), ('nid005709', 128), ('nid005742', 128), ('nid006092', 128), ('nid006162', 128), ('nid006431', 128), ('nid006438', 128), ('nid006447', 128), ('nid006519', 128), ('nid006823', 128)]
+2025-09-09 16:19:36,124 FRAMEWORK       WARNING  RM: max_ppn = 128 
+2025-09-09 16:19:36,124 FRAMEWORK       WARNING  Using user set procs per node: 128
+2025-09-09 16:19:36,124 FRAMEWORK       WARNING  RM: 10 nodes and 128 processors per node
+2025-09-09 16:19:36,197 FWK_COMP_PortalBridge_10 WARNING  Missing USER_W3_DIR configuration - disabling web-visible logging

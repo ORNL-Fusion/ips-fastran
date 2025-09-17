@@ -1,0 +1,31 @@
+09Sep2025 16:23:07.53 [07] -openLog: PID=209618 info_level=1
+09Sep2025 16:23:07.53 [07] !c_setloglevel: info_level set to: 1
+09Sep2025 16:23:07.54 [07] \Enter\ nubeam_step_child
+09Sep2025 16:23:07.85 [07]   ! nbi_chunks_find_int: MAX_MPI_INT_BLOCK environment variable: undefined. use default  = 2000000
+09Sep2025 16:23:07.85 [07]   ! nbi_chunks_find_r8: MAX_MPI_R8_BLOCK environment variable: undefined. use default  = 30000000
+09Sep2025 16:23:08.17 [07]   !NBSTART: WARNING --
+09Sep2025 16:23:08.17 [07]   !   stop time of previous timestep = 5.000000e-02
+09Sep2025 16:23:08.17 [07]   !   start time of current timestep = 0.000000e+00
+09Sep2025 16:23:10.61 [07]   !
+09Sep2025 16:23:10.61 [07]   !IN NBSTART: myidd= 7
+09Sep2025 16:23:10.61 [07]   !Total time in nbstart= 2.619369e-01
+09Sep2025 16:23:10.61 [07]   !Total time for file read= 2.999991e-08
+09Sep2025 16:23:10.61 [07]   !
+09Sep2025 16:23:10.61 [07]   !IN DEPALL: myidd= 7
+09Sep2025 16:23:10.61 [07]   !Total parallel processing time= 2.899386e-02
+09Sep2025 16:23:10.61 [07]   !Total time for calculation= 1.333491e-01
+09Sep2025 16:23:10.61 [07]   !Total time in depall/add_track= 2.375068e-02
+09Sep2025 16:23:10.61 [07]   !Time for MPI dpt_gather= 0.000000e+00
+09Sep2025 16:23:10.61 [07]   !Total time in depall= 1.623429e-01
+09Sep2025 16:23:10.61 [07]   !
+09Sep2025 16:23:10.61 [07]   !IN ORBALL: myidd= 7
+09Sep2025 16:23:10.61 [07]   !Time for MPI BUF Reduce= 5.781133e-01
+09Sep2025 16:23:10.61 [07]   !Time for calculation= 1.438880e+00
+09Sep2025 16:23:10.61 [07]   !Total time in orball= 2.016993e+00
+09Sep2025 16:23:10.61 [07]   !Total time in orball (using cptim)= 2.012835e+00
+09Sep2025 16:23:10.61 [07]   !
+09Sep2025 16:23:10.61 [07]   !IN NBSTART, DEPALL, ORBALL: myidd= 7
+09Sep2025 16:23:10.61 [07]   !Total time = 2.441273e+00
+09Sep2025 16:23:10.61 [07]   !
+09Sep2025 16:23:10.62 [07] /Exit / nubeam_step_child
+09Sep2025 16:23:10.98 [07] \Enter\ nbi_avg_bsource

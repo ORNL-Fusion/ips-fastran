@@ -1,0 +1,37 @@
+0       # Zero radial gridpoints triggers input.profiles read
+0.92
+0.9
+1.02
+1.54
+1.67
+0.15
+0.622
+1.75
+1.0
+0.2
+0.0
+3.8
+1.0
+0.5
+0.1
+1.0
+2.0    # Main ion mass in AMU 
+1.0    # Main ion charge in e
+3.0    # Secondary thermal ion mass in AMU
+1.0    # Secondary thermal ion charge in e
+0.5    # Fraction of primary thermal ion
+4.0    # EP ion mass in AMU
+2.0    # EP ion charge in e 
+3.5   # Effective injection energy in MeV (for Angioni model, probably can elliminate)
+3.0
+1.1
+1.1
+0
+1
+1
+1
+alpha_dpdr_crit.input
+4
+1.0
+null
+input.gacode
