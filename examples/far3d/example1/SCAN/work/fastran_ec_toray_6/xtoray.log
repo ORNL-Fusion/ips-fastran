@@ -1,0 +1,49 @@
+
+ running toray 1.9 (12 July 2012)
+
+  resetting kj=          102  (           52 )
+ Reading in namelist from toray.in ... 
+
+ Ray pattern = .gauss.   Number of rays =            30
+
+ running GAFIT version 4.0 (12 July 2012)
+
+ no GAFIT namelist input - using defaults
+
+  TorGA_read_psiin:: nr =           129  (           65 )
+  TorGA_read_psiin:: nz =           129  (           65 )
+ Ray=   1  ISTOP= 7   IFLAG= 2  AT     0.168404E+03    0.289850E+02    0.243338E+01
+ Ray=   2  ISTOP= 7   IFLAG= 2  AT     0.168277E+03    0.314884E+02    0.279265E+01
+ Ray=   3  ISTOP= 7   IFLAG= 2  AT     0.168453E+03    0.293850E+02   -0.199685E+00
+ Ray=   4  ISTOP= 7   IFLAG= 2  AT     0.168534E+03    0.268229E+02    0.508789E+00
+ Ray=   5  ISTOP= 7   IFLAG= 2  AT     0.168523E+03    0.271692E+02    0.386641E+01
+ Ray=   6  ISTOP= 7   IFLAG= 2  AT     0.168464E+03    0.300275E+02    0.535423E+01
+ Ray=   7  ISTOP= 7   IFLAG= 2  AT     0.168364E+03    0.327471E+02    0.778478E+01
+ Ray=   8  ISTOP= 7   IFLAG= 2  AT     0.168195E+03    0.340727E+02    0.539503E+01
+ Ray=   9  ISTOP= 7   IFLAG= 2  AT     0.168266E+03    0.338574E+02    0.217434E+01
+ Ray=  10  ISTOP= 7   IFLAG= 2  AT     0.168575E+03    0.322346E+02   -0.837645E+00
+ Ray=  11  ISTOP= 7   IFLAG= 2  AT     0.168664E+03    0.299451E+02   -0.271834E+01
+ Ray=  12  ISTOP= 7   IFLAG= 2  AT     0.168769E+03    0.274415E+02   -0.323259E+01
+ Ray=  13  ISTOP= 7   IFLAG= 2  AT     0.168604E+03    0.254522E+02   -0.223666E+01
+ Ray=  14  ISTOP= 7   IFLAG= 2  AT     0.168629E+03    0.242449E+02   -0.129232E+00
+ Ray=  15  ISTOP= 7   IFLAG= 2  AT     0.168357E+03    0.243654E+02    0.285930E+01
+ Ray=  16  ISTOP= 7   IFLAG= 2  AT     0.168429E+03    0.255861E+02    0.576354E+01
+ Ray=  17  ISTOP= 7   IFLAG= 2  AT     0.168496E+03    0.277826E+02    0.792848E+01
+ Ray=  18  ISTOP= 7   IFLAG= 2  AT     0.168192E+03    0.305776E+02    0.889729E+01
+ Ray=  19  ISTOP= 7   IFLAG= 2  AT     0.168170E+03    0.336353E+02    0.141315E+02
+ Ray=  20  ISTOP= 7   IFLAG= 2  AT     0.167904E+03    0.373194E+02    0.111982E+02
+ Ray=  21  ISTOP= 7   IFLAG= 2  AT     0.168200E+03    0.382548E+02    0.554977E+01
+ Ray=  22  ISTOP= 7   IFLAG= 2  AT     0.168288E+03    0.367678E+02   -0.227818E+00
+ Ray=  23  ISTOP= 7   IFLAG= 2  AT     0.168486E+03    0.333274E+02   -0.463133E+01
+ Ray=  24  ISTOP= 7   IFLAG= 2  AT     0.168876E+03    0.289307E+02   -0.688441E+01
+ Ray=  25  ISTOP= 7   IFLAG= 2  AT     0.168873E+03    0.248978E+02   -0.664110E+01
+ Ray=  26  ISTOP= 7   IFLAG= 2  AT     0.168565E+03    0.219813E+02   -0.410373E+01
+ Ray=  27  ISTOP= 7   IFLAG= 2  AT     0.168404E+03    0.206895E+02    0.140489E+00
+ Ray=  28  ISTOP= 7   IFLAG= 2  AT     0.168283E+03    0.215243E+02    0.537792E+01
+ Ray=  29  ISTOP= 7   IFLAG= 2  AT     0.168263E+03    0.244449E+02    0.103796E+02
+ Ray=  30  ISTOP= 7   IFLAG= 2  AT     0.168121E+03    0.289440E+02    0.138442E+02
+ TorGa_wrtnetcdf,  kopt=            1
+ TorGa_wrtnetcdf,  kopt=            0
+
+ TORAY-GA         total CPU time       0.31 sec
+

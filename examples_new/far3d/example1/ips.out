@@ -9,7 +9,7 @@ Created <class 'fastran.heating.nubeam.nubeam'>
 Created <class 'fastran.equilibrium.efit.efit'>
 Created <class 'fastran.solver.fastran.fastran'>
 Created <class 'fastran.stability.far3d.far3d'>
-IPS SLURM_NODES =  [('nid006005', 256)]
+IPS SLURM_NODES =  [('nid005367', 256)]
 fastran_init.init() started
 state_files: s000001.00001 g000001.00001 i000001.00001
 create null s000001.00001
@@ -131,7 +131,7 @@ weigting upper xpoint: [14, 15, 16, 17]
 weigting lower xpoint: [44, 45, 46, 47]
 run efit
 efit, subprocess
-elapsed time =  0.260  1.388
+elapsed time =  0.258  1.396
 error_efit = 5.736e-05
 *** generate kfile 1
 apply underrelaxation
@@ -146,7 +146,7 @@ diff_p = 0.14699109941040772
 diff_f = 0.37443573666593755
 run efit
 efit, subprocess
-elapsed time =  0.273  1.383
+elapsed time =  0.307  1.377
 error_efit = 8.91e-05
 *** generate kfile 2
 apply underrelaxation
@@ -161,7 +161,7 @@ diff_p = 0.12569220465507577
 diff_f = 0.3870882289060812
 run efit
 efit, subprocess
-elapsed time =  0.283  1.334
+elapsed time =  0.391  1.343
 error_efit = 8.145e-05
 *** generate kfile 3
 apply underrelaxation
@@ -176,7 +176,7 @@ diff_p = 0.07976725313081023
 diff_f = 0.283809306508198
 run efit
 efit, subprocess
-elapsed time =  0.275  1.324
+elapsed time =  0.293  1.311
 error_efit = 9.805e-05
 *** generate kfile 4
 apply underrelaxation
@@ -191,7 +191,7 @@ diff_p = 0.04338316623643166
 diff_f = 0.16656573545555206
 run efit
 efit, subprocess
-elapsed time =  0.271  1.339
+elapsed time =  0.281  1.355
 error_efit = 9.805e-05
 *** generate kfile 5
 apply underrelaxation
@@ -270,7 +270,7 @@ diff_p = 0.021164395405711602
 diff_f = 0.08210449620075057
 run efit
 efit, subprocess
-elapsed time =  0.296  1.346
+elapsed time =  0.292  1.329
 error_efit = 9.359e-05
 *** generate kfile 6
 apply underrelaxation
@@ -285,7 +285,7 @@ diff_p = 0.00958627943003868
 diff_f = 0.03570248392481341
 run efit
 efit, subprocess
-elapsed time =  0.292  1.316
+elapsed time =  0.284  1.386
 error_efit = 6.251e-05
 *** generate kfile 7
 apply underrelaxation
@@ -300,7 +300,7 @@ diff_p = 0.004329184877500629
 diff_f = 0.014812336354039118
 run efit
 efit, subprocess
-elapsed time =  0.269  1.315
+elapsed time =  0.317  1.310
 error_efit = 6.573e-05
 *** generate kfile 8
 apply underrelaxation
@@ -429,7 +429,7 @@ weigting upper xpoint: [14, 15, 16, 17]
 weigting lower xpoint: [44, 45, 46, 47]
 run efit
 efit, subprocess
-elapsed time =  0.248  1.329
+elapsed time =  0.242  1.839
 error_efit = 6.593e-05
 *** generate kfile 1
 apply underrelaxation
@@ -444,7 +444,7 @@ diff_p = 0.08476298504249075
 diff_f = 0.22932442243342074
 run efit
 efit, subprocess
-elapsed time =  0.281  1.515
+elapsed time =  0.275  1.499
 error_efit = 9.075e-05
 *** generate kfile 2
 apply underrelaxation
@@ -459,7 +459,7 @@ diff_p = 0.08434440242317419
 diff_f = 0.20694543694838644
 run efit
 efit, subprocess
-elapsed time =  0.285  1.281
+elapsed time =  0.293  1.294
 error_efit = 8.03e-05
 *** generate kfile 3
 apply underrelaxation
@@ -474,7 +474,7 @@ diff_p = 0.05967406386704125
 diff_f = 0.13650901034568114
 run efit
 efit, subprocess
-elapsed time =  0.293  1.335
+elapsed time =  0.290  1.298
 error_efit = 7.237e-05
 *** generate kfile 4
 apply underrelaxation
@@ -553,7 +553,7 @@ diff_p = 0.03608488508113524
 diff_f = 0.07934627920579909
 run efit
 efit, subprocess
-elapsed time =  0.326  1.291
+elapsed time =  0.301  1.261
 error_efit = 6.723e-05
 *** generate kfile 5
 apply underrelaxation
@@ -568,7 +568,7 @@ diff_p = 0.020302978560011016
 diff_f = 0.04377110429044997
 run efit
 efit, subprocess
-elapsed time =  0.275  1.296
+elapsed time =  0.282  1.282
 error_efit = 6.277e-05
 *** generate kfile 6
 apply underrelaxation
@@ -583,7 +583,7 @@ diff_p = 0.011524696678756273
 diff_f = 0.024500906088796983
 run efit
 efit, subprocess
-elapsed time =  0.279  1.290
+elapsed time =  0.282  1.327
 error_efit = 6.283e-05
 *** generate kfile 7
 apply underrelaxation
@@ -598,7 +598,7 @@ diff_p = 0.007078996819268922
 diff_f = 0.015046028689900218
 run efit
 efit, subprocess
-elapsed time =  0.283  1.296
+elapsed time =  0.267  1.269
 error_efit = 7.297e-05
 *** generate kfile 8
 apply underrelaxation
@@ -613,7 +613,7 @@ diff_p = 0.00483023229702317
 diff_f = 0.010374771716623927
 run efit
 efit, subprocess
-elapsed time =  0.295  1.302
+elapsed time =  0.289  1.285
 error_efit = 7.309e-05
 *** generate kfile 9
 apply underrelaxation
@@ -736,7 +736,7 @@ weigting upper xpoint: [14, 15, 16, 17]
 weigting lower xpoint: [44, 45, 46, 47]
 run efit
 efit, subprocess
-elapsed time =  0.242  1.288
+elapsed time =  0.245  1.281
 error_efit = 9.532e-05
 *** generate kfile 1
 apply underrelaxation
@@ -815,7 +815,7 @@ diff_p = 0.008115494632765041
 diff_f = 0.015496603814540096
 run efit
 efit, subprocess
-elapsed time =  0.282  1.290
+elapsed time =  0.278  1.313
 error_efit = 9.192e-05
 *** generate kfile 2
 apply underrelaxation
@@ -830,7 +830,7 @@ diff_p = 0.006528983580475037
 diff_f = 0.011882186343545596
 run efit
 efit, subprocess
-elapsed time =  0.281  1.286
+elapsed time =  0.300  1.286
 error_efit = 8.884e-05
 *** generate kfile 3
 apply underrelaxation
@@ -957,7 +957,7 @@ weigting upper xpoint: [14, 15, 16, 17]
 weigting lower xpoint: [44, 45, 46, 47]
 run efit
 efit, subprocess
-elapsed time =  0.244  1.332
+elapsed time =  0.238  1.322
 error_efit = 6.414e-05
 *** generate kfile 1
 apply underrelaxation
@@ -1264,7 +1264,7 @@ weigting upper xpoint: [14, 15, 16, 17]
 weigting lower xpoint: [44, 45, 46, 47]
 run efit
 efit, subprocess
-elapsed time =  0.244  1.349
+elapsed time =  0.242  1.390
 error_efit = 7.176e-05
 *** generate kfile 1
 apply underrelaxation
@@ -1279,7 +1279,7 @@ diff_p = 0.017193059087208327
 diff_f = 0.019148618598297192
 run efit
 efit, subprocess
-elapsed time =  0.270  1.376
+elapsed time =  0.279  1.362
 error_efit = 7.759e-05
 *** generate kfile 2
 apply underrelaxation
@@ -1358,7 +1358,7 @@ diff_p = 0.011526745521158732
 diff_f = 0.014453425006776809
 run efit
 efit, subprocess
-elapsed time =  0.288  1.338
+elapsed time =  0.273  1.347
 error_efit = 9.442e-05
 *** generate kfile 3
 apply underrelaxation
@@ -1373,7 +1373,7 @@ diff_p = 0.010341238058040082
 diff_f = 0.008628039765691434
 run efit
 efit, subprocess
-elapsed time =  0.301  1.376
+elapsed time =  0.299  1.437
 error_efit = 7.082e-05
 *** generate kfile 4
 apply underrelaxation
@@ -1388,7 +1388,7 @@ diff_p = 0.015371226354364685
 diff_f = 0.007267312648845907
 run efit
 efit, subprocess
-elapsed time =  0.285  1.400
+elapsed time =  0.283  1.537
 error_efit = 7.694e-05
 *** generate kfile 5
 apply underrelaxation
@@ -1403,7 +1403,7 @@ diff_p = 0.015995772655740037
 diff_f = 0.0061872178241163
 run efit
 efit, subprocess
-elapsed time =  0.282  1.369
+elapsed time =  0.269  1.375
 error_efit = 8.079e-05
 *** generate kfile 6
 apply underrelaxation
@@ -1418,7 +1418,7 @@ diff_p = 0.013764456931982494
 diff_f = 0.005955088280351517
 run efit
 efit, subprocess
-elapsed time =  0.274  1.460
+elapsed time =  0.278  1.395
 error_efit = 8.309e-05
 *** generate kfile 7
 apply underrelaxation
@@ -1433,7 +1433,7 @@ diff_p = 0.010516926365699744
 diff_f = 0.004830000584484423
 run efit
 efit, subprocess
-elapsed time =  0.400  1.406
+elapsed time =  0.308  1.393
 error_efit = 8.445e-05
 *** generate kfile 8
 apply underrelaxation

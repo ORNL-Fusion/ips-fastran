@@ -5,16 +5,16 @@ using accurate nodes: True
 # time (in seconds since the | available | allocated | percent allocated | processes | percent used | notes 
 #   resource manager started |           |           |                   |           |              |
 #-----------------------------------------------------------------------------------------------------------
-                     3.77857 |       128 |         0 |              0.00 |         0 |        0.00  #  initial state of resources
-                     8.07375 |         0 |       128 |            100.00 |         1 |        0.78  #  allocation for task 1 using whole nodes
-                    10.59251 |       128 |         0 |              0.00 |         0 |        0.00  #  released nodes for task 1
-                    26.34075 |         0 |       128 |            100.00 |         1 |        0.78  #  allocation for task 2 using whole nodes
-                    27.00373 |       128 |         0 |              0.00 |         0 |        0.00  #  released nodes for task 2
-                    45.99874 |         0 |       128 |            100.00 |         1 |        0.78  #  allocation for task 3 using whole nodes
-                    46.43711 |       128 |         0 |              0.00 |         0 |        0.00  #  released nodes for task 3
-                    55.32995 |         0 |       128 |            100.00 |         1 |        0.78  #  allocation for task 4 using whole nodes
-                    55.76177 |       128 |         0 |              0.00 |         0 |        0.00  #  released nodes for task 4
-                    61.84015 |         0 |       128 |            100.00 |         1 |        0.78  #  allocation for task 5 using whole nodes
-                    62.31105 |       128 |         0 |              0.00 |         0 |        0.00  #  released nodes for task 5
-                    81.35162 |         0 |       128 |            100.00 |         1 |        0.78  #  allocation for task 6 using whole nodes
-                    81.78054 |       128 |         0 |              0.00 |         0 |        0.00  #  released nodes for task 6
+                     2.67583 |       128 |         0 |              0.00 |         0 |        0.00  #  initial state of resources
+                     6.76933 |         0 |       128 |            100.00 |         1 |        0.78  #  allocation for task 1 using whole nodes
+                     8.61478 |       128 |         0 |              0.00 |         0 |        0.00  #  released nodes for task 1
+                    24.51495 |         0 |       128 |            100.00 |         1 |        0.78  #  allocation for task 2 using whole nodes
+                    25.05804 |       128 |         0 |              0.00 |         0 |        0.00  #  released nodes for task 2
+                    44.40550 |         0 |       128 |            100.00 |         1 |        0.78  #  allocation for task 3 using whole nodes
+                    44.83176 |       128 |         0 |              0.00 |         0 |        0.00  #  released nodes for task 3
+                    53.75561 |         0 |       128 |            100.00 |         1 |        0.78  #  allocation for task 4 using whole nodes
+                    54.30425 |       128 |         0 |              0.00 |         0 |        0.00  #  released nodes for task 4
+                    59.88217 |         0 |       128 |            100.00 |         1 |        0.78  #  allocation for task 5 using whole nodes
+                    60.30645 |       128 |         0 |              0.00 |         0 |        0.00  #  released nodes for task 5
+                    78.66223 |         0 |       128 |            100.00 |         1 |        0.78  #  allocation for task 6 using whole nodes
+                    79.10470 |       128 |         0 |              0.00 |         0 |        0.00  #  released nodes for task 6

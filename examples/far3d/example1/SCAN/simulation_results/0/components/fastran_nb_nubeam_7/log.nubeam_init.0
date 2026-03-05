@@ -1,0 +1,98 @@
+  
+  ==> nubeam_comp_exec Jun 2011 vsn (server mod: DMC) 
+  
+%nubeam_comp_exec: MPI Mode: myid=     0 proc_name= nid004386
+  %nubeam_comp_exec:  NUBEAM_ACTION = INIT (rng init from system clock).
+  %nubeam_comp_exec: NUBEAM_WORKPATH: ./
+  open_new: ./nubeam_status_summary.log
+  open_new: ./nubeam_save_files.output
+  %nubeam_comp_exec: LOG_LEVEL env. var:
+  !nubeam_comp_exec:   LOGFILE_LEVEL: warn
+  %nubeam_comp_exec: postprocessing option: NONE.
+  %nubeam_comp_exec: open file: ./nubeam_init_files.dat
+  %nubeam_comp_exec: read namelist in file:
+  
+   NUBEAM_FILES namelist contents:
+  
+      input_plasma_state = "s000001.00001"
+      output_plasma_state = ""
+      plasma_state_update = "state_changes.cdf"
+  
+      init_namelist = "nubeam_init_input.dat"
+      init_cdf = ""
+  
+      step_namelist = ""
+      step_cdf = ""
+  
+      RF_idata = ""
+      RF_odata = ""
+  
+  %nubeam_comp_exec: namelist logic check OK.
+ nubeam_comp_exec: complete non-STEP environment.
+ nubeam_comp_exec finished with environment.
+  (mpi_share_env) process myid=           0  cwd: /pscratch/sd/y/yashu_gh/FREDA_KSTAR_2/ips-fastran/examples/far3d/example1/SCAN/work/fastran_nb_nubeam_7
+  %nubeam_comp_exec[0:3]: myid=           0  -- mpi_share_env OK.
+ -------------------------------------------- 
+ process_id:            0  mpi_printenv:
+  _cwd =
+    /pscratch/sd/y/yashu_gh/FREDA_KSTAR_2/ips-fastran/examples/far3d/example1/SCAN/work/fastran_nb_nubeam_7
+  _nargs = 0
+  FRANTIC_INIT = 
+  FRANTIC_ACTION = 
+  NUBEAM_ACTION = INIT
+  NUBEAM_WORKPATH = ./
+  LOG_LEVEL = 
+  LOGFILE_LEVEL = warn
+  MAX_MPI_INT_BLOCK = 
+  MAX_MPI_R8_BLOCK = 
+  PREACTDIR = /global/common/software/atom/perlmutter/data/nubeam/PREACT
+  ADASDIR = /global/common/software/atom/perlmutter/data/nubeam/ADAS
+  NUBEAM_POSTPROC = NONE
+  NUBEAM_REPEAT_COUNT = 1
+  STEPFLAG = FALSE
+  LIST_FLAG = FALSE
+  SERVER_FLAG = FALSE
+  PPPLCLUSTER_HOME = 
+  MPI_SHARE_ENV_DEBUG = 
+ end mpi_printenv
+ ------------------------ 
+ 
+  ps_init_tag: Plasma State v2.035 f90 module initialization.
+  
+  %plasma_state_get: WARNING, version_id mismatch:
+   Version_ID of current software: "2.035".
+   Version_ID found in file:       "2.055".
+  
+   ...Hash code checks disabled.
+   ...Error handling modified.
+  
+  %plasma_state_get: warning: variable name = "nmini_bdy":
+   NetCDF message: NetCDF: Variable not found
+  %nubeam_comp_exec: state file(s) read OK.
+  %using default filename: ./ips_nbi_fld_state.cdf
+  %nubeam_comp_exec: init_namelist read OK.
+   setting NZONES to match Plasma State (NBI or FUS):  ss_in%nrho_nbi - 1 =          100
+  
+  
+   ---> RNG seed reset to:    905267521
+  
+  
+   executing NUBEAM initialization:
+  
+ cpu time (sec) in nubeam_ctrl_init:   1.0550E-03
+  %nubeam_comp_exec: nubeam_ctrl_init OK.
+  
+   complete NUBEAM initialization: call nubeam_ctrl_nostep(...)
+    nbi_getprofiles ne*dVol sum (input): 3.1985E+20
+    nbi_getprofiles ne*dVol sum (ions):  3.1985E+20
+ % nbi_alloc2_init: nbi_alloc2 done
+  %nubeam_comp_exec: nubeam_ctrl_nostep OK.
+  %nubeam_comp_exec: nubeam_chk_state_grids OK.
+  %nubeam_comp_exec: #zones for FRANTIC set to match fast ion grid(s):         100
+  %frantic_init_check: completed.
+  %nubeam_comp_exec: nubeam_comp_ps_ini completed.
+  *ps_update_file_write: normal exit,            0  update elements written.
+  ...CALL nbi_states(...,"S",...)
+  (cpu0) ...CALL nbi_states(...,"S",...)
+  % nbi_states: fld_states write OK to filename: ./ips_nbi_fld_state.cdf
+ nubeam INIT completed:  normal exit.

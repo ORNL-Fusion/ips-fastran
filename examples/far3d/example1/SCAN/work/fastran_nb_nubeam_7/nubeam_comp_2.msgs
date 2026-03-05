@@ -1,0 +1,951 @@
+ -------------------------------------------- 
+ process_id:            2  mpi_printenv:
+  _cwd =
+    /pscratch/sd/y/yashu_gh/FREDA_KSTAR_2/ips-fastran/examples/far3d/example1/SCAN/work/fastran_nb_nubeam_7
+  _nargs = 0
+  FRANTIC_INIT = 
+  FRANTIC_ACTION = NONE
+  NUBEAM_ACTION = STEP
+  NUBEAM_WORKPATH = ./
+  LOG_LEVEL = 
+  LOGFILE_LEVEL = warn
+  MAX_MPI_INT_BLOCK = 
+  MAX_MPI_R8_BLOCK = 
+  PREACTDIR = /global/common/software/atom/perlmutter/data/nubeam/PREACT
+  ADASDIR = /global/common/software/atom/perlmutter/data/nubeam/ADAS
+  NUBEAM_POSTPROC = SUMMARY_TEST
+  NUBEAM_REPEAT_COUNT = 10x0.020000
+  STEPFLAG = TRUE
+  LIST_FLAG = FALSE
+  SERVER_FLAG = FALSE
+  PPPLCLUSTER_HOME = 
+  MPI_SHARE_ENV_DEBUG = 
+ end mpi_printenv
+ ------------------------ 
+ 
+  %nubeam_comp_exec:  NUBEAM_ACTION = STEP.
+  
+   executing NUBEAM step:           1
+  ==> Entering NUBEAM_STEP_CHILD, MPI myidd =            2
+ % nbi_alloc2_init: nbi_alloc2 done
+  NBI_INTERP_PROFILES... 
+    nbi_getprofiles ne*dVol sum (input): 3.1985E+20
+    nbi_getprofiles ne*dVol sum (ions):  3.1985E+20
+  NBSTART... 
+  %nbatom deposition model: lev_nbidep=           1
+  %nbatom deposition model: NSIGEXC=           1
+ %sigfacz (exc.states) Erel= 4.6420E+03 out of range
+   min= 2.0000E+04 max= 1.0000E+07 eV/amu; fixup taken.
+ %sigfacz (exc.states) Erel= 4.9545E+03 out of range
+   min= 2.0000E+04 max= 1.0000E+07 eV/amu; fixup taken.
+ %sigfacz (exc.states) Erel= 5.2670E+03 out of range
+   min= 2.0000E+04 max= 1.0000E+07 eV/amu; fixup taken.
+ %sigfacz (exc.states) Erel= 5.5795E+03 out of range
+   min= 2.0000E+04 max= 1.0000E+07 eV/amu; fixup taken.
+ %sigfacz (exc.states) Te= 9.7137E+02 out of range
+   min= 1.0000E+03 max= 5.0000E+04 eV; fixup taken.
+ %sigfacz (exc.states) Te= 9.7137E+02 out of range
+   min= 1.0000E+03 max= 5.0000E+04 eV; fixup taken.
+ %sigfacz (exc.states) Te= 9.7137E+02 out of range
+   min= 1.0000E+03 max= 5.0000E+04 eV; fixup taken.
+ %sigfacz (exc.states) Te= 9.7137E+02 out of range
+   min= 1.0000E+03 max= 5.0000E+04 eV; fixup taken.
+  %nbatom deposition model: lev_nbidep=           1
+  %nbatom deposition model: NSIGEXC=           1
+  DEPALL... 
+  DEPALL EXITED            0
+  ORBALL... 
+  ORBALL EXITED            0
+  ==> Exiting NUBEAM_STEP_CHILD, MPI myidd =            2
+  
+   executing NUBEAM step:           2
+  ==> Entering NUBEAM_STEP_CHILD, MPI myidd =            2
+ %nbi_alloc: backz already allocated; exiting.
+ %nbi_alloc2: ebb_rel_co already allocated; exiting.
+  NBI_INTERP_PROFILES... 
+    nbi_getprofiles ne*dVol sum (input): 3.1985E+20
+    nbi_getprofiles ne*dVol sum (ions):  3.2550E+20
+  %nbi_getprofiles: quasineutrality check => 
+   use externally provided fast ion densities.
+  ==> retry using input data for fast densities.
+    nbi_getprofiles ne*dVol sum (input): 3.1985E+20
+    nbi_getprofiles ne*dVol sum (ions):  3.1985E+20
+  NBSTART... 
+  %nbatom deposition model: lev_nbidep=           1
+  %nbatom deposition model: NSIGEXC=           1
+  %nbatom deposition model: lev_nbidep=           1
+  %nbatom deposition model: NSIGEXC=           1
+  DEPALL... 
+  DEPALL EXITED            0
+  ORBALL... 
+  %trackr(xstraln): too many re-entries, track truncated.
+  ORBALL EXITED            0
+  ==> Exiting NUBEAM_STEP_CHILD, MPI myidd =            2
+  
+   executing NUBEAM step:           3
+  ==> Entering NUBEAM_STEP_CHILD, MPI myidd =            2
+ %nbi_alloc: backz already allocated; exiting.
+ %nbi_alloc2: ebb_rel_co already allocated; exiting.
+  NBI_INTERP_PROFILES... 
+    nbi_getprofiles ne*dVol sum (input): 3.1985E+20
+    nbi_getprofiles ne*dVol sum (ions):  3.3402E+20
+  %nbi_getprofiles: quasineutrality check => 
+   use externally provided fast ion densities.
+  ==> retry using input data for fast densities.
+    nbi_getprofiles ne*dVol sum (input): 3.1985E+20
+    nbi_getprofiles ne*dVol sum (ions):  3.1985E+20
+  NBSTART... 
+  %nbatom deposition model: lev_nbidep=           1
+  %nbatom deposition model: NSIGEXC=           1
+  %nbatom deposition model: lev_nbidep=           1
+  %nbatom deposition model: NSIGEXC=           1
+  DEPALL... 
+  DEPALL EXITED            0
+  ORBALL... 
+  ORBALL EXITED            0
+  ==> Exiting NUBEAM_STEP_CHILD, MPI myidd =            2
+  
+   executing NUBEAM step:           4
+  ==> Entering NUBEAM_STEP_CHILD, MPI myidd =            2
+ %nbi_alloc: backz already allocated; exiting.
+ %nbi_alloc2: ebb_rel_co already allocated; exiting.
+  NBI_INTERP_PROFILES... 
+    nbi_getprofiles ne*dVol sum (input): 3.1985E+20
+    nbi_getprofiles ne*dVol sum (ions):  3.3921E+20
+  %nbi_getprofiles: quasineutrality check => 
+   use externally provided fast ion densities.
+  ==> retry using input data for fast densities.
+    nbi_getprofiles ne*dVol sum (input): 3.1985E+20
+    nbi_getprofiles ne*dVol sum (ions):  3.1985E+20
+  NBSTART... 
+  %nbatom deposition model: lev_nbidep=           1
+  %nbatom deposition model: NSIGEXC=           1
+  %nbatom deposition model: lev_nbidep=           1
+  %nbatom deposition model: NSIGEXC=           1
+  DEPALL... 
+  DEPALL EXITED            0
+  ORBALL... 
+  ORBALL EXITED            0
+  ==> Exiting NUBEAM_STEP_CHILD, MPI myidd =            2
+  
+   executing NUBEAM step:           5
+  ==> Entering NUBEAM_STEP_CHILD, MPI myidd =            2
+ %nbi_alloc: backz already allocated; exiting.
+ %nbi_alloc2: ebb_rel_co already allocated; exiting.
+  NBI_INTERP_PROFILES... 
+    nbi_getprofiles ne*dVol sum (input): 3.1985E+20
+    nbi_getprofiles ne*dVol sum (ions):  3.4152E+20
+  %nbi_getprofiles: quasineutrality check => 
+   use externally provided fast ion densities.
+  ==> retry using input data for fast densities.
+    nbi_getprofiles ne*dVol sum (input): 3.1985E+20
+    nbi_getprofiles ne*dVol sum (ions):  3.1985E+20
+  NBSTART... 
+  %nbatom deposition model: lev_nbidep=           1
+  %nbatom deposition model: NSIGEXC=           1
+  %nbatom deposition model: lev_nbidep=           1
+  %nbatom deposition model: NSIGEXC=           1
+  DEPALL... 
+  DEPALL EXITED            0
+  ORBALL... 
+  ORBALL EXITED            0
+  ==> Exiting NUBEAM_STEP_CHILD, MPI myidd =            2
+  
+   executing NUBEAM step:           6
+  ==> Entering NUBEAM_STEP_CHILD, MPI myidd =            2
+ %nbi_alloc: backz already allocated; exiting.
+ %nbi_alloc2: ebb_rel_co already allocated; exiting.
+  NBI_INTERP_PROFILES... 
+    nbi_getprofiles ne*dVol sum (input): 3.1985E+20
+    nbi_getprofiles ne*dVol sum (ions):  3.4288E+20
+  %nbi_getprofiles: quasineutrality check => 
+   use externally provided fast ion densities.
+  ==> retry using input data for fast densities.
+    nbi_getprofiles ne*dVol sum (input): 3.1985E+20
+    nbi_getprofiles ne*dVol sum (ions):  3.1985E+20
+  NBSTART... 
+  %nbatom deposition model: lev_nbidep=           1
+  %nbatom deposition model: NSIGEXC=           1
+  %nbatom deposition model: lev_nbidep=           1
+  %nbatom deposition model: NSIGEXC=           1
+  DEPALL... 
+  DEPALL EXITED            0
+  ORBALL... 
+  ORBALL EXITED            0
+  ==> Exiting NUBEAM_STEP_CHILD, MPI myidd =            2
+  
+   executing NUBEAM step:           7
+  ==> Entering NUBEAM_STEP_CHILD, MPI myidd =            2
+ %nbi_alloc: backz already allocated; exiting.
+ %nbi_alloc2: ebb_rel_co already allocated; exiting.
+  NBI_INTERP_PROFILES... 
+    nbi_getprofiles ne*dVol sum (input): 3.1985E+20
+    nbi_getprofiles ne*dVol sum (ions):  3.4335E+20
+  %nbi_getprofiles: quasineutrality check => 
+   use externally provided fast ion densities.
+  ==> retry using input data for fast densities.
+    nbi_getprofiles ne*dVol sum (input): 3.1985E+20
+    nbi_getprofiles ne*dVol sum (ions):  3.1985E+20
+  NBSTART... 
+  %nbatom deposition model: lev_nbidep=           1
+  %nbatom deposition model: NSIGEXC=           1
+  %nbatom deposition model: lev_nbidep=           1
+  %nbatom deposition model: NSIGEXC=           1
+  DEPALL... 
+  DEPALL EXITED            0
+  ORBALL... 
+  ORBALL EXITED            0
+  ==> Exiting NUBEAM_STEP_CHILD, MPI myidd =            2
+  
+   executing NUBEAM step:           8
+  ==> Entering NUBEAM_STEP_CHILD, MPI myidd =            2
+ %nbi_alloc: backz already allocated; exiting.
+ %nbi_alloc2: ebb_rel_co already allocated; exiting.
+  NBI_INTERP_PROFILES... 
+    nbi_getprofiles ne*dVol sum (input): 3.1985E+20
+    nbi_getprofiles ne*dVol sum (ions):  3.4357E+20
+  %nbi_getprofiles: quasineutrality check => 
+   use externally provided fast ion densities.
+  ==> retry using input data for fast densities.
+    nbi_getprofiles ne*dVol sum (input): 3.1985E+20
+    nbi_getprofiles ne*dVol sum (ions):  3.1985E+20
+  NBSTART... 
+  %nbatom deposition model: lev_nbidep=           1
+  %nbatom deposition model: NSIGEXC=           1
+  %nbatom deposition model: lev_nbidep=           1
+  %nbatom deposition model: NSIGEXC=           1
+  DEPALL... 
+  DEPALL EXITED            0
+  ORBALL... 
+  ORBALL EXITED            0
+  ==> Exiting NUBEAM_STEP_CHILD, MPI myidd =            2
+  
+   executing NUBEAM step:           9
+  ==> Entering NUBEAM_STEP_CHILD, MPI myidd =            2
+ %nbi_alloc: backz already allocated; exiting.
+ %nbi_alloc2: ebb_rel_co already allocated; exiting.
+  NBI_INTERP_PROFILES... 
+    nbi_getprofiles ne*dVol sum (input): 3.1985E+20
+    nbi_getprofiles ne*dVol sum (ions):  3.4349E+20
+  %nbi_getprofiles: quasineutrality check => 
+   use externally provided fast ion densities.
+  ==> retry using input data for fast densities.
+    nbi_getprofiles ne*dVol sum (input): 3.1985E+20
+    nbi_getprofiles ne*dVol sum (ions):  3.1985E+20
+  NBSTART... 
+  %nbatom deposition model: lev_nbidep=           1
+  %nbatom deposition model: NSIGEXC=           1
+  %nbatom deposition model: lev_nbidep=           1
+  %nbatom deposition model: NSIGEXC=           1
+  DEPALL... 
+  DEPALL EXITED            0
+  ORBALL... 
+  ORBALL EXITED            0
+  ==> Exiting NUBEAM_STEP_CHILD, MPI myidd =            2
+  
+   executing NUBEAM step:          10
+  ==> Entering NUBEAM_STEP_CHILD, MPI myidd =            2
+ %nbi_alloc: backz already allocated; exiting.
+ %nbi_alloc2: ebb_rel_co already allocated; exiting.
+  NBI_INTERP_PROFILES... 
+    nbi_getprofiles ne*dVol sum (input): 3.1985E+20
+    nbi_getprofiles ne*dVol sum (ions):  3.4343E+20
+  %nbi_getprofiles: quasineutrality check => 
+   use externally provided fast ion densities.
+  ==> retry using input data for fast densities.
+    nbi_getprofiles ne*dVol sum (input): 3.1985E+20
+    nbi_getprofiles ne*dVol sum (ions):  3.1985E+20
+  NBSTART... 
+  %nbatom deposition model: lev_nbidep=           1
+  %nbatom deposition model: NSIGEXC=           1
+  %nbatom deposition model: lev_nbidep=           1
+  %nbatom deposition model: NSIGEXC=           1
+  DEPALL... 
+  DEPALL EXITED            0
+  ORBALL... 
+  ORBALL EXITED            0
+  ==> Exiting NUBEAM_STEP_CHILD, MPI myidd =            2
+  ...CALL nbi_states(...,"S",...)
+
+%nbi_states: cpu  2 virtual memory size =  4.733E+02 MB.
+
+ -------------------------------------------- 
+ process_id:            2  mpi_printenv:
+  _cwd =
+    /pscratch/sd/y/yashu_gh/FREDA_KSTAR_2/ips-fastran/examples/far3d/example1/SCAN/work/fastran_nb_nubeam_7
+  _nargs = 0
+  FRANTIC_INIT = 
+  FRANTIC_ACTION = NONE
+  NUBEAM_ACTION = STEP
+  NUBEAM_WORKPATH = ./
+  LOG_LEVEL = 
+  LOGFILE_LEVEL = warn
+  MAX_MPI_INT_BLOCK = 
+  MAX_MPI_R8_BLOCK = 
+  PREACTDIR = /global/common/software/atom/perlmutter/data/nubeam/PREACT
+  ADASDIR = /global/common/software/atom/perlmutter/data/nubeam/ADAS
+  NUBEAM_POSTPROC = SUMMARY_TEST
+  NUBEAM_REPEAT_COUNT = 1x0.020000
+  STEPFLAG = TRUE
+  LIST_FLAG = FALSE
+  SERVER_FLAG = FALSE
+  PPPLCLUSTER_HOME = 
+  MPI_SHARE_ENV_DEBUG = 
+ end mpi_printenv
+ ------------------------ 
+ 
+  %nubeam_comp_exec:  NUBEAM_ACTION = STEP.
+  
+   executing NUBEAM step:           1
+  ==> Entering NUBEAM_STEP_CHILD, MPI myidd =            2
+ % nbi_alloc2_init: nbi_alloc2 done
+  NBI_INTERP_PROFILES... 
+    nbi_getprofiles ne*dVol sum (input): 3.1985E+20
+    nbi_getprofiles ne*dVol sum (ions):  3.4369E+20
+  %nbi_getprofiles: quasineutrality check => 
+   use externally provided fast ion densities.
+  ==> retry using input data for fast densities.
+    nbi_getprofiles ne*dVol sum (input): 3.1985E+20
+    nbi_getprofiles ne*dVol sum (ions):  3.1985E+20
+  NBSTART... 
+  %nbatom deposition model: lev_nbidep=           1
+  %nbatom deposition model: NSIGEXC=           1
+ %sigfacz (exc.states) Erel= 4.6420E+03 out of range
+   min= 2.0000E+04 max= 1.0000E+07 eV/amu; fixup taken.
+ %sigfacz (exc.states) Erel= 4.9545E+03 out of range
+   min= 2.0000E+04 max= 1.0000E+07 eV/amu; fixup taken.
+ %sigfacz (exc.states) Erel= 5.2670E+03 out of range
+   min= 2.0000E+04 max= 1.0000E+07 eV/amu; fixup taken.
+ %sigfacz (exc.states) Erel= 5.5795E+03 out of range
+   min= 2.0000E+04 max= 1.0000E+07 eV/amu; fixup taken.
+ %sigfacz (exc.states) Te= 9.7137E+02 out of range
+   min= 1.0000E+03 max= 5.0000E+04 eV; fixup taken.
+ %sigfacz (exc.states) Te= 9.7137E+02 out of range
+   min= 1.0000E+03 max= 5.0000E+04 eV; fixup taken.
+ %sigfacz (exc.states) Te= 9.7137E+02 out of range
+   min= 1.0000E+03 max= 5.0000E+04 eV; fixup taken.
+ %sigfacz (exc.states) Te= 9.7137E+02 out of range
+   min= 1.0000E+03 max= 5.0000E+04 eV; fixup taken.
+  %nbatom deposition model: lev_nbidep=           1
+  %nbatom deposition model: NSIGEXC=           1
+  DEPALL... 
+  DEPALL EXITED            0
+  ORBALL... 
+  ORBALL EXITED            0
+  ==> Exiting NUBEAM_STEP_CHILD, MPI myidd =            2
+  ...CALL nbi_states(...,"S",...)
+
+%nbi_states: cpu  2 virtual memory size =  4.710E+02 MB.
+
+ -------------------------------------------- 
+ process_id:            2  mpi_printenv:
+  _cwd =
+    /pscratch/sd/y/yashu_gh/FREDA_KSTAR_2/ips-fastran/examples/far3d/example1/SCAN/work/fastran_nb_nubeam_7
+  _nargs = 0
+  FRANTIC_INIT = 
+  FRANTIC_ACTION = NONE
+  NUBEAM_ACTION = STEP
+  NUBEAM_WORKPATH = ./
+  LOG_LEVEL = 
+  LOGFILE_LEVEL = warn
+  MAX_MPI_INT_BLOCK = 
+  MAX_MPI_R8_BLOCK = 
+  PREACTDIR = /global/common/software/atom/perlmutter/data/nubeam/PREACT
+  ADASDIR = /global/common/software/atom/perlmutter/data/nubeam/ADAS
+  NUBEAM_POSTPROC = SUMMARY_TEST
+  NUBEAM_REPEAT_COUNT = 1x0.020000
+  STEPFLAG = TRUE
+  LIST_FLAG = FALSE
+  SERVER_FLAG = FALSE
+  PPPLCLUSTER_HOME = 
+  MPI_SHARE_ENV_DEBUG = 
+ end mpi_printenv
+ ------------------------ 
+ 
+  %nubeam_comp_exec:  NUBEAM_ACTION = STEP.
+  
+   executing NUBEAM step:           1
+  ==> Entering NUBEAM_STEP_CHILD, MPI myidd =            2
+ % nbi_alloc2_init: nbi_alloc2 done
+  NBI_INTERP_PROFILES... 
+    nbi_getprofiles ne*dVol sum (input): 3.1985E+20
+    nbi_getprofiles ne*dVol sum (ions):  3.4386E+20
+  %nbi_getprofiles: quasineutrality check => 
+   use externally provided fast ion densities.
+  ==> retry using input data for fast densities.
+    nbi_getprofiles ne*dVol sum (input): 3.1985E+20
+    nbi_getprofiles ne*dVol sum (ions):  3.1985E+20
+  NBSTART... 
+  %nbatom deposition model: lev_nbidep=           1
+  %nbatom deposition model: NSIGEXC=           1
+ %sigfacz (exc.states) Erel= 4.6420E+03 out of range
+   min= 2.0000E+04 max= 1.0000E+07 eV/amu; fixup taken.
+ %sigfacz (exc.states) Erel= 4.9545E+03 out of range
+   min= 2.0000E+04 max= 1.0000E+07 eV/amu; fixup taken.
+ %sigfacz (exc.states) Erel= 5.2670E+03 out of range
+   min= 2.0000E+04 max= 1.0000E+07 eV/amu; fixup taken.
+ %sigfacz (exc.states) Erel= 5.5795E+03 out of range
+   min= 2.0000E+04 max= 1.0000E+07 eV/amu; fixup taken.
+ %sigfacz (exc.states) Te= 9.7137E+02 out of range
+   min= 1.0000E+03 max= 5.0000E+04 eV; fixup taken.
+ %sigfacz (exc.states) Te= 9.7137E+02 out of range
+   min= 1.0000E+03 max= 5.0000E+04 eV; fixup taken.
+ %sigfacz (exc.states) Te= 9.7137E+02 out of range
+   min= 1.0000E+03 max= 5.0000E+04 eV; fixup taken.
+ %sigfacz (exc.states) Te= 9.7137E+02 out of range
+   min= 1.0000E+03 max= 5.0000E+04 eV; fixup taken.
+  %nbatom deposition model: lev_nbidep=           1
+  %nbatom deposition model: NSIGEXC=           1
+  DEPALL... 
+  DEPALL EXITED            0
+  ORBALL... 
+  ORBALL EXITED            0
+  ==> Exiting NUBEAM_STEP_CHILD, MPI myidd =            2
+  ...CALL nbi_states(...,"S",...)
+
+%nbi_states: cpu  2 virtual memory size =  4.710E+02 MB.
+
+ -------------------------------------------- 
+ process_id:            2  mpi_printenv:
+  _cwd =
+    /pscratch/sd/y/yashu_gh/FREDA_KSTAR_2/ips-fastran/examples/far3d/example1/SCAN/work/fastran_nb_nubeam_7
+  _nargs = 0
+  FRANTIC_INIT = 
+  FRANTIC_ACTION = NONE
+  NUBEAM_ACTION = STEP
+  NUBEAM_WORKPATH = ./
+  LOG_LEVEL = 
+  LOGFILE_LEVEL = warn
+  MAX_MPI_INT_BLOCK = 
+  MAX_MPI_R8_BLOCK = 
+  PREACTDIR = /global/common/software/atom/perlmutter/data/nubeam/PREACT
+  ADASDIR = /global/common/software/atom/perlmutter/data/nubeam/ADAS
+  NUBEAM_POSTPROC = SUMMARY_TEST
+  NUBEAM_REPEAT_COUNT = 1x0.020000
+  STEPFLAG = TRUE
+  LIST_FLAG = FALSE
+  SERVER_FLAG = FALSE
+  PPPLCLUSTER_HOME = 
+  MPI_SHARE_ENV_DEBUG = 
+ end mpi_printenv
+ ------------------------ 
+ 
+  %nubeam_comp_exec:  NUBEAM_ACTION = STEP.
+  
+   executing NUBEAM step:           1
+  ==> Entering NUBEAM_STEP_CHILD, MPI myidd =            2
+ % nbi_alloc2_init: nbi_alloc2 done
+  NBI_INTERP_PROFILES... 
+    nbi_getprofiles ne*dVol sum (input): 3.1985E+20
+    nbi_getprofiles ne*dVol sum (ions):  3.4400E+20
+  %nbi_getprofiles: quasineutrality check => 
+   use externally provided fast ion densities.
+  ==> retry using input data for fast densities.
+    nbi_getprofiles ne*dVol sum (input): 3.1985E+20
+    nbi_getprofiles ne*dVol sum (ions):  3.1985E+20
+  NBSTART... 
+  %nbatom deposition model: lev_nbidep=           1
+  %nbatom deposition model: NSIGEXC=           1
+ %sigfacz (exc.states) Erel= 4.6420E+03 out of range
+   min= 2.0000E+04 max= 1.0000E+07 eV/amu; fixup taken.
+ %sigfacz (exc.states) Erel= 4.9545E+03 out of range
+   min= 2.0000E+04 max= 1.0000E+07 eV/amu; fixup taken.
+ %sigfacz (exc.states) Erel= 5.2670E+03 out of range
+   min= 2.0000E+04 max= 1.0000E+07 eV/amu; fixup taken.
+ %sigfacz (exc.states) Erel= 5.5795E+03 out of range
+   min= 2.0000E+04 max= 1.0000E+07 eV/amu; fixup taken.
+ %sigfacz (exc.states) Te= 9.7137E+02 out of range
+   min= 1.0000E+03 max= 5.0000E+04 eV; fixup taken.
+ %sigfacz (exc.states) Te= 9.7137E+02 out of range
+   min= 1.0000E+03 max= 5.0000E+04 eV; fixup taken.
+ %sigfacz (exc.states) Te= 9.7137E+02 out of range
+   min= 1.0000E+03 max= 5.0000E+04 eV; fixup taken.
+ %sigfacz (exc.states) Te= 9.7137E+02 out of range
+   min= 1.0000E+03 max= 5.0000E+04 eV; fixup taken.
+  %nbatom deposition model: lev_nbidep=           1
+  %nbatom deposition model: NSIGEXC=           1
+  DEPALL... 
+  DEPALL EXITED            0
+  ORBALL... 
+  ORBALL EXITED            0
+  ==> Exiting NUBEAM_STEP_CHILD, MPI myidd =            2
+  ...CALL nbi_states(...,"S",...)
+
+%nbi_states: cpu  2 virtual memory size =  4.710E+02 MB.
+
+ -------------------------------------------- 
+ process_id:            2  mpi_printenv:
+  _cwd =
+    /pscratch/sd/y/yashu_gh/FREDA_KSTAR_2/ips-fastran/examples/far3d/example1/SCAN/work/fastran_nb_nubeam_7
+  _nargs = 0
+  FRANTIC_INIT = 
+  FRANTIC_ACTION = NONE
+  NUBEAM_ACTION = STEP
+  NUBEAM_WORKPATH = ./
+  LOG_LEVEL = 
+  LOGFILE_LEVEL = warn
+  MAX_MPI_INT_BLOCK = 
+  MAX_MPI_R8_BLOCK = 
+  PREACTDIR = /global/common/software/atom/perlmutter/data/nubeam/PREACT
+  ADASDIR = /global/common/software/atom/perlmutter/data/nubeam/ADAS
+  NUBEAM_POSTPROC = SUMMARY_TEST
+  NUBEAM_REPEAT_COUNT = 1x0.020000
+  STEPFLAG = TRUE
+  LIST_FLAG = FALSE
+  SERVER_FLAG = FALSE
+  PPPLCLUSTER_HOME = 
+  MPI_SHARE_ENV_DEBUG = 
+ end mpi_printenv
+ ------------------------ 
+ 
+  %nubeam_comp_exec:  NUBEAM_ACTION = STEP.
+  
+   executing NUBEAM step:           1
+  ==> Entering NUBEAM_STEP_CHILD, MPI myidd =            2
+ % nbi_alloc2_init: nbi_alloc2 done
+  NBI_INTERP_PROFILES... 
+    nbi_getprofiles ne*dVol sum (input): 3.1985E+20
+    nbi_getprofiles ne*dVol sum (ions):  3.4401E+20
+  %nbi_getprofiles: quasineutrality check => 
+   use externally provided fast ion densities.
+  ==> retry using input data for fast densities.
+    nbi_getprofiles ne*dVol sum (input): 3.1985E+20
+    nbi_getprofiles ne*dVol sum (ions):  3.1985E+20
+  NBSTART... 
+  %nbatom deposition model: lev_nbidep=           1
+  %nbatom deposition model: NSIGEXC=           1
+ %sigfacz (exc.states) Erel= 4.6420E+03 out of range
+   min= 2.0000E+04 max= 1.0000E+07 eV/amu; fixup taken.
+ %sigfacz (exc.states) Erel= 4.9545E+03 out of range
+   min= 2.0000E+04 max= 1.0000E+07 eV/amu; fixup taken.
+ %sigfacz (exc.states) Erel= 5.2670E+03 out of range
+   min= 2.0000E+04 max= 1.0000E+07 eV/amu; fixup taken.
+ %sigfacz (exc.states) Erel= 5.5795E+03 out of range
+   min= 2.0000E+04 max= 1.0000E+07 eV/amu; fixup taken.
+ %sigfacz (exc.states) Te= 9.7137E+02 out of range
+   min= 1.0000E+03 max= 5.0000E+04 eV; fixup taken.
+ %sigfacz (exc.states) Te= 9.7137E+02 out of range
+   min= 1.0000E+03 max= 5.0000E+04 eV; fixup taken.
+ %sigfacz (exc.states) Te= 9.7137E+02 out of range
+   min= 1.0000E+03 max= 5.0000E+04 eV; fixup taken.
+ %sigfacz (exc.states) Te= 9.7137E+02 out of range
+   min= 1.0000E+03 max= 5.0000E+04 eV; fixup taken.
+  %nbatom deposition model: lev_nbidep=           1
+  %nbatom deposition model: NSIGEXC=           1
+  DEPALL... 
+  DEPALL EXITED            0
+  ORBALL... 
+  ORBALL EXITED            0
+  ==> Exiting NUBEAM_STEP_CHILD, MPI myidd =            2
+  ...CALL nbi_states(...,"S",...)
+
+%nbi_states: cpu  2 virtual memory size =  4.710E+02 MB.
+
+ -------------------------------------------- 
+ process_id:            2  mpi_printenv:
+  _cwd =
+    /pscratch/sd/y/yashu_gh/FREDA_KSTAR_2/ips-fastran/examples/far3d/example1/SCAN/work/fastran_nb_nubeam_7
+  _nargs = 0
+  FRANTIC_INIT = 
+  FRANTIC_ACTION = NONE
+  NUBEAM_ACTION = STEP
+  NUBEAM_WORKPATH = ./
+  LOG_LEVEL = 
+  LOGFILE_LEVEL = warn
+  MAX_MPI_INT_BLOCK = 
+  MAX_MPI_R8_BLOCK = 
+  PREACTDIR = /global/common/software/atom/perlmutter/data/nubeam/PREACT
+  ADASDIR = /global/common/software/atom/perlmutter/data/nubeam/ADAS
+  NUBEAM_POSTPROC = SUMMARY_TEST
+  NUBEAM_REPEAT_COUNT = 1x0.020000
+  STEPFLAG = TRUE
+  LIST_FLAG = FALSE
+  SERVER_FLAG = FALSE
+  PPPLCLUSTER_HOME = 
+  MPI_SHARE_ENV_DEBUG = 
+ end mpi_printenv
+ ------------------------ 
+ 
+  %nubeam_comp_exec:  NUBEAM_ACTION = STEP.
+  
+   executing NUBEAM step:           1
+  ==> Entering NUBEAM_STEP_CHILD, MPI myidd =            2
+ % nbi_alloc2_init: nbi_alloc2 done
+  NBI_INTERP_PROFILES... 
+    nbi_getprofiles ne*dVol sum (input): 3.1985E+20
+    nbi_getprofiles ne*dVol sum (ions):  3.4405E+20
+  %nbi_getprofiles: quasineutrality check => 
+   use externally provided fast ion densities.
+  ==> retry using input data for fast densities.
+    nbi_getprofiles ne*dVol sum (input): 3.1985E+20
+    nbi_getprofiles ne*dVol sum (ions):  3.1985E+20
+  NBSTART... 
+  %nbatom deposition model: lev_nbidep=           1
+  %nbatom deposition model: NSIGEXC=           1
+ %sigfacz (exc.states) Erel= 4.6420E+03 out of range
+   min= 2.0000E+04 max= 1.0000E+07 eV/amu; fixup taken.
+ %sigfacz (exc.states) Erel= 4.9545E+03 out of range
+   min= 2.0000E+04 max= 1.0000E+07 eV/amu; fixup taken.
+ %sigfacz (exc.states) Erel= 5.2670E+03 out of range
+   min= 2.0000E+04 max= 1.0000E+07 eV/amu; fixup taken.
+ %sigfacz (exc.states) Erel= 5.5795E+03 out of range
+   min= 2.0000E+04 max= 1.0000E+07 eV/amu; fixup taken.
+ %sigfacz (exc.states) Te= 9.7137E+02 out of range
+   min= 1.0000E+03 max= 5.0000E+04 eV; fixup taken.
+ %sigfacz (exc.states) Te= 9.7137E+02 out of range
+   min= 1.0000E+03 max= 5.0000E+04 eV; fixup taken.
+ %sigfacz (exc.states) Te= 9.7137E+02 out of range
+   min= 1.0000E+03 max= 5.0000E+04 eV; fixup taken.
+ %sigfacz (exc.states) Te= 9.7137E+02 out of range
+   min= 1.0000E+03 max= 5.0000E+04 eV; fixup taken.
+  %nbatom deposition model: lev_nbidep=           1
+  %nbatom deposition model: NSIGEXC=           1
+  DEPALL... 
+  DEPALL EXITED            0
+  ORBALL... 
+  ORBALL EXITED            0
+  ==> Exiting NUBEAM_STEP_CHILD, MPI myidd =            2
+  ...CALL nbi_states(...,"S",...)
+
+%nbi_states: cpu  2 virtual memory size =  4.710E+02 MB.
+
+ -------------------------------------------- 
+ process_id:            2  mpi_printenv:
+  _cwd =
+    /pscratch/sd/y/yashu_gh/FREDA_KSTAR_2/ips-fastran/examples/far3d/example1/SCAN/work/fastran_nb_nubeam_7
+  _nargs = 0
+  FRANTIC_INIT = 
+  FRANTIC_ACTION = NONE
+  NUBEAM_ACTION = STEP
+  NUBEAM_WORKPATH = ./
+  LOG_LEVEL = 
+  LOGFILE_LEVEL = warn
+  MAX_MPI_INT_BLOCK = 
+  MAX_MPI_R8_BLOCK = 
+  PREACTDIR = /global/common/software/atom/perlmutter/data/nubeam/PREACT
+  ADASDIR = /global/common/software/atom/perlmutter/data/nubeam/ADAS
+  NUBEAM_POSTPROC = SUMMARY_TEST
+  NUBEAM_REPEAT_COUNT = 1x0.020000
+  STEPFLAG = TRUE
+  LIST_FLAG = FALSE
+  SERVER_FLAG = FALSE
+  PPPLCLUSTER_HOME = 
+  MPI_SHARE_ENV_DEBUG = 
+ end mpi_printenv
+ ------------------------ 
+ 
+  %nubeam_comp_exec:  NUBEAM_ACTION = STEP.
+  
+   executing NUBEAM step:           1
+  ==> Entering NUBEAM_STEP_CHILD, MPI myidd =            2
+ % nbi_alloc2_init: nbi_alloc2 done
+  NBI_INTERP_PROFILES... 
+    nbi_getprofiles ne*dVol sum (input): 3.1985E+20
+    nbi_getprofiles ne*dVol sum (ions):  3.4368E+20
+  %nbi_getprofiles: quasineutrality check => 
+   use externally provided fast ion densities.
+  ==> retry using input data for fast densities.
+    nbi_getprofiles ne*dVol sum (input): 3.1985E+20
+    nbi_getprofiles ne*dVol sum (ions):  3.1985E+20
+  NBSTART... 
+  %nbatom deposition model: lev_nbidep=           1
+  %nbatom deposition model: NSIGEXC=           1
+ %sigfacz (exc.states) Erel= 4.6420E+03 out of range
+   min= 2.0000E+04 max= 1.0000E+07 eV/amu; fixup taken.
+ %sigfacz (exc.states) Erel= 4.9545E+03 out of range
+   min= 2.0000E+04 max= 1.0000E+07 eV/amu; fixup taken.
+ %sigfacz (exc.states) Erel= 5.2670E+03 out of range
+   min= 2.0000E+04 max= 1.0000E+07 eV/amu; fixup taken.
+ %sigfacz (exc.states) Erel= 5.5795E+03 out of range
+   min= 2.0000E+04 max= 1.0000E+07 eV/amu; fixup taken.
+ %sigfacz (exc.states) Te= 9.7137E+02 out of range
+   min= 1.0000E+03 max= 5.0000E+04 eV; fixup taken.
+ %sigfacz (exc.states) Te= 9.7137E+02 out of range
+   min= 1.0000E+03 max= 5.0000E+04 eV; fixup taken.
+ %sigfacz (exc.states) Te= 9.7137E+02 out of range
+   min= 1.0000E+03 max= 5.0000E+04 eV; fixup taken.
+ %sigfacz (exc.states) Te= 9.7137E+02 out of range
+   min= 1.0000E+03 max= 5.0000E+04 eV; fixup taken.
+  %nbatom deposition model: lev_nbidep=           1
+  %nbatom deposition model: NSIGEXC=           1
+  DEPALL... 
+  DEPALL EXITED            0
+  ORBALL... 
+  ORBALL EXITED            0
+  ==> Exiting NUBEAM_STEP_CHILD, MPI myidd =            2
+  ...CALL nbi_states(...,"S",...)
+
+%nbi_states: cpu  2 virtual memory size =  4.710E+02 MB.
+
+ -------------------------------------------- 
+ process_id:            2  mpi_printenv:
+  _cwd =
+    /pscratch/sd/y/yashu_gh/FREDA_KSTAR_2/ips-fastran/examples/far3d/example1/SCAN/work/fastran_nb_nubeam_7
+  _nargs = 0
+  FRANTIC_INIT = 
+  FRANTIC_ACTION = NONE
+  NUBEAM_ACTION = STEP
+  NUBEAM_WORKPATH = ./
+  LOG_LEVEL = 
+  LOGFILE_LEVEL = warn
+  MAX_MPI_INT_BLOCK = 
+  MAX_MPI_R8_BLOCK = 
+  PREACTDIR = /global/common/software/atom/perlmutter/data/nubeam/PREACT
+  ADASDIR = /global/common/software/atom/perlmutter/data/nubeam/ADAS
+  NUBEAM_POSTPROC = SUMMARY_TEST
+  NUBEAM_REPEAT_COUNT = 1x0.020000
+  STEPFLAG = TRUE
+  LIST_FLAG = FALSE
+  SERVER_FLAG = FALSE
+  PPPLCLUSTER_HOME = 
+  MPI_SHARE_ENV_DEBUG = 
+ end mpi_printenv
+ ------------------------ 
+ 
+  %nubeam_comp_exec:  NUBEAM_ACTION = STEP.
+  
+   executing NUBEAM step:           1
+  ==> Entering NUBEAM_STEP_CHILD, MPI myidd =            2
+ % nbi_alloc2_init: nbi_alloc2 done
+  NBI_INTERP_PROFILES... 
+    nbi_getprofiles ne*dVol sum (input): 3.1985E+20
+    nbi_getprofiles ne*dVol sum (ions):  3.4389E+20
+  %nbi_getprofiles: quasineutrality check => 
+   use externally provided fast ion densities.
+  ==> retry using input data for fast densities.
+    nbi_getprofiles ne*dVol sum (input): 3.1985E+20
+    nbi_getprofiles ne*dVol sum (ions):  3.1985E+20
+  NBSTART... 
+  %nbatom deposition model: lev_nbidep=           1
+  %nbatom deposition model: NSIGEXC=           1
+ %sigfacz (exc.states) Erel= 4.6420E+03 out of range
+   min= 2.0000E+04 max= 1.0000E+07 eV/amu; fixup taken.
+ %sigfacz (exc.states) Erel= 4.9545E+03 out of range
+   min= 2.0000E+04 max= 1.0000E+07 eV/amu; fixup taken.
+ %sigfacz (exc.states) Erel= 5.2670E+03 out of range
+   min= 2.0000E+04 max= 1.0000E+07 eV/amu; fixup taken.
+ %sigfacz (exc.states) Erel= 5.5795E+03 out of range
+   min= 2.0000E+04 max= 1.0000E+07 eV/amu; fixup taken.
+ %sigfacz (exc.states) Te= 9.7137E+02 out of range
+   min= 1.0000E+03 max= 5.0000E+04 eV; fixup taken.
+ %sigfacz (exc.states) Te= 9.7137E+02 out of range
+   min= 1.0000E+03 max= 5.0000E+04 eV; fixup taken.
+ %sigfacz (exc.states) Te= 9.7137E+02 out of range
+   min= 1.0000E+03 max= 5.0000E+04 eV; fixup taken.
+ %sigfacz (exc.states) Te= 9.7137E+02 out of range
+   min= 1.0000E+03 max= 5.0000E+04 eV; fixup taken.
+  %nbatom deposition model: lev_nbidep=           1
+  %nbatom deposition model: NSIGEXC=           1
+  DEPALL... 
+  DEPALL EXITED            0
+  ORBALL... 
+  ORBALL EXITED            0
+  ==> Exiting NUBEAM_STEP_CHILD, MPI myidd =            2
+  ...CALL nbi_states(...,"S",...)
+
+%nbi_states: cpu  2 virtual memory size =  4.710E+02 MB.
+
+ -------------------------------------------- 
+ process_id:            2  mpi_printenv:
+  _cwd =
+    /pscratch/sd/y/yashu_gh/FREDA_KSTAR_2/ips-fastran/examples/far3d/example1/SCAN/work/fastran_nb_nubeam_7
+  _nargs = 0
+  FRANTIC_INIT = 
+  FRANTIC_ACTION = NONE
+  NUBEAM_ACTION = STEP
+  NUBEAM_WORKPATH = ./
+  LOG_LEVEL = 
+  LOGFILE_LEVEL = warn
+  MAX_MPI_INT_BLOCK = 
+  MAX_MPI_R8_BLOCK = 
+  PREACTDIR = /global/common/software/atom/perlmutter/data/nubeam/PREACT
+  ADASDIR = /global/common/software/atom/perlmutter/data/nubeam/ADAS
+  NUBEAM_POSTPROC = SUMMARY_TEST
+  NUBEAM_REPEAT_COUNT = 1x0.020000
+  STEPFLAG = TRUE
+  LIST_FLAG = FALSE
+  SERVER_FLAG = FALSE
+  PPPLCLUSTER_HOME = 
+  MPI_SHARE_ENV_DEBUG = 
+ end mpi_printenv
+ ------------------------ 
+ 
+  %nubeam_comp_exec:  NUBEAM_ACTION = STEP.
+  
+   executing NUBEAM step:           1
+  ==> Entering NUBEAM_STEP_CHILD, MPI myidd =            2
+ % nbi_alloc2_init: nbi_alloc2 done
+  NBI_INTERP_PROFILES... 
+    nbi_getprofiles ne*dVol sum (input): 3.1985E+20
+    nbi_getprofiles ne*dVol sum (ions):  3.4375E+20
+  %nbi_getprofiles: quasineutrality check => 
+   use externally provided fast ion densities.
+  ==> retry using input data for fast densities.
+    nbi_getprofiles ne*dVol sum (input): 3.1985E+20
+    nbi_getprofiles ne*dVol sum (ions):  3.1985E+20
+  NBSTART... 
+  %nbatom deposition model: lev_nbidep=           1
+  %nbatom deposition model: NSIGEXC=           1
+ %sigfacz (exc.states) Erel= 4.6420E+03 out of range
+   min= 2.0000E+04 max= 1.0000E+07 eV/amu; fixup taken.
+ %sigfacz (exc.states) Erel= 4.9545E+03 out of range
+   min= 2.0000E+04 max= 1.0000E+07 eV/amu; fixup taken.
+ %sigfacz (exc.states) Erel= 5.2670E+03 out of range
+   min= 2.0000E+04 max= 1.0000E+07 eV/amu; fixup taken.
+ %sigfacz (exc.states) Erel= 5.5795E+03 out of range
+   min= 2.0000E+04 max= 1.0000E+07 eV/amu; fixup taken.
+ %sigfacz (exc.states) Te= 9.7137E+02 out of range
+   min= 1.0000E+03 max= 5.0000E+04 eV; fixup taken.
+ %sigfacz (exc.states) Te= 9.7137E+02 out of range
+   min= 1.0000E+03 max= 5.0000E+04 eV; fixup taken.
+ %sigfacz (exc.states) Te= 9.7137E+02 out of range
+   min= 1.0000E+03 max= 5.0000E+04 eV; fixup taken.
+ %sigfacz (exc.states) Te= 9.7137E+02 out of range
+   min= 1.0000E+03 max= 5.0000E+04 eV; fixup taken.
+  %nbatom deposition model: lev_nbidep=           1
+  %nbatom deposition model: NSIGEXC=           1
+  DEPALL... 
+  DEPALL EXITED            0
+  ORBALL... 
+  ORBALL EXITED            0
+  ==> Exiting NUBEAM_STEP_CHILD, MPI myidd =            2
+  ...CALL nbi_states(...,"S",...)
+
+%nbi_states: cpu  2 virtual memory size =  4.710E+02 MB.
+
+ -------------------------------------------- 
+ process_id:            2  mpi_printenv:
+  _cwd =
+    /pscratch/sd/y/yashu_gh/FREDA_KSTAR_2/ips-fastran/examples/far3d/example1/SCAN/work/fastran_nb_nubeam_7
+  _nargs = 0
+  FRANTIC_INIT = 
+  FRANTIC_ACTION = NONE
+  NUBEAM_ACTION = STEP
+  NUBEAM_WORKPATH = ./
+  LOG_LEVEL = 
+  LOGFILE_LEVEL = warn
+  MAX_MPI_INT_BLOCK = 
+  MAX_MPI_R8_BLOCK = 
+  PREACTDIR = /global/common/software/atom/perlmutter/data/nubeam/PREACT
+  ADASDIR = /global/common/software/atom/perlmutter/data/nubeam/ADAS
+  NUBEAM_POSTPROC = SUMMARY_TEST
+  NUBEAM_REPEAT_COUNT = 1x0.020000
+  STEPFLAG = TRUE
+  LIST_FLAG = FALSE
+  SERVER_FLAG = FALSE
+  PPPLCLUSTER_HOME = 
+  MPI_SHARE_ENV_DEBUG = 
+ end mpi_printenv
+ ------------------------ 
+ 
+  %nubeam_comp_exec:  NUBEAM_ACTION = STEP.
+  
+   executing NUBEAM step:           1
+  ==> Entering NUBEAM_STEP_CHILD, MPI myidd =            2
+ % nbi_alloc2_init: nbi_alloc2 done
+  NBI_INTERP_PROFILES... 
+    nbi_getprofiles ne*dVol sum (input): 3.1985E+20
+    nbi_getprofiles ne*dVol sum (ions):  3.4402E+20
+  %nbi_getprofiles: quasineutrality check => 
+   use externally provided fast ion densities.
+  ==> retry using input data for fast densities.
+    nbi_getprofiles ne*dVol sum (input): 3.1985E+20
+    nbi_getprofiles ne*dVol sum (ions):  3.1985E+20
+  NBSTART... 
+  %nbatom deposition model: lev_nbidep=           1
+  %nbatom deposition model: NSIGEXC=           1
+ %sigfacz (exc.states) Erel= 4.6420E+03 out of range
+   min= 2.0000E+04 max= 1.0000E+07 eV/amu; fixup taken.
+ %sigfacz (exc.states) Erel= 4.9545E+03 out of range
+   min= 2.0000E+04 max= 1.0000E+07 eV/amu; fixup taken.
+ %sigfacz (exc.states) Erel= 5.2670E+03 out of range
+   min= 2.0000E+04 max= 1.0000E+07 eV/amu; fixup taken.
+ %sigfacz (exc.states) Erel= 5.5795E+03 out of range
+   min= 2.0000E+04 max= 1.0000E+07 eV/amu; fixup taken.
+ %sigfacz (exc.states) Te= 9.7137E+02 out of range
+   min= 1.0000E+03 max= 5.0000E+04 eV; fixup taken.
+ %sigfacz (exc.states) Te= 9.7137E+02 out of range
+   min= 1.0000E+03 max= 5.0000E+04 eV; fixup taken.
+ %sigfacz (exc.states) Te= 9.7137E+02 out of range
+   min= 1.0000E+03 max= 5.0000E+04 eV; fixup taken.
+ %sigfacz (exc.states) Te= 9.7137E+02 out of range
+   min= 1.0000E+03 max= 5.0000E+04 eV; fixup taken.
+  %nbatom deposition model: lev_nbidep=           1
+  %nbatom deposition model: NSIGEXC=           1
+  DEPALL... 
+  DEPALL EXITED            0
+  ORBALL... 
+  ORBALL EXITED            0
+  ==> Exiting NUBEAM_STEP_CHILD, MPI myidd =            2
+  ...CALL nbi_states(...,"S",...)
+
+%nbi_states: cpu  2 virtual memory size =  4.709E+02 MB.
+
+ -------------------------------------------- 
+ process_id:            2  mpi_printenv:
+  _cwd =
+    /pscratch/sd/y/yashu_gh/FREDA_KSTAR_2/ips-fastran/examples/far3d/example1/SCAN/work/fastran_nb_nubeam_7
+  _nargs = 0
+  FRANTIC_INIT = 
+  FRANTIC_ACTION = NONE
+  NUBEAM_ACTION = STEP
+  NUBEAM_WORKPATH = ./
+  LOG_LEVEL = 
+  LOGFILE_LEVEL = warn
+  MAX_MPI_INT_BLOCK = 
+  MAX_MPI_R8_BLOCK = 
+  PREACTDIR = /global/common/software/atom/perlmutter/data/nubeam/PREACT
+  ADASDIR = /global/common/software/atom/perlmutter/data/nubeam/ADAS
+  NUBEAM_POSTPROC = SUMMARY_TEST
+  NUBEAM_REPEAT_COUNT = 1x0.020000
+  STEPFLAG = TRUE
+  LIST_FLAG = FALSE
+  SERVER_FLAG = FALSE
+  PPPLCLUSTER_HOME = 
+  MPI_SHARE_ENV_DEBUG = 
+ end mpi_printenv
+ ------------------------ 
+ 
+  %nubeam_comp_exec:  NUBEAM_ACTION = STEP.
+  
+   executing NUBEAM step:           1
+  ==> Entering NUBEAM_STEP_CHILD, MPI myidd =            2
+ % nbi_alloc2_init: nbi_alloc2 done
+  NBI_INTERP_PROFILES... 
+    nbi_getprofiles ne*dVol sum (input): 3.1985E+20
+    nbi_getprofiles ne*dVol sum (ions):  3.4388E+20
+  %nbi_getprofiles: quasineutrality check => 
+   use externally provided fast ion densities.
+  ==> retry using input data for fast densities.
+    nbi_getprofiles ne*dVol sum (input): 3.1985E+20
+    nbi_getprofiles ne*dVol sum (ions):  3.1985E+20
+  NBSTART... 
+  %nbatom deposition model: lev_nbidep=           1
+  %nbatom deposition model: NSIGEXC=           1
+ %sigfacz (exc.states) Erel= 4.6420E+03 out of range
+   min= 2.0000E+04 max= 1.0000E+07 eV/amu; fixup taken.
+ %sigfacz (exc.states) Erel= 4.9545E+03 out of range
+   min= 2.0000E+04 max= 1.0000E+07 eV/amu; fixup taken.
+ %sigfacz (exc.states) Erel= 5.2670E+03 out of range
+   min= 2.0000E+04 max= 1.0000E+07 eV/amu; fixup taken.
+ %sigfacz (exc.states) Erel= 5.5795E+03 out of range
+   min= 2.0000E+04 max= 1.0000E+07 eV/amu; fixup taken.
+ %sigfacz (exc.states) Te= 9.7137E+02 out of range
+   min= 1.0000E+03 max= 5.0000E+04 eV; fixup taken.
+ %sigfacz (exc.states) Te= 9.7137E+02 out of range
+   min= 1.0000E+03 max= 5.0000E+04 eV; fixup taken.
+ %sigfacz (exc.states) Te= 9.7137E+02 out of range
+   min= 1.0000E+03 max= 5.0000E+04 eV; fixup taken.
+ %sigfacz (exc.states) Te= 9.7137E+02 out of range
+   min= 1.0000E+03 max= 5.0000E+04 eV; fixup taken.
+  %nbatom deposition model: lev_nbidep=           1
+  %nbatom deposition model: NSIGEXC=           1
+  DEPALL... 
+  DEPALL EXITED            0
+  ORBALL... 
+  ORBALL EXITED            0
+  ==> Exiting NUBEAM_STEP_CHILD, MPI myidd =            2
+  ...CALL nbi_states(...,"S",...)
+
+%nbi_states: cpu  2 virtual memory size =  4.710E+02 MB.
+

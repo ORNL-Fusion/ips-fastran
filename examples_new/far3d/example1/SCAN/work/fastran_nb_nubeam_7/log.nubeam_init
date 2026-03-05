@@ -1,14 +1,14 @@
   
   ==> nubeam_comp_exec Jun 2011 vsn (server mod: DMC) 
   
-%nubeam_comp_exec: MPI Mode: myid=     0 proc_name= nid006005
+%nubeam_comp_exec: MPI Mode: myid=     0 proc_name= nid005367
   %nubeam_comp_exec: NUBEAM_WORKPATH: ./
   %nubeam_comp_exec:  NUBEAM_ACTION = INIT (rng init from system clock).
   open_new: ./nubeam_status_summary.log
   open_new: ./nubeam_save_files.output
-  %nubeam_comp_exec: postprocessing option: NONE.
   %nubeam_comp_exec: LOG_LEVEL env. var:
   !nubeam_comp_exec:   LOGFILE_LEVEL: warn
+  %nubeam_comp_exec: postprocessing option: NONE.
   %nubeam_comp_exec: open file: ./nubeam_init_files.dat
   %nubeam_comp_exec: read namelist in file:
   
@@ -30,8 +30,6 @@
   %nubeam_comp_exec: namelist logic check OK.
  nubeam_comp_exec: complete non-STEP environment.
  nubeam_comp_exec finished with environment.
-  (mpi_share_env) process myid=           0  cwd: /global/u2/y/yashu_gh/FREDA_EP/ips-fastran/examples_new/far3d/example1/SCAN/work/fastran_nb_nubeam_7
-  %nubeam_comp_exec[0:3]: myid=           0  -- mpi_share_env OK.
  -------------------------------------------- 
  process_id:            0  mpi_printenv:
   _cwd =
@@ -39,6 +37,8 @@
   _nargs = 0
   FRANTIC_INIT = 
   FRANTIC_ACTION = 
+  (mpi_share_env) process myid=           0  cwd: /global/u2/y/yashu_gh/FREDA_EP/ips-fastran/examples_new/far3d/example1/SCAN/work/fastran_nb_nubeam_7
+  %nubeam_comp_exec[0:3]: myid=           0  -- mpi_share_env OK.
   NUBEAM_ACTION = INIT
   NUBEAM_WORKPATH = ./
   LOG_LEVEL = 
@@ -74,12 +74,12 @@
    setting NZONES to match Plasma State (NBI or FUS):  ss_in%nrho_nbi - 1 =          100
   
   
-   ---> RNG seed reset to:   1010974913
+   ---> RNG seed reset to:   1042413697
   
   
    executing NUBEAM initialization:
   
- cpu time (sec) in nubeam_ctrl_init:   1.0831E-03
+ cpu time (sec) in nubeam_ctrl_init:   1.0650E-03
   %nubeam_comp_exec: nubeam_ctrl_init OK.
   
    complete NUBEAM initialization: call nubeam_ctrl_nostep(...)

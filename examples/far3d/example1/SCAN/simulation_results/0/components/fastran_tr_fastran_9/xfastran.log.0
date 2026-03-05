@@ -1,0 +1,66 @@
+========================================================================
+= FASTRAN
+
+nonlinear model = 0
+ichi = 0
+ineo = 0
+reading state...
+read formatted input, inprof...
+init geometry...
+read formatted input, inmetric...
+nrho in inmetric = 101
+rhob in inmetric = 5.788942e-01
+solve avg grad-shafranv...
+solve_avg_gs::Ip_temp = 5.793656e-01 
+solve_avg_gs::Ip      = 5.845845e-01 
+
+ plasma volume = 10.826305
+ stored energy(e,i,b) = 1.588811e-01 1.708383e-01 1.397877e-01
+ betan = 3.183363
+*power
+ Pnb(e,i) = 9.415516e-01 2.905344e+00
+ Prf(e,i) = 1.429146e+00 0.000000e+00
+ Prad     = 0.000000e+00 
+ Pei      = 7.096404e-01 
+ Pfuse    = 0.000000e+00 
+ Pfusi    = 0.000000e+00 
+ Poh      = 0.000000e+00 
+*confinement time
+ taut, tauITER98y2, H98y2 : 6.249371e-02 4.585895e-02 1.362738e+00
+ taue, taui : 5.157911e-02 7.780573e-02
+ taut, tau89, H89 : 8.898852e-02 3.776630e-02 2.356294e+00
+*temperature
+ nea, nebar : 2.891491e+00 3.443183e+00 
+ tea, tia : 1.768881e+00 2.511246e+00 (7.043838e-01)
+ te0, ti0 : 5.321253e+00 5.901174e+00 (9.017279e-01)
+ Sn : 3.255296e+01 
+*current balance
+ Ip,Ibs,Inb,Irf: 5.845845e-01 2.753211e-01 2.107670e-01 4.539402e-02
+ fni,fbs: 0.909 0.471
+
+ plasma volume = 10.826305
+ stored energy(e,i,b) = 1.588811e-01 1.708383e-01 1.397877e-01
+ betan = 3.183363
+*power
+ Pnb(e,i) = 9.415516e-01 2.905344e+00
+ Prf(e,i) = 1.429146e+00 0.000000e+00
+ Prad     = 0.000000e+00 
+ Pei      = 7.096404e-01 
+ Pfuse    = 0.000000e+00 
+ Pfusi    = 0.000000e+00 
+ Poh      = 0.000000e+00 
+*confinement time
+ taut, tauITER98y2, H98y2 : 6.249371e-02 4.585895e-02 1.362738e+00
+ taue, taui : 5.157911e-02 7.780573e-02
+ taut, tau89, H89 : 8.898852e-02 3.776630e-02 2.356294e+00
+*temperature
+ nea, nebar : 2.891491e+00 3.443183e+00 
+ tea, tia : 1.768881e+00 2.511246e+00 (7.043838e-01)
+ te0, ti0 : 5.321253e+00 5.901174e+00 (9.017279e-01)
+ Sn : 3.255296e+01 
+*current balance
+ Ip,Ibs,Inb,Irf: 5.845845e-01 2.753211e-01 2.107670e-01 4.539402e-02
+ fni,fbs: 0.909 0.471
+ ELAPASED TIME = 0 sec
+
+finalize

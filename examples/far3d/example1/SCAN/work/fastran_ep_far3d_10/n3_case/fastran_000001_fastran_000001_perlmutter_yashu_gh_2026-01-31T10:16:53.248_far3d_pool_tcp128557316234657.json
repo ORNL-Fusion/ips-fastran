@@ -1,0 +1,4 @@
+{"eventType": "IPS_LAUNCH_DASK_TASK", "event_time": 1769884052.184862, "comment": "task_name = far3d_task_02, Target = /global/common/software/atom/perlmutter/binaries/far3d/linear/xfar3d_n "}
+{"eventType": "IPS_TASK_END", "event_time": 1769884069.1349845, "comment": "task_name = far3d_task_02, elapsed time = 16.99s", "start_time": 1769884052.1436355, "elapsed_time": 16.9913489818573, "target": "/global/common/software/atom/perlmutter/binaries/far3d/linear/xfar3d_n", "operation": ""}
+{"eventType": "IPS_LAUNCH_DASK_TASK", "event_time": 1769884052.1708384, "comment": "task_name = far3d_task_03, Target = /global/common/software/atom/perlmutter/binaries/far3d/linear/xfar3d_n "}
+{"eventType": "IPS_TASK_END", "event_time": 1769884079.3683136, "comment": "task_name = far3d_task_03, elapsed time = 27.24s", "start_time": 1769884052.1266513, "elapsed_time": 27.24166226387024, "target": "/global/common/software/atom/perlmutter/binaries/far3d/linear/xfar3d_n", "operation": ""}

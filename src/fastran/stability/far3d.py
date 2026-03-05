@@ -111,7 +111,9 @@ class far3d(Component):
         print('All preprocessing steps completed successfully.')
 
         # ===== Generate FAR3d profile input =====
-        far3d_profile = far3d_io.far3d_io_profile()
+
+        alpha_EP = int(self.ALPHA_EP)
+        far3d_profile = far3d_io.far3d_io_profile(alpha_EP)
         far3d_profile.from_state(f_instate=cur_instate_file, f_state=cur_state_file)
         far3d_profile.write_profile('Profile.txt')
 
@@ -163,7 +165,7 @@ class far3d(Component):
         betf= 2.0 * mu0 * peak_pbeam_kPa*1e3 / (B0_e**2)
         betalf = (2.0 * mu0 * peak_palpha_kPa*1.6e4) / (B0_e**2)
         va0 = B0_e / math.sqrt(uion_e * mu0 * peak_nion*1e20 * m_p)
-        omgcya = e_charge * B0_e * R0_e / (m_p * 4.0 * va0)
+        omgcya = e_charge * B0_e * R0_e / (m_p * 2.0 * va0)
         omgcy = e_charge * B0_e * R0_e / (m_p * 2.0 * va0)
         for n in n_values:
 
@@ -218,12 +220,6 @@ class far3d(Component):
         # Step 2: Launch FAR3d across all run directories and wait for completion
         self.run_far3d_with_dask(run_dirs, str(far3d_exe), dask_nodes)
 
-        # -- update plasma state files
-        self.services.update_state()
-
-        # -- archive output files
-        self.services.stage_output_files(timeid, self.OUTPUT_FILES, save_plasma_state=False)
-
     def run_far3d_with_dask(self, run_dirs, far3d_exe, dask_nodes):
         """Enqueue one FAR3d task per run directory, submit via Dask, and wait."""
         if dask_nodes is None or dask_nodes < 1:
@@ -272,9 +268,6 @@ class far3d(Component):
 
         print("All runs completed.")
 
-    def finalize(self, timeid=0):
-        print('far3d.finalize() called')
-        
         collect_path = (Path(self.BIN_PATH) / 'collect.py').resolve()
         ret = subprocess.run(
             ['python3', str(collect_path)],
@@ -300,11 +293,20 @@ class far3d(Component):
         #Adding the variables to instate file
         cur_instate_file = self.services.get_config_param('CURRENT_INSTATE')
         instate=Namelist(cur_instate_file)
+        instate['EP']['n']=n
         instate['EP']['growth_rate']=growth_rate
         instate['EP']['frequency']=frequency
 #        instate['EP']['std_growth']=std_growth
 #        instate['EP']['std_om']=std_om
         #writing back to the instate file
         instate.write(cur_instate_file)
-        print("finalize:wrote growth_rate and frequency to instate")
 
+        # -- update plasma state files
+        self.services.update_state()
+
+        # -- archive output files
+        self.services.stage_output_files(timeid, self.OUTPUT_FILES, save_plasma_state=False)
+    def finalize(self, timeid=0):
+        print('far3d.finalize() called')
+
+        print("finalize:wrote growth_rate and frequency to instate")

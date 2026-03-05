@@ -1,0 +1,2 @@
+{"eventType": "IPS_LAUNCH_DASK_TASK", "event_time": 1770928726.4745264, "comment": "task_name = far3d_task_03, Target = /global/common/software/atom/perlmutter/binaries/far3d/linear/xfar3d_n "}
+{"eventType": "IPS_TASK_END", "event_time": 1770928755.3730712, "comment": "task_name = far3d_task_03, elapsed time = 28.96s", "start_time": 1770928726.40809, "elapsed_time": 28.964981079101562, "target": "/global/common/software/atom/perlmutter/binaries/far3d/linear/xfar3d_n", "operation": ""}

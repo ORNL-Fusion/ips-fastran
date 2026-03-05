@@ -1,0 +1,14 @@
+  update_state: arguments OK.
+    -input:  /pscratch/sd/y/yashu_gh/FREDA_KSTAR_2/ips-fastran/examples/far3d/example1/SCAN/work/plasma_state/s000001.00001
+    -output: /pscratch/sd/y/yashu_gh/FREDA_KSTAR_2/ips-fastran/examples/far3d/example1/SCAN/work/plasma_state/s000001.00001
+    -updates on command line:            1  files.
+    -stdin (T/F):  F
+  
+  ps_init_tag: Plasma State v2.055 f90 module initialization.
+  ps_get_plasma_state OK: /pscratch/sd/y/yashu_gh/FREDA_KSTAR_2/ips-fastran/examples/far3d/example1/SCAN/work/plasma_state/s000001.00001
+  %ps_update_file_read: warning: version_id mismatch:
+   Version_ID of current software: "2.055".
+   Version_ID found in file:       "2.035".
+   (...recovery attempt in progress...)
+  *ps_update_file_read: OK, found data for          15  state elements.
+  update applied: /pscratch/sd/y/yashu_gh/FREDA_KSTAR_2/ips-fastran/examples/far3d/example1/SCAN/work/fastran_nb_nubeam_7/state_changes.cdf

@@ -1,0 +1,83 @@
+
+Note: the module "darshan" cannot be unloaded because it was not loaded.
+
+
+Lmod is automatically replacing "PrgEnv-nvidia/8.5.0" with
+"PrgEnv-intel/8.5.0".
+
+
+Lmod is automatically replacing "nvidia/24.5" with "intel/2023.1.0".
+
+
+Due to MODULEPATH changes, the following have been reloaded:
+  1) cray-hdf5/1.12.2.3
+
+The following have been reloaded with a version change:
+  1) cray-libsci/24.07.0 => cray-libsci/23.09.1.1
+  2) cray-mpich/8.1.30 => cray-mpich/8.1.27
+
+Lmod has detected the following error: The following module(s) are unknown:
+"dfftpack"
+
+Please check the spelling or version number. Also try "module spider ..."
+It is also possible your cache file is out-of-date; it may help to try:
+  $ module --ignore_cache load "dfftpack"
+
+Also make sure that all modulefiles written in TCL start with the string
+#%Module
+
+
+
+
+Lmod is automatically replacing "intel/2023.1.0" with "nvidia/24.5".
+
+
+Lmod is automatically replacing "PrgEnv-intel/8.5.0" with
+"PrgEnv-nvidia/8.5.0".
+
+
+Due to MODULEPATH changes, the following have been reloaded:
+  1) cray-hdf5/1.12.2.3
+
+The following have been reloaded with a version change:
+  1) cray-libsci/23.09.1.1 => cray-libsci/24.07.0
+  2) cray-mpich/8.1.27 => cray-mpich/8.1.30
+  3) cray-netcdf/4.9.0.7 => cray-netcdf/4.9.0.9
+
+NCAPTC: : NetCDF: Variable not found
+Warning: ieee_overflow is signaling
+Warning: ieee_underflow is signaling
+Warning: ieee_inexact is signaling
+FORTRAN STOP
+/global/common/software/atom/perlmutter/cesol/conda/v0.16.2/lib/python3.8/site-packages/distributed/cli/dask_scheduler.py:140: FutureWarning: dask-scheduler is deprecated and will be removed in a future release; use `dask scheduler` instead
+  warnings.warn(
+2026-02-12 12:38:44,557 - distributed.scheduler - INFO - -----------------------------------------------
+2026-02-12 12:38:44,609 - distributed.http.proxy - INFO - To route to workers diagnostics web server please install jupyter-server-proxy: python -m pip install jupyter-server-proxy
+2026-02-12 12:38:44,615 - distributed.scheduler - INFO - State start
+2026-02-12 12:38:44,622 - distributed.scheduler - INFO - -----------------------------------------------
+2026-02-12 12:38:44,623 - distributed.scheduler - INFO -   Scheduler at: tcp://128.55.71.137:36991
+2026-02-12 12:38:44,624 - distributed.scheduler - INFO -   dashboard at:  http://128.55.71.137:8787/status
+2026-02-12 12:38:44,647 - distributed.scheduler - INFO - Receive client connection: Client-d28a7cc0-0852-11f1-9536-0040a6870992
+2026-02-12 12:38:45,087 - distributed.core - INFO - Starting established connection to tcp://128.55.71.137:58786
+2026-02-12 12:38:46,332 - distributed.scheduler - INFO - Register worker <WorkerState 'tcp://128.55.71.137:37255', status: init, memory: 0, processing: 0>
+2026-02-12 12:38:46,333 - distributed.scheduler - INFO - Starting worker compute stream, tcp://128.55.71.137:37255
+2026-02-12 12:38:46,333 - distributed.core - INFO - Starting established connection to tcp://128.55.71.137:58802
+2026-02-12 12:39:45,266 - distributed.scheduler - INFO - Scheduler closing...
+2026-02-12 12:39:45,267 - distributed.scheduler - INFO - Scheduler closing all comms
+2026-02-12 12:39:45,268 - distributed.core - INFO - Connection to tcp://128.55.71.137:58802 has been closed.
+2026-02-12 12:39:45,268 - distributed.scheduler - INFO - Remove worker <WorkerState 'tcp://128.55.71.137:37255', status: running, memory: 19, processing: 0>
+2026-02-12 12:39:45,268 - distributed.core - INFO - Removing comms to tcp://128.55.71.137:37255
+2026-02-12 12:39:45,269 - distributed.scheduler - INFO - Lost all workers
+2026-02-12 12:39:45,270 - distributed.batched - INFO - Batched Comm Closed <TCP (closed) Scheduler->Client local=tcp://128.55.71.137:36991 remote=tcp://128.55.71.137:58786>
+Traceback (most recent call last):
+  File "/global/common/software/atom/perlmutter/cesol/conda/v0.16.2/lib/python3.8/site-packages/distributed/batched.py", line 115, in _background_send
+    nbytes = yield coro
+  File "/global/common/software/atom/perlmutter/cesol/conda/v0.16.2/lib/python3.8/site-packages/tornado/gen.py", line 766, in run
+    value = future.result()
+  File "/global/common/software/atom/perlmutter/cesol/conda/v0.16.2/lib/python3.8/site-packages/distributed/comm/tcp.py", line 269, in write
+    raise CommClosedError()
+distributed.comm.core.CommClosedError
+2026-02-12 12:39:45,280 - distributed.scheduler - INFO - Stopped scheduler at 'tcp://128.55.71.137:36991'
+2026-02-12 12:39:45,280 - distributed.scheduler - INFO - End scheduler
+/global/common/software/atom/perlmutter/cesol/conda/v0.16.2/lib/python3.8/site-packages/scipy/optimize/_minpack_py.py:476: RuntimeWarning: Number of calls to function has reached maxfev = 3600.
+  warnings.warn(errors[info][0], RuntimeWarning)

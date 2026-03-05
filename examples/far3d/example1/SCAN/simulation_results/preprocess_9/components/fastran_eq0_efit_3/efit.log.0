@@ -1,0 +1,58 @@
+NCAPTC: : NetCDF: Variable not found
+Warning: ieee_overflow is signaling
+Warning: ieee_underflow is signaling
+Warning: ieee_inexact is signaling
+FORTRAN STOP
+ solver
+ /global/common/software/atom/perlmutter/data/greentable/
+ /global/common/software/atom/perlmutter/data/greentable/
+
+          EFITD Version  07/09/2014
+
+
+ type mode (2=file, 3=snap, 4=time, 5=input, 6=com file, 7=snap_ext):
+
+ number of time slices?
+
+ type input file names:
+ #
+ table_dir = </global/common/software/atom/perlmutter/data/greentable/>
+
+  ----- time =     1 ms ----- ( 0)
+ it=  1 chi2=0.00E+00 zm=-5.21E-05 err=5.431E+00 dz=-5.212E-05 chigam= 0.00E+00
+ it=  2 chi2=0.00E+00 zm=-1.05E-04 err=8.040E-01 dz=-5.311E-05 chigam= 0.00E+00
+ it=  3 chi2=0.00E+00 zm=-1.41E-04 err=4.225E-01 dz=-3.552E-05 chigam= 0.00E+00
+ it=  4 chi2=0.00E+00 zm=-1.66E-04 err=2.243E-01 dz=-2.507E-05 chigam= 0.00E+00
+ it=  5 chi2=0.00E+00 zm=-1.85E-04 err=1.211E-01 dz=-1.926E-05 chigam= 0.00E+00
+ it=  6 chi2=0.00E+00 zm=-1.97E-04 err=6.556E-02 dz=-1.217E-05 chigam= 0.00E+00
+ it=  7 chi2=0.00E+00 zm=-2.06E-04 err=3.658E-02 dz=-8.569E-06 chigam= 0.00E+00
+ it=  8 chi2=0.00E+00 zm=-2.12E-04 err=2.068E-02 dz=-6.008E-06 chigam= 0.00E+00
+ it=  9 chi2=0.00E+00 zm=-2.16E-04 err=1.184E-02 dz=-4.184E-06 chigam= 0.00E+00
+ it= 10 chi2=0.00E+00 zm=-2.19E-04 err=6.864E-03 dz=-2.895E-06 chigam= 0.00E+00
+ it= 11 chi2=0.00E+00 zm=-2.21E-04 err=4.030E-03 dz=-1.987E-06 chigam= 0.00E+00
+ it= 12 chi2=0.00E+00 zm=-2.22E-04 err=2.395E-03 dz=-1.353E-06 chigam= 0.00E+00
+ it= 13 chi2=0.00E+00 zm=-2.23E-04 err=1.454E-03 dz=-9.164E-07 chigam= 0.00E+00
+ it= 14 chi2=0.00E+00 zm=-2.24E-04 err=1.012E-03 dz=-6.151E-07 chigam= 0.00E+00
+ it= 15 chi2=0.00E+00 zm=-2.24E-04 err=6.963E-04 dz=-4.115E-07 chigam= 0.00E+00
+ it= 16 chi2=0.00E+00 zm=-2.24E-04 err=4.750E-04 dz=-2.723E-07 chigam= 0.00E+00
+ it= 17 chi2=0.00E+00 zm=-2.25E-04 err=3.219E-04 dz=-1.801E-07 chigam= 0.00E+00
+ it= 18 chi2=0.00E+00 zm=-2.25E-04 err=2.169E-04 dz=-1.179E-07 chigam= 0.00E+00
+ it= 19 chi2=0.00E+00 zm=-2.25E-04 err=1.456E-04 dz=-7.627E-08 chigam= 0.00E+00
+ it= 20 chi2=0.00E+00 zm=-2.25E-04 err=9.733E-05 dz=-4.975E-08 chigam= 0.00E+00
+
+      ******************** EFITD129 x 129  output ********************
+
+       data used:   
+  0 flux loops
+  0 magnetic probes(i)
+  0 full rogowski
+  0 diamagnetic loop
+
+
+ shot #   =          1 time(ms) =          1 chi**2   =  0.000E+00
+ betat(%) =      1.676 betap    =      1.541 li       =      1.070
+ vol(cm3) =  0.967E+07 rout(cm) =    170.190 zout(cm) =     -0.189
+ elong    =      1.648 utriang  =      0.774 ltriang  =      0.772
+ a(cm)    =     44.283 lin(cm)  = ********** lout(cm) =      4.647
+ ltop(cm) = ********** q*       =      5.971 rc(cm)   =    173.005
+ zc(cm)   =     -0.059 bt0(t)   =      2.000 qout     =     10.676

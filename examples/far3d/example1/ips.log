@@ -1,0 +1,6 @@
+2026-02-12 12:34:18,941 FRAMEWORK       WARNING  RM: listOfNodes = [('nid004386', 128)]
+2026-02-12 12:34:18,942 FRAMEWORK       WARNING  RM: max_ppn = 128 
+2026-02-12 12:34:18,943 FRAMEWORK       WARNING  Using user set procs per node: 128
+2026-02-12 12:34:18,943 FRAMEWORK       WARNING  RM: 1 nodes and 128 processors per node
+2026-02-12 12:34:19,014 FWK_COMP_PortalBridge_12 WARNING  Missing USER_W3_DIR configuration - disabling web-visible logging
+2026-02-12 12:39:47,987 FRAMEWORK       ERROR    received a failure message from component fastran_000001@fastran_driver@2 : (Exception('component call'),)

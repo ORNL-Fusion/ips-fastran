@@ -1,0 +1,60 @@
+# host: perlmutter
+# total nodes: 1
+# processors per node: 128
+using accurate nodes: True
+# time (in seconds since the | available | allocated | percent allocated | processes | percent used | notes 
+#   resource manager started |           |           |                   |           |              |
+#-----------------------------------------------------------------------------------------------------------
+                     6.14079 |       128 |         0 |              0.00 |         0 |        0.00  #  initial state of resources
+                     9.69268 |         0 |       128 |            100.00 |         1 |        0.78  #  allocation for task 1 using whole nodes
+                    10.93566 |       128 |         0 |              0.00 |         0 |        0.00  #  released nodes for task 1
+                    28.44001 |         0 |       128 |            100.00 |         1 |        0.78  #  allocation for task 2 using whole nodes
+                    28.95184 |       128 |         0 |              0.00 |         0 |        0.00  #  released nodes for task 2
+                    31.87704 |         0 |       128 |            100.00 |         1 |        0.78  #  allocation for task 3 using whole nodes
+                    32.23417 |       128 |         0 |              0.00 |         0 |        0.00  #  released nodes for task 3
+                    35.63102 |         0 |       128 |            100.00 |         1 |        0.78  #  allocation for task 4 using whole nodes
+                    36.07580 |       128 |         0 |              0.00 |         0 |        0.00  #  released nodes for task 4
+                    39.04473 |         0 |       128 |            100.00 |         1 |        0.78  #  allocation for task 5 using whole nodes
+                    39.37767 |       128 |         0 |              0.00 |         0 |        0.00  #  released nodes for task 5
+                    42.32858 |         0 |       128 |            100.00 |         1 |        0.78  #  allocation for task 6 using whole nodes
+                    42.66294 |       128 |         0 |              0.00 |         0 |        0.00  #  released nodes for task 6
+                    45.60842 |         0 |       128 |            100.00 |         1 |        0.78  #  allocation for task 7 using whole nodes
+                    45.96519 |       128 |         0 |              0.00 |         0 |        0.00  #  released nodes for task 7
+                    48.91218 |         0 |       128 |            100.00 |         1 |        0.78  #  allocation for task 8 using whole nodes
+                    49.25170 |       128 |         0 |              0.00 |         0 |        0.00  #  released nodes for task 8
+                    52.22650 |         0 |       128 |            100.00 |         1 |        0.78  #  allocation for task 9 using whole nodes
+                    52.56708 |       128 |         0 |              0.00 |         0 |        0.00  #  released nodes for task 9
+                    55.53193 |         0 |       128 |            100.00 |         1 |        0.78  #  allocation for task 10 using whole nodes
+                    55.87021 |       128 |         0 |              0.00 |         0 |        0.00  #  released nodes for task 10
+                    58.84068 |         0 |       128 |            100.00 |         1 |        0.78  #  allocation for task 11 using whole nodes
+                    59.17228 |       128 |         0 |              0.00 |         0 |        0.00  #  released nodes for task 11
+                    60.03254 |         0 |       128 |            100.00 |         1 |        0.78  #  allocation for task 12 using whole nodes
+                    60.72884 |       128 |         0 |              0.00 |         0 |        0.00  #  released nodes for task 12
+                    60.76006 |         0 |       128 |            100.00 |         1 |        0.78  #  allocation for task 13 using whole nodes
+                    61.37794 |       128 |         0 |              0.00 |         0 |        0.00  #  released nodes for task 13
+                    61.78423 |         0 |       128 |            100.00 |        24 |       18.75  #  allocation for task 14 using whole nodes
+                    83.71298 |       128 |         0 |              0.00 |         0 |        0.00  #  released nodes for task 14
+                    83.72439 |         0 |       128 |            100.00 |        24 |       18.75  #  allocation for task 15 using whole nodes
+                    87.21747 |       128 |         0 |              0.00 |         0 |        0.00  #  released nodes for task 15
+                    87.23108 |         0 |       128 |            100.00 |        24 |       18.75  #  allocation for task 16 using whole nodes
+                    90.80192 |       128 |         0 |              0.00 |         0 |        0.00  #  released nodes for task 16
+                    90.81558 |         0 |       128 |            100.00 |        24 |       18.75  #  allocation for task 17 using whole nodes
+                    94.47637 |       128 |         0 |              0.00 |         0 |        0.00  #  released nodes for task 17
+                    94.48981 |         0 |       128 |            100.00 |        24 |       18.75  #  allocation for task 18 using whole nodes
+                    98.00253 |       128 |         0 |              0.00 |         0 |        0.00  #  released nodes for task 18
+                    98.01622 |         0 |       128 |            100.00 |        24 |       18.75  #  allocation for task 19 using whole nodes
+                   101.61985 |       128 |         0 |              0.00 |         0 |        0.00  #  released nodes for task 19
+                   101.63350 |         0 |       128 |            100.00 |        24 |       18.75  #  allocation for task 20 using whole nodes
+                   105.23719 |       128 |         0 |              0.00 |         0 |        0.00  #  released nodes for task 20
+                   105.25053 |         0 |       128 |            100.00 |        24 |       18.75  #  allocation for task 21 using whole nodes
+                   108.76510 |       128 |         0 |              0.00 |         0 |        0.00  #  released nodes for task 21
+                   108.77838 |         0 |       128 |            100.00 |        24 |       18.75  #  allocation for task 22 using whole nodes
+                   112.30284 |       128 |         0 |              0.00 |         0 |        0.00  #  released nodes for task 22
+                   112.31607 |         0 |       128 |            100.00 |        24 |       18.75  #  allocation for task 23 using whole nodes
+                   115.89677 |       128 |         0 |              0.00 |         0 |        0.00  #  released nodes for task 23
+                   115.91028 |         0 |       128 |            100.00 |        24 |       18.75  #  allocation for task 24 using whole nodes
+                   119.48317 |       128 |         0 |              0.00 |         0 |        0.00  #  released nodes for task 24
+                   138.27046 |         0 |       128 |            100.00 |         1 |        0.78  #  allocation for task 25 using whole nodes
+                   138.63274 |       128 |         0 |              0.00 |         0 |        0.00  #  released nodes for task 25
+                   270.90200 |         0 |       128 |            100.00 |         1 |        0.78  #  allocation for task 26 using whole nodes
+                   334.74152 |       128 |         0 |              0.00 |         0 |        0.00  #  released nodes for task 26
