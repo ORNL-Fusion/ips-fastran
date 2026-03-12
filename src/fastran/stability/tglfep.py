@@ -69,14 +69,41 @@ class tglfep(Component):
         for ir in range(nr):
             cg_list[ir] = cg_str[ir+1]
 
-        with open('alpha_flow.out', 'r') as f:
-            flow_str = f.readlines()
-            f.close
+        with open('density_alpha.input', 'r') as f:
+            den_str = f.readlines()
+            f.close()
 
-        nr = len(flow_str) - 1
-        flow_list = [0.] * nr
+        nr = len(den_str) - 1
+        den_list = [0.] * nr
         for ir in range(nr):
-            flow_list[ir] = flow_str[ir+1]
+            den_list[ir] = den_str[ir+1]
+
+        with open('pe_fus.out', 'r') as f:
+            pe_str = f.readlines()
+            f.close()
+
+        nr = len(pe_str) - 1
+        pe_list = [0.] * nr
+        for ir in range(nr):
+            pe_list[ir] = pe_str[ir+1]
+
+        with open('pi_fus.out', 'r') as f:
+            pi_str = f.readlines()
+            f.close()
+
+        nr = len(pi_str) - 1
+        pi_list = [0.] * nr
+        for ir in range(nr):
+            pi_list[ir] = pi_str[ir+1]
+
+#        with open('alpha_flow.out', 'r') as f:
+#            flow_str = f.readlines()
+#            f.close
+#
+#        nr = len(flow_str) - 1
+#        flow_list = [0.] * nr
+#        for ir in range(nr):
+#            flow_list[ir] = flow_str[ir+1]
 
         # update state file
 
@@ -85,8 +112,11 @@ class tglfep(Component):
         instate = Namelist(cur_instate_file)
         instate['EP']['alpha_critical_gradient'] = cg_list
         instate['EP']['critical_gradient_units'] = '10 kPa/m'
-        instate['EP']['alpha_flow'] = flow_list
-        instate['EP']['alpha_flow_units'] = '10^19/s'
+#        instate['EP']['alpha_flow'] = flow_list
+#        instate['EP']['alpha_flow_units'] = '10^19/s'
+        instate['pe_fus'] = pe_list
+        instate['pi_fus'] = pi_list
+        instate['density_alpha'] = den_list
 
         instate.write(cur_instate_file)
 
