@@ -10,28 +10,45 @@ from fastran.state.instate import Instate
 
 
 class far3d_io_profile():
-    def __init__(self):
-        self.key_map = {
-            'rho'    : [0, 'Rho', '(norml_sqrt_toroid_flux)'],
-            'q'      : [1, 'q', ''],
-            'nbeam'  : [2, 'BeamIonDensity', '(10^14cm^-3)'],
-            'nion'   : [3, 'IonDensity', '(10^14cm^-3)'],
-            'ne'     : [4, 'ElecDensity', '(10^14cm^-3)'],
-            'nalpha' : [5, 'AlphaDensity', '(10^14cm^-3)'],
-            'nz'     : [6, 'ImpurityDensity', '(10^14cm^-3)'],
-            'tbeam'  : [7, 'BeamIonEffectiveTemp', '(keV)'],
-            'ti'     : [8, 'IonTemp', '(keV)'],
-            'te'     : [9, 'ElectronTemp', '(keV)'],
-            'talpha' : [10, 'Effective_Alpha_Temp', '(keV)'],
-            'pbeam'  : [11, 'BeamPressure', '(kPa)'],
-            'pth'    : [12, 'ThermalPressure', '(kPa)'],
-            'pmhd'   : [13, 'EquilPressure', '(kPa)'],
-            'omega'  : [14, 'TorRot', '(kHz)'],
-            'vpol'   : [15, 'PolRot', '(10^5m/s)']
-            }
+    def __init__(self,alpha_EP):
+        if alpha_EP==1: 
+            self.key_map = {
+                'rho'    : [0, 'Rho', '(norml_sqrt_toroid_flux)'],
+                'q'      : [1, 'q', ''],
+                'nbeam'  : [2, 'BeamIonDensity', '(10^14cm^-3)'],
+                'nion'   : [3, 'IonDensity', '(10^14cm^-3)'],
+                'ne'     : [4, 'ElecDensity', '(10^14cm^-3)'],
+                'nalpha' : [5, 'AlphaDensity', '(10^14cm^-3)'],
+                'nz'     : [6, 'ImpurityDensity', '(10^14cm^-3)'],
+                'tbeam'  : [7, 'BeamIonEffectiveTemp', '(keV)'],
+                'ti'     : [8, 'IonTemp', '(keV)'],
+                'te'     : [9, 'ElectronTemp', '(keV)'],
+                'talpha' : [10, 'Effective_Alpha_Temp', '(keV)'],
+                'pbeam'  : [11, 'BeamPressure', '(kPa)'],
+                'pth'    : [12, 'ThermalPressure', '(kPa)'],
+                'pmhd'   : [13, 'EquilPressure', '(kPa)'],
+                'omega'  : [14, 'TorRot', '(kHz)'],
+                'vpol'   : [15, 'PolRot', '(10^5m/s)']
+                }
+        else: 
+            self.key_map = {
+                'rho'    : [0, 'Rho', '(norml_sqrt_toroid_flux)'],
+                'q'      : [1, 'q', ''],
+                'nbeam'  : [2, 'BeamIonDensity', '(10^14cm^-3)'],
+                'nion'   : [3, 'IonDensity', '(10^14cm^-3)'],
+                'ne'     : [4, 'ElecDensity', '(10^14cm^-3)'],
+                'nz'     : [5, 'ImpurityDensity', '(10^14cm^-3)'],
+                'tbeam'  : [6, 'BeamIonEffectiveTemp', '(keV)'],
+                'ti'     : [7, 'IonTemp', '(keV)'],
+                'te'     : [8, 'ElectronTemp', '(keV)'],
+                'pbeam'  : [9, 'BeamPressure', '(kPa)'],
+                'pth'    : [10, 'ThermalPressure', '(kPa)'],
+                'pmhd'   : [11, 'EquilPressure', '(kPa)'],
+                'omega'  : [12, 'TorRot', '(kHz)'],
+                'vpol'   : [13, 'PolRot', '(10^5m/s)']
+                }
         self.data = {}  
         pass
-
     def __getitem__(self, key):
         return self.data[key]
 

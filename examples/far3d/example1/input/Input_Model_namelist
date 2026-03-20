@@ -8,7 +8,7 @@ numvac = "41503"           ! numvac: run number index
 nonlin = 0                 ! nonlin: linear run if 0, non linear run if 1 (no available yet)
 ngeneq = 1                 ! ngeneq: equilibrium input (only VMEC available now)
 eq_name = "woutb"    ! eq_name: equilibrium name 
-maxstp=1000                ! maxstp: simulation time steps
+maxstp=3000                ! maxstp: simulation time steps
 dt0 = 2.                   ! dt0: simulation time step
 <LDIM>                  ! ldim: total number of poloidal modes (equilibrium + dynamic)
 <LEQDIM>               ! leqdim: equilibrium poloidal modes
@@ -23,7 +23,7 @@ iflr_on = 0                ! iflr_on: activate thermal ion FLR damping effects i
 epflr_on = 0               ! epflr_on: activate fast particle FLR damping effects if 1
 ieldamp_on = 0             ! ieldamp_on: activate electron-ion Landau damping effect if 1
 twofl_on = 0               ! twofl_on: activate two fluid effects if 1
-alpha_on = 1               ! alpha_on: activate a 2nd fast particle species if 1
+alpha_on = 0               ! alpha_on: activate a 2nd fast particle species if 1
 Trapped_on = 0             ! Trapped_on: activate correction for trapped 1st fast particle species if 1
 matrix_out = .false.	   ! matrix_out: activate eigensolver output
 m0dy = 0                   ! m0dy: equilibrium modes as dynamic

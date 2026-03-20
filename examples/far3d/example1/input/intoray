@@ -1,37 +1,28 @@
-&intoray
-   ntoray = 1 
-   idamp  = 8
-   nray   = 30
-   nbfld  = 3
-   freq   = 2.3e11
-   wrfo   = 1.0 
-   x      = 500.0
-   z      = 300.0
-   hlw    = 2.55 
-   ratw   = 1.0
-   rfpow  = 30.0e6
-   thet   = 140
-   phai   = 205
+! EC3 105GHz, EC5 105GHz
+
+&INTORAY
+  NTORAY = 2 
+  IDAMP = 8 8
+  NRAY = 30 32
+  NBFLD = 3 3
+  FREQ = 1.05e+11 1.05e+11 
+  WRFO = 0.0 0.0
+  X = 244.92 246.29
+  Z = -35.0 -35.0
+  HLW = 2.6 2.6
+  RATW = 1.0 1.0
+  RFPOW = 0.442e6 0.60e6
+  THET = 65.53 65.35
+  PHAI = 165.38 166.4
 /
 
-&adjust
-   width = 0.0 
-   j_multi = 1.2
+&ADJUST
+  WIDTH  = 0. 0.
+  WIDTH2 = 0. 0.
+  J_MULTI = -1.0 -0.5
 /
 
-&edata
-   powinc    = 1.0e+13
-   smax      = 1500.0
-   ds        = 1.0
-   pwrfmin   = 0.01
-   fdout     = 1
-   nharm     = 1
-   mray      = 1 5 12 12 18
-   gauszone  = 5
-   netcdfdat = .true.
-   cqldat    = .false.
-!  nlout(1)  = .false.
-!  nlout(2)  = .false.
-   igafit    = 1
-! modelc = 5
+&EDATA
+  IGAFIT = 1 
+  NETCDFDAT = .true. 
 /

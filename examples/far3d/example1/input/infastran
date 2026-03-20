@@ -55,17 +55,13 @@
   const_chi_v = 0.1 
   const_chi_n = 1.0e-4
 
-  dt_relax_j = 1000.0
-  dt_step_relax_j = 0.1
+  dt_relax_j = 10.0
+  dt_step_relax_j = 0.01
 
-  include_fusion = 1 
-  include_nhe = 1 
-  include_rad = 1
-  taup = 5.0 
-  model_density = 1
+  include_fusion = 0 
+  include_nhe = 0 
+  taup = 0.425 
+  model_density = 0
 
-  tglf_q_input = 0
-  tglf_pmhd_input = 1
-  model_ftrap = 1
 
 /
