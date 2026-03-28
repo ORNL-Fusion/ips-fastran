@@ -1,7 +1,0 @@
-.DS_Store
-*.swp
-/_build
-/doctrees
-
-__pycache__
-*.pyc
