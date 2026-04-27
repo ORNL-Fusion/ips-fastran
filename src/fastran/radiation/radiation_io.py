@@ -16,7 +16,7 @@ class radiation_io():
      
     tiny = np.finfo(np.float64).tiny
 
-    def log10_with_floor(self, x: xr.DataArray | np.ndarray | float) -> xr.DataArray | np.ndarray | float:
+    def log10_with_floor(self, x: np.ndarray | float) -> np.ndarray | float:
         """Return the log of x if x > 0, and otherwise return the log of the smallest representable float."""
         return np.log10(np.maximum(x, self.tiny))
     
@@ -32,8 +32,8 @@ class radiation_io():
         print(dim_ne[0], dim_ne[-1])
         print(dim_te[0], dim_te[-1])
         """Data is log scale so must take log off all quantities before interpolation"""
-        self.Lz = RectBivariateSpline(log10_with_floor(dim_te), log10_with_floor(dim_ne), log10_with_floor(data_Lz)) 
+        self.Lz = RectBivariateSpline(self.log10_with_floor(dim_te), self.log10_with_floor(dim_ne), self.log10_with_floor(data_Lz)) 
        
     def __call__(self, te, ne, nte_tau=0.5e17):
         '''Return 10 to the power of result'''
-        return np.power(10, self.Lz(log10_with_floor(te), log10_with_floor(ne), grid=False)) #must be temp in eV, density in m^-3
+        return np.power(10, self.Lz(self.log10_with_floor(te), self.log10_with_floor(ne), grid=False)) #must be temp in eV, density in m^-3
