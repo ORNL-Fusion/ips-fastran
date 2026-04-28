@@ -16,7 +16,7 @@ class radiation_io():
      
     tiny = np.finfo(np.float64).tiny
 
-    def log10_with_floor(self, x: np.ndarray | float) -> np.ndarray | float:
+    def log10_with_floor(self, x):
         """Return the log of x if x > 0, and otherwise return the log of the smallest representable float."""
         return np.log10(np.maximum(x, self.tiny))
     
