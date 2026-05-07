@@ -76,11 +76,12 @@ class impurity_radiation(Component):
         a_imp = instate['a_imp']
         z_imp = instate['z_imp']
         rho = instate['rho']
+        p_rad = np.zeros(len(rho))
         for k, z in enumerate(z_imp):
             ne = instate[f'ne'] * 1.e19
             nz = instate[f'density_imp_{k}'] * 1.e19
             te = instate['te'] * 1.e3
-            p_rad = self.Lz[z](te, ne) * ne * nz
+            p_rad += self.Lz[z](te, ne) * ne * nz
             print(k, p_rad)
         instate['p_rad'] = -p_rad * 1.e-6
         instate.write(cur_instate_file)
