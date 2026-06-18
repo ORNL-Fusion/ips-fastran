@@ -99,6 +99,8 @@ def write_inputfiles(f_state, f_eqdsk, nexp=201):
     psi = ps['psipol'][:]/ps['psipol'][-1]  # equi-drho grid
     rho = np.sqrt(ps['phit'][:]/ps['phit'][-1])
     rhob = (ps['phit'][-1]/np.pi/b0)**0.5
+    torflux = ps['phit'][-1]/(2*np.pi)
+
 
     rhopsi = zinterp(psi, rho)
     ipol = ps['g_eq'][:]/(r0*b0)
@@ -149,7 +151,7 @@ def write_inputfiles(f_state, f_eqdsk, nexp=201):
             f.write('[therm] ')  # For each impurity
         f.write('\n')
         f.write('# masse'+'\n')
-        f.write('5.4488739E-04'+'\n')
+        f.write(' 5.4488739E-04'+'\n')
         f.write('# mass'+'\n')
         for x in a_ion:
             f.write(f'{x:>14.7E}')   # Mmain ions
@@ -171,7 +173,7 @@ def write_inputfiles(f_state, f_eqdsk, nexp=201):
             f.write(f'{x:>14.7E}')
         f.write('\n')
         f.write('# torfluxa | Wb/radian'+'\n')
-        f.write(f'{rhob:>14.7E}'+'\n')
+        f.write(f'{torflux:>14.7E}'+'\n')
         f.write('# rcentr | m'+'\n')
         f.write(f'{r0:>14.7E}'+'\n')
         f.write('# bcentr | T'+'\n')
