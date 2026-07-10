@@ -46,10 +46,12 @@ class tglfep(Component):
         task_id = self.services.launch_task(self.NPROC, cwd, tglfep_bin, logfile='tglfep.log')
         retcode = self.services.wait_task(task_id)
         if (retcode != 0):
+            print(retcode)
             raise Exception('Error executing: tglfep')
         task_id = self.services.launch_task(self.NPROC, cwd, alpha_bin, logfile='alpha.log')
         retcode = self.services.wait_task(task_id)
         if (retcode != 0):
+            print(retcode)
             raise Exception('Error executing: Alpha')
 
         # -- get tglfep output
@@ -69,7 +71,7 @@ class tglfep(Component):
         for ir in range(nr):
             cg_list[ir] = cg_str[ir+1]
 
-        with open('density_alpha.input', 'r') as f:
+        with open('density_alpha.out', 'r') as f:
             den_str = f.readlines()
             f.close()
 
