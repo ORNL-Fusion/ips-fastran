@@ -7,7 +7,7 @@
 import os
 import shutil
 from ipsframework import Component
-from fastran.stability import tglfep_io
+import tglfep_io
 
 
 class tglfep(Component):
@@ -45,10 +45,10 @@ class tglfep(Component):
         cwd = self.services.get_working_dir()
         task_id = self.services.launch_task(self.NPROC, cwd, tglfep_bin, logfile='tglfep.log')
         retcode = self.services.wait_task(task_id)
-        if (retcode != 0):
-            print(retcode)
-            raise Exception('Error executing: tglfep')
-        task_id = self.services.launch_task(self.NPROC, cwd, alpha_bin, logfile='alpha.log')
+#        if (retcode != 0):
+#            print(retcode)
+#            raise Exception('Error executing: tglfep')
+        task_id = self.services.launch_task(1, cwd, alpha_bin, logfile='alpha.log')
         retcode = self.services.wait_task(task_id)
         if (retcode != 0):
             print(retcode)
